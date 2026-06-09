@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+server/node_modules
+functions/node_modules
+
+# builds
+dist
+build
+
+# environment / secrets
+.env
+.env.local
+.env.production
+server/.env
+functions/.env
+functions/functions.env
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# system
+.DS_Store
+Thumbs.db
+
+# firebase / service keys
+*firebase-adminsdk*.json
+service-account*.txt
+*.pem
+*.key
