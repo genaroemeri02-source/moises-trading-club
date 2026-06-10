@@ -441,29 +441,55 @@ async function paypalAccessToken() {
   return payload.access_token;
 }
 
-async function paypalRequest(path, options = {}) {
-  const token = await paypalAccessToken();
+async function verifyPayPalWebhook(req) {
+  const event = req.body || {};
 
-  const response = await fetch(`${PAYPAL_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation',
-      ...(options.headers || {}),
-    },
-  });
+  // El simulador de PayPal manda eventos mock. Para test local/sandbox,
+  // permitimos recibirlos aunque no haya Webhook ID todavía.
+  if (!PAYPAL_WEBHOOK_ID) {
+    console.warn('paypal_webhook_unverified_no_webhook_id');
+    return event;
+  }
 
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    console.error('paypal_api_error', path, response.status, payload);
-    const err = new Error(payload?.message || payload?.name || 'paypal_api_error');
-    err.status = response.status;
-    err.payload = payload;
+  const transmissionId = req.get('paypal-transmission-id');
+  const transmissionTime = req.get('paypal-transmission-time');
+  const certUrl = req.get('paypal-cert-url');
+  const authAlgo = req.get('paypal-auth-algo');
+  const transmissionSig = req.get('paypal-transmission-sig');
+
+  // Si faltan headers, probablemente viene del simulador o de una prueba manual.
+  // No rompemos el endpoint en sandbox.
+  if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
+    if (PAYPAL_ENV === 'sandbox') {
+      console.warn('paypal_webhook_unverified_missing_headers_sandbox');
+      return event;
+    }
+
+    const err = new Error('paypal_webhook_missing_headers');
+    err.status = 400;
     throw err;
   }
 
-  return payload;
+  const verification = await paypalRequest('/v1/notifications/verify-webhook-signature', {
+    method: 'POST',
+    body: JSON.stringify({
+      auth_algo: authAlgo,
+      cert_url: certUrl,
+      transmission_id: transmissionId,
+      transmission_sig: transmissionSig,
+      transmission_time: transmissionTime,
+      webhook_id: PAYPAL_WEBHOOK_ID,
+      webhook_event: event,
+    }),
+  });
+
+  if (verification.verification_status !== 'SUCCESS') {
+    const err = new Error('paypal_webhook_verification_failed');
+    err.status = 400;
+    throw err;
+  }
+
+  return event;
 }
 
 async function activateMembership({ uid, planId, billingCycle, paymentId, paypalOrderId, paypalCaptureId }) {
