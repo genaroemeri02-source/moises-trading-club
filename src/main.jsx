@@ -568,7 +568,7 @@ const WHATSAPP_MENTORIA=import.meta.env.VITE_WHATSAPP_MENTORIA || '5493412133662
 const API_BASE_URL=String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 const apiUrl=(path)=>`${API_BASE_URL}${path.startsWith('/')?path:`/${path}`}`;
 const PAYMENT_CONFIG={
-  enabled:String(import.meta.env.VITE_PAYMENTS_ENABLED || 'false')==='true',
+  enabled:String(import.meta.env.VITE_PAYMENTS_ENABLED || (API_BASE_URL ? 'true' : 'false'))==='true',
   provider:import.meta.env.VITE_PAYMENT_PROVIDER || 'paypal',
   checkoutEndpoint:import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
   paypalCreateOrderEndpoint:import.meta.env.VITE_PAYPAL_CREATE_ORDER_ENDPOINT || import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
@@ -578,8 +578,8 @@ const PAYMENT_CONFIG={
   membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
 };
 const ACCESS_PLANS=[
-  {id:'basic',name:'Esencial',headline:'Para iniciar con estructura',cta:'Activar Esencial',tone:'base',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist de Moisés antes de ejecutar','Biblioteca privada del club','Comunidad privada']},
-  {id:'premium',name:'Pro',headline:'Recomendado para traders activos',cta:'Desbloquear Pro',recommended:true,tone:'pro',features:['Todo lo del Esencial','Analytics avanzado de ejecución','Arena Moisés y ranking trimestral','Revisión de trades y comportamiento','Reportes para medir disciplina','Competencia trimestral']},
+  {id:'basic',name:'Club',headline:'Acceso base al ecosistema',cta:'Activar Club',tone:'base',features:['Dashboard operativo desbloqueado','Journal profesional','Checklist de Moisés','Biblioteca privada','Comunidad privada']},
+  {id:'premium',name:'Pro',headline:'Recomendado para traders activos',cta:'Activar Pro',recommended:true,tone:'pro',features:['Todo lo del plan Club','Analytics avanzado','Arena Moisés y ranking','Revisión de trades','Reportes de disciplina','Competencia trimestral']},
   {id:'mentorship',name:'Mentoría',headline:'Acompañamiento personalizado',cta:'Solicitar Mentoría',tone:'mentor',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
 ];
 function calculatePlanPrice(planId,cycleId='monthly'){
@@ -902,7 +902,7 @@ function Login({initialMode='login'}){
   </div></div>
 }
 
-function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['brokers','Sync Broker',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal]]],['SISTEMA',[['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['coach','Coach IA',Activity]]],['COMUNIDAD',[['academy','Academia',BookOpen],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Ecosystem</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
+function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['brokers','Sync MT5',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal]]],['SISTEMA',[['analytics','Analytics',BarChart3],['results','Resultados',Trophy]]],['COMUNIDAD',[['academy','Academia',BookOpen],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
   onClick={toggleTheme}
   className="icon"
   title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
@@ -914,9 +914,9 @@ function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPER
   }
 </button><div className="user"><div className="avatar">{profile.avatar||profile.name?.slice(0,2)||'MT'}</div><div><b>{profile.name}</b><span>{profile.role==='admin'?'mentor/admin':'trader'}</span></div><button onClick={()=>signOut(auth)} title="Salir"><LogOut size={16}/></button></div></aside>}
 
-function MobileNav({profile,tab,setTab,data}){const items=[['dashboard','Inicio',Home],['journal','Journal',LineChart],['brokers','Sync',Activity],['risk','Riesgo',SlidersHorizontal],['checklist','Checklist',CheckCircle2],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['ideas','Ideas',Lightbulb],['coach','Coach IA',Activity],['notifications','Avisos',Bell],['settings','Perfil',Settings]]; if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]); return <div className="mobileNav">{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}<button className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button></div>}
+function MobileNav({profile,tab,setTab,data}){const items=[['dashboard','Inicio',Home],['journal','Journal',LineChart],['brokers','Sync MT5',Activity],['risk','Riesgo',SlidersHorizontal],['checklist','Checklist',CheckCircle2],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['ideas','Ideas',Lightbulb],['notifications','Avisos',Bell],['settings','Perfil',Settings]]; if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]); return <div className="mobileNav">{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}<button className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button></div>}
 
-function Topbar({tab,profile,theme,toggleTheme}){const names={dashboard:'Dashboard principal',journal:'Journal de trading',brokers:'Sync Broker',risk:'Riesgo y lotaje',checklist:'Checklist de Moisés',system:'Sistema',reading:'Libros y lectura',news:'Noticias económicas',analytics:'Analytics',academy:'Academia privada',community:'Comunidad',announcements:'Anuncios del mentor',chat:'Chat privado',online:'Usuarios online',ideas:'Ideas de trading',coach:'Coach psicológico de trading',results:'Resultados',notifications:'Notificaciones',settings:'Perfil y configuración',admin:'Panel Admin'}; return <header className="top premiumTop"><div><h1>{names[tab]||'Moisés Trading Club'}</h1><p>{profile.name} · {profile.role}</p></div><div className="topActions"><button className="topCta ghost" onClick={()=>window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}))}><CheckCircle2 size={15}/> Checklist</button><button
+function Topbar({tab,profile,theme,toggleTheme}){const names={dashboard:'Dashboard principal',journal:'Journal de trading',brokers:'Sync MT5',risk:'Riesgo y lotaje',checklist:'Checklist de Moisés',system:'Sistema',reading:'Libros y lectura',news:'Noticias económicas',analytics:'Analytics',academy:'Academia privada',community:'Comunidad',announcements:'Anuncios del mentor',chat:'Chat privado',online:'Usuarios online',ideas:'Ideas de trading',results:'Resultados',notifications:'Notificaciones',settings:'Perfil y configuración',admin:'Panel Admin'}; return <header className="top premiumTop"><div><h1>{names[tab]||'Moisés Trading Club'}</h1><p>{profile.name} · {profile.role}</p></div><div className="topActions"><button className="topCta ghost" onClick={()=>window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}))}><CheckCircle2 size={15}/> Checklist</button><button
   className="icon"
   onClick={toggleTheme}
   title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
@@ -1573,80 +1573,36 @@ function BrokerStatusPill({status}) {
   return <span className={`brokerStatus brokerStatus${label}`}>{label}</span>;
 }
 function BrokerSync({data,profile}){
-  const [form,setForm]=useState({platform:'mt5',brokerName:'',serverName:'',login:'',investorPassword:'',accountName:'',syncFromDate:new Date(Date.now()-90*86400000).toISOString().slice(0,10),autoSync:true});
-  const [busy,setBusy]=useState('');
-  const connections=data.brokerConnections||[];
+  const [notify,setNotify]=useState(()=>localStorage.getItem('mtc-mt5-notify')==='1');
   const importedTrades=(data.trades||[]).filter(t=>t.brokerSource==='metaapi');
-  const ch=(k,v)=>setForm(f=>({...f,[k]:v}));
-  async function connect(){
-    try{
-      setBusy('connect');
-      const payload={...form,brokerName:form.brokerName.trim(),serverName:form.serverName.trim(),login:String(form.login).trim(),investorPassword:String(form.investorPassword).trim(),accountName:form.accountName.trim()||`${form.brokerName} ${String(form.login).slice(-4)}`};
-      if(!payload.brokerName||!payload.serverName||!payload.login||!payload.investorPassword) return toast('Completá broker, servidor, login e investor password.','error');
-      const r=await connectMetaTrader(payload);
-      toast(r.status==='connected'?'MetaTrader conectado':'Conexión creada. MetaAPI puede tardar unos minutos en sincronizar.','success');
-      setForm(f=>({...f,investorPassword:''}));
-    }catch(e){toast(e.message||'No se pudo conectar MetaTrader.','error')}
-    finally{setBusy('')}
-  }
-  async function sync(c){
-    try{setBusy(`sync-${c.id}`); const r=await syncMetaTrader(c.id); toast(`Sync finalizada: ${r.imported||0} importados · ${r.skipped||0} duplicados`,'success');}
-    catch(e){toast(e.message||'No se pudo sincronizar.','error')}
-    finally{setBusy('')}
-  }
-  async function status(c){
-    try{setBusy(`status-${c.id}`); const r=await checkMetaTraderStatus(c.id); toast(r.message||`Estado: ${r.status}`);}
-    catch(e){toast(e.message||'No se pudo revisar estado.','error')}
-    finally{setBusy('')}
-  }
-  async function disconnect(c){
-    if(!confirm('¿Desconectar esta cuenta MetaTrader? El journal importado no se borra.')) return;
-    try{setBusy(`disconnect-${c.id}`); await disconnectMetaTrader(c.id); toast('Conexión desactivada.','success');}
-    catch(e){toast(e.message||'No se pudo desconectar.','error')}
-    finally{setBusy('')}
-  }
-  return <main className="page brokerSyncPage">
-    <section className="brokerHero">
+  function activateReminder(){localStorage.setItem('mtc-mt5-notify','1'); setNotify(true); toast('Listo. Te avisaremos cuando el Sync MT5 esté disponible.','success')}
+  return <main className="page brokerSyncPage comingSoonBrokerPage">
+    <section className="brokerHero cleanBrokerHero">
       <div>
-        <span className="brokerBadge"><Activity size={15}/> MetaTrader Auto Sync</span>
-        <h2>Conectá MT4 / MT5 al Journal</h2>
-        <p>Importá operaciones históricas y nuevas desde MetaTrader hacia MTC. El dato objetivo entra automático; vos completás setup, emoción, checklist y lección.</p>
-        <div className="brokerHeroStats"><span>{connections.length} conexiones</span><span>{importedTrades.length} trades importados</span><span>Sync cada 60 min</span></div>
+        <span className="brokerBadge"><Activity size={15}/> Próxima versión</span>
+        <h2>Sync MT4 / MT5</h2>
+        <p>La importación automática de operaciones está en pausa para esta primera versión comercial. El Journal manual, Checklist, Analytics, Comunidad y Membresías ya quedan como núcleo activo del producto.</p>
+        <div className="brokerHeroStats"><span>Journal manual activo</span><span>PayPal listo para activar</span><span>Sync MT5 próximamente</span></div>
       </div>
-      <div className="brokerHeroPanel"><b>Read-only first</b><small>Usá investor password. No ingreses la contraseña master de trading.</small></div>
+      <div className="brokerHeroPanel"><b>Muy pronto</b><small>La conexión automática se habilitará cuando esté lista para uso comercial sin fricción de terceros.</small></div>
     </section>
+
     <div className="brokerGrid">
-      <Card title="Conectar MetaTrader 4 / MT5" sub="Compatible con cuentas prop firm, forex, índices y XAUUSD en brokers MT4/MT5 soportados por MetaAPI.">
-        <div className="brokerSecurityNote"><Shield size={18}/><div><b>Seguridad</b><p>Usá siempre tu investor password/read-only password. Las credenciales se envían solo al backend y se cifran con AES-256-GCM antes de guardarse.</p></div></div>
-        <div className="formGrid labeled brokerForm">
-          <Field label="Plataforma"><select className="input brokerInput" value={form.platform} onChange={e=>ch('platform',e.target.value)}><option value="mt5">MetaTrader 5</option><option value="mt4">MetaTrader 4</option></select></Field>
-          <Field label="Broker"><input className="input brokerInput" placeholder="The5ers, FundingPips, IC Markets..." value={form.brokerName} onChange={e=>ch('brokerName',e.target.value)}/></Field>
-          <Field label="Servidor MT5"><input className="input brokerInput" placeholder="Broker-Server-Demo / Live" value={form.serverName} onChange={e=>ch('serverName',e.target.value)}/></Field>
-          <Field label="Número de cuenta"><input className="input brokerInput" inputMode="numeric" placeholder="12345678" value={form.login} onChange={e=>ch('login',e.target.value)}/></Field>
-          <Field label="Investor Password / Read-only password"><input className="input brokerInput" type="password" placeholder="No uses contraseña master" value={form.investorPassword} onChange={e=>ch('investorPassword',e.target.value)}/></Field>
-          <Field label="Nombre interno de la cuenta"><input className="input brokerInput" placeholder="FTMO 100K / The5ers 25K" value={form.accountName} onChange={e=>ch('accountName',e.target.value)}/></Field>
-          <Field label="Sincronizar desde"><input className="input brokerInput" type="date" value={form.syncFromDate} onChange={e=>ch('syncFromDate',e.target.value)}/></Field>
-          <label className="brokerSwitch"><input type="checkbox" checked={form.autoSync} onChange={e=>ch('autoSync',e.target.checked)}/><span>Activar sync automático cada hora</span></label>
+      <Card title="Estado del módulo" sub="Mantenemos la sección visible para preparar una próxima actualización sin vender una función incompleta.">
+        <div className="comingSoonStack">
+          <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Los alumnos ya pueden cargar operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
+          <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Analytics disponible</b><p>La app ya puede medir rendimiento, comportamiento, sesiones, errores y evolución.</p></div></div>
+          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Importación automática en preparación</b><p>Se incorporará como mejora posterior cuando el proveedor de sincronización sea estable y rentable.</p></div></div>
         </div>
-        <div className="brokerActions"><button className="primary" onClick={connect} disabled={!!busy}>{busy==='connect'?'Conectando...':'Conectar MetaTrader'}</button></div>
+        <div className="brokerActions"><button className="primary" onClick={activateReminder}>{notify?'Aviso activado':'Avisarme cuando esté disponible'}</button></div>
       </Card>
-      <Card title="Arquitectura de sync" sub="Identidad por Firebase Auth. MetaTrader por MetaAPI. Journal y analytics por Firestore.">
-        <div className="brokerFlow"><div><b>1</b><span>Conectar cuenta</span><p>Broker, server, login e investor password.</p></div><div><b>2</b><span>MetaAPI provisiona</span><p>La cuenta queda connected o pending.</p></div><div><b>3</b><span>Sync de deals</span><p>Se reconstruyen trades cerrados por positionId.</p></div><div><b>4</b><span>Journal automático</span><p>Se deduplica y se guarda en trades.</p></div></div>
+      <Card title="Modelo comercial actual" sub="Funciones disponibles para vender el acceso hoy.">
+        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Membresía</span><p>Acceso con PayPal y roles por usuario.</p></div><div><b>2</b><span>Journal</span><p>Registro manual profesional.</p></div><div><b>3</b><span>Checklist</span><p>Validación operativa antes de ejecutar.</p></div><div><b>4</b><span>Analytics</span><p>Medición y mejora continua.</p></div></div>
       </Card>
     </div>
-    <Card title="Cuentas conectadas" sub="Sincronizá manualmente, revisá estado o desactivá conexiones.">
-      <div className="brokerConnections">
-        {connections.map(c=><article className={`brokerCardConnected ${c.connectionStatus||'pending'}`} key={c.id}>
-          <div className="brokerCardTop"><div><BrokerStatusPill status={c.connectionStatus}/><h3>{c.accountName||'Cuenta MetaTrader'}</h3><p>{String(c.platform||'mt5').toUpperCase()} · {c.brokerName} · {c.serverName}</p></div><div className="brokerLogin"><span>Login</span><b>{c.loginMasked||'****'}</b></div></div>
-          <div className="brokerMetaGrid"><span><b>Última sync</b>{brokerDate(c.lastSyncAt)}</span><span><b>Estado sync</b>{c.lastSyncStatus||'—'}</span><span><b>Auto Sync</b>{c.autoSync?'ON':'OFF'}</span><span><b>Desde</b>{c.syncFromDate||'—'}</span></div>
-          {c.lastSyncError&&<p className="brokerError">{c.lastSyncError}</p>}
-          <div className="brokerActions"><button className="primary compact" onClick={()=>sync(c)} disabled={!!busy}>{busy===`sync-${c.id}`?'Sincronizando...':'Sincronizar ahora'}</button><button className="ghost compact" onClick={()=>status(c)} disabled={!!busy}>Revisar estado</button><button className="ghost danger compact" onClick={()=>disconnect(c)} disabled={!!busy}>Desconectar</button></div>
-        </article>)}
-        {!connections.length&&<Empty title="Sin cuentas conectadas" text="Conectá tu primera cuenta MT4/MT5 para empezar a llenar el journal automáticamente."/>}
-      </div>
-    </Card>
-    <Card title="Trades importados" sub="Los trades MetaTrader entran como pendientes de revisión para que completes setup, emoción y lección.">
-      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">Todavía no hay trades importados desde MetaTrader.</p>}</div>
+
+    <Card title="Trades importados anteriormente" sub="Historial reservado para futuras versiones del Sync.">
+      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">Todavía no hay trades importados automáticamente.</p>}</div>
     </Card>
   </main>
 }
@@ -1930,7 +1886,7 @@ function AccessGate({profile}){
     const quote=calculatePlanPrice(plan.id,cycle);
     const endpoint=PAYMENT_CONFIG.provider==='paypal' ? PAYMENT_CONFIG.paypalCreateOrderEndpoint : PAYMENT_CONFIG.checkoutEndpoint;
     if(!PAYMENT_CONFIG.enabled || !endpoint){
-      toast('PayPal sandbox próximamente. Contactá al admin para activar tu acceso.','info');
+      toast('Los pagos todavía no están activos. Contactá al administrador para activar tu acceso.','info');
       return;
     }
     try{
@@ -1952,10 +1908,10 @@ function AccessGate({profile}){
       if(!res.ok) throw new Error(payload?.error || 'checkout_failed');
       if(payload.approvalUrl) window.location.href=payload.approvalUrl;
       else if(payload.checkoutUrl) window.location.href=payload.checkoutUrl;
-      else toast('Orden creada, pero falta approvalUrl de PayPal.','error');
+      else toast('No pudimos abrir el checkout. Intentá nuevamente.','error');
     }catch(e){
       console.warn(e);
-      toast('No se pudo iniciar PayPal. Verificá backend/env vars.','error');
+      toast('No se pudo iniciar el pago. Intentá nuevamente o contactá soporte.','error');
     }finally{setBusy(null)}
   }
   return <div className="paywallPage premiumPaywall paywallV437 referencePaywallGate">
@@ -1964,7 +1920,7 @@ function AccessGate({profile}){
     </div>
     <section className="paywallModal paywallModalPro conversionPaywall referencePaywallModal" aria-label="Activación de acceso">
       <div className="paywallHeader paywallHeaderPro conversionHeader">
-        <div className="paywallBrand"><img className="paywallLogo" src="/moises-logo.jpg" alt="Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Ecosystem</span></div></div>
+        <div className="paywallBrand"><img className="paywallLogo" src="/moises-logo.jpg" alt="Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div>
         <div className="paywallHeaderActions"><span className={`statusBadge ${status}`}>{accessLabel(status)}</span><button className="ghost compact" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
       </div>
 
@@ -2092,14 +2048,12 @@ function PaymentSuccessPage({profile}){
         <div><span>Vencimiento</span><b>{profile?.currentPeriodEnd?formatMembershipDate(profile.currentPeriodEnd):'Pendiente'}</b></div>
       </div>
       {error&&<div className="paymentResultNotice"><AlertTriangle size={16}/>{error}</div>}
-      {captureResult?.paypalOrderId&&<div className="paymentQueryBox"><b>Resultado PayPal</b><span>Orden: {captureResult.paypalOrderId} · Estado: {captureResult.status || 'recibido'}</span></div>}
-      {Object.keys(queryInfo).length>0&&<div className="paymentQueryBox"><b>Referencia recibida</b><span>{['paymentId','payment_id','orderId','paypalOrderId','token','PayerID','session_id','preference_id','status'].filter(k=>queryInfo[k]).map(k=>`${k}: ${queryInfo[k]}`).join(' · ') || 'Parámetros de pago recibidos.'}</span></div>}
       <div className="paymentResultActions">
         {state==='active'?<button className="primary" onClick={()=>routeTo('/app')}>Entrar al Dashboard</button>:<button className="primary" onClick={()=>verify({capture:state!=='error'})}>Reintentar verificación</button>}
         <button className="ghost" onClick={()=>routeTo('/app')}>{state==='active'?'Volver a la app':'Volver a planes'}</button>
         {state==='error'&&<a className="ghost center" href={`https://wa.me/${WHATSAPP_MENTORIA}?text=${encodeURIComponent('Hola, necesito soporte con la activación de mi pago en Moisés Trading Club.')}`} target="_blank" rel="noreferrer">Contactar soporte</a>}
       </div>
-      <small>Esta página no activa acceso por sí sola. La activación real depende de capturePayPalOrder o del webhook seguro del backend.</small>
+      <small>La activación puede tardar unos segundos después del pago.</small>
     </section>
   </div>
 }
@@ -2139,7 +2093,7 @@ function GamePlanPanel(){
 }
 function CommandPalette({open,setOpen,setTab}){
   const [q,setQ]=useState('');
-  const actions=[['dashboard','Ir al Dashboard','📊'],['journal','Nuevo trade / Journal','📝'],['brokers','Sync Broker','🔄'],['system','Sistema de Moisés','🛡️'],['reading','Biblioteca','📚'],['academy','Academia','🎓'],['community','Comunidad','🤝'],['announcements','Anuncios del mentor','📌'],['chat','Chat privado','💬'],['online','Usuarios online','🟢'],['ideas','Ideas de trading','💡'],['coach','Coach IA','🧠'],['analytics','Analytics','📈'],['risk','Riesgo y lotaje','🛡️'],['settings','Perfil','⚙️']].filter(a=>a[1].toLowerCase().includes(q.toLowerCase()));
+  const actions=[['dashboard','Ir al Dashboard','📊'],['journal','Nuevo trade / Journal','📝'],['brokers','Sync Broker','🔄'],['system','Sistema de Moisés','🛡️'],['reading','Biblioteca','📚'],['academy','Academia','🎓'],['community','Comunidad','🤝'],['announcements','Anuncios del mentor','📌'],['chat','Chat privado','💬'],['online','Usuarios online','🟢'],['ideas','Ideas de trading','💡'],['analytics','Analytics','📈'],['risk','Riesgo y lotaje','🛡️'],['settings','Perfil','⚙️']].filter(a=>a[1].toLowerCase().includes(q.toLowerCase()));
   if(!open)return null;
   return <div className="cmdOverlay" onClick={()=>setOpen(false)}><div className="cmdPalette" onClick={e=>e.stopPropagation()}><div className="cmdSearch"><span>⌘K</span><input autoFocus placeholder="Buscar sección o acción rápida..." value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==='Escape')setOpen(false)}}/></div><div className="cmdList">{actions.map(([id,label,ico])=><button key={id} onClick={()=>{setTab(id); setOpen(false); toast(`Abriendo ${label}`)}}><span>{ico}</span><b>{label}</b></button>)}</div></div></div>
 }
@@ -2208,7 +2162,7 @@ function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useS
   if(!info.expired || profile.subscriptionStatus==='expired' || profile.accessStatus==='inactive') return;
   if(!PAYMENT_CONFIG.membershipSyncEndpoint) return;
   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
-},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><HelpBot/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><HelpBot/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><HelpBot/><ToastHost/></div>}
+},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
 
 class ErrorBoundary extends React.Component {
   constructor(props){

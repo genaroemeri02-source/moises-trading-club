@@ -354,7 +354,7 @@ function setCors(req, res) {
     res.set('Access-Control-Allow-Origin', origin || '*');
   }
   res.set('Vary', 'Origin');
-  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Paypal-Transmission-Id, Paypal-Transmission-Time, Paypal-Cert-Url, Paypal-Auth-Algo, Paypal-Transmission-Sig');
 }
 
@@ -1003,9 +1003,19 @@ app.use((req, res, next) => {
 app.get('/health', (_req, res) => res.status(200).json({ ok: true, service: 'mtc-render-backend', version: '44.1' }));
 app.get('/api/health', (_req, res) => res.status(200).json({ ok: true, service: 'mtc-render-backend', version: '44.1' }));
 
+
+app.get('/api/plans', (req, res) => {
+  setCors(req, res);
+  return res.status(200).json({
+    ok: true,
+    currency: DEFAULT_CURRENCY,
+    plans: Object.entries(PLAN_PRICING).map(([id, plan]) => ({ id, name: plan.name, monthly: plan.monthly, currency: plan.currency }))
+  });
+});
 app.post('/api/createPayPalOrder', createPayPalOrderHandler);
 app.post('/api/capturePayPalOrder', capturePayPalOrderHandler);
 app.post('/api/paypalWebhook', paypalWebhookHandler);
+app.post('/api/paypal/webhook', paypalWebhookHandler);
 app.post('/api/updateMembershipStatus', updateMembershipStatusHandler);
 
 app.post('/api/mtConnect', mtConnectHandler);

@@ -1,6 +1,6 @@
 {
   "name": "mtc-render-backend",
-  "version": "1.0.44-1",
+  "version": "1.0.45-commercial",
   "private": true,
   "type": "module",
   "main": "index.js",
