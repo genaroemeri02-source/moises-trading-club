@@ -16,7 +16,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return hasUserDoc() && userDoc().data.role in ['admin', 'moderador'];
+      return hasUserDoc() && userDoc().data.role in ['admin', 'moderador', 'mentor'];
     }
 
     function isApproved() {
@@ -38,6 +38,7 @@ service cloud.firestore {
         'paymentProvider',
         'customerId',
         'subscriptionId',
+        'paypalSubscriptionId',
         'startedAt',
         'currentPeriodStart',
         'currentPeriodEnd',
@@ -46,16 +47,18 @@ service cloud.firestore {
         'expiredAt',
         'approved',
         'status',
-        'role'
+        'role',
+        'isAdmin',
+        'admin',
+        'createdByAdmin'
       ];
     }
-
 
     function userCreateIsSafe(userId) {
       return signedIn()
         && request.auth.uid == userId
         && request.resource.data.uid == userId
-        && request.resource.data.role in ['alumno', 'member']
+        && request.resource.data.role in ['alumno', 'member', 'invitado']
         && request.resource.data.status in ['pending', 'pending_payment']
         && request.resource.data.approved == false
         && request.resource.data.accessStatus == 'pending_payment'
@@ -65,12 +68,16 @@ service cloud.firestore {
         && !request.resource.data.keys().hasAny([
           'customerId',
           'subscriptionId',
+          'paypalSubscriptionId',
           'currentPeriodStart',
           'currentPeriodEnd',
           'lastPaymentAt',
           'expiredAt',
           'startedAt',
-          'paymentProvider'
+          'paymentProvider',
+          'isAdmin',
+          'admin',
+          'createdByAdmin'
         ]);
     }
 
@@ -84,12 +91,18 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function docUserId(data) {
+      return data.userId == request.auth.uid
+        || data.uid == request.auth.uid
+        || data.ownerId == request.auth.uid;
+    }
+
     function tradeCreateOwnerIsSafe() {
-      return request.resource.data.userId == request.auth.uid;
+      return docUserId(request.resource.data);
     }
 
     function tradeResourceOwnerIsSafe() {
-      return resource.data.userId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.ownerId == request.auth.uid;
+      return docUserId(resource.data);
     }
 
     function ideaOwnerIsSafe() {
@@ -101,6 +114,10 @@ service cloud.firestore {
     }
 
     function ideaLikeUpdateIsSafe() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']);
+    }
+
+    function postLikeUpdateIsSafe() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']);
     }
 
@@ -119,7 +136,17 @@ service cloud.firestore {
 
     match /payments/{paymentId} {
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow create, update, delete: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /paypalWebhookEvents/{eventId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /brokerConnections/{connectionId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      allow write: if false;
     }
 
     match /settings/{userId} {
@@ -133,16 +160,26 @@ service cloud.firestore {
       allow update, delete: if isApproved() && (isAdmin() || tradeResourceOwnerIsSafe());
     }
 
-
     match /dailyPlans/{planId} {
       allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
       allow read, update, delete: if isApproved() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
+    match /checklists/{checklistId} {
+      allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
+      allow read: if isApproved() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isApproved() && (isAdmin() || resource.data.userId == request.auth.uid);
+    }
+
     match /posts/{postId} {
       allow read: if isApproved();
-      allow create: if isApproved();
-      allow update, delete: if isApproved() && (isAdmin() || resource.data.authorId == request.auth.uid);
+      allow create: if isApproved() && (isAdmin() || request.resource.data.authorId == request.auth.uid);
+      allow update: if isApproved() && (
+        isAdmin()
+        || resource.data.authorId == request.auth.uid
+        || postLikeUpdateIsSafe()
+      );
+      allow delete: if isApproved() && (isAdmin() || resource.data.authorId == request.auth.uid);
     }
 
     match /ideas/{ideaId} {
@@ -159,23 +196,28 @@ service cloud.firestore {
       allow delete: if isAdmin() || (isApproved() && resource.data.userId == request.auth.uid);
     }
 
-
     match /messages/{messageId} {
       allow create: if isApproved() && request.auth.uid in request.resource.data.participants;
       allow read, update, delete: if isApproved() && request.auth.uid in resource.data.participants;
     }
 
-    match /lessonProgress/{progressId} {
-      allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if isApproved() && (resource.data.userId == request.auth.uid || isAdmin());
+    match /books/{bookId} {
+      allow read: if isApproved();
+      allow create: if isApproved();
+      allow update, delete: if isApproved() && (
+        isAdmin()
+        || resource.data.authorId == request.auth.uid
+        || resource.data.userId == request.auth.uid
+        || resource.data.uploaderId == request.auth.uid
+      );
     }
 
-    match /courses/{courseId} {
+    match /academyLessons/{lessonId} {
       allow read: if isApproved();
       allow create, update, delete: if isAdmin();
     }
 
-    match /academyLessons/{lessonId} {
+    match /courses/{courseId} {
       allow read: if isApproved();
       allow create, update, delete: if isAdmin();
     }
@@ -185,20 +227,10 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
-
-
-    match /checklists/{checklistId} {
+    match /lessonProgress/{progressId} {
       allow create: if isApproved() && request.resource.data.userId == request.auth.uid;
-      allow read: if isApproved() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow update, delete: if isApproved() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isApproved() && (resource.data.userId == request.auth.uid || isAdmin());
     }
-
-    match /books/{bookId} {
-      allow read: if isApproved();
-      allow create: if isApproved();
-      allow update, delete: if isApproved() && (isAdmin() || resource.data.authorId == request.auth.uid || resource.data.userId == request.auth.uid);
-    }
-
 
     match /resultPosts/{resultId} {
       function sensitiveResultFields() {
@@ -247,6 +279,10 @@ service cloud.firestore {
     match /announcements/{announcementId} {
       allow read: if isApproved();
       allow create, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

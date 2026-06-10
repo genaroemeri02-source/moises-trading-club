@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import HeroSection from './components/HeroSection/HeroSection';
+import * as React from 'react';
+import { Component, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserLocalPersistence } from 'firebase/auth';
@@ -555,7 +557,8 @@ function accessLabel(status){
   return labels[s] || 'Activación pendiente';
 }
 
-const PLAN_PRICING={
+/** Dev fallback only — must match server PLAN_PRICING (basic 29 / premium 49 USD). */
+const DEV_FALLBACK_PLAN_PRICING={
   basic:{monthly:29,currency:'USD'},
   premium:{monthly:49,currency:'USD'}
 };
@@ -578,12 +581,32 @@ const PAYMENT_CONFIG={
   membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
 };
 const ACCESS_PLANS=[
-  {id:'basic',name:'Club',headline:'Acceso base al ecosistema',cta:'Activar Club',tone:'base',features:['Dashboard operativo desbloqueado','Journal profesional','Checklist de Moisés','Biblioteca privada','Comunidad privada']},
-  {id:'premium',name:'Pro',headline:'Recomendado para traders activos',cta:'Activar Pro',recommended:true,tone:'pro',features:['Todo lo del plan Club','Analytics avanzado','Arena Moisés y ranking','Revisión de trades','Reportes de disciplina','Competencia trimestral']},
-  {id:'mentorship',name:'Mentoría',headline:'Acompañamiento personalizado',cta:'Solicitar Mentoría',tone:'mentor',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
+  {id:'basic',name:'Club',kicker:'Base operativa',headline:'Para ordenar tu proceso y dejar de registrar trades a medias.',cta:'Activar Club',tone:'base',valueNote:'Ideal si querés pasar de improvisar a trabajar con checklist, journal y evidencia.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist de Moisés antes de ejecutar','Biblioteca privada del club','Comunidad privada']},
+  {id:'premium',name:'Pro',kicker:'Más elegido',headline:'Para traders activos que quieren detectar edge, fugas y patrones reales.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'La mejor relación entre precio, claridad y profundidad operativa.',features:['Todo lo del plan Club','Analytics avanzado de ejecución','Heatmap de horarios, setups y sesiones','Risk Guard para frenar sobreoperación','Revisión de trades y comportamiento','Reportes para medir disciplina']},
+  {id:'mentorship',name:'Mentoría',kicker:'Acompañamiento 1 a 1',headline:'Para acelerar resultados con revisión directa y plan de mejora.',cta:'Aplicar a mentoría',tone:'mentor',valueNote:'Feedback personalizado para traders que quieren corrección directa y seguimiento.',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
 ];
-function calculatePlanPrice(planId,cycleId='monthly'){
-  const pricing=PLAN_PRICING[planId];
+function planPricingFromApiPayload(payload){
+  const map={};
+  (payload?.plans||[]).forEach(p=>{
+    if(!p?.id) return;
+    map[p.id]={monthly:Number(p.monthly),currency:p.currency||payload.currency||'USD',name:p.name||p.id};
+  });
+  return Object.keys(map).length?map:null;
+}
+async function fetchPlanPricing(){
+  if(!API_BASE_URL) return {...DEV_FALLBACK_PLAN_PRICING};
+  try{
+    const res=await fetch(apiUrl('/api/plans'));
+    const payload=await res.json().catch(()=>({}));
+    if(res.ok){
+      const fromApi=planPricingFromApiPayload(payload);
+      if(fromApi) return fromApi;
+    }
+  }catch(_e){}
+  return {...DEV_FALLBACK_PLAN_PRICING};
+}
+function calculatePlanPrice(planId,cycleId='monthly',pricingMap=DEV_FALLBACK_PLAN_PRICING){
+  const pricing=pricingMap?.[planId];
   if(!pricing) return null;
   const monthly=pricing.monthly;
   if(cycleId==='monthly') return {currency:pricing.currency,monthly,regular:monthly,total:monthly,savePct:0,saveAmount:0,months:1};
@@ -600,11 +623,13 @@ function calculatePlanPrice(planId,cycleId='monthly'){
   return {currency:pricing.currency,monthly,regular,total,savePct:10,effectiveSavePct,saveAmount:regular-total,months:12};
 }
 function formatCurrencyValue(value,currency='USD',options={}){
-  const {decimals=false}=options;
-  return `${currency} ${Number(value||0).toLocaleString('en-US',{minimumFractionDigits:decimals?2:0,maximumFractionDigits:decimals?2:0})}`;
+  const amount=Number(value||0);
+  const hasDecimals=Math.abs(amount%1)>0.0001;
+  const decimals=options.decimals ?? hasDecimals;
+  return `${currency} ${amount.toLocaleString('en-US',{minimumFractionDigits:decimals?2:0,maximumFractionDigits:decimals?2:0})}`;
 }
-function planCycleSummary(planId,cycleId){
-  const price=calculatePlanPrice(planId,cycleId);
+function planCycleSummary(planId,cycleId,pricingMap){
+  const price=calculatePlanPrice(planId,cycleId,pricingMap);
   if(!price) return null;
   return {price,final:formatCurrencyValue(price.total,price.currency),regular:price.regular>price.total?formatCurrencyValue(price.regular,price.currency):null,perMonth:cycleId==='monthly'?null:`Equiv. ${formatCurrencyValue(price.total/price.months,price.currency)}/mes`};
 }
@@ -902,7 +927,7 @@ function Login({initialMode='login'}){
   </div></div>
 }
 
-function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['brokers','Sync MT5',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal]]],['SISTEMA',[['analytics','Analytics',BarChart3],['results','Resultados',Trophy]]],['COMUNIDAD',[['academy','Academia',BookOpen],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
+function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['brokers','Integraciones',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal]]],['SISTEMA',[['analytics','Analytics',BarChart3],['results','Resultados',Trophy]]],['COMUNIDAD',[['academy','Academia',BookOpen],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
   onClick={toggleTheme}
   className="icon"
   title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
@@ -914,9 +939,9 @@ function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPER
   }
 </button><div className="user"><div className="avatar">{profile.avatar||profile.name?.slice(0,2)||'MT'}</div><div><b>{profile.name}</b><span>{profile.role==='admin'?'mentor/admin':'trader'}</span></div><button onClick={()=>signOut(auth)} title="Salir"><LogOut size={16}/></button></div></aside>}
 
-function MobileNav({profile,tab,setTab,data}){const items=[['dashboard','Inicio',Home],['journal','Journal',LineChart],['brokers','Sync MT5',Activity],['risk','Riesgo',SlidersHorizontal],['checklist','Checklist',CheckCircle2],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['ideas','Ideas',Lightbulb],['notifications','Avisos',Bell],['settings','Perfil',Settings]]; if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]); return <div className="mobileNav">{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}<button className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button></div>}
+function MobileNav({profile,tab,setTab,data}){const items=[['dashboard','Inicio',Home],['journal','Journal',LineChart],['brokers','Integraciones',Activity],['risk','Riesgo',SlidersHorizontal],['checklist','Checklist',CheckCircle2],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['ideas','Ideas',Lightbulb],['notifications','Avisos',Bell],['settings','Perfil',Settings]]; if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]); return <div className="mobileNav">{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}<button className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button></div>}
 
-function Topbar({tab,profile,theme,toggleTheme}){const names={dashboard:'Dashboard principal',journal:'Journal de trading',brokers:'Sync MT5',risk:'Riesgo y lotaje',checklist:'Checklist de Moisés',system:'Sistema',reading:'Libros y lectura',news:'Noticias económicas',analytics:'Analytics',academy:'Academia privada',community:'Comunidad',announcements:'Anuncios del mentor',chat:'Chat privado',online:'Usuarios online',ideas:'Ideas de trading',results:'Resultados',notifications:'Notificaciones',settings:'Perfil y configuración',admin:'Panel Admin'}; return <header className="top premiumTop"><div><h1>{names[tab]||'Moisés Trading Club'}</h1><p>{profile.name} · {profile.role}</p></div><div className="topActions"><button className="topCta ghost" onClick={()=>window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}))}><CheckCircle2 size={15}/> Checklist</button><button
+function Topbar({tab,profile,theme,toggleTheme}){const names={dashboard:'Dashboard principal',journal:'Journal de trading',brokers:'Integraciones',risk:'Riesgo y lotaje',checklist:'Checklist de Moisés',system:'Sistema',reading:'Libros y lectura',news:'Noticias económicas',analytics:'Analytics',academy:'Academia privada',community:'Comunidad',announcements:'Anuncios del mentor',chat:'Chat privado',online:'Usuarios online',ideas:'Ideas de trading',results:'Resultados',notifications:'Notificaciones',settings:'Perfil y configuración',admin:'Panel Admin'}; return <header className="top premiumTop"><div><h1>{names[tab]||'Moisés Trading Club'}</h1><p>{profile.name} · {profile.role}</p></div><div className="topActions"><button className="topCta ghost" onClick={()=>window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}))}><CheckCircle2 size={15}/> Checklist</button><button
   className="icon"
   onClick={toggleTheme}
   title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
@@ -1575,24 +1600,24 @@ function BrokerStatusPill({status}) {
 function BrokerSync({data,profile}){
   const [notify,setNotify]=useState(()=>localStorage.getItem('mtc-mt5-notify')==='1');
   const importedTrades=(data.trades||[]).filter(t=>t.brokerSource==='metaapi');
-  function activateReminder(){localStorage.setItem('mtc-mt5-notify','1'); setNotify(true); toast('Listo. Te avisaremos cuando el Sync MT5 esté disponible.','success')}
+  function activateReminder(){localStorage.setItem('mtc-mt5-notify','1'); setNotify(true); toast('Listo. Te avisaremos cuando las integraciones estén disponibles.','success')}
   return <main className="page brokerSyncPage comingSoonBrokerPage">
     <section className="brokerHero cleanBrokerHero">
       <div>
         <span className="brokerBadge"><Activity size={15}/> Próxima versión</span>
-        <h2>Sync MT4 / MT5</h2>
-        <p>La importación automática de operaciones está en pausa para esta primera versión comercial. El Journal manual, Checklist, Analytics, Comunidad y Membresías ya quedan como núcleo activo del producto.</p>
-        <div className="brokerHeroStats"><span>Journal manual activo</span><span>PayPal listo para activar</span><span>Sync MT5 próximamente</span></div>
+        <h2>Integraciones MT4 / MT5</h2>
+        <p>La plataforma comercial ya está activa con Journal, Checklist, Analytics, Comunidad y Membresías. La importación automática queda reservada para una actualización posterior, sin depender de terceros en esta primera etapa.</p>
+        <div className="brokerHeroStats"><span>Journal profesional</span><span>Membresías privadas</span><span>Automatización futura</span></div>
       </div>
-      <div className="brokerHeroPanel"><b>Muy pronto</b><small>La conexión automática se habilitará cuando esté lista para uso comercial sin fricción de terceros.</small></div>
+      <div className="brokerHeroPanel"><b>Próxima mejora</b><small>Las integraciones automáticas se activarán cuando aporten valor real sin fricción para el usuario.</small></div>
     </section>
 
     <div className="brokerGrid">
-      <Card title="Estado del módulo" sub="Mantenemos la sección visible para preparar una próxima actualización sin vender una función incompleta.">
+      <Card title="Estado comercial" sub="La versión actual se enfoca en lo que ya puede venderse con una experiencia sólida y clara.">
         <div className="comingSoonStack">
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Los alumnos ya pueden cargar operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Analytics disponible</b><p>La app ya puede medir rendimiento, comportamiento, sesiones, errores y evolución.</p></div></div>
-          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Importación automática en preparación</b><p>Se incorporará como mejora posterior cuando el proveedor de sincronización sea estable y rentable.</p></div></div>
+          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Automatización en preparación</b><p>Se incorporará como mejora posterior cuando el proveedor sea estable, rentable y simple para el usuario.</p></div></div>
         </div>
         <div className="brokerActions"><button className="primary" onClick={activateReminder}>{notify?'Aviso activado':'Avisarme cuando esté disponible'}</button></div>
       </Card>
@@ -1601,8 +1626,8 @@ function BrokerSync({data,profile}){
       </Card>
     </div>
 
-    <Card title="Trades importados anteriormente" sub="Historial reservado para futuras versiones del Sync.">
-      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">Todavía no hay trades importados automáticamente.</p>}</div>
+    <Card title="Historial de integraciones" sub="Espacio reservado para futuras versiones automáticas.">
+      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">La importación automática estará disponible en una próxima versión.</p>}</div>
     </Card>
   </main>
 }
@@ -1846,28 +1871,20 @@ function AccessGate({profile}){
   const [cycle,setCycle]=useState('monthly');
   const [selected,setSelected]=useState('premium');
   const [busy,setBusy]=useState(null);
-  const [preview,setPreview]=useState(0);
+  const [planPricing,setPlanPricing]=useState(null);
+  const [plansLoading,setPlansLoading]=useState(true);
+  useEffect(()=>{
+    let cancelled=false;
+    fetchPlanPricing().then(pricing=>{if(!cancelled){setPlanPricing(pricing);setPlansLoading(false);}});
+    return ()=>{cancelled=true;};
+  },[]);
   const status=effectiveStatus(profile);
   const isBlocked=status==='denied'||status==='suspended'||status==='blocked';
-  const info=membershipInfo(profile);
-  const selectedPlan=ACCESS_PLANS.find(p=>p.id===selected) || ACCESS_PLANS[1];
-  const previewTabs=[
-    {name:'Dashboard',kpi:'Net P&L',value:'+$3,100',detail:'Score 86 · Riesgo controlado',bars:[38,58,44,76,62,88,70]},
-    {name:'Checklist',kpi:'Validación',value:'7/8',detail:'Entrada A · Contexto limpio',bars:[92,92,92,92,92,92,42]},
-    {name:'Journal',kpi:'Trades',value:'128',detail:'Winrate 57% · PF 1.82',bars:[44,68,36,74,52,88,61]},
-    {name:'Analytics',kpi:'Disciplina',value:'84%',detail:'Mejor sesión: NY Killzone',bars:[66,72,80,58,86,76,92]},
-    {name:'Arena',kpi:'Ranking',value:'#03',detail:'Competencia trimestral',bars:[48,56,62,70,76,83,91]}
+  const billingOptions=[
+    {id:'monthly',label:'Mensual',note:'Flexible'},
+    {id:'quarterly',label:'Trimestral',note:'Patrones reales'},
+    {id:'annual',label:'Anual',note:'Mejor valor'}
   ];
-  const activePreview=previewTabs[preview];
-  useEffect(()=>{
-    document.documentElement.classList.add('mtc-paywall-open');
-    document.body.classList.add('mtc-paywall-open');
-    return()=>{
-      document.documentElement.classList.remove('mtc-paywall-open');
-      document.body.classList.remove('mtc-paywall-open');
-    };
-  },[]);
-  useEffect(()=>{const id=setInterval(()=>setPreview(v=>(v+1)%previewTabs.length),3200); return()=>clearInterval(id)},[]);
   const statusCopy={
     past_due:'Tu pago está pendiente. Actualizá tu método de pago para recuperar acceso.',
     canceled:'Tu suscripción está cancelada. Podés reactivar tu acceso.',
@@ -1876,14 +1893,13 @@ function AccessGate({profile}){
     denied:'Tu acceso fue denegado. Contactá al administrador.',
     suspended:'Tu acceso está suspendido. Contactá al administrador.'
   };
-  const whatsappUrl=`https://wa.me/${WHATSAPP_MENTORIA}?text=${encodeURIComponent('Estoy interesado en Mentoria 1 a 1 de trading institucional')}`;
+  const whatsappUrl=`https://wa.me/${WHATSAPP_MENTORIA}?text=${encodeURIComponent('Estoy interesado en Mentoría personalizada de Moisés Trading Club')}`;
   async function startCheckout(plan){
     setSelected(plan.id);
     if(plan.id==='mentorship'){
       window.open(whatsappUrl,'_blank','noopener,noreferrer');
       return;
     }
-    const quote=calculatePlanPrice(plan.id,cycle);
     const endpoint=PAYMENT_CONFIG.provider==='paypal' ? PAYMENT_CONFIG.paypalCreateOrderEndpoint : PAYMENT_CONFIG.checkoutEndpoint;
     if(!PAYMENT_CONFIG.enabled || !endpoint){
       toast('Los pagos todavía no están activos. Contactá al administrador para activar tu acceso.','info');
@@ -1895,14 +1911,8 @@ function AccessGate({profile}){
       const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({
         planId:plan.id,
         billingCycle:cycle,
-        provider:PAYMENT_CONFIG.provider,
-        amount:quote?.total,
-        currency:quote?.currency,
-        durationMonths:membershipDurationMonths(cycle),
         successUrl:PAYMENT_CONFIG.successUrl,
-        cancelUrl:PAYMENT_CONFIG.cancelUrl,
-        uid:profile?.uid,
-        email:profile?.email || auth.currentUser?.email || ''
+        cancelUrl:PAYMENT_CONFIG.cancelUrl
       })});
       const payload=await res.json().catch(()=>({}));
       if(!res.ok) throw new Error(payload?.error || 'checkout_failed');
@@ -1914,70 +1924,56 @@ function AccessGate({profile}){
       toast('No se pudo iniciar el pago. Intentá nuevamente o contactá soporte.','error');
     }finally{setBusy(null)}
   }
-  return <div className="paywallPage premiumPaywall paywallV437 referencePaywallGate">
-    <div className="paywallBackdrop dashboardBackdrop" aria-hidden="true">
-      <img src="/paywall-dashboard-preview.png" alt=""/>
-    </div>
-    <section className="paywallModal paywallModalPro conversionPaywall referencePaywallModal" aria-label="Activación de acceso">
-      <div className="paywallHeader paywallHeaderPro conversionHeader">
-        <div className="paywallBrand"><img className="paywallLogo" src="/moises-logo.jpg" alt="Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div>
-        <div className="paywallHeaderActions"><span className={`statusBadge ${status}`}>{accessLabel(status)}</span><button className="ghost compact" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
-      </div>
-
-      <div className="paywallConversionGrid">
-        <div className="paywallLeftColumn">
-          <div className="paywallHeroCompact">
-            <p className="eyebrow">Activación de membresía</p>
-            <h1>Elegí tu plan</h1>
-            <p className="heroLead">Desbloqueá el ecosistema operativo de Moisés Trading Club.</p>
-            <p className="heroSupport">Checklist, Journal, Analytics, Arena y comunidad privada para operar con estructura, medir con evidencia y corregir con sistema.</p>
+  return <div className="paywallFunnel">
+    <div className="paywallFunnelBg" aria-hidden="true"><span></span><span></span><span></span></div>
+    <section className="paywallFunnelShell" aria-label="Activación de acceso">
+      <header className="paywallFunnelHeader">
+        <div className="paywallFunnelBrand"><img src="/moises-logo.jpg" alt="Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Ecosystem</span></div></div>
+        <div className="paywallFunnelActions"><span className={`paywallFunnelStatus ${status}`}>{accessLabel(status)}</span><button onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
+      </header>
+      <div className="paywallFunnelLayout">
+        <div className="paywallFunnelMain">
+          <div className="paywallFunnelHero">
+            <p>Activación de membresía</p>
+            <h1>Dejá de operar por sensación. Mejorá con evidencia.</h1>
+            <h2>El ecosistema privado para traders discrecionales que quieren medir ejecución, detectar patrones reales y corregir errores antes de que vuelvan a costar dinero.</h2>
+            <div className="paywallFunnelChips"><span><Target size={14}/> Checklist antes de arriesgar</span><span><BarChart3 size={14}/> Analytics accionables</span><span><Shield size={14}/> Risk Guard diario</span></div>
           </div>
-
-          <div className="billingRow conversionBillingRow">
-            <div><b>Facturación</b><span>Elegí mensual, trimestral o anual.</span></div>
-            <div className="billingSwitch premiumBilling" role="tablist" aria-label="Selector de facturación">{Object.values(BILLING_CYCLES).map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><span className="cycleLabel">{c.label}</span><small>{c.id==='monthly'?'Pago mensual':c.id==='quarterly'?'Ahorra 20%':'Mejor valor'}{c.id==='quarterly'&&<em className="cycleDiscount">-20%</em>}{c.id==='annual'&&<em className="cycleDiscount">-30%</em>}</small></button>)}</div>
+          <div className="paywallFunnelBilling">
+            <div><b>Un mes te muestra datos. Tres meses te muestran patrones.</b><span>Elegí mensual, trimestral o anual según tu proceso.</span></div>
+            <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
           </div>
-
-          {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="accessNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
-
-          <div className="planGrid premiumPlanGrid conversionPlans">{ACCESS_PLANS.map(plan=>{
-            const active=selected===plan.id;
-            const quote=planCycleSummary(plan.id,cycle);
-            return <article key={plan.id} className={`planCard premiumPlanCard ${plan.recommended?'recommended':''} ${active?'selected':''} ${plan.tone}`} onClick={()=>setSelected(plan.id)}>
-              {plan.recommended&&<span className="recommendedBadge"><Crown size={13}/> Recomendado</span>}
-              <div className="planTop"><div><h2>{plan.name}</h2><p>{plan.headline}</p></div></div>
-              <div className="priceBlock">
-                {quote? <><div className="priceLine">{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b></div><span>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</span>{quote.perMonth&&<small>{quote.perMonth}</small>}{quote.price.savePct>0&&<em>{cycle==='annual'?`Mejor valor · ${quote.price.effectiveSavePct}% vs mensual`:`Ahorro ${quote.price.savePct}%`}</em>}</> : <><div className="priceLine mentorPriceLine"><b>USD 790</b></div><span>/mes</span><small>1 a 1 con mentor · Se coordina por WhatsApp</small></>}
-              </div>
-              <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={16}/><span>{f}</span></li>)}</ul>
-              <button className={plan.recommended?'primary full':'ghost full center'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Hablar por WhatsApp':'Activar plan'}</button>
-            </article>
-          })}</div>
+          {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
+          <div className="paywallFunnelPlans">
+            {ACCESS_PLANS.map(plan=>{
+              const quote=plan.id==='mentorship'?null:planCycleSummary(plan.id,cycle,planPricing||DEV_FALLBACK_PLAN_PRICING);
+              const active=selected===plan.id;
+              return <article key={plan.id} className={`paywallFunnelPlan ${plan.tone} ${plan.recommended?'featured':''} ${active?'selected':''}`} onClick={()=>setSelected(plan.id)}>
+                {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
+                <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
+                <div className="paywallFunnelPrice">
+                  {plansLoading&&plan.id!=='mentorship'?<><b>…</b><em>Cargando precios</em></>:quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>USD 250</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
+                </div>
+                <p className="paywallFunnelValue">{plan.valueNote}</p>
+                <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
+                <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
+              </article>
+            })}
+          </div>
         </div>
-
-        <aside className="paywallRightColumn referenceRightColumn">
-          <div className="productPreviewCard productShowcaseCard referenceVideoCard">
-            <div className="previewTop referencePreviewTop brandPreviewTitle"><div><b><span className="brandMoises">MOISES</span><span className="brandTradingRow"><span className="brandLine" aria-hidden="true"></span><span className="brandTrading">TRADING CLUB</span><span className="brandLine" aria-hidden="true"></span></span></b><span>Hecho por Traders para Traders.</span></div></div>
-            <div className="paywallVideoFrame">
-              <video className="paywallProductVideo paywallProductDemo" src="/paywall-product-demo.mp4" poster="/paywall-dashboard-preview.png" autoPlay muted loop playsInline preload="metadata" aria-label="Preview del ecosistema operativo de Moisés Trading Club" />
-              <div className="videoGlassOverlay" aria-hidden="true"></div>
-            </div>
+        <aside className="paywallFunnelProof">
+          <div className="paywallFunnelLogo"><b>MOISES</b><span>TRADING CLUB</span><small>Hecho por traders para traders.</small></div>
+          <div className="paywallFunnelPreview">
+            <video src="/paywall-product-demo.mp4" poster="/paywall-dashboard-preview.png" autoPlay muted loop playsInline preload="metadata" />
           </div>
-
-          <div className="paywallAside premiumAside benefitAside showcaseBenefits referenceBenefits">
-            <div><Target size={18}/><b>Operá con estructura</b><span>Validá contexto, zona, patrón y ejecución antes de entrar al mercado.</span></div>
-            <div><BarChart3 size={18}/><b>Medí lo que hacés</b><span>Convertí cada trade en evidencia para detectar errores, fortalezas y progreso real.</span></div>
-            <div><Rocket size={18}/><b>Evolucioná más rápido</b><span>Checklist, Journal, Analytics y revisión te ayudan a corregir antes de repetir errores.</span></div>
-          </div>
-
-          <div className="activationLockNote"><Lock size={16}/><span>Tu cuenta está creada. Activá tu plan para desbloquear el acceso total.</span></div>
+          <div className="paywallFunnelInside"><b>Lo que desbloqueás</b><div><span>Equity curve + drawdown</span><span>Heatmap horario</span><span>Setups rentables</span><span>Errores repetidos</span><span>Risk Guard</span><span>Checklist A+</span></div></div>
+          <div className="paywallFunnelBenefits"><div><Target size={18}/><b>Operá con estructura</b><span>Validá contexto, zona, patrón y ejecución antes de entrar.</span></div><div><BarChart3 size={18}/><b>Medí lo que hacés</b><span>Transformá cada trade en evidencia para corregir.</span></div><div><Rocket size={18}/><b>Evolucioná más rápido</b><span>Menos ruido, más claridad y un proceso repetible.</span></div></div>
+          <div className="paywallFunnelLock"><Lock size={15}/> Tu cuenta está creada. Activá tu plan y entrás directo al dashboard.</div>
         </aside>
       </div>
     </section>
   </div>
 }
-
-
 
 
 function routeTo(path){
@@ -2129,7 +2125,7 @@ function HelpBot(){
 
 
 
-class SectionBoundary extends React.Component {constructor(props){super(props);this.state={error:null};} static getDerivedStateFromError(error){return {error};} componentDidCatch(error,info){console.error('MTC section error',error,info);} render(){if(this.state.error){return <main className="page"><section className="errorSection"><h2>Esta sección tuvo un error</h2><p>La app sigue activa. Copiá este mensaje y enviámelo para corregirlo.</p><code>{String(this.state.error?.message||this.state.error)}</code><button className="primary" onClick={()=>this.setState({error:null})}>Reintentar sección</button></section></main>;} return this.props.children;}}
+class SectionBoundary extends Component {constructor(props){super(props);this.state={error:null};} static getDerivedStateFromError(error){return {error};} componentDidCatch(error,info){console.error('MTC section error',error,info);} render(){if(this.state.error){return <main className="page"><section className="errorSection"><h2>Esta sección tuvo un error</h2><p>La app sigue activa. Copiá este mensaje y enviámelo para corregirlo.</p><code>{String(this.state.error?.message||this.state.error)}</code><button className="primary" onClick={()=>this.setState({error:null})}>Reintentar sección</button></section></main>;} return this.props.children;}}
 
 
 function desktopMainWheelHandler(e){
@@ -2164,7 +2160,7 @@ function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useS
   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
 },[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
 
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends Component {
   constructor(props){
     super(props);
     this.state={error:null};

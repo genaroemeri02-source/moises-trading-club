@@ -1,0 +1,757 @@
+.mtcHero {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(201, 168, 76, 0.16), transparent 30%),
+    radial-gradient(circle at 82% 24%, rgba(34, 197, 94, 0.08), transparent 26%),
+    linear-gradient(180deg, #0A0A0A 0%, #0D0D0D 54%, #0A0A0A 100%);
+  color: #F5F5F5;
+  padding: 28px clamp(24px, 5vw, 76px) 42px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mtcHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at top, #000, transparent 74%);
+  pointer-events: none;
+}
+
+.mtcHeroNav,
+.mtcHeroGrid,
+.mtcHeroStats {
+  width: min(100%, 1320px);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.mtcHeroNav {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.72);
+  backdrop-filter: blur(18px);
+  border-radius: 22px;
+  padding: 0 18px;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.26);
+}
+
+.mtcHeroBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #F5F5F5;
+  text-decoration: none;
+  min-width: 230px;
+}
+
+.mtcHeroBrandMark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.22), rgba(201, 168, 76, 0.06));
+  border: 1px solid rgba(201, 168, 76, 0.34);
+  color: #C9A84C;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.mtcHeroBrand strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.mtcHeroBrand small {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.mtcHeroLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  flex: 1;
+}
+
+.mtcHeroLinks a,
+.mtcHeroLogin {
+  color: #A5A5A5;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 180ms ease;
+}
+
+.mtcHeroLinks a:hover,
+.mtcHeroLogin:hover {
+  color: #F5F5F5;
+}
+
+.mtcHeroActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 230px;
+}
+
+.mtcHeroLogin,
+.mtcHeroCta {
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  padding: 0 16px;
+}
+
+.mtcHeroLogin {
+  border: 1px solid #2A2A2A;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.mtcHeroCta {
+  color: #0A0A0A;
+  background: #C9A84C;
+  border: 1px solid #C9A84C;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 16px 42px rgba(201, 168, 76, 0.18);
+  transition: 180ms ease;
+}
+
+.mtcHeroCta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.mtcHeroGrid {
+  min-height: calc(100vh - 160px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(460px, 1.05fr);
+  align-items: center;
+  gap: clamp(42px, 7vw, 92px);
+  padding: 72px 0 56px;
+}
+
+.mtcHeroCopy {
+  max-width: 690px;
+}
+
+.mtcHeroEyebrow {
+  width: max-content;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #C9A84C;
+  border: 1px solid rgba(201, 168, 76, 0.24);
+  background: rgba(201, 168, 76, 0.08);
+  border-radius: 999px;
+  padding: 9px 13px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mtcHeroEyebrow span {
+  width: 8px;
+  height: 8px;
+  background: #22C55E;
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.8);
+}
+
+.mtcHeroCopy h1 {
+  margin: 28px 0 18px;
+  color: #F5F5F5;
+  font-size: clamp(48px, 5.8vw, 82px);
+  line-height: 0.94;
+  letter-spacing: -0.078em;
+  font-weight: 950;
+  text-wrap: balance;
+}
+
+.mtcHeroCopy p {
+  max-width: 650px;
+  margin: 0;
+  color: #A2A2A2;
+  font-size: clamp(16px, 1.55vw, 20px);
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+.mtcHeroButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 30px 0 12px;
+}
+
+.mtcHeroPrimary,
+.mtcHeroSecondary,
+.mtcHeroGhost {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  padding: 0 20px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 900;
+  transition: 180ms ease;
+}
+
+.mtcHeroPrimary {
+  color: #0A0A0A;
+  background: #C9A84C;
+  border: 1px solid #C9A84C;
+  box-shadow: 0 18px 48px rgba(201, 168, 76, 0.18);
+}
+
+.mtcHeroSecondary {
+  color: #F5F5F5;
+  background: #111111;
+  border: 1px solid #2A2A2A;
+}
+
+.mtcHeroGhost {
+  color: #C9A84C;
+  background: rgba(201, 168, 76, 0.06);
+  border: 1px solid rgba(201, 168, 76, 0.22);
+}
+
+.mtcHeroPrimary:hover,
+.mtcHeroSecondary:hover,
+.mtcHeroGhost:hover {
+  transform: translateY(-2px);
+}
+
+.mtcHeroMicrocopy {
+  display: block;
+  color: #777777;
+  font-size: 13px;
+}
+
+.mtcHeroProof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.mtcHeroProof span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid #2A2A2A;
+  color: #CFCFCF;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.mtcProductVisual {
+  position: relative;
+  width: min(100%, 670px);
+  justify-self: end;
+}
+
+.mtcProductShell {
+  position: relative;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(201, 168, 76, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(26, 26, 26, 0.96), rgba(17, 17, 17, 0.96));
+  box-shadow:
+    0 40px 130px rgba(0, 0, 0, 0.52),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  overflow: hidden;
+}
+
+.mtcProductTopbar {
+  height: 46px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-bottom: 1px solid #2A2A2A;
+  margin: -4px 0 18px;
+  padding-bottom: 14px;
+}
+
+.mtcProductTopbar div {
+  display: flex;
+  gap: 7px;
+}
+
+.mtcProductTopbar i {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #2A2A2A;
+}
+
+.mtcProductTopbar i:nth-child(2) {
+  background: rgba(201, 168, 76, 0.55);
+}
+
+.mtcProductTopbar span {
+  color: #888888;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.mtcProductTopbar strong {
+  justify-self: end;
+  color: #22C55E;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mtcMetricRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.mtcMetricRow div,
+.mtcEquityPanel,
+.mtcHeatmapPanel {
+  border: 1px solid #2A2A2A;
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 18px;
+}
+
+.mtcMetricRow div {
+  padding: 15px;
+}
+
+.mtcMetricRow span,
+.mtcPanelHead span {
+  display: block;
+  color: #888888;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mtcMetricRow strong {
+  display: block;
+  margin-top: 8px;
+  color: #F5F5F5;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.mtcMetricRow div:first-child strong {
+  color: #22C55E;
+}
+
+.mtcMetricRow div:last-child strong {
+  color: #C9A84C;
+}
+
+.mtcEquityPanel {
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.mtcPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.mtcPanelHead strong {
+  color: #AFAFAF;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mtcEquitySvg {
+  width: 100%;
+  height: 230px;
+  display: block;
+  overflow: visible;
+}
+
+.mtcEquityArea {
+  fill: url(#mtcHeroArea);
+  opacity: 0;
+  animation: mtcAreaFade 900ms ease 600ms forwards;
+}
+
+.mtcEquityLine {
+  fill: none;
+  stroke: url(#mtcHeroLine);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 720;
+  stroke-dashoffset: 720;
+  animation: mtcDrawLine 1.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  filter: drop-shadow(0 10px 22px rgba(201, 168, 76, 0.22));
+}
+
+.mtcEquityDot {
+  fill: #22C55E;
+  opacity: 0;
+  animation: mtcDotPulse 1.8s ease 1.65s infinite;
+}
+
+.mtcHeatmapPanel {
+  padding: 16px;
+}
+
+.mtcHeatmap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.mtcHeatCell {
+  height: 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #1A1A1A;
+}
+
+.mtcHeatCell.soft {
+  background: rgba(201, 168, 76, 0.14);
+}
+
+.mtcHeatCell.mid {
+  background: rgba(201, 168, 76, 0.34);
+}
+
+.mtcHeatCell.hot {
+  background: rgba(201, 168, 76, 0.72);
+  box-shadow: 0 0 18px rgba(201, 168, 76, 0.14);
+}
+
+.mtcFloatCard {
+  position: absolute;
+  z-index: 4;
+  min-width: 230px;
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  background: rgba(17, 17, 17, 0.82);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  padding: 15px 16px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+  animation: mtcFloat 5.8s ease-in-out infinite;
+}
+
+.mtcFloatCardTop {
+  top: 54px;
+  right: -28px;
+}
+
+.mtcFloatCardBottom {
+  left: -38px;
+  bottom: 110px;
+  animation-delay: -2.2s;
+}
+
+.mtcFloatCard span {
+  display: block;
+  color: #888888;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mtcFloatCard strong {
+  display: block;
+  margin-top: 6px;
+  color: #F5F5F5;
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+.mtcFloatCard small {
+  display: block;
+  margin-top: 6px;
+  color: #C9A84C;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mtcHeroStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid #2A2A2A;
+  border-bottom: 1px solid #2A2A2A;
+  background: rgba(17, 17, 17, 0.42);
+  backdrop-filter: blur(14px);
+}
+
+.mtcHeroStats div {
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 20px;
+  text-align: center;
+}
+
+.mtcHeroStats div + div {
+  border-left: 1px solid #2A2A2A;
+}
+
+.mtcHeroStats strong {
+  color: #F5F5F5;
+  font-size: clamp(26px, 2.4vw, 38px);
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.05em;
+}
+
+.mtcHeroStats span {
+  color: #888888;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+@keyframes mtcDrawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes mtcAreaFade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mtcDotPulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.72;
+    transform: scale(1.35);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mtcFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+@media (max-width: 1120px) {
+  .mtcHeroGrid {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .mtcProductVisual {
+    justify-self: center;
+  }
+
+  .mtcFloatCardTop {
+    right: 12px;
+  }
+
+  .mtcFloatCardBottom {
+    left: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mtcHero {
+    padding: 16px 14px 34px;
+  }
+
+  .mtcHeroNav {
+    height: auto;
+    min-height: 70px;
+    border-radius: 18px;
+    padding: 12px;
+  }
+
+  .mtcHeroBrand {
+    min-width: 0;
+  }
+
+  .mtcHeroBrand small,
+  .mtcHeroLinks,
+  .mtcHeroLogin {
+    display: none;
+  }
+
+  .mtcHeroActions {
+    min-width: 0;
+  }
+
+  .mtcHeroCta {
+    height: 42px;
+    padding: 0 13px;
+    font-size: 13px;
+  }
+
+  .mtcHeroGrid {
+    min-height: auto;
+    padding: 48px 0 36px;
+  }
+
+  .mtcHeroCopy {
+    text-align: center;
+  }
+
+  .mtcHeroEyebrow {
+    width: 100%;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .mtcHeroCopy h1 {
+    font-size: clamp(38px, 12vw, 56px);
+    line-height: 0.98;
+    margin-top: 22px;
+  }
+
+  .mtcHeroCopy p {
+    font-size: 15px;
+    line-height: 1.58;
+  }
+
+  .mtcHeroButtons {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .mtcHeroPrimary,
+  .mtcHeroSecondary,
+  .mtcHeroGhost {
+    width: 100%;
+  }
+
+  .mtcHeroProof {
+    justify-content: center;
+  }
+
+  .mtcProductVisual {
+    width: 100%;
+  }
+
+  .mtcProductShell {
+    border-radius: 24px;
+    padding: 14px;
+  }
+
+  .mtcProductTopbar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .mtcProductTopbar span {
+    justify-self: end;
+  }
+
+  .mtcProductTopbar strong {
+    display: none;
+  }
+
+  .mtcMetricRow {
+    grid-template-columns: 1fr;
+  }
+
+  .mtcMetricRow strong {
+    font-size: 28px;
+  }
+
+  .mtcEquitySvg {
+    height: 180px;
+  }
+
+  .mtcPanelHead {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mtcFloatCard {
+    position: relative;
+    inset: auto;
+    min-width: 0;
+    width: 100%;
+    margin-bottom: 12px;
+    animation: none;
+  }
+
+  .mtcFloatCardBottom {
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+
+  .mtcHeroStats {
+    grid-template-columns: 1fr;
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  .mtcHeroStats div {
+    min-height: 84px;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mtcHeroStats div + div {
+    border-left: 0;
+    border-top: 1px solid #2A2A2A;
+  }
+}
