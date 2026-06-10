@@ -557,11 +557,13 @@ function accessLabel(status){
   return labels[s] || 'Activación pendiente';
 }
 
-/** Dev fallback only — must match server PLAN_PRICING (basic 29 / premium 49 USD). */
-const DEV_FALLBACK_PLAN_PRICING={
-  basic:{monthly:29,currency:'USD'},
-  premium:{monthly:49,currency:'USD'}
+/** Única fuente local de precios del paywall cuando /api/plans no responde. En producción manda GET /api/plans (backend). */
+const PAYWALL_PRICING_FALLBACK={
+  basic:{monthly:14.99,currency:'USD',name:'Club'},
+  premium:{monthly:24.99,currency:'USD',name:'Pro'},
+  mentorship:{monthly:250,currency:'USD',name:'Mentoría'}
 };
+const PAYWALL_VIDEO_SRC='/paywall-premium-loop.mp4';
 const BILLING_CYCLES={
   monthly:{id:'monthly',label:'Mensual',short:'1 mes',suffix:'/mes',months:1,badge:null,featured:false},
   quarterly:{id:'quarterly',label:'Trimestral',short:'3 meses',suffix:'/trim.',months:3,badge:'Ahorro 20%',featured:false},
@@ -581,9 +583,9 @@ const PAYMENT_CONFIG={
   membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
 };
 const ACCESS_PLANS=[
-  {id:'basic',name:'Club',kicker:'Base operativa',headline:'Para ordenar tu proceso y dejar de registrar trades a medias.',cta:'Activar Club',tone:'base',valueNote:'Ideal si querés pasar de improvisar a trabajar con checklist, journal y evidencia.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist de Moisés antes de ejecutar','Biblioteca privada del club','Comunidad privada']},
-  {id:'premium',name:'Pro',kicker:'Más elegido',headline:'Para traders activos que quieren detectar edge, fugas y patrones reales.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'La mejor relación entre precio, claridad y profundidad operativa.',features:['Todo lo del plan Club','Analytics avanzado de ejecución','Heatmap de horarios, setups y sesiones','Risk Guard para frenar sobreoperación','Revisión de trades y comportamiento','Reportes para medir disciplina']},
-  {id:'mentorship',name:'Mentoría',kicker:'Acompañamiento 1 a 1',headline:'Para acelerar resultados con revisión directa y plan de mejora.',cta:'Aplicar a mentoría',tone:'mentor',valueNote:'Feedback personalizado para traders que quieren corrección directa y seguimiento.',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
+  {id:'basic',name:'Club',kicker:'Estructura base',headline:'Ordená tu operativa diaria con journal, checklist y comunidad privada.',cta:'Activar Club',tone:'base',valueNote:'El punto de entrada al ecosistema. Dejá de improvisar y empezá a registrar con criterio.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist de Moisés antes de ejecutar','Biblioteca privada del club','Comunidad privada']},
+  {id:'premium',name:'Pro',kicker:'Profundidad operativa',headline:'Detectá edge, fugas y patrones reales con analytics y Risk Guard.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'La opción más elegida: máxima claridad sobre tu ejecución sin pagar de más.',features:['Todo lo del plan Club','Analytics avanzado de ejecución','Heatmap de horarios, setups y sesiones','Risk Guard para frenar sobreoperación','Revisión de trades y comportamiento','Reportes para medir disciplina']},
+  {id:'mentorship',name:'Mentoría',kicker:'Alto impacto · 1 a 1',headline:'Aceleración directa con revisión del mentor y plan de mejora personal.',cta:'Aplicar a mentoría',tone:'mentor',valueNote:'Para traders serios que buscan corrección directa, accountability y evolución acelerada.',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
 ];
 function planPricingFromApiPayload(payload){
   const map={};
@@ -593,19 +595,22 @@ function planPricingFromApiPayload(payload){
   });
   return Object.keys(map).length?map:null;
 }
+function mergePaywallPricing(apiMap){
+  return {...PAYWALL_PRICING_FALLBACK,...apiMap};
+}
 async function fetchPlanPricing(){
-  if(!API_BASE_URL) return {...DEV_FALLBACK_PLAN_PRICING};
+  if(!API_BASE_URL) return {...PAYWALL_PRICING_FALLBACK};
   try{
     const res=await fetch(apiUrl('/api/plans'));
     const payload=await res.json().catch(()=>({}));
     if(res.ok){
       const fromApi=planPricingFromApiPayload(payload);
-      if(fromApi) return fromApi;
+      if(fromApi) return mergePaywallPricing(fromApi);
     }
   }catch(_e){}
-  return {...DEV_FALLBACK_PLAN_PRICING};
+  return {...PAYWALL_PRICING_FALLBACK};
 }
-function calculatePlanPrice(planId,cycleId='monthly',pricingMap=DEV_FALLBACK_PLAN_PRICING){
+function calculatePlanPrice(planId,cycleId='monthly',pricingMap=PAYWALL_PRICING_FALLBACK){
   const pricing=pricingMap?.[planId];
   if(!pricing) return null;
   const monthly=pricing.monthly;
@@ -632,6 +637,10 @@ function planCycleSummary(planId,cycleId,pricingMap){
   const price=calculatePlanPrice(planId,cycleId,pricingMap);
   if(!price) return null;
   return {price,final:formatCurrencyValue(price.total,price.currency),regular:price.regular>price.total?formatCurrencyValue(price.regular,price.currency):null,perMonth:cycleId==='monthly'?null:`Equiv. ${formatCurrencyValue(price.total/price.months,price.currency)}/mes`};
+}
+function mentorshipMonthlyQuote(pricingMap=PAYWALL_PRICING_FALLBACK){
+  const p=pricingMap?.mentorship||PAYWALL_PRICING_FALLBACK.mentorship;
+  return {final:formatCurrencyValue(p.monthly,p.currency),suffix:'/mes',note:'Mentoría personalizada 1 a 1'};
 }
 function membershipDurationMonths(cycleId){return cycleId==='annual'?12:cycleId==='quarterly'?3:1}
 function membershipDurationDays(cycleId){return cycleId==='annual'?365:cycleId==='quarterly'?90:30}
@@ -828,8 +837,8 @@ function PublicLanding(){
       <div className="landingHeroText">
         <img className="landingBrandLogo" src="/moises-logo.jpg" alt="Moisés Trading Club"/>
         <span className="landingBadge subtleHero"><Crown size={16}/> Centro operativo para traders disciplinados</span>
-        <h1>Opera con estructura.<br/>Corrige con evidencia.<br/>Evoluciona con sistema.</h1>
-        <p>Journal profesional, Checklist de Moisés, analytics, academia y comunidad privada en un solo centro operativo.</p>
+        <h1>Operá con estructura.<br/>Corregí con evidencia.<br/>Evolucioná con sistema.</h1>
+        <p>Journal profesional, checklist, analytics y comunidad privada para traders discrecionales que quieren medir, corregir y escalar con evidencia.</p>
         <div className="landingActions">
           <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
           <button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button>
@@ -1874,6 +1883,14 @@ function AccessGate({profile}){
   const [planPricing,setPlanPricing]=useState(null);
   const [plansLoading,setPlansLoading]=useState(true);
   useEffect(()=>{
+    document.documentElement.classList.add('mtc-paywall-open');
+    document.body.classList.add('mtc-paywall-open');
+    return()=>{
+      document.documentElement.classList.remove('mtc-paywall-open');
+      document.body.classList.remove('mtc-paywall-open');
+    };
+  },[]);
+  useEffect(()=>{
     let cancelled=false;
     fetchPlanPricing().then(pricing=>{if(!cancelled){setPlanPricing(pricing);setPlansLoading(false);}});
     return ()=>{cancelled=true;};
@@ -1925,51 +1942,55 @@ function AccessGate({profile}){
     }finally{setBusy(null)}
   }
   return <div className="paywallFunnel">
+    <div className="paywallFunnelVideoBg" aria-hidden="true">
+      <video src={PAYWALL_VIDEO_SRC} autoPlay muted loop playsInline preload="metadata"/>
+      <span className="paywallFunnelVideoBgOverlay"/>
+    </div>
     <div className="paywallFunnelBg" aria-hidden="true"><span></span><span></span><span></span></div>
     <section className="paywallFunnelShell" aria-label="Activación de acceso">
       <header className="paywallFunnelHeader">
         <div className="paywallFunnelBrand"><img src="/moises-logo.jpg" alt="Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Ecosystem</span></div></div>
-        <div className="paywallFunnelActions"><span className={`paywallFunnelStatus ${status}`}>{accessLabel(status)}</span><button onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
+        <div className="paywallFunnelActions"><span className={`paywallFunnelStatus ${status}`}>{accessLabel(status)}</span><button className="paywallFunnelSignOut" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
       </header>
       <div className="paywallFunnelLayout">
-        <div className="paywallFunnelMain">
+        <div className="paywallFunnelActivation">
           <div className="paywallFunnelHero">
-            <p>Activación de membresía</p>
-            <h1>Dejá de operar por sensación. Mejorá con evidencia.</h1>
-            <h2>El ecosistema privado para traders discrecionales que quieren medir ejecución, detectar patrones reales y corregir errores antes de que vuelvan a costar dinero.</h2>
+            <p>Activación pendiente</p>
+            <h1>Activá tu centro operativo.</h1>
+            <h2>Tu cuenta ya está lista. Ahora elegí cómo querés operar: con estructura, con profundidad o con acompañamiento directo.</h2>
             <div className="paywallFunnelChips"><span><Target size={14}/> Checklist antes de arriesgar</span><span><BarChart3 size={14}/> Analytics accionables</span><span><Shield size={14}/> Risk Guard diario</span></div>
           </div>
-          <div className="paywallFunnelBilling">
-            <div><b>Un mes te muestra datos. Tres meses te muestran patrones.</b><span>Elegí mensual, trimestral o anual según tu proceso.</span></div>
-            <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
-          </div>
-          {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
-          <div className="paywallFunnelPlans">
-            {ACCESS_PLANS.map(plan=>{
-              const quote=plan.id==='mentorship'?null:planCycleSummary(plan.id,cycle,planPricing||DEV_FALLBACK_PLAN_PRICING);
-              const active=selected===plan.id;
-              return <article key={plan.id} className={`paywallFunnelPlan ${plan.tone} ${plan.recommended?'featured':''} ${active?'selected':''}`} onClick={()=>setSelected(plan.id)}>
-                {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
-                <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
-                <div className="paywallFunnelPrice">
-                  {plansLoading&&plan.id!=='mentorship'?<><b>…</b><em>Cargando precios</em></>:quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>USD 250</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
-                </div>
-                <p className="paywallFunnelValue">{plan.valueNote}</p>
-                <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
-                <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
-              </article>
-            })}
-          </div>
         </div>
-        <aside className="paywallFunnelProof">
-          <div className="paywallFunnelLogo"><b>MOISES</b><span>TRADING CLUB</span><small>Hecho por traders para traders.</small></div>
+        <div className="paywallFunnelProductStrip">
           <div className="paywallFunnelPreview">
-            <video src="/paywall-product-demo.mp4" poster="/paywall-dashboard-preview.png" autoPlay muted loop playsInline preload="metadata" />
+            <video src={PAYWALL_VIDEO_SRC} autoPlay muted loop playsInline preload="metadata"/>
           </div>
-          <div className="paywallFunnelInside"><b>Lo que desbloqueás</b><div><span>Equity curve + drawdown</span><span>Heatmap horario</span><span>Setups rentables</span><span>Errores repetidos</span><span>Risk Guard</span><span>Checklist A+</span></div></div>
-          <div className="paywallFunnelBenefits"><div><Target size={18}/><b>Operá con estructura</b><span>Validá contexto, zona, patrón y ejecución antes de entrar.</span></div><div><BarChart3 size={18}/><b>Medí lo que hacés</b><span>Transformá cada trade en evidencia para corregir.</span></div><div><Rocket size={18}/><b>Evolucioná más rápido</b><span>Menos ruido, más claridad y un proceso repetible.</span></div></div>
-          <div className="paywallFunnelLock"><Lock size={15}/> Tu cuenta está creada. Activá tu plan y entrás directo al dashboard.</div>
-        </aside>
+          <div className="paywallFunnelInside"><b>Lo que desbloqueás al activar</b><div><span>Equity curve + drawdown</span><span>Heatmap horario</span><span>Setups rentables</span><span>Errores repetidos</span><span>Risk Guard</span><span>Checklist A+</span></div></div>
+        </div>
+        <div className="paywallFunnelBilling">
+          <div><b>Un mes te muestra datos. Tres meses te muestran patrones.</b><span>Elegí mensual, trimestral o anual según tu proceso.</span></div>
+          <div className="paywallFunnelBillingSwitch">{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
+        </div>
+        {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
+        <div className="paywallFunnelPlans">
+          {ACCESS_PLANS.map(plan=>{
+            const pricing=planPricing||PAYWALL_PRICING_FALLBACK;
+            const quote=plan.id==='mentorship'?null:planCycleSummary(plan.id,cycle,pricing);
+            const mentorQuote=plan.id==='mentorship'?mentorshipMonthlyQuote(pricing):null;
+            const active=selected===plan.id;
+            return <article key={plan.id} className={`paywallFunnelPlan ${plan.tone} ${plan.recommended?'featured':''} ${active?'selected':''}`} onClick={()=>setSelected(plan.id)}>
+              {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
+              <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
+              <div className="paywallFunnelPrice">
+                {plansLoading&&plan.id!=='mentorship'?<><b>…</b><em>Cargando precios</em></>:quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : mentorQuote? <><b>{mentorQuote.final}</b><em>{mentorQuote.suffix}</em><small>{mentorQuote.note}</small></> : null}
+              </div>
+              <p className="paywallFunnelValue">{plan.valueNote}</p>
+              <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
+              <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
+            </article>
+          })}
+        </div>
+        <div className="paywallFunnelLock"><Lock size={15}/> Tu cuenta está creada. Activá tu plan y entrás directo al dashboard.</div>
       </div>
     </section>
   </div>

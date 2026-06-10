@@ -1,0 +1,80 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ],
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/createPayPalOrder",
+        "function": {
+          "functionId": "createPayPalOrder",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/capturePayPalOrder",
+        "function": {
+          "functionId": "capturePayPalOrder",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/updateMembershipStatus",
+        "function": {
+          "functionId": "updateMembershipStatus",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/mtConnect",
+        "function": {
+          "functionId": "mtConnect",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/mtConnectionStatus",
+        "function": {
+          "functionId": "mtConnectionStatus",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/mtSync",
+        "function": {
+          "functionId": "mtSync",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/mtDisconnect",
+        "function": {
+          "functionId": "mtDisconnect",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

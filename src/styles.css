@@ -6613,7 +6613,2166 @@ html[data-theme="light"] .mobileNav button.active{
   .paywallFunnelHero h1{font-size:clamp(34px,10vw,44px)!important;}
   .paywallFunnelHero h2{font-size:14.5px!important;}
   .paywallFunnelBilling{display:grid!important;}
-  .paywallFunnelBilling>div:last-child{width:100%!important;overflow-x:auto!important;}
-  .paywallFunnelBilling button{min-width:96px!important;}
+  .paywallFunnelBilling>div:last-child{width:100%!important;overflow:visible!important;}
+  .paywallFunnelBilling button{min-width:0!important;}
   .paywallFunnelInside div{grid-template-columns:1fr!important;}
+}
+
+/* ======================================================================
+   MTC v45.2 — PRE-DEPLOY VISUAL HOTFIX (Landing + Login + Paywall)
+   Solo CSS. No toca lógica, backend, PayPal ni pricing.
+   ====================================================================== */
+
+/* ── Global: sin scroll horizontal en rutas públicas ── */
+html,
+body,
+#root{
+  max-width:100%!important;
+  overflow-x:hidden!important;
+}
+.publicLanding,
+.authPage,
+.paywallFunnel{
+  max-width:100%!important;
+  overflow-x:hidden!important;
+}
+
+/* ── LANDING OSCURA: contraste premium y legible ── */
+.publicLanding{
+  color:#F4F0E6!important;
+  background-image:
+    linear-gradient(105deg,rgba(4,6,10,.94) 0%,rgba(5,7,11,.88) 38%,rgba(5,7,11,.72) 62%,rgba(4,6,10,.90) 100%),
+    linear-gradient(180deg,rgba(7,9,13,.82),rgba(7,9,13,.96) 58%,#07090D 100%),
+    radial-gradient(circle at 18% 8%,rgba(212,166,58,.14),transparent 28%),
+    url('/landing-trader-bg.jpg')!important;
+  background-size:cover,cover,auto,cover!important;
+  background-position:center,center,center,center top!important;
+}
+.publicLanding:before{
+  opacity:.55!important;
+}
+.landingHero{
+  isolation:isolate!important;
+}
+.landingHeroText{
+  position:relative!important;
+  z-index:2!important;
+  max-width:760px!important;
+  padding:clamp(22px,3.2vw,38px)!important;
+  border-radius:28px!important;
+  background:linear-gradient(145deg,rgba(8,11,17,.88),rgba(6,8,13,.78))!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  box-shadow:0 28px 90px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.06)!important;
+}
+.landingHeroText h1{
+  color:#FFF8EB!important;
+  -webkit-text-fill-color:#FFF8EB!important;
+  font-weight:900!important;
+  line-height:.96!important;
+  letter-spacing:-.068em!important;
+  text-shadow:0 2px 28px rgba(0,0,0,.42)!important;
+}
+.landingHeroText p{
+  color:#D8DEE8!important;
+  -webkit-text-fill-color:#D8DEE8!important;
+  opacity:1!important;
+}
+.landingBadge{
+  color:#F0C55A!important;
+  -webkit-text-fill-color:#F0C55A!important;
+  border-color:rgba(212,166,58,.30)!important;
+  background:rgba(212,166,58,.12)!important;
+}
+.landingBadge.subtleHero{
+  color:#E8EDF5!important;
+  -webkit-text-fill-color:#E8EDF5!important;
+  background:rgba(255,255,255,.06)!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+.landingBadge.soft{
+  color:#E2E8F0!important;
+  -webkit-text-fill-color:#E2E8F0!important;
+}
+.landingMicro{
+  color:#A8B2C4!important;
+  -webkit-text-fill-color:#A8B2C4!important;
+}
+.landingSection h2,
+.landingFinal h2{
+  color:#FFF4D8!important;
+  -webkit-text-fill-color:#FFF4D8!important;
+}
+.landingSection p,
+.landingFinal p,
+.landingFlow p{
+  color:#C5CDD9!important;
+  -webkit-text-fill-color:#C5CDD9!important;
+}
+.landingFlow b,
+.featureGrid div,
+.landingPanel b{
+  color:#F5F0E4!important;
+  -webkit-text-fill-color:#F5F0E4!important;
+}
+.landingPanel ul{
+  color:#D5DCE8!important;
+}
+.publicLanding .landingCta.primary,
+.publicLanding .primary.landingCta{
+  color:#0A0A0A!important;
+  background:linear-gradient(135deg,#E8C96B,#C9A84C,#B8862D)!important;
+  border-color:#C9A84C!important;
+  box-shadow:0 16px 42px rgba(201,168,76,.28)!important;
+}
+.publicLanding .landingCta.ghost,
+.publicLanding .ghost.landingCta{
+  color:#F2F5FA!important;
+  -webkit-text-fill-color:#F2F5FA!important;
+  background:rgba(255,255,255,.07)!important;
+  border-color:rgba(255,255,255,.14)!important;
+}
+.publicLanding .landingCta.subtle{
+  color:#EAD79A!important;
+  -webkit-text-fill-color:#EAD79A!important;
+  border-color:rgba(212,166,58,.28)!important;
+  background:rgba(212,166,58,.08)!important;
+}
+
+/* Light theme guard: landing siempre oscura y legible */
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="light"] .publicLanding .landingHeroText h1,
+:root[data-theme="light"] .publicLanding .landingHeroText p,
+:root[data-theme="light"] .publicLanding .landingBadge,
+:root[data-theme="light"] .publicLanding .landingSection h2,
+:root[data-theme="light"] .publicLanding .landingFinal h2{
+  color:inherit!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+:root[data-theme="light"] .publicLanding .landingHeroText h1{color:#FFF8EB!important;-webkit-text-fill-color:#FFF8EB!important;}
+:root[data-theme="light"] .publicLanding .landingHeroText p{color:#D8DEE8!important;-webkit-text-fill-color:#D8DEE8!important;}
+
+@media(max-width:920px){
+  .landingHeroText{
+    margin:0 auto!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+}
+
+/* ── LOGIN / AUTH: card clara, jerarquía y contraste ── */
+.authPage::after{
+  background:
+    linear-gradient(180deg,rgba(2,3,5,.78),rgba(2,3,5,.90)),
+    radial-gradient(circle at 50% 18%,rgba(212,166,58,.10),transparent 34%)!important;
+}
+.authPage .loginCard.premiumAuth,
+.authPage .standaloneAuth{
+  width:min(460px,100%)!important;
+  max-width:100%!important;
+  background:linear-gradient(180deg,rgba(14,18,27,.97),rgba(9,12,19,.98))!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:0 32px 90px rgba(0,0,0,.52)!important;
+}
+.authPage .loginCard h1,
+.authPage .premiumAuth h1{
+  color:#FFF6DF!important;
+  -webkit-text-fill-color:#FFF6DF!important;
+}
+.authPage .loginCard p,
+.authPage .premiumAuth p,
+.authPage .hint{
+  color:#B8C2D2!important;
+  -webkit-text-fill-color:#B8C2D2!important;
+}
+.authPage .backLanding{
+  color:#E8EDF5!important;
+  background:rgba(255,255,255,.06)!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+.authPage .seg{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  gap:4px!important;
+}
+.authPage .seg button{
+  min-width:0!important;
+  width:100%!important;
+  white-space:nowrap!important;
+}
+:root[data-theme="light"] .authPage{
+  background:#EEF1F6!important;
+}
+:root[data-theme="light"] .authPage::before{opacity:.35!important;}
+:root[data-theme="light"] .authPage::after{
+  background:linear-gradient(180deg,rgba(240,242,246,.88),rgba(240,242,246,.95))!important;
+}
+:root[data-theme="light"] .authPage .loginCard.premiumAuth{
+  background:#FFFFFF!important;
+  border-color:rgba(15,23,42,.10)!important;
+  box-shadow:0 24px 70px rgba(15,23,42,.10)!important;
+}
+:root[data-theme="light"] .authPage .loginCard h1,
+:root[data-theme="light"] .authPage .premiumAuth h1{color:#111827!important;-webkit-text-fill-color:#111827!important;}
+:root[data-theme="light"] .authPage .loginCard p,
+:root[data-theme="light"] .authPage .premiumAuth p,
+:root[data-theme="light"] .authPage .hint{color:#4B5563!important;-webkit-text-fill-color:#4B5563!important;}
+:root[data-theme="light"] .authPage .backLanding{color:#374151!important;background:#FFFFFF!important;border-color:rgba(15,23,42,.10)!important;}
+
+/* ── PAYWALL: selector billing contenido + cards alineadas ── */
+.paywallFunnel{
+  width:100%!important;
+  max-width:100%!important;
+}
+.paywallFunnelShell{
+  width:min(1180px,calc(100% - 8px))!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+.paywallFunnelBilling{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+}
+.paywallFunnelBilling>div:first-child{
+  min-width:0!important;
+}
+.paywallFunnelBilling>div:last-child{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:6px!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  padding:5px!important;
+}
+.paywallFunnelBilling button{
+  min-width:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  padding:10px 8px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  overflow:hidden!important;
+}
+.paywallFunnelBilling button b{
+  display:block!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+  white-space:normal!important;
+}
+.paywallFunnelBilling button small{
+  display:block!important;
+  margin-top:3px!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+  white-space:normal!important;
+}
+.paywallFunnelPlans{
+  align-items:stretch!important;
+}
+.paywallFunnelPlan{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  min-height:480px!important;
+}
+.paywallFunnelPlan ul{
+  flex:1 1 auto!important;
+}
+.paywallFunnelPlan .paywallFunnelValue{
+  flex:0 0 auto!important;
+}
+.paywallFunnelPlan>button{
+  margin-top:auto!important;
+  width:100%!important;
+}
+.paywallFunnelBadge{
+  max-width:calc(100% - 28px)!important;
+  white-space:normal!important;
+  text-align:center!important;
+  line-height:1.2!important;
+}
+
+/* Paywall modo claro: billing y cards sin desborde */
+:root[data-theme="light"] .paywallFunnelBilling>div:last-child{
+  background:rgba(15,23,42,.04)!important;
+  border-color:rgba(15,23,42,.10)!important;
+}
+:root[data-theme="light"] .paywallFunnelBilling button{
+  color:#374151!important;
+}
+:root[data-theme="light"] .paywallFunnelBilling button.active{
+  color:#130E05!important;
+}
+:root[data-theme="light"] .paywallFunnelBilling button.active small{
+  color:#48320D!important;
+}
+
+@media(min-width:761px){
+  .paywallFunnelBilling{
+    grid-template-columns:minmax(0,1fr) minmax(280px,360px)!important;
+    align-items:center!important;
+  }
+}
+@media(max-width:760px){
+  .paywallFunnelBilling>div:last-child{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  .paywallFunnelPlan{
+    min-height:auto!important;
+  }
+}
+@media(max-width:400px){
+  .paywallFunnelBilling button b{font-size:11px!important;}
+  .paywallFunnelBilling button small{font-size:9px!important;}
+}
+
+/* ======================================================================
+   MTC v45.3 — FINAL PRE-DEPLOY (Landing + Paywall premium SaaS)
+   Solo CSS + wrappers mínimos en JSX. Sin pricing/backend/PayPal.
+   ====================================================================== */
+
+/* ── LANDING: más jerarquía, aire y contraste ── */
+.publicLanding{
+  padding:clamp(24px,4vw,56px) clamp(18px,4vw,64px) clamp(40px,6vw,72px)!important;
+}
+.landingHero{
+  gap:clamp(32px,5vw,80px)!important;
+  padding-bottom:clamp(24px,4vw,48px)!important;
+}
+.landingHeroText h1{
+  font-size:clamp(42px,5.4vw,76px)!important;
+  margin:22px 0 20px!important;
+}
+.landingHeroText p{
+  font-size:clamp(16px,1.6vw,19px)!important;
+  line-height:1.68!important;
+  max-width:640px!important;
+}
+.landingActions{
+  gap:14px!important;
+  margin-top:28px!important;
+}
+.landingFlow.persuasive{
+  gap:18px!important;
+  margin-bottom:clamp(40px,5vw,64px)!important;
+}
+.landingFlow.persuasive div{
+  padding:26px 24px!important;
+  background:rgba(8,11,17,.72)!important;
+  border-color:rgba(255,255,255,.09)!important;
+}
+.landingSection,
+.landingFinal{
+  padding:clamp(28px,4vw,42px)!important;
+  margin-bottom:clamp(36px,5vw,56px)!important;
+  background:linear-gradient(180deg,rgba(10,13,20,.82),rgba(8,10,16,.68))!important;
+  border-color:rgba(255,255,255,.09)!important;
+}
+.landingVideoCard{
+  box-shadow:0 40px 110px rgba(0,0,0,.58),0 0 0 1px rgba(212,166,58,.14) inset!important;
+}
+
+/* ── PAYWALL: dashboard blur de fondo (producto bloqueado) ── */
+.paywallFunnel{
+  position:relative!important;
+  isolation:isolate!important;
+  min-height:100dvh!important;
+  padding:clamp(16px,2.5vw,36px)!important;
+  background:#04060a!important;
+}
+.paywallFunnelDashboardBg{
+  position:fixed!important;
+  inset:0!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  overflow:hidden!important;
+}
+.paywallFunnelDashboardBg>img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center top!important;
+  opacity:.34!important;
+  filter:blur(7px) saturate(.92) brightness(.48) contrast(1.04)!important;
+  transform:scale(1.04)!important;
+}
+.paywallFunnelFakeDash{
+  position:absolute!important;
+  inset:clamp(28px,4vw,56px)!important;
+  display:grid!important;
+  grid-template-columns:220px repeat(3,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(120px,1fr)!important;
+  gap:16px!important;
+  opacity:.22!important;
+  filter:blur(1px)!important;
+}
+.paywallFunnelFakeDash aside{
+  grid-row:span 3!important;
+  border-radius:22px!important;
+  border:1px solid rgba(212,168,67,.14)!important;
+  background:linear-gradient(180deg,rgba(212,168,67,.10),rgba(255,255,255,.02))!important;
+}
+.paywallFunnelFakeDash section{
+  border-radius:20px!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02))!important;
+  box-shadow:0 24px 60px rgba(0,0,0,.28)!important;
+}
+.paywallFunnelFakeDash section:nth-child(3){grid-column:span 2!important;}
+.paywallFunnelFakeDash section:nth-child(6){grid-column:span 2!important;}
+.paywallFunnelBg{
+  z-index:1!important;
+}
+.paywallFunnelBg:after{
+  content:''!important;
+  position:absolute!important;
+  inset:0!important;
+  background:
+    linear-gradient(180deg,rgba(4,6,10,.72) 0%,rgba(4,6,10,.88) 42%,rgba(4,6,10,.94) 100%),
+    radial-gradient(circle at 50% 0%,rgba(212,168,67,.08),transparent 42%)!important;
+  pointer-events:none!important;
+}
+.paywallFunnelShell{
+  position:relative!important;
+  z-index:2!important;
+  width:min(1280px,calc(100% - 12px))!important;
+  padding:clamp(22px,3vw,36px)!important;
+  border-radius:32px!important;
+  background:linear-gradient(180deg,rgba(14,18,28,.94),rgba(9,12,20,.97))!important;
+  border:1px solid rgba(240,197,90,.18)!important;
+  box-shadow:
+    0 40px 120px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,255,255,.04) inset!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+}
+
+/* Header: cerrar sesión secundario */
+.paywallFunnelSignOut,
+.paywallFunnelActions button.paywallFunnelSignOut{
+  height:36px!important;
+  padding:0 12px!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  color:#8B95A8!important;
+  background:transparent!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+}
+.paywallFunnelSignOut:hover{
+  color:#C5CDD8!important;
+  border-color:rgba(255,255,255,.14)!important;
+  background:rgba(255,255,255,.04)!important;
+}
+.paywallFunnelStatus{
+  font-size:10px!important;
+  letter-spacing:.1em!important;
+}
+
+/* Layout: hero + proof arriba, planes full-width abajo */
+.paywallFunnelLayout{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:clamp(24px,3vw,36px)!important;
+}
+.paywallFunnelTopRow{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.08fr) minmax(300px,.72fr)!important;
+  gap:clamp(20px,3vw,32px)!important;
+  align-items:start!important;
+}
+.paywallFunnelMain{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:20px!important;
+  min-width:0!important;
+}
+.paywallFunnelHero{
+  margin-bottom:0!important;
+}
+.paywallFunnelHero h1{
+  font-size:clamp(36px,3.8vw,54px)!important;
+  line-height:.98!important;
+}
+.paywallFunnelHero h2{
+  font-size:clamp(14px,1.4vw,16px)!important;
+  line-height:1.62!important;
+}
+
+/* Billing: pill switch limpio */
+.paywallFunnelBilling{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  padding:20px 22px!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.035)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+.paywallFunnelBilling>div:first-child b{
+  font-size:15px!important;
+  line-height:1.35!important;
+}
+.paywallFunnelBilling>div:first-child span{
+  margin-top:6px!important;
+  font-size:13px!important;
+}
+.paywallFunnelBillingSwitch,
+.paywallFunnelBilling>div:last-child{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+  width:100%!important;
+  max-width:100%!important;
+  padding:6px!important;
+  border-radius:18px!important;
+  background:rgba(0,0,0,.28)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  overflow:hidden!important;
+}
+.paywallFunnelBillingSwitch button,
+.paywallFunnelBilling>div:last-child button{
+  min-width:0!important;
+  min-height:52px!important;
+  padding:10px 10px!important;
+  border-radius:14px!important;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease!important;
+}
+.paywallFunnelBillingSwitch button.active,
+.paywallFunnelBilling>div:last-child button.active{
+  background:linear-gradient(135deg,#F0C55A,#D4A843)!important;
+  color:#120D04!important;
+  box-shadow:0 12px 28px rgba(212,168,67,.22)!important;
+  transform:none!important;
+}
+.paywallFunnelBillingSwitch button:not(.active):hover,
+.paywallFunnelBilling>div:last-child button:not(.active):hover{
+  background:rgba(255,255,255,.05)!important;
+}
+
+/* Pricing cards: más anchas, aire y jerarquía */
+.paywallFunnelPlans{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:clamp(16px,2vw,22px)!important;
+  width:100%!important;
+  align-items:stretch!important;
+}
+.paywallFunnelPlan{
+  position:relative!important;
+  min-height:0!important;
+  padding:clamp(22px,2.4vw,28px)!important;
+  gap:18px!important;
+  border-radius:24px!important;
+  background:linear-gradient(180deg,rgba(18,22,32,.96),rgba(11,14,22,.98))!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+}
+.paywallFunnelPlan.featured{
+  border-color:rgba(212,168,67,.38)!important;
+  background:
+    radial-gradient(circle at 88% 0%,rgba(212,168,67,.18),transparent 38%),
+    linear-gradient(180deg,rgba(28,24,16,.98),rgba(12,14,22,.98))!important;
+  box-shadow:0 28px 70px rgba(0,0,0,.32),0 0 0 1px rgba(212,168,67,.12) inset!important;
+}
+.paywallFunnelBadge{
+  position:relative!important;
+  top:auto!important;
+  right:auto!important;
+  align-self:flex-start!important;
+  margin:0 0 2px!important;
+  padding:8px 12px!important;
+  max-width:100%!important;
+  font-size:10px!important;
+  letter-spacing:.1em!important;
+}
+.paywallFunnelPlanTop{
+  padding-top:0!important;
+}
+.paywallFunnelPlanTop>span{
+  margin-bottom:12px!important;
+  padding:7px 11px!important;
+}
+.paywallFunnelPlanTop h3{
+  font-size:clamp(28px,2.6vw,36px)!important;
+  margin-bottom:4px!important;
+}
+.paywallFunnelPlanTop p{
+  font-size:14px!important;
+  line-height:1.55!important;
+  margin-top:8px!important;
+}
+.paywallFunnelPrice{
+  padding:20px 22px!important;
+  border-radius:20px!important;
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+}
+.paywallFunnelPlan.featured .paywallFunnelPrice{
+  background:linear-gradient(180deg,rgba(212,168,67,.12),rgba(255,255,255,.03))!important;
+  border-color:rgba(212,168,67,.22)!important;
+}
+.paywallFunnelPrice s{
+  margin-bottom:4px!important;
+  font-size:13px!important;
+}
+.paywallFunnelPrice b{
+  font-size:clamp(38px,3.2vw,48px)!important;
+  line-height:1!important;
+  letter-spacing:-.05em!important;
+}
+.paywallFunnelPrice em{
+  margin-top:10px!important;
+  font-size:11px!important;
+}
+.paywallFunnelPrice small{
+  margin-top:8px!important;
+  font-size:12px!important;
+  line-height:1.45!important;
+}
+.paywallFunnelValue{
+  min-height:0!important;
+  font-size:13px!important;
+  line-height:1.55!important;
+  padding:0 2px!important;
+}
+.paywallFunnelPlan ul{
+  gap:11px!important;
+  padding-top:4px!important;
+}
+.paywallFunnelPlan li{
+  font-size:13.5px!important;
+  gap:10px!important;
+}
+.paywallFunnelPlan>button{
+  margin-top:auto!important;
+  min-height:52px!important;
+  font-size:15px!important;
+  border-radius:15px!important;
+}
+.paywallFunnelPlan button.primary{
+  background:linear-gradient(135deg,#F0C55A,#D4A843)!important;
+  color:#120D04!important;
+  border:0!important;
+  box-shadow:0 16px 36px rgba(212,168,67,.26)!important;
+}
+.paywallFunnelPlan button.secondary{
+  background:transparent!important;
+  color:#F0E6CC!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+}
+.paywallFunnelPlan button.secondary:hover{
+  border-color:rgba(212,168,67,.28)!important;
+  background:rgba(255,255,255,.04)!important;
+}
+
+/* Proof aside: compacto, no compite con planes */
+.paywallFunnelProof{
+  position:relative!important;
+  top:auto!important;
+  gap:12px!important;
+  padding:4px 0!important;
+}
+.paywallFunnelPreview{
+  border-radius:18px!important;
+  overflow:hidden!important;
+}
+.paywallFunnelLock{
+  padding:14px 16px!important;
+  font-size:12px!important;
+  line-height:1.5!important;
+  color:#B0BAC9!important;
+}
+
+/* Modo claro paywall */
+:root[data-theme="light"] .paywallFunnel{
+  background:#EEF1F6!important;
+}
+:root[data-theme="light"] .paywallFunnelDashboardBg>img{
+  opacity:.22!important;
+  filter:blur(9px) saturate(.9) brightness(.72)!important;
+}
+:root[data-theme="light"] .paywallFunnelShell{
+  background:rgba(255,255,255,.94)!important;
+  border-color:rgba(183,134,28,.18)!important;
+  box-shadow:0 32px 90px rgba(15,23,42,.12)!important;
+}
+:root[data-theme="light"] .paywallFunnelPlan button.secondary{
+  color:#374151!important;
+  border-color:rgba(15,23,42,.12)!important;
+}
+
+@media(max-width:1100px){
+  .paywallFunnelTopRow{
+    grid-template-columns:1fr!important;
+  }
+  .paywallFunnelProof{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .paywallFunnelLogo,
+  .paywallFunnelPreview{grid-column:span 2!important;}
+}
+@media(max-width:768px){
+  .paywallFunnelFakeDash{
+    inset:16px!important;
+    grid-template-columns:1fr 1fr!important;
+    opacity:.14!important;
+  }
+  .paywallFunnelFakeDash aside{display:none!important;}
+  .paywallFunnelShell{
+    padding:18px 16px!important;
+    border-radius:24px!important;
+  }
+  .paywallFunnelHeader{
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:12px!important;
+  }
+  .paywallFunnelActions{
+    justify-content:space-between!important;
+    flex-wrap:wrap!important;
+  }
+  .paywallFunnelPlans{
+    grid-template-columns:1fr!important;
+    gap:16px!important;
+  }
+  .paywallFunnelPlan{
+    padding:22px 20px!important;
+  }
+  .paywallFunnelProof{
+    grid-template-columns:1fr!important;
+  }
+  .paywallFunnelLogo,
+  .paywallFunnelPreview{grid-column:auto!important;}
+  .paywallFunnelBilling{
+    padding:18px 16px!important;
+  }
+  .landingHeroText h1{
+    font-size:clamp(36px,10vw,52px)!important;
+  }
+}
+@media(max-width:400px){
+  .paywallFunnelBillingSwitch button,
+  .paywallFunnelBilling>div:last-child button{
+    min-height:48px!important;
+    padding:8px 6px!important;
+  }
+}
+
+/* ======================================================================
+   MTC v45.4 — Paywall premium activation hero
+   Dashboard visible · cards jerarquizadas · tipografía editorial
+   ====================================================================== */
+
+/* ── Dashboard de fondo: producto real, blur mínimo ── */
+.paywallFunnelDashboardBg>img{
+  opacity:.68!important;
+  filter:blur(2px) saturate(1.12) brightness(.62) contrast(1.06)!important;
+  transform:scale(1.02)!important;
+}
+.paywallFunnelFakeDash{
+  opacity:.38!important;
+  filter:none!important;
+  inset:clamp(20px,3vw,48px)!important;
+}
+.paywallFunnelFakeDash aside,
+.paywallFunnelFakeDash section{
+  box-shadow:0 20px 50px rgba(0,0,0,.32)!important;
+}
+.paywallFunnelBg:after{
+  background:
+    linear-gradient(180deg,rgba(4,6,10,.48) 0%,rgba(4,6,10,.62) 38%,rgba(4,6,10,.78) 100%),
+    radial-gradient(ellipse 80% 60% at 50% 20%,rgba(212,168,67,.06),transparent 55%)!important;
+}
+
+/* ── Shell: cristal premium sin ocultar el fondo ── */
+.paywallFunnelShell{
+  width:min(1320px,calc(100% - 16px))!important;
+  padding:clamp(24px,3.2vw,40px)!important;
+  border-radius:34px!important;
+  background:linear-gradient(180deg,rgba(12,16,26,.90),rgba(8,11,18,.93))!important;
+  border:1px solid rgba(240,197,90,.22)!important;
+  box-shadow:
+    0 48px 140px rgba(0,0,0,.52),
+    0 0 80px rgba(212,168,67,.06),
+    inset 0 1px rgba(255,255,255,.06)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+}
+
+/* ── Layout: composición hero → billing → planes ── */
+.paywallFunnelLayout{
+  gap:clamp(28px,3.5vw,40px)!important;
+}
+.paywallFunnelActivation{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.05fr) minmax(280px,.75fr)!important;
+  gap:clamp(24px,3vw,36px)!important;
+  align-items:center!important;
+}
+.paywallFunnelHero{
+  text-align:left!important;
+}
+.paywallFunnelHero p{
+  margin:0 0 18px!important;
+  padding:9px 14px!important;
+  font-size:10px!important;
+  letter-spacing:.16em!important;
+  color:#F0C55A!important;
+  background:rgba(212,168,67,.10)!important;
+  border-color:rgba(240,197,90,.28)!important;
+}
+.paywallFunnelHero h1{
+  max-width:820px!important;
+  font-size:clamp(44px,5.2vw,68px)!important;
+  line-height:.92!important;
+  letter-spacing:-.075em!important;
+  font-weight:900!important;
+  color:#FFF8E8!important;
+}
+.paywallFunnelHero h2{
+  max-width:640px!important;
+  margin-top:20px!important;
+  font-size:clamp(15px,1.5vw,17px)!important;
+  line-height:1.65!important;
+  font-weight:500!important;
+  color:#A8B4C8!important;
+}
+.paywallFunnelChips{
+  margin-top:22px!important;
+  gap:10px!important;
+}
+.paywallFunnelChips span{
+  padding:10px 14px!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  letter-spacing:.01em!important;
+  color:#E8DCC0!important;
+  background:rgba(255,255,255,.05)!important;
+  border-color:rgba(255,255,255,.10)!important;
+}
+
+/* ── Product strip: preview + unlock grid ── */
+.paywallFunnelProductStrip{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:14px!important;
+  min-width:0!important;
+}
+.paywallFunnelProductStrip .paywallFunnelPreview{
+  aspect-ratio:16/10!important;
+  margin-top:0!important;
+  border-radius:20px!important;
+  border:1px solid rgba(212,168,67,.26)!important;
+  box-shadow:0 24px 64px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.04) inset!important;
+}
+.paywallFunnelProductStrip .paywallFunnelPreview video{
+  filter:saturate(1.05) brightness(.78) contrast(1.08)!important;
+}
+.paywallFunnelProductStrip .paywallFunnelInside{
+  padding:16px 18px!important;
+  border-radius:18px!important;
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+}
+.paywallFunnelProductStrip .paywallFunnelInside>b{
+  font-size:11px!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  color:#F0C55A!important;
+  margin-bottom:10px!important;
+}
+.paywallFunnelProductStrip .paywallFunnelInside div{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+.paywallFunnelProductStrip .paywallFunnelInside span{
+  padding:8px 10px!important;
+  font-size:11px!important;
+  font-weight:700!important;
+}
+
+/* ── Billing: selector pill premium ── */
+.paywallFunnelBilling{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(320px,420px)!important;
+  align-items:center!important;
+  gap:20px!important;
+  padding:22px 26px!important;
+  border-radius:24px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.025))!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+}
+.paywallFunnelBilling>div:first-child b{
+  font-size:16px!important;
+  font-weight:800!important;
+  letter-spacing:-.02em!important;
+  color:#FFF4DC!important;
+}
+.paywallFunnelBilling>div:first-child span{
+  font-size:13.5px!important;
+  color:#94A0B4!important;
+}
+.paywallFunnelBillingSwitch,
+.paywallFunnelBilling>div:last-child{
+  padding:7px!important;
+  border-radius:20px!important;
+  background:rgba(0,0,0,.32)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+}
+.paywallFunnelBillingSwitch button,
+.paywallFunnelBilling>div:last-child button{
+  min-height:54px!important;
+  border-radius:15px!important;
+}
+.paywallFunnelBillingSwitch button b,
+.paywallFunnelBilling>div:last-child button b{
+  font-size:13px!important;
+  font-weight:800!important;
+  letter-spacing:.02em!important;
+}
+.paywallFunnelBillingSwitch button small,
+.paywallFunnelBilling>div:last-child button small{
+  font-size:10px!important;
+  letter-spacing:.04em!important;
+  opacity:.85!important;
+}
+
+/* ── Pricing cards: 3 columnas, jerarquía clara ── */
+.paywallFunnelPlans{
+  gap:clamp(18px,2.2vw,24px)!important;
+}
+.paywallFunnelPlan{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:20px!important;
+  padding:clamp(24px,2.6vw,30px)!important;
+  min-height:520px!important;
+  border-radius:26px!important;
+  background:linear-gradient(180deg,rgba(16,20,30,.97),rgba(10,13,20,.98))!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease!important;
+}
+.paywallFunnelPlan:hover{
+  transform:translateY(-3px)!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:0 28px 70px rgba(0,0,0,.34)!important;
+}
+.paywallFunnelPlan.base{
+  background:linear-gradient(180deg,rgba(14,18,28,.97),rgba(9,12,18,.98))!important;
+}
+.paywallFunnelPlan.pro.featured{
+  min-height:548px!important;
+  margin-top:-8px!important;
+  border-color:rgba(212,168,67,.45)!important;
+  background:
+    radial-gradient(circle at 85% 0%,rgba(212,168,67,.22),transparent 42%),
+    linear-gradient(180deg,rgba(30,26,16,.98),rgba(12,14,22,.98))!important;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.38),
+    0 0 48px rgba(212,168,67,.12),
+    inset 0 1px rgba(212,168,67,.18)!important;
+}
+.paywallFunnelPlan.pro.featured:hover{
+  transform:translateY(-5px)!important;
+  box-shadow:
+    0 36px 90px rgba(0,0,0,.42),
+    0 0 60px rgba(212,168,67,.16),
+    inset 0 1px rgba(212,168,67,.22)!important;
+}
+.paywallFunnelPlan.mentor{
+  background:linear-gradient(180deg,rgba(14,16,26,.98),rgba(8,10,18,.99))!important;
+  border-color:rgba(180,160,220,.18)!important;
+  box-shadow:0 24px 64px rgba(0,0,0,.32),inset 0 1px rgba(180,160,220,.08)!important;
+}
+.paywallFunnelPlan.mentor .paywallFunnelPlanTop>span{
+  color:#C4B8E8!important;
+  background:rgba(180,160,220,.10)!important;
+  border-color:rgba(180,160,220,.18)!important;
+}
+.paywallFunnelPlan.mentor .paywallFunnelPrice{
+  background:linear-gradient(180deg,rgba(180,160,220,.08),rgba(255,255,255,.02))!important;
+  border-color:rgba(180,160,220,.16)!important;
+}
+.paywallFunnelPlan.mentor .paywallFunnelPrice b{
+  color:#F5F0FF!important;
+}
+.paywallFunnelPlan.mentor .paywallFunnelPrice em{
+  color:#C4B8E8!important;
+}
+.paywallFunnelBadge{
+  align-self:flex-start!important;
+  margin:0 0 4px!important;
+  padding:8px 13px!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  color:#F9D775!important;
+  background:rgba(212,168,67,.18)!important;
+  border:1px solid rgba(212,168,67,.38)!important;
+  border-radius:999px!important;
+  box-shadow:0 8px 24px rgba(212,168,67,.14)!important;
+}
+.paywallFunnelPlanTop>span{
+  display:inline-flex!important;
+  margin-bottom:14px!important;
+  padding:7px 12px!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.13em!important;
+  text-transform:uppercase!important;
+}
+.paywallFunnelPlanTop h3{
+  font-size:clamp(30px,2.8vw,38px)!important;
+  font-weight:900!important;
+  letter-spacing:-.045em!important;
+  line-height:1!important;
+  color:#FFF6E4!important;
+}
+.paywallFunnelPlanTop p{
+  margin-top:10px!important;
+  font-size:14px!important;
+  line-height:1.58!important;
+  font-weight:500!important;
+  color:#9AA6BA!important;
+}
+.paywallFunnelPrice{
+  padding:22px 24px!important;
+  border-radius:22px!important;
+  margin:4px 0!important;
+}
+.paywallFunnelPlan.featured .paywallFunnelPrice{
+  background:linear-gradient(180deg,rgba(212,168,67,.14),rgba(255,255,255,.03))!important;
+  border-color:rgba(212,168,67,.26)!important;
+}
+.paywallFunnelPrice b{
+  font-size:clamp(44px,3.8vw,56px)!important;
+  font-weight:900!important;
+  letter-spacing:-.06em!important;
+  line-height:.95!important;
+  color:#FFF4D8!important;
+}
+.paywallFunnelPrice em{
+  margin-top:12px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  letter-spacing:.14em!important;
+}
+.paywallFunnelPrice small{
+  margin-top:10px!important;
+  font-size:12.5px!important;
+  line-height:1.5!important;
+  color:#8E9AAD!important;
+}
+.paywallFunnelValue{
+  font-size:13.5px!important;
+  line-height:1.58!important;
+  color:#B0BAC9!important;
+  padding:0 4px!important;
+}
+.paywallFunnelPlan ul{
+  gap:12px!important;
+  padding:6px 0 8px!important;
+  flex:1 1 auto!important;
+}
+.paywallFunnelPlan li{
+  font-size:13.5px!important;
+  line-height:1.48!important;
+  color:#E4DAC8!important;
+}
+.paywallFunnelPlan li svg{
+  color:#F0C55A!important;
+  flex-shrink:0!important;
+}
+.paywallFunnelPlan.mentor li svg{
+  color:#C4B8E8!important;
+}
+.paywallFunnelPlan>button{
+  margin-top:auto!important;
+  min-height:54px!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  letter-spacing:.02em!important;
+  border-radius:16px!important;
+}
+.paywallFunnelPlan button.primary{
+  background:linear-gradient(135deg,#F2CA5E 0%,#D4A843 48%,#C9913D 100%)!important;
+  color:#120D04!important;
+  box-shadow:0 18px 40px rgba(212,168,67,.30)!important;
+}
+.paywallFunnelPlan button.primary:hover{
+  box-shadow:0 22px 48px rgba(212,168,67,.38)!important;
+}
+.paywallFunnelPlan button.secondary{
+  background:rgba(255,255,255,.04)!important;
+  color:#F2E8D0!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+}
+.paywallFunnelPlan.mentor button.secondary{
+  color:#E8E0F8!important;
+  border-color:rgba(180,160,220,.22)!important;
+  background:rgba(180,160,220,.06)!important;
+}
+.paywallFunnelLock{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  padding:16px 20px!important;
+  border-radius:18px!important;
+  font-size:13px!important;
+  font-weight:600!important;
+  letter-spacing:.01em!important;
+  color:#A8B4C8!important;
+  background:rgba(255,255,255,.035)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  text-align:center!important;
+}
+.paywallFunnelLock svg{
+  color:#F0C55A!important;
+  flex-shrink:0!important;
+}
+
+/* ── Tipografía global paywall ── */
+.paywallFunnel,
+.paywallFunnel *{
+  font-feature-settings:'kern' 1,'liga' 1!important;
+}
+.paywallFunnelBrand b{
+  font-size:15px!important;
+  font-weight:800!important;
+  letter-spacing:-.01em!important;
+}
+.paywallFunnelBrand span{
+  font-size:11px!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+}
+.paywallFunnelStatus{
+  font-weight:900!important;
+  letter-spacing:.12em!important;
+}
+
+/* ── Modo claro ── */
+:root[data-theme="light"] .paywallFunnelDashboardBg>img{
+  opacity:.38!important;
+  filter:blur(3px) saturate(1.05) brightness(.78)!important;
+}
+:root[data-theme="light"] .paywallFunnelShell{
+  background:rgba(255,255,255,.92)!important;
+}
+:root[data-theme="light"] .paywallFunnelHero h1{color:#0F172A!important;}
+:root[data-theme="light"] .paywallFunnelHero h2{color:#4B5563!important;}
+:root[data-theme="light"] .paywallFunnelPlan.mentor{
+  border-color:rgba(99,102,241,.18)!important;
+}
+
+/* ── Responsive ── */
+@media(min-width:769px){
+  .paywallFunnelPlans{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:1100px){
+  .paywallFunnelActivation{
+    grid-template-columns:1fr!important;
+    gap:24px!important;
+  }
+  .paywallFunnelProductStrip{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:14px!important;
+    align-items:stretch!important;
+  }
+  .paywallFunnelProductStrip .paywallFunnelPreview{
+    grid-column:span 2!important;
+  }
+  .paywallFunnelPlans{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  .paywallFunnelPlan.pro.featured{
+    margin-top:0!important;
+    min-height:520px!important;
+  }
+}
+@media(max-width:900px){
+  .paywallFunnelBilling{
+    grid-template-columns:1fr!important;
+  }
+}
+@media(max-width:768px){
+  .paywallFunnelPlans{
+    grid-template-columns:1fr!important;
+    gap:18px!important;
+  }
+  .paywallFunnelPlan,
+  .paywallFunnelPlan.pro.featured{
+    min-height:auto!important;
+    margin-top:0!important;
+  }
+  .paywallFunnelDashboardBg>img{
+    opacity:.52!important;
+    filter:blur(3px) saturate(1.08) brightness(.58)!important;
+  }
+  .paywallFunnelFakeDash{
+    opacity:.22!important;
+  }
+  .paywallFunnelShell{
+    padding:20px 16px!important;
+    border-radius:26px!important;
+  }
+  .paywallFunnelHero h1{
+    font-size:clamp(36px,9.5vw,48px)!important;
+  }
+  .paywallFunnelProductStrip{
+    grid-template-columns:1fr!important;
+  }
+  .paywallFunnelProductStrip .paywallFunnelPreview{
+    grid-column:auto!important;
+  }
+  .paywallFunnelPrice b{
+    font-size:clamp(40px,11vw,48px)!important;
+  }
+}
+@media(max-width:400px){
+  .paywallFunnelProductStrip .paywallFunnelInside div{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* ======================================================================
+   MTC v47 — Paywall premium loop video · pricing polish · bugfixes
+   ====================================================================== */
+
+/* Video de fondo: profundidad sutil, no compite con contenido */
+.paywallFunnelVideoBg{
+  position:fixed!important;
+  inset:0!important;
+  z-index:0!important;
+  overflow:hidden!important;
+  pointer-events:none!important;
+}
+.paywallFunnelVideoBg video{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  opacity:.15!important;
+  filter:blur(3px) saturate(.62) brightness(.52)!important;
+  transform:scale(1.04)!important;
+}
+.paywallFunnelVideoBgOverlay{
+  position:absolute!important;
+  inset:0!important;
+  background:rgba(0,0,0,.80)!important;
+  pointer-events:none!important;
+}
+.paywallFunnelDashboardBg{
+  display:none!important;
+}
+
+/* Overlay general más sobrio */
+.paywallFunnelBg{
+  z-index:1!important;
+}
+.paywallFunnelBg:after{
+  background:
+    linear-gradient(180deg,rgba(2,3,6,.55) 0%,rgba(2,3,6,.72) 45%,rgba(2,3,6,.82) 100%),
+    radial-gradient(ellipse 70% 50% at 50% 0%,rgba(212,168,67,.05),transparent 60%)!important;
+}
+
+/* Shell: sin recortes ni scroll interno feo */
+.paywallFunnel{
+  height:auto!important;
+  min-height:100dvh!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+.paywallFunnelShell{
+  overflow:visible!important;
+  max-height:none!important;
+  width:min(1240px,calc(100% - 20px))!important;
+  padding:clamp(22px,2.8vw,34px)!important;
+  background:linear-gradient(180deg,rgba(10,13,20,.92),rgba(7,9,15,.94))!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+}
+
+/* Card visual superior derecha: video 16:9 premium */
+.paywallFunnelProductStrip .paywallFunnelPreview{
+  position:relative!important;
+  aspect-ratio:16/9!important;
+  margin-top:0!important;
+  border-radius:18px!important;
+  border:1px solid rgba(212,168,67,.22)!important;
+  background:#05070c!important;
+  overflow:hidden!important;
+  box-shadow:0 20px 56px rgba(0,0,0,.38)!important;
+}
+.paywallFunnelProductStrip .paywallFunnelPreview video{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  filter:saturate(.88) brightness(.72) contrast(1.05)!important;
+}
+.paywallFunnelProductStrip .paywallFunnelPreview:after{
+  content:''!important;
+  position:absolute!important;
+  inset:0!important;
+  background:linear-gradient(180deg,rgba(2,4,8,.08),rgba(2,4,8,.52))!important;
+  pointer-events:none!important;
+}
+
+/* Cards: legibles, sin laterales invisibles ni compresión */
+.paywallFunnelPlans{
+  gap:clamp(14px,1.8vw,20px)!important;
+  width:100%!important;
+  max-width:100%!important;
+}
+.paywallFunnelPlan{
+  min-height:0!important;
+  overflow:visible!important;
+  padding:clamp(20px,2.2vw,26px)!important;
+  gap:16px!important;
+}
+.paywallFunnelPlan.pro.featured{
+  margin-top:0!important;
+  min-height:0!important;
+  transform:none!important;
+  border-color:rgba(212,168,67,.34)!important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.30),
+    0 0 32px rgba(212,168,67,.08),
+    inset 0 1px rgba(212,168,67,.14)!important;
+}
+.paywallFunnelPlan:hover,
+.paywallFunnelPlan.pro.featured:hover{
+  transform:translateY(-2px)!important;
+}
+
+/* Precios: protagonistas pero sin romper cards */
+.paywallFunnelPrice{
+  padding:16px 18px!important;
+  overflow:hidden!important;
+}
+.paywallFunnelPrice b{
+  font-size:clamp(28px,2.4vw,36px)!important;
+  line-height:1.05!important;
+  letter-spacing:-.04em!important;
+  word-break:break-word!important;
+}
+.paywallFunnelPrice s{
+  font-size:12px!important;
+}
+.paywallFunnelPrice em{
+  font-size:10px!important;
+  letter-spacing:.12em!important;
+}
+.paywallFunnelPrice small{
+  font-size:11.5px!important;
+  line-height:1.45!important;
+}
+
+/* Tipografía hero más institucional, menos exagerada */
+.paywallFunnelHero h1{
+  font-size:clamp(36px,4vw,56px)!important;
+  line-height:.96!important;
+  letter-spacing:-.06em!important;
+}
+.paywallFunnelHero h2{
+  font-size:clamp(14px,1.35vw,16px)!important;
+  line-height:1.62!important;
+}
+
+/* Espaciado vertical más contenido */
+.paywallFunnelLayout{
+  gap:clamp(22px,2.8vw,32px)!important;
+}
+.paywallFunnelActivation{
+  gap:clamp(20px,2.5vw,28px)!important;
+}
+
+@media(max-width:768px){
+  .paywallFunnelVideoBg video{
+    opacity:.12!important;
+    filter:blur(4px) saturate(.58) brightness(.48)!important;
+  }
+  .paywallFunnelVideoBgOverlay{
+    background:rgba(0,0,0,.84)!important;
+  }
+  .paywallFunnelPrice b{
+    font-size:clamp(26px,7.5vw,34px)!important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MTC v47.3 — PAYWALL ROLLBACK + SMOKE BACKGROUND
+   Vuelve al paywall oscuro v47, solo cambia el fondo general y libera scroll.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html.mtc-paywall-open,
+body.mtc-paywall-open,
+html.mtc-paywall-open #root,
+body.mtc-paywall-open #root{
+  height:auto!important;
+  min-height:100%!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+
+body.mtc-paywall-open{
+  background:#030406!important;
+}
+
+.paywallFunnel{
+  position:relative!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  max-height:none!important;
+  display:grid!important;
+  place-items:start center!important;
+  padding:28px!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+  background:#030406!important;
+  color:#f7eed8!important;
+  isolation:isolate!important;
+}
+
+/* La imagen smoke es SOLO fondo general; el video queda SOLO en la card derecha. */
+.paywallFunnel::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(90deg,rgba(3,4,7,.90),rgba(3,4,7,.76) 48%,rgba(3,4,7,.91)),
+    radial-gradient(circle at 15% 10%,rgba(201,145,61,.14),transparent 32%),
+    url("/paywall-premium-bg.webp");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  filter:saturate(.86) brightness(.68) contrast(1.03);
+}
+
+.paywallFunnel::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:radial-gradient(circle at 50% 0%,rgba(201,145,61,.10),transparent 38%);
+}
+
+/* Anulamos solo el video de fondo full-screen anterior. */
+.paywallFunnelVideoBg,
+.paywallFunnelVideoBg video,
+.paywallFunnelVideoBgOverlay{
+  display:none!important;
+  pointer-events:none!important;
+}
+
+/* Mantiene glows viejos sin tapar contenido. */
+.paywallFunnelBg{
+  position:fixed!important;
+  inset:0!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  background:radial-gradient(circle at 18% 8%,rgba(212,168,67,.10),transparent 30%),radial-gradient(circle at 92% 18%,rgba(36,99,168,.07),transparent 24%)!important;
+}
+.paywallFunnelBg:before{display:none!important;}
+.paywallFunnelBg span{opacity:.18!important;filter:blur(60px)!important;}
+
+/* Volvemos al shell oscuro; sin tema blanco y sin scroll interno. */
+.paywallFunnelShell{
+  position:relative!important;
+  z-index:2!important;
+  width:min(1240px,96vw)!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  padding:24px!important;
+  border-radius:32px!important;
+  border:1px solid rgba(212,168,67,.26)!important;
+  background:linear-gradient(145deg,rgba(14,17,24,.96),rgba(8,10,15,.985))!important;
+  box-shadow:0 44px 130px rgba(0,0,0,.70),0 0 0 1px rgba(255,255,255,.035) inset!important;
+  backdrop-filter:blur(10px)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+}
+
+.paywallFunnelHeader,
+.paywallFunnelLayout,
+.paywallFunnelActivation,
+.paywallFunnelBilling,
+.paywallFunnelPlans,
+.paywallFunnelLock{
+  position:relative!important;
+  z-index:3!important;
+}
+
+.paywallFunnelHeader{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+  padding:0 2px 18px!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+  margin-bottom:24px!important;
+}
+
+.paywallFunnelBrand b{color:#fff4d6!important;}
+.paywallFunnelBrand span{color:#8d97aa!important;}
+.paywallFunnelStatus{color:#f4ce73!important;background:rgba(212,168,67,.12)!important;border-color:rgba(212,168,67,.26)!important;}
+.paywallFunnelActions button{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))!important;color:#f5ead4!important;border-color:rgba(255,255,255,.10)!important;}
+
+/* Conserva composición v47 existente, solo evita cortes. */
+.paywallFunnelLayout{
+  gap:clamp(28px,3.5vw,40px)!important;
+  align-items:start!important;
+}
+.paywallFunnelActivation{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.05fr) minmax(280px,.75fr)!important;
+  gap:clamp(24px,3vw,36px)!important;
+  align-items:center!important;
+}
+
+.paywallFunnelHero{text-align:left!important;}
+.paywallFunnelHero p{color:#F0C55A!important;background:rgba(212,168,67,.10)!important;border-color:rgba(240,197,90,.28)!important;}
+.paywallFunnelHero h1{color:#FFF3D2!important;text-shadow:0 18px 60px rgba(0,0,0,.36)!important;}
+.paywallFunnelHero h2{color:#B8C1D1!important;}
+.paywallFunnelChips span{color:#E8DCC0!important;background:rgba(255,255,255,.05)!important;border-color:rgba(255,255,255,.10)!important;}
+.paywallFunnelChips svg{color:#efc55f!important;}
+
+/* Card derecha con video: se mantiene, solo más elegante. */
+.paywallFunnelProductStrip{display:flex!important;flex-direction:column!important;gap:14px!important;min-width:0!important;}
+.paywallFunnelProductStrip .paywallFunnelPreview{
+  aspect-ratio:16/10!important;
+  margin-top:0!important;
+  border-radius:20px!important;
+  border:1px solid rgba(212,168,67,.26)!important;
+  background:#030406!important;
+  box-shadow:0 24px 64px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.04) inset!important;
+}
+.paywallFunnelProductStrip .paywallFunnelPreview video{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  filter:saturate(.86) brightness(.62) contrast(1.08)!important;
+}
+.paywallFunnelProductStrip .paywallFunnelPreview::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(3,5,10,.10),rgba(3,5,10,.58));
+}
+.paywallFunnelProductStrip .paywallFunnelInside{
+  padding:16px 18px!important;
+  border-radius:18px!important;
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+.paywallFunnelInside>b{color:#fff1d1!important;}
+.paywallFunnelInside span{background:rgba(212,168,67,.075)!important;border-color:rgba(212,168,67,.12)!important;color:#ddc98f!important;}
+
+.paywallFunnelBilling{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022))!important;
+  border-color:rgba(255,255,255,.09)!important;
+}
+.paywallFunnelBilling b{color:#fff1d1!important;}
+.paywallFunnelBilling span{color:#8f9aaf!important;}
+.paywallFunnelBilling>div:last-child{background:rgba(0,0,0,.24)!important;border-color:rgba(255,255,255,.08)!important;}
+.paywallFunnelBilling button{color:#cfd7e5!important;background:transparent!important;}
+.paywallFunnelBilling button.active{background:linear-gradient(135deg,#efc65b,#d5a032)!important;color:#151008!important;}
+
+.paywallFunnelPlan{
+  background:linear-gradient(180deg,rgba(18,21,30,.98),rgba(10,12,18,.98))!important;
+  border-color:rgba(255,255,255,.09)!important;
+  color:#f7eed8!important;
+}
+.paywallFunnelPlan.featured{
+  background:radial-gradient(circle at 72% 0%,rgba(212,168,67,.24),transparent 38%),linear-gradient(180deg,rgba(33,27,17,.98),rgba(12,13,18,.98))!important;
+  border-color:rgba(212,168,67,.42)!important;
+}
+.paywallFunnelPlanTop h3,.paywallFunnelPrice b{color:#fff2d0!important;}
+.paywallFunnelPlanTop p{color:#9ca7bb!important;}
+.paywallFunnelPrice{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;border-color:rgba(255,255,255,.08)!important;}
+.paywallFunnelPlan.featured .paywallFunnelPrice{background:linear-gradient(180deg,rgba(212,168,67,.13),rgba(255,255,255,.018))!important;border-color:rgba(212,168,67,.24)!important;}
+.paywallFunnelValue{color:#c7d0de!important;}
+.paywallFunnelPlan li{color:#e6dcc9!important;}
+.paywallFunnelPlan li svg{color:#efc55f!important;}
+.paywallFunnelPlan button.primary{background:linear-gradient(135deg,#efc65b,#d5a032)!important;color:#151008!important;}
+.paywallFunnelPlan button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02))!important;color:#fff0cc!important;border-color:rgba(255,255,255,.12)!important;}
+
+.paywallFunnelLock{color:#adb7c8!important;}
+.paywallFunnelLock svg{color:#efc55f!important;}
+
+@media(max-width:1120px){
+  .paywallFunnelLayout{grid-template-columns:1fr!important;}
+  .paywallFunnelActivation{grid-template-columns:1fr!important;}
+  .paywallFunnelPlans{grid-template-columns:1fr!important;}
+  .paywallFunnelPlan{min-height:auto!important;}
+}
+@media(max-width:760px){
+  .paywallFunnel{padding:12px!important;}
+  .paywallFunnelShell{padding:16px!important;border-radius:22px!important;}
+  .paywallFunnelHeader{display:grid!important;}
+  .paywallFunnelActions{display:grid!important;grid-template-columns:1fr!important;}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MTC v47.3 — CORRECCIÓN FINAL PAYWALL
+   Restaura estructura premium oscura + video grande derecha + smoke visible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html.mtc-paywall-open,
+body.mtc-paywall-open,
+html.mtc-paywall-open #root,
+body.mtc-paywall-open #root{
+  height:auto!important;
+  min-height:100%!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+
+body.mtc-paywall-open{
+  background:#020306!important;
+}
+
+/* Contenedor principal con scroll real */
+.paywallFunnel{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  max-height:none!important;
+  padding:22px clamp(14px,2.4vw,34px) 56px!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+  color:#f7eed8!important;
+  background:#020306!important;
+  isolation:isolate!important;
+}
+
+/* Smoke visible, pero oscuro y premium */
+.paywallFunnel::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(90deg,rgba(2,3,6,.70),rgba(2,3,6,.54) 43%,rgba(2,3,6,.78)),
+    radial-gradient(circle at 18% 12%,rgba(201,145,61,.17),transparent 34%),
+    url("/paywall-premium-bg.webp");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  filter:saturate(.96) brightness(.88) contrast(1.05);
+  opacity:1;
+}
+
+.paywallFunnel::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(201,145,61,.08),transparent 38%),
+    linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.010) 1px,transparent 1px);
+  background-size:auto,54px 54px,54px 54px;
+  mask-image:radial-gradient(ellipse at 50% 12%,#000 0%,transparent 76%);
+  opacity:.62;
+}
+
+/* El video NO es fondo general */
+.paywallFunnelVideoBg,
+.paywallFunnelVideoBg video,
+.paywallFunnelVideoBgOverlay{
+  display:none!important;
+  pointer-events:none!important;
+}
+
+/* Evita que manchas decorativas tapen el smoke */
+.paywallFunnelBg{
+  position:fixed!important;
+  inset:0!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  overflow:hidden!important;
+  background:transparent!important;
+}
+.paywallFunnelBg:before{display:none!important;}
+.paywallFunnelBg span{opacity:.14!important;filter:blur(76px)!important;}
+
+/* Shell oscuro; no blanco; sin scroll interno */
+.paywallFunnelShell{
+  position:relative!important;
+  z-index:2!important;
+  width:min(1320px,100%)!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+  padding:24px!important;
+  border-radius:32px!important;
+  border:1px solid rgba(201,145,61,.27)!important;
+  background:
+    linear-gradient(145deg,rgba(9,12,18,.88),rgba(4,6,10,.94))!important;
+  color:#f7eed8!important;
+  box-shadow:
+    0 44px 130px rgba(0,0,0,.68),
+    0 0 0 1px rgba(255,255,255,.035) inset,
+    0 0 96px rgba(201,145,61,.08)!important;
+  backdrop-filter:blur(8px)!important;
+  -webkit-backdrop-filter:blur(8px)!important;
+}
+
+.paywallFunnelHeader{
+  margin-bottom:18px!important;
+  padding-bottom:16px!important;
+}
+
+/* Layout superior: hero izquierda, video grande derecha */
+.paywallFunnelLayout{
+  display:grid!important;
+  grid-template-columns:minmax(330px,.78fr) minmax(520px,1.22fr)!important;
+  grid-template-areas:
+    "hero proof"
+    "billing billing"
+    "notice notice"
+    "plans plans"
+    "lock lock"!important;
+  gap:18px 24px!important;
+  align-items:start!important;
+}
+
+.paywallFunnelActivation{
+  grid-area:hero!important;
+  min-width:0!important;
+}
+
+.paywallFunnelProductStrip{
+  grid-area:proof!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.05fr) minmax(250px,.95fr)!important;
+  gap:14px!important;
+  align-items:stretch!important;
+  margin:0!important;
+  min-width:0!important;
+}
+
+.paywallFunnelBilling{
+  grid-area:billing!important;
+  margin:8px 0 0!important;
+}
+
+.paywallFunnelNotice{grid-area:notice!important;}
+.paywallFunnelPlans{grid-area:plans!important;}
+.paywallFunnelLock{grid-area:lock!important;}
+
+/* Hero legible y sin exceso de altura */
+.paywallFunnelHero p{
+  margin:0 0 9px!important;
+  color:#efc55f!important;
+  text-transform:uppercase!important;
+  letter-spacing:.22em!important;
+  font-size:11px!important;
+  font-weight:900!important;
+}
+
+.paywallFunnelHero h1{
+  max-width:540px!important;
+  margin:0!important;
+  color:#fff4d8!important;
+  font-size:clamp(42px,4.8vw,70px)!important;
+  line-height:.91!important;
+  letter-spacing:-.07em!important;
+}
+
+.paywallFunnelHero h2{
+  max-width:520px!important;
+  margin:15px 0 0!important;
+  color:#aeb8ca!important;
+  font-size:15px!important;
+  line-height:1.55!important;
+  font-weight:600!important;
+}
+
+.paywallFunnelChips{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+  margin-top:15px!important;
+}
+
+.paywallFunnelChips span{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  padding:8px 11px!important;
+  border-radius:999px!important;
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#e9dfc5!important;
+  font-size:11px!important;
+  font-weight:800!important;
+}
+
+/* Video vuelve a ser grande y protagonista visual, pero no fondo */
+.paywallFunnelPreview{
+  position:relative!important;
+  width:100%!important;
+  min-height:230px!important;
+  aspect-ratio:16/9!important;
+  margin:0!important;
+  border-radius:22px!important;
+  border:1px solid rgba(201,145,61,.30)!important;
+  overflow:hidden!important;
+  background:#040507!important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.46),
+    0 0 0 1px rgba(255,255,255,.035) inset!important;
+}
+
+.paywallFunnelPreview video{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  filter:brightness(.58) saturate(.78) contrast(1.08)!important;
+}
+
+.paywallFunnelPreview::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:
+    linear-gradient(180deg,rgba(3,5,10,.08),rgba(3,5,10,.54)),
+    radial-gradient(circle at 22% 10%,rgba(201,145,61,.16),transparent 38%);
+}
+
+/* Unlocks al lado del video, no debajo comprimido */
+.paywallFunnelInside{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-height:230px!important;
+  padding:16px!important;
+  border-radius:22px!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;
+  backdrop-filter:blur(8px)!important;
+}
+
+.paywallFunnelInside>b{
+  display:block!important;
+  color:#f5cb63!important;
+  font-size:12px!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+  margin-bottom:12px!important;
+}
+
+.paywallFunnelInside div{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+}
+
+.paywallFunnelInside span{
+  padding:9px 10px!important;
+  border-radius:12px!important;
+  background:rgba(201,145,61,.08)!important;
+  border:1px solid rgba(201,145,61,.13)!important;
+  color:#ddc98f!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+
+/* Billing ancho y compacto */
+.paywallFunnelBilling{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:16px!important;
+  padding:16px!important;
+  border-radius:24px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.022))!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+}
+
+.paywallFunnelBilling b{color:#fff1d1!important;font-size:15px!important;}
+.paywallFunnelBilling span{color:#8f9aaf!important;font-size:13px!important;}
+.paywallFunnelBilling>div:last-child{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:6px!important;
+  padding:6px!important;
+  border-radius:18px!important;
+  background:rgba(0,0,0,.24)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+.paywallFunnelBilling button{
+  min-width:112px!important;
+  padding:11px 13px!important;
+  border-radius:14px!important;
+}
+
+/* Cards como estaban: oscuras, alineadas y legibles */
+.paywallFunnelPlans{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important;
+}
+
+.paywallFunnelPlan{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:14px!important;
+  min-height:0!important;
+  padding:20px!important;
+  border-radius:26px!important;
+  background:linear-gradient(180deg,rgba(18,21,30,.96),rgba(9,11,17,.98))!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#f7eed8!important;
+  box-shadow:0 22px 60px rgba(0,0,0,.24)!important;
+}
+
+.paywallFunnelPlan.featured{
+  background:
+    radial-gradient(circle at 72% 0%,rgba(201,145,61,.22),transparent 38%),
+    linear-gradient(180deg,rgba(32,27,17,.98),rgba(10,12,18,.98))!important;
+  border-color:rgba(201,145,61,.45)!important;
+  box-shadow:0 30px 80px rgba(0,0,0,.38),0 0 0 1px rgba(201,145,61,.08) inset!important;
+}
+
+.paywallFunnelBadge{
+  background:rgba(201,145,61,.16)!important;
+  border:1px solid rgba(201,145,61,.34)!important;
+  color:#f9d775!important;
+}
+
+.paywallFunnelPlanTop h3{
+  color:#fff3d5!important;
+  font-size:clamp(28px,2.4vw,34px)!important;
+}
+
+.paywallFunnelPlanTop p,
+.paywallFunnelValue,
+.paywallFunnelPlan li{
+  color:#d7dded!important;
+}
+
+.paywallFunnelPrice{
+  padding:16px!important;
+  border-radius:20px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+
+.paywallFunnelPlan.featured .paywallFunnelPrice{
+  background:linear-gradient(180deg,rgba(201,145,61,.13),rgba(255,255,255,.018))!important;
+  border-color:rgba(201,145,61,.24)!important;
+}
+
+.paywallFunnelPrice b{
+  color:#fff2d0!important;
+  font-size:clamp(32px,3vw,42px)!important;
+  line-height:.96!important;
+  white-space:nowrap!important;
+}
+
+.paywallFunnelPlan button.primary{
+  background:linear-gradient(135deg,#efc65b,#d5a032)!important;
+  color:#151008!important;
+}
+
+/* Responsive seguro */
+@media(max-width:1180px){
+  .paywallFunnelLayout{
+    grid-template-columns:1fr!important;
+    grid-template-areas:
+      "hero"
+      "proof"
+      "billing"
+      "notice"
+      "plans"
+      "lock"!important;
+  }
+  .paywallFunnelProductStrip{
+    grid-template-columns:1fr!important;
+  }
+  .paywallFunnelPreview,
+  .paywallFunnelInside{
+    min-height:auto!important;
+  }
+}
+
+@media(max-width:760px){
+  .paywallFunnel{
+    padding:12px 10px 38px!important;
+  }
+  .paywallFunnelShell{
+    padding:16px!important;
+    border-radius:22px!important;
+  }
+  .paywallFunnelHeader{
+    display:grid!important;
+    gap:12px!important;
+  }
+  .paywallFunnelActions{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  .paywallFunnelHero h1{
+    font-size:38px!important;
+  }
+  .paywallFunnelBilling{
+    display:grid!important;
+  }
+  .paywallFunnelBilling>div:last-child{
+    overflow-x:auto!important;
+    width:100%!important;
+  }
+  .paywallFunnelBilling button{
+    min-width:104px!important;
+  }
+  .paywallFunnelPlans{
+    grid-template-columns:1fr!important;
+  }
+}
+
+
+/* MTC v47.4 — HOTFIX DISTRIBUCIÓN PAYWALL */
+.paywallFunnel::before{
+  background-image:
+    linear-gradient(90deg,rgba(2,3,6,.52),rgba(2,3,6,.38) 42%,rgba(2,3,6,.60)),
+    radial-gradient(circle at 18% 12%,rgba(201,145,61,.12),transparent 36%),
+    url("/paywall-premium-bg-final.jpg") !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  filter:saturate(.96) brightness(.86) contrast(1.05) !important;
+  opacity:1 !important;
+}
+.paywallFunnel::after{
+  opacity:.28 !important;
+}
+.paywallFunnelShell{
+  width:min(1340px,96vw) !important;
+}
+.paywallFunnelLayout{
+  display:grid !important;
+  grid-template-columns:minmax(430px,.88fr) minmax(560px,1.12fr) !important;
+  grid-template-areas:
+    "hero proof"
+    "billing billing"
+    "notice notice"
+    "plans plans"
+    "lock lock" !important;
+  gap:22px 22px !important;
+  align-items:start !important;
+}
+.paywallFunnelActivation{grid-area:hero !important; min-width:0 !important;}
+.paywallFunnelProductStrip{
+  grid-area:proof !important;
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:14px !important;
+  align-self:start !important;
+  min-width:0 !important;
+}
+.paywallFunnelBilling{grid-area:billing !important; margin:2px 0 0 !important;}
+.paywallFunnelNotice{grid-area:notice !important;}
+.paywallFunnelPlans{grid-area:plans !important;}
+.paywallFunnelLock{grid-area:lock !important;}
+.paywallFunnelHero h1{
+  max-width:640px !important;
+  font-size:clamp(54px,4.7vw,78px) !important;
+  line-height:.94 !important;
+}
+.paywallFunnelHero h2{
+  max-width:560px !important;
+  font-size:16px !important;
+}
+.paywallFunnelPreview{
+  width:100% !important;
+  aspect-ratio:16/9 !important;
+  min-height:300px !important;
+  margin-top:0 !important;
+  border-radius:24px !important;
+  overflow:hidden !important;
+}
+.paywallFunnelPreview video{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  filter:brightness(.74) saturate(.96) contrast(1.04) !important;
+}
+.paywallFunnelInside{
+  min-height:auto !important;
+  padding:16px !important;
+}
+.paywallFunnelInside b{
+  color:#f2cf73 !important;
+  letter-spacing:.12em !important;
+  text-transform:uppercase !important;
+  font-size:12px !important;
+}
+.paywallFunnelInside div{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+.paywallFunnelInside span{
+  min-height:42px !important;
+  display:flex !important;
+  align-items:center !important;
+}
+.paywallFunnelBilling>div:first-child{max-width:520px !important;}
+.paywallFunnelBilling>div:last-child{margin-left:auto !important;}
+@media (max-width:1180px){
+  .paywallFunnelLayout{
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "hero"
+      "proof"
+      "billing"
+      "notice"
+      "plans"
+      "lock" !important;
+  }
+  .paywallFunnelHero h1{font-size:46px !important; max-width:none !important;}
+  .paywallFunnelPreview{min-height:260px !important;}
+}
+@media (max-width:760px){
+  .paywallFunnelShell{width:min(100%,98vw) !important; padding:16px !important;}
+  .paywallFunnelHero h1{font-size:38px !important;}
+  .paywallFunnelInside div{grid-template-columns:1fr !important;}
+  .paywallFunnelPreview{min-height:220px !important;}
 }
