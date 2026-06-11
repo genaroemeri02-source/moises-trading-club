@@ -314,8 +314,8 @@ const PAYPAL_BASE_URL =
     : 'https://api-m.sandbox.paypal.com';
 
 const PLAN_PRICING = {
-  basic: { name: 'Esencial', monthly: 29, currency: 'USD' },
-  premium: { name: 'Pro', monthly: 49, currency: 'USD' },
+  basic: { name: 'Club', monthly: Number(process.env.PLAN_BASIC_MONTHLY || 14.99), currency: 'USD' },
+  premium: { name: 'Pro', monthly: Number(process.env.PLAN_PREMIUM_MONTHLY || 24.99), currency: 'USD' },
 };
 
 const BILLING_MONTHS = {
@@ -464,40 +464,6 @@ async function verifyPayPalWebhook(req) {
   throw err;
 }
 
-
-  // Fallback temporal para live: no procesar si no está implementada verificación real.
-  const err = new Error('paypal_webhook_verification_not_configured');
-  err.status = 400;
-  throw err;
-
-    }
-
-    const err = new Error('paypal_webhook_missing_headers');
-    err.status = 400;
-    throw err;
-  }
-
-  const verification = await paypalRequest('/v1/notifications/verify-webhook-signature', {
-    method: 'POST',
-    body: JSON.stringify({
-      auth_algo: authAlgo,
-      cert_url: certUrl,
-      transmission_id: transmissionId,
-      transmission_sig: transmissionSig,
-      transmission_time: transmissionTime,
-      webhook_id: PAYPAL_WEBHOOK_ID,
-      webhook_event: event,
-    }),
-  });
-
-  if (verification.verification_status !== 'SUCCESS') {
-    const err = new Error('paypal_webhook_verification_failed');
-    err.status = 400;
-    throw err;
-  }
-
-  return event;
-}
 
 async function activateMembership({ uid, planId, billingCycle, paymentId, paypalOrderId, paypalCaptureId }) {
   const now = new Date();
