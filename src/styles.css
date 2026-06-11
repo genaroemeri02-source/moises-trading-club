@@ -6585,3 +6585,141 @@ html[data-theme="light"] .mobileNav button.active{
     -webkit-overflow-scrolling:touch!important;
   }
 }
+
+
+/* =========================================================
+   MTC v47.3 HOTFIX — Admin bypass + Paywall contrast premium
+   ========================================================= */
+
+/* El paywall SIEMPRE usa contraste dark premium, aunque la app esté en modo claro. */
+.paywallFunnel,
+:root[data-theme="light"] .paywallFunnel{
+  background:#030406!important;
+  color:#fff1cf!important;
+}
+
+.paywallFunnelShell,
+:root[data-theme="light"] .paywallFunnelShell{
+  background:linear-gradient(145deg,rgba(13,16,24,.985),rgba(5,7,12,.995))!important;
+  border-color:rgba(212,168,67,.24)!important;
+  box-shadow:0 44px 130px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.04) inset!important;
+}
+
+.paywallFunnelHero p,
+:root[data-theme="light"] .paywallFunnelHero p{
+  color:#f4c85f!important;
+  text-shadow:0 0 24px rgba(212,168,67,.18)!important;
+}
+
+.paywallFunnelHero h1,
+:root[data-theme="light"] .paywallFunnelHero h1{
+  color:#fff4d2!important;
+  text-shadow:0 16px 46px rgba(0,0,0,.50),0 0 34px rgba(212,168,67,.12)!important;
+}
+
+.paywallFunnelHero h2,
+:root[data-theme="light"] .paywallFunnelHero h2{
+  color:#f0e4c7!important;
+  opacity:1!important;
+  font-weight:650!important;
+  text-shadow:0 10px 30px rgba(0,0,0,.32)!important;
+}
+
+.paywallFunnelBrand b,
+.paywallFunnelPlanTop h3,
+.paywallFunnelPrice b,
+.paywallFunnelBilling b,
+.paywallFunnelInside>b,
+:root[data-theme="light"] .paywallFunnelBrand b,
+:root[data-theme="light"] .paywallFunnelPlanTop h3,
+:root[data-theme="light"] .paywallFunnelPrice b,
+:root[data-theme="light"] .paywallFunnelBilling b,
+:root[data-theme="light"] .paywallFunnelInside>b{
+  color:#fff2cf!important;
+}
+
+.paywallFunnelBrand span,
+.paywallFunnelBilling span,
+.paywallFunnelPlanTop p,
+.paywallFunnelPrice small,
+.paywallFunnelValue,
+.paywallFunnelLock,
+:root[data-theme="light"] .paywallFunnelBrand span,
+:root[data-theme="light"] .paywallFunnelBilling span,
+:root[data-theme="light"] .paywallFunnelPlanTop p,
+:root[data-theme="light"] .paywallFunnelPrice small,
+:root[data-theme="light"] .paywallFunnelValue,
+:root[data-theme="light"] .paywallFunnelLock{
+  color:#c9d2e4!important;
+  opacity:1!important;
+}
+
+.paywallFunnelChips span,
+.paywallFunnelPlan li,
+.paywallFunnelBenefits span,
+:root[data-theme="light"] .paywallFunnelChips span,
+:root[data-theme="light"] .paywallFunnelPlan li,
+:root[data-theme="light"] .paywallFunnelBenefits span{
+  color:#efe6cf!important;
+  opacity:1!important;
+}
+
+.paywallFunnelPlanTop>span,
+.paywallFunnelPrice em,
+.paywallFunnelBenefits b,
+.paywallFunnelInside span,
+.paywallFunnelChips svg,
+.paywallFunnelPlan li svg,
+:root[data-theme="light"] .paywallFunnelPlanTop>span,
+:root[data-theme="light"] .paywallFunnelPrice em,
+:root[data-theme="light"] .paywallFunnelBenefits b,
+:root[data-theme="light"] .paywallFunnelInside span,
+:root[data-theme="light"] .paywallFunnelChips svg,
+:root[data-theme="light"] .paywallFunnelPlan li svg{
+  color:#f4c85f!important;
+}
+
+.paywallFunnelPlan,
+.paywallFunnelBilling,
+.paywallFunnelInside,
+.paywallFunnelBenefits>div,
+.paywallFunnelLock,
+:root[data-theme="light"] .paywallFunnelPlan,
+:root[data-theme="light"] .paywallFunnelBilling,
+:root[data-theme="light"] .paywallFunnelInside,
+:root[data-theme="light"] .paywallFunnelBenefits>div,
+:root[data-theme="light"] .paywallFunnelLock{
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.026))!important;
+  border-color:rgba(255,255,255,.105)!important;
+}
+
+.paywallFunnelPlan.featured,
+.paywallFunnelPlan.selected,
+:root[data-theme="light"] .paywallFunnelPlan.featured,
+:root[data-theme="light"] .paywallFunnelPlan.selected{
+  background:radial-gradient(circle at 72% 0%,rgba(212,168,67,.27),transparent 38%),linear-gradient(180deg,rgba(35,28,16,.99),rgba(11,13,18,.99))!important;
+  border-color:rgba(212,168,67,.46)!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.42),0 0 0 1px rgba(212,168,67,.11) inset!important;
+}
+
+.paywallFunnelPreview video,
+:root[data-theme="light"] .paywallFunnelPreview video{
+  filter:saturate(1.02) brightness(.84) contrast(1.08)!important;
+}
+
+.paywallFunnelNotice,
+:root[data-theme="light"] .paywallFunnelNotice{
+  color:#ffe4e8!important;
+  background:rgba(244,63,94,.14)!important;
+  border-color:rgba(244,63,94,.32)!important;
+}
+
+.paywallFunnelActions button,
+:root[data-theme="light"] .paywallFunnelActions button{
+  color:#fff0cc!important;
+}
+
+.paywallFunnelStatus,
+:root[data-theme="light"] .paywallFunnelStatus{
+  color:#f7cf68!important;
+}
