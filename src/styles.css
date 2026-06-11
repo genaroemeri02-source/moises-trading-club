@@ -7307,31 +7307,1858 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPreview.neg::befo
   color: #f5ead0 !important;
   opacity: 0.95 !important;
 }
-
-/* v47.20.1 — Paywall brand subtitle color fix
-   Cambia TRADING CLUB del bloque del logo del paywall a blanco cálido premium. */
-.referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandTrading,
-.referencePaywallModal .referencePreviewTop.brandPreviewTitle .brandTrading,
-.referenceVideoCard .referencePreviewTop.brandPreviewTitle .brandTrading,
-.referencePreviewTop.brandPreviewTitle .brandTradingRow .brandTrading,
-.referencePreviewTop.brandPreviewTitle span.brandTrading {
-  color: #fff7df !important;
-  opacity: 1 !important;
-  text-shadow: 0 0 18px rgba(255,247,223,.18), 0 10px 28px rgba(218,165,64,.16) !important;
+/* v47.20.3 — Paywall light brand gold + premium white text cleanup
+   Scope: only light theme. Dark theme remains untouched. */
+:root[data-theme="light"] .referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandTrading,
+:root[data-theme="light"] .referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandTradingRow .brandTrading,
+:root[data-theme="light"] .referencePaywallGate .referencePreviewTop.brandPreviewTitle span.brandTrading,
+:root[data-theme="light"] .referencePaywallGate .brandPreviewTitle .brandTrading,
+:root[data-theme="light"] .referencePaywallGate [class*="brandTrading"],
+:root[data-theme="light"] .paywallFunnel .referencePreviewTop.brandPreviewTitle .brandTrading,
+:root[data-theme="light"] .paywallFunnel .brandPreviewTitle .brandTrading,
+:root[data-theme="light"] .paywallFunnel [class*="brandTrading"]{
+  color:#f0c55a!important;
+  -webkit-text-fill-color:#f0c55a!important;
+  opacity:1!important;
+  text-shadow:0 0 18px rgba(240,197,90,.22),0 10px 28px rgba(212,166,58,.18)!important;
 }
 
-/* Refuerzo por si el texto TRADING CLUB quedó como span genérico dentro del logo. */
-.referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandTradingRow span,
-.referencePaywallModal .referencePreviewTop.brandPreviewTitle .brandTradingRow span,
-.referenceVideoCard .referencePreviewTop.brandPreviewTitle .brandTradingRow span {
-  color: #fff7df !important;
+:root[data-theme="light"] .referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandLine,
+:root[data-theme="light"] .paywallFunnel .referencePreviewTop.brandPreviewTitle .brandLine{
+  background:linear-gradient(90deg,transparent,rgba(240,197,90,.82),transparent)!important;
+  opacity:.9!important;
+}
+
+/* White app: restore premium readable hierarchy without affecting dark mode */
+:root[data-theme="light"] .app .top h1,
+:root[data-theme="light"] .app .top h2,
+:root[data-theme="light"] .app .page h1,
+:root[data-theme="light"] .app .page h2,
+:root[data-theme="light"] .app .card h3,
+:root[data-theme="light"] .app .cardHead h3,
+:root[data-theme="light"] .app .checkHero h2,
+:root[data-theme="light"] .app .heroSystem h2,
+:root[data-theme="light"] .app .riskHero h2,
+:root[data-theme="light"] .app .arenaHero h2,
+:root[data-theme="light"] .app .modalHead h3{
+  color:#0f172a!important;
+  -webkit-text-fill-color:#0f172a!important;
+  opacity:1!important;
+}
+
+:root[data-theme="light"] .app .top p,
+:root[data-theme="light"] .app .cardHead p,
+:root[data-theme="light"] .app .checkHero p,
+:root[data-theme="light"] .app .heroSystem p,
+:root[data-theme="light"] .app .riskHero p,
+:root[data-theme="light"] .app .arenaHero p,
+:root[data-theme="light"] .app .muted,
+:root[data-theme="light"] .app .field small,
+:root[data-theme="light"] .app .settingsHint{
+  color:#334155!important;
+  -webkit-text-fill-color:#334155!important;
+  opacity:1!important;
+}
+
+:root[data-theme="light"] .app .field>span,
+:root[data-theme="light"] .app .metric span,
+:root[data-theme="light"] .app .metricPremiumTop span,
+:root[data-theme="light"] .app .resultPreview span,
+:root[data-theme="light"] .app .detailKpis span,
+:root[data-theme="light"] .app .detailBlock>span,
+:root[data-theme="light"] .app .heatCell small,
+:root[data-theme="light"] .app .statMatrix span{
+  color:#64748b!important;
+  -webkit-text-fill-color:#64748b!important;
+  opacity:1!important;
+}
+
+/* Checklist block headers in light mode: stronger, cleaner and less washed out */
+:root[data-theme="light"] .app .checkBlockHeader{
+  background:linear-gradient(180deg,#ffffff,#fbfcfe)!important;
+  border-color:rgba(15,23,42,.10)!important;
+  box-shadow:0 8px 22px rgba(15,23,42,.045)!important;
+}
+:root[data-theme="light"] .app .checkBlockHeader b{
+  color:#9a6a05!important;
+  -webkit-text-fill-color:#9a6a05!important;
+  letter-spacing:.11em!important;
+  opacity:1!important;
+}
+:root[data-theme="light"] .app .checkBlockHeader span{
+  color:#475569!important;
+  -webkit-text-fill-color:#475569!important;
+  background:#f8fafc!important;
+  border-color:rgba(15,23,42,.10)!important;
+  opacity:1!important;
+}
+:root[data-theme="light"] .app .checkBlockHeader.validado span{
+  color:#047857!important;
+  -webkit-text-fill-color:#047857!important;
+  background:rgba(16,185,129,.10)!important;
+  border-color:rgba(16,185,129,.22)!important;
+}
+:root[data-theme="light"] .app .checkBlockHeader.en-progreso span{
+  color:#9a6a05!important;
+  -webkit-text-fill-color:#9a6a05!important;
+  background:rgba(212,166,58,.12)!important;
+  border-color:rgba(212,166,58,.24)!important;
+}
+:root[data-theme="light"] .app .checkBlockHeader.rechazado span{
+  color:#be123c!important;
+  -webkit-text-fill-color:#be123c!important;
+  background:rgba(225,29,72,.09)!important;
+  border-color:rgba(225,29,72,.20)!important;
+}
+
+/* Keep intentionally dark mini-cards readable when light mode uses dark surfaces */
+:root[data-theme="light"] .app .patternCard,
+:root[data-theme="light"] .app .readingProtocol div,
+:root[data-theme="light"] .app .ruleMini span,
+:root[data-theme="light"] .app .checkResult,
+:root[data-theme="light"] .app .answerList div{
+  color:#e5eaf3!important;
+}
+:root[data-theme="light"] .app .patternCard h3,
+:root[data-theme="light"] .app .readingProtocol b,
+:root[data-theme="light"] .app .ruleMini b,
+:root[data-theme="light"] .app .checkResult b,
+:root[data-theme="light"] .app .answerList span{
+  color:#f8fafc!important;
+  -webkit-text-fill-color:#f8fafc!important;
+}
+:root[data-theme="light"] .app .patternCard p,
+:root[data-theme="light"] .app .readingProtocol p,
+:root[data-theme="light"] .app .ruleMini span,
+:root[data-theme="light"] .app .checkResult p,
+:root[data-theme="light"] .app .answerList b{
+  color:#cbd5e1!important;
+  -webkit-text-fill-color:#cbd5e1!important;
+}
+/* v47.20.4 — FINAL light mode readability without touching dark mode
+   Scope: only when the app is in white/light theme. Dark mode remains untouched. */
+
+:root[data-theme="light"] {
+  --text: #0f172a !important;
+  --muted: #334155 !important;
+  --muted2: #64748b !important;
+  --panel: #ffffff !important;
+  --panel2: #f8fafc !important;
+  --panel3: #eef2f7 !important;
+  --line: rgba(15, 23, 42, .10) !important;
+  --line2: rgba(15, 23, 42, .16) !important;
+}
+
+/* Paywall/activation in light mode: keep the premium gold brand subtitle, do not affect dark. */
+:root[data-theme="light"] .paywallFunnel .brandTrading,
+:root[data-theme="light"] .paywallFunnel .referencePreviewTop .brandTrading,
+:root[data-theme="light"] .paywallFunnel .brandPreviewTitle .brandTrading,
+:root[data-theme="light"] .paywallFunnel .referencePreviewTop span,
+:root[data-theme="light"] .paywallFunnel .brandPreviewTitle span {
+  color: #f0c55a !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #f0c55a !important;
+  text-shadow: 0 0 18px rgba(240, 197, 90, .16) !important;
+}
+
+/* General app readability in white mode. Excludes paywall so the activation page stays premium. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .main,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .page,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .card,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metric,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .post,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .idea,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .trade,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryBookPro,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readingProtocol div,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readCard,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPost,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .achievement,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .adminRow,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .rank,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .notif,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .onlineRow,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .memberList button {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .top h1,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .top h2,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .card h1,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .card h2,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .card h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .heroSystem h2,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkHero h2,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .riskHero h2,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryInfo h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .academyLesson h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPost h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .idea h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .achievement b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkResult b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .ruleBox h3,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metric b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metricPremium b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .controlStats b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .pulseGrid b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .heatCell b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .proTable strong,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .proTable span {
+  color: #0b1220 !important;
+  -webkit-text-fill-color: #0b1220 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) small,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .muted,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .cardHead p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .heroSystem p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkHero p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readingProtocol p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readCard p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPost p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .idea p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryInfo span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryInfo small,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .achievement small,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkResult p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .detailBlock p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .linkedValidationCard small,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .linkedTradeCard small,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .onlineRow small,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .memberList button small {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
   opacity: 1 !important;
 }
 
-/* Mantiene el texto inferior más sutil, pero legible. */
-.referencePaywallGate .referencePreviewTop.brandPreviewTitle span:not(.brandMoises):not(.brandTrading):not(.brandTradingRow):not(.brandLine),
-.referencePaywallModal .referencePreviewTop.brandPreviewTitle span:not(.brandMoises):not(.brandTrading):not(.brandTradingRow):not(.brandLine),
-.referenceVideoCard .referencePreviewTop.brandPreviewTitle span:not(.brandMoises):not(.brandTrading):not(.brandTradingRow):not(.brandLine) {
+/* Labels and section headers that were almost invisible in Checklist/System/Results/Profile. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .field > span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metric span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metricPremiumTop span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPreview span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .detailKpis span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .detailBlock > span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkBlockHeader b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkBlockHeader span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .answerList b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .accessSummary span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .accessGroupHead span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .bookMeta span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .pill,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .linkedMini,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .statusBadge {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  opacity: 1 !important;
+}
+
+/* Gold section titles remain premium but readable. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .heroEyebrow,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .controlBadge,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .landingBadge,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkBlockHeader.validado span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .pill.gold,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .bookActions a,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryInfo p,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .lessonBadge,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkResult span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .ruleBox h3 {
+  color: #9a6700 !important;
+  -webkit-text-fill-color: #9a6700 !important;
+  opacity: 1 !important;
+}
+
+/* Protocol/insight panels: keep color accents but make the text strong enough. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .mandamiento,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .ruleMini span,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readingProtocol div,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkResult,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .insight,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .insightPro,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .achievement,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .heatCell,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPost,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .academyLesson,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryBook,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .libraryBookPro {
+  background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+  border-color: rgba(15, 23, 42, .12) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, .06) !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard:nth-child(3n+1),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readingProtocol div:nth-child(3n+1),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .mandamiento:nth-child(4n+1),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkItem:nth-child(4n+1) {
+  border-color: rgba(212, 166, 58, .32) !important;
+  background: linear-gradient(135deg, #ffffff, #fff9e8) !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard:nth-child(3n+2),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readingProtocol div:nth-child(3n+2),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .mandamiento:nth-child(4n+2),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkItem:nth-child(4n+2) {
+  border-color: rgba(59, 130, 246, .28) !important;
+  background: linear-gradient(135deg, #ffffff, #eef5ff) !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .patternCard:nth-child(3n+3),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .readingProtocol div:nth-child(3n+3),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .mandamiento:nth-child(4n+3),
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checkItem:nth-child(4n+3) {
+  border-color: rgba(22, 163, 74, .26) !important;
+  background: linear-gradient(135deg, #ffffff, #ecfdf5) !important;
+}
+
+/* Form controls in white mode: text always visible. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) input,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) select,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) textarea,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .input,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) select.input {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, .14) !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) input::placeholder,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) textarea::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* Buttons/tabs in Results and filters that looked faded. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .ghost,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .actions button,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .toolbar button,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .seg button,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .coachFaqs button,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .cmdList button,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .chipSelect button,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checks button {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, .12) !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .ghost:hover,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .actions button:hover,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .toolbar button:hover,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .seg button.on,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .chipSelect button.on,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .checks button.on,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .actions .active,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .pill.gold {
+  color: #8a5a00 !important;
+  -webkit-text-fill-color: #8a5a00 !important;
+  border-color: rgba(212, 166, 58, .34) !important;
+  background: linear-gradient(180deg, #fffdf5, #fff6dc) !important;
+}
+
+/* Positive/negative values should keep semantic color. */
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .pos,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPostKpis .pos,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metric.green b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .win small {
+  color: #047857 !important;
+  -webkit-text-fill-color: #047857 !important;
+}
+
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .neg,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPostKpis .neg,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .metric.red b,
+:root[data-theme="light"] body:not(:has(.paywallFunnel)) .loss small {
+  color: #be123c !important;
+  -webkit-text-fill-color: #be123c !important;
+}
+/* v47.20.5 — STRONG LIGHT MODE READABILITY
+   Scope: light theme only. Does not modify dark mode or paywall layout. */
+:root[data-theme="light"] {
+  --text: #0f172a !important;
+  --muted: #334155 !important;
+  --muted2: #64748b !important;
+}
+
+/* Base text contrast inside logged-in app */
+:root[data-theme="light"] .app,
+:root[data-theme="light"] .main,
+:root[data-theme="light"] .page,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .heroSystem,
+:root[data-theme="light"] .readingHero,
+:root[data-theme="light"] .newsHero {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .page h1,
+:root[data-theme="light"] .page h2,
+:root[data-theme="light"] .page h3,
+:root[data-theme="light"] .card h1,
+:root[data-theme="light"] .card h2,
+:root[data-theme="light"] .card h3,
+:root[data-theme="light"] .top h1,
+:root[data-theme="light"] .top h2,
+:root[data-theme="light"] .heroSystem h2,
+:root[data-theme="light"] .newsHero h2,
+:root[data-theme="light"] .readingHero h2,
+:root[data-theme="light"] .patternCard h3,
+:root[data-theme="light"] .readingProtocol b,
+:root[data-theme="light"] .readCard b,
+:root[data-theme="light"] .ruleBox h3,
+:root[data-theme="light"] .rank b,
+:root[data-theme="light"] .achievement b,
+:root[data-theme="light"] .resultPost h3,
+:root[data-theme="light"] .libraryInfo h3,
+:root[data-theme="light"] .academyLesson h3,
+:root[data-theme="light"] .checkResult b,
+:root[data-theme="light"] .checkBlockHeader b,
+:root[data-theme="light"] .answerList span,
+:root[data-theme="light"] .detailBlock b {
+  color: #0f172a !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+/* Subtitles, paragraphs and explanatory text */
+:root[data-theme="light"] .card p,
+:root[data-theme="light"] .cardHead p,
+:root[data-theme="light"] .muted,
+:root[data-theme="light"] .heroSystem p,
+:root[data-theme="light"] .newsHero p,
+:root[data-theme="light"] .readingHero p,
+:root[data-theme="light"] .patternCard p,
+:root[data-theme="light"] .readingProtocol p,
+:root[data-theme="light"] .readCard p,
+:root[data-theme="light"] .ruleBox p,
+:root[data-theme="light"] .ruleMini span,
+:root[data-theme="light"] .mandamiento span,
+:root[data-theme="light"] .checkResult p,
+:root[data-theme="light"] .checkResult span,
+:root[data-theme="light"] .answerList b,
+:root[data-theme="light"] .detailBlock p,
+:root[data-theme="light"] .achievement small,
+:root[data-theme="light"] .resultPost p,
+:root[data-theme="light"] .libraryInfo span,
+:root[data-theme="light"] .libraryInfo p,
+:root[data-theme="light"] .academyLesson span,
+:root[data-theme="light"] .academyLesson p,
+:root[data-theme="light"] .trade p,
+:root[data-theme="light"] .notif p,
+:root[data-theme="light"] .adminRow p {
+  color: #1f2937 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* Tiny labels that were almost invisible */
+:root[data-theme="light"] .field > span,
+:root[data-theme="light"] .metric span,
+:root[data-theme="light"] .metricPremium span,
+:root[data-theme="light"] .resultPreview span,
+:root[data-theme="light"] .detailKpis span,
+:root[data-theme="light"] .detailBlock > span,
+:root[data-theme="light"] .checkBlockHeader span,
+:root[data-theme="light"] .statusBadge,
+:root[data-theme="light"] .pill,
+:root[data-theme="light"] .buy,
+:root[data-theme="light"] .sell,
+:root[data-theme="light"] .quality,
+:root[data-theme="light"] .accessSummary span,
+:root[data-theme="light"] .libraryInfo small,
+:root[data-theme="light"] .academyLesson small,
+:root[data-theme="light"] .bookMeta span,
+:root[data-theme="light"] .lessonBadge,
+:root[data-theme="light"] .linkedMini,
+:root[data-theme="light"] .checkItem small,
+:root[data-theme="light"] .rankingFilter,
+:root[data-theme="light"] .tab,
+:root[data-theme="light"] .actions button,
+:root[data-theme="light"] .ghost {
+  color: #475569 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #475569 !important;
+}
+
+/* Cards that intentionally have colored borders/backgrounds in light mode */
+:root[data-theme="light"] .patternCard,
+:root[data-theme="light"] .readingProtocol div,
+:root[data-theme="light"] .readCard,
+:root[data-theme="light"] .mandamiento,
+:root[data-theme="light"] .ruleMini span,
+:root[data-theme="light"] .checkResult,
+:root[data-theme="light"] .checkItem,
+:root[data-theme="light"] .resultPost,
+:root[data-theme="light"] .achievement,
+:root[data-theme="light"] .libraryBookPro,
+:root[data-theme="light"] .academyLesson,
+:root[data-theme="light"] .rank,
+:root[data-theme="light"] .adminRow,
+:root[data-theme="light"] .notif,
+:root[data-theme="light"] .onlineRow,
+:root[data-theme="light"] .memberList button {
+  color: #0f172a !important;
+  opacity: 1 !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, .055) !important;
+}
+
+/* Stronger specific fixes for screenshots: Sistema / Noticias / Resultados */
+:root[data-theme="light"] .patternGrid .patternCard h3,
+:root[data-theme="light"] .patternGrid .patternCard p,
+:root[data-theme="light"] .readingProtocol div b,
+:root[data-theme="light"] .readingProtocol div p,
+:root[data-theme="light"] .resultFeed .resultPost *,
+:root[data-theme="light"] .badgeGrid .achievement *,
+:root[data-theme="light"] .podiumCard *,
+:root[data-theme="light"] .arenaHero *,
+:root[data-theme="light"] .compRank *,
+:root[data-theme="light"] .activityFeed button *,
+:root[data-theme="light"] .checkResult *,
+:root[data-theme="light"] .checkBlockHeader *,
+:root[data-theme="light"] .answerList *,
+:root[data-theme="light"] .mandamientos *,
+:root[data-theme="light"] .ruleMini *,
+:root[data-theme="light"] .ruleBox * {
+  color: #0f172a !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+/* Preserve semantic accents */
+:root[data-theme="light"] .pos,
+:root[data-theme="light"] .green,
+:root[data-theme="light"] .statusBadge.approved,
+:root[data-theme="light"] .unlockNotice.ok,
+:root[data-theme="light"] .linkedMini.ok {
+  color: #047857 !important;
+  -webkit-text-fill-color: #047857 !important;
+}
+:root[data-theme="light"] .neg,
+:root[data-theme="light"] .danger,
+:root[data-theme="light"] .statusBadge.denied,
+:root[data-theme="light"] .statusBadge.suspended,
+:root[data-theme="light"] .unlockNotice.locked {
+  color: #be123c !important;
+  -webkit-text-fill-color: #be123c !important;
+}
+:root[data-theme="light"] .pill.gold,
+:root[data-theme="light"] .linkedMini.gold,
+:root[data-theme="light"] .primary,
+:root[data-theme="light"] .landingBadge,
+:root[data-theme="light"] .heroEyebrow,
+:root[data-theme="light"] .accessGroupHead b,
+:root[data-theme="light"] .checkBlockHeader.validado span,
+:root[data-theme="light"] .checkBlockHeader.en-progreso span,
+:root[data-theme="light"] .checkBlockHeader.rechazado span {
+  color: #8a5a00 !important;
+  -webkit-text-fill-color: #8a5a00 !important;
+}
+
+/* Inputs/selects must remain readable in light */
+:root[data-theme="light"] input,
+:root[data-theme="light"] select,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] .input,
+:root[data-theme="light"] select.input {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, .14) !important;
+}
+:root[data-theme="light"] input::placeholder,
+:root[data-theme="light"] textarea::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* Paywall brand: only in light mode keep the subtitle gold; dark stays untouched */
+:root[data-theme="light"] .paywallFunnel .brandTrading,
+:root[data-theme="light"] .paywallFunnel .referencePreviewTop .brandTrading,
+:root[data-theme="light"] .paywallFunnel .brandPreviewTitle .brandTrading,
+:root[data-theme="light"] .paywallFunnel [class*="brand"] .brandTrading,
+:root[data-theme="light"] .paywallFunnel [class*="Brand"] .brandTrading {
+  color: #f0c55a !important;
+  -webkit-text-fill-color: #f0c55a !important;
+  opacity: 1 !important;
+}
+
+/* Selection remains native, but avoid selected hidden text looking broken */
+:root[data-theme="light"] ::selection {
+  background: rgba(37, 99, 235, .86) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+/* v47.20.6 FINAL — Light mode text visibility hard fix
+   Scope: ONLY light theme. Does not affect dark mode. */
+:root[data-theme="light"]{
+  --text:#0f172a!important;
+  --muted:#334155!important;
+  --muted2:#64748b!important;
+}
+
+/* Base readable text in light mode */
+:root[data-theme="light"] .main,
+:root[data-theme="light"] .page,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .heroSystem,
+:root[data-theme="light"] .ruleBox,
+:root[data-theme="light"] .patternCard,
+:root[data-theme="light"] .readingProtocol div,
+:root[data-theme="light"] .readCard,
+:root[data-theme="light"] .checkHero,
+:root[data-theme="light"] .checkResult,
+:root[data-theme="light"] .checkBlockHeader,
+:root[data-theme="light"] .notif,
+:root[data-theme="light"] .resultPost,
+:root[data-theme="light"] .achievement,
+:root[data-theme="light"] .libraryBookPro,
+:root[data-theme="light"] .academyLesson,
+:root[data-theme="light"] .onlineRow,
+:root[data-theme="light"] .adminRow,
+:root[data-theme="light"] .rank,
+:root[data-theme="light"] .trade,
+:root[data-theme="light"] .idea,
+:root[data-theme="light"] .post {
+  color:#0f172a!important;
+  opacity:1!important;
+  -webkit-text-fill-color:initial!important;
+}
+
+/* Headings and important labels */
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3,
+:root[data-theme="light"] h4,
+:root[data-theme="light"] .top h1,
+:root[data-theme="light"] .top h2,
+:root[data-theme="light"] .card h3,
+:root[data-theme="light"] .cardHead h3,
+:root[data-theme="light"] .heroSystem h2,
+:root[data-theme="light"] .patternCard h3,
+:root[data-theme="light"] .readingProtocol b,
+:root[data-theme="light"] .readCard b,
+:root[data-theme="light"] .checkBlockHeader b,
+:root[data-theme="light"] .checkResult b,
+:root[data-theme="light"] .ruleBox h3,
+:root[data-theme="light"] .resultPost h3,
+:root[data-theme="light"] .achievement b,
+:root[data-theme="light"] .libraryInfo h3,
+:root[data-theme="light"] .academyLesson h3,
+:root[data-theme="light"] .onlineRow b,
+:root[data-theme="light"] .trade b,
+:root[data-theme="light"] .notif b,
+:root[data-theme="light"] .postTop b,
+:root[data-theme="light"] .idea h3 {
+  color:#0b1220!important;
+  opacity:1!important;
+  -webkit-text-fill-color:#0b1220!important;
+  text-shadow:none!important;
+}
+
+/* Paragraphs, descriptions, small explanatory text */
+:root[data-theme="light"] p,
+:root[data-theme="light"] small,
+:root[data-theme="light"] span,
+:root[data-theme="light"] em,
+:root[data-theme="light"] li,
+:root[data-theme="light"] .muted,
+:root[data-theme="light"] .cardHead p,
+:root[data-theme="light"] .heroSystem p,
+:root[data-theme="light"] .patternCard p,
+:root[data-theme="light"] .readingProtocol p,
+:root[data-theme="light"] .readCard p,
+:root[data-theme="light"] .ruleBox p,
+:root[data-theme="light"] .ruleMini span,
+:root[data-theme="light"] .mandamiento span,
+:root[data-theme="light"] .checkResult p,
+:root[data-theme="light"] .checkResult small,
+:root[data-theme="light"] .answerList span,
+:root[data-theme="light"] .detailBlock p,
+:root[data-theme="light"] .resultPost p,
+:root[data-theme="light"] .achievement small,
+:root[data-theme="light"] .libraryInfo span,
+:root[data-theme="light"] .academyLesson span,
+:root[data-theme="light"] .onlineRow small,
+:root[data-theme="light"] .trade p,
+:root[data-theme="light"] .notif p,
+:root[data-theme="light"] .post > p,
+:root[data-theme="light"] .idea p {
+  color:#334155!important;
+  opacity:1!important;
+  -webkit-text-fill-color:#334155!important;
+  text-shadow:none!important;
+}
+
+/* Uppercase section labels / numbered questions */
+:root[data-theme="light"] .field > span,
+:root[data-theme="light"] .metric span,
+:root[data-theme="light"] .resultPreview span,
+:root[data-theme="light"] .detailKpis span,
+:root[data-theme="light"] .detailBlock > span,
+:root[data-theme="light"] .checkBlockHeader span,
+:root[data-theme="light"] .answerList b,
+:root[data-theme="light"] .statusBadge,
+:root[data-theme="light"] .pill,
+:root[data-theme="light"] .quality,
+:root[data-theme="light"] .buy,
+:root[data-theme="light"] .sell,
+:root[data-theme="light"] label,
+:root[data-theme="light"] .input + small,
+:root[data-theme="light"] .field small {
+  color:#475569!important;
+  opacity:1!important;
+  -webkit-text-fill-color:#475569!important;
+}
+
+/* Gold headings must stay premium but readable */
+:root[data-theme="light"] .heroEyebrow,
+:root[data-theme="light"] .controlBadge,
+:root[data-theme="light"] .landingBadge,
+:root[data-theme="light"] .pill.gold,
+:root[data-theme="light"] .checkBlockHeader.validado span,
+:root[data-theme="light"] .checkBlockHeader.en-progreso span,
+:root[data-theme="light"] .checkBlockHeader.rechazado span,
+:root[data-theme="light"] .patternCard svg,
+:root[data-theme="light"] .readCard svg,
+:root[data-theme="light"] .bookActions a,
+:root[data-theme="light"] .libraryInfo p,
+:root[data-theme="light"] .academyLesson a {
+  color:#9a6a00!important;
+  -webkit-text-fill-color:#9a6a00!important;
+  opacity:1!important;
+}
+
+/* The exact problem blocks shown in Sistema / Noticias */
+:root[data-theme="light"] .patternCard,
+:root[data-theme="light"] .readingProtocol div,
+:root[data-theme="light"] .ruleMini span,
+:root[data-theme="light"] .mandamiento,
+:root[data-theme="light"] .checkResult,
+:root[data-theme="light"] .checkBlockHeader,
+:root[data-theme="light"] .newsHero,
+:root[data-theme="light"] .heroSystem {
+  background-color:#ffffff!important;
+  color:#0f172a!important;
+}
+
+:root[data-theme="light"] .patternCard *,
+:root[data-theme="light"] .readingProtocol div *,
+:root[data-theme="light"] .ruleMini span *,
+:root[data-theme="light"] .mandamiento *,
+:root[data-theme="light"] .checkResult *,
+:root[data-theme="light"] .checkBlockHeader *,
+:root[data-theme="light"] .newsHero *,
+:root[data-theme="light"] .heroSystem * {
+  opacity:1!important;
+}
+
+:root[data-theme="light"] .patternCard h3,
+:root[data-theme="light"] .readingProtocol b,
+:root[data-theme="light"] .checkResult b,
+:root[data-theme="light"] .newsHero h2,
+:root[data-theme="light"] .heroSystem h2 {
+  color:#0f172a!important;
+  -webkit-text-fill-color:#0f172a!important;
+}
+
+:root[data-theme="light"] .patternCard p,
+:root[data-theme="light"] .readingProtocol p,
+:root[data-theme="light"] .ruleMini span,
+:root[data-theme="light"] .mandamiento span,
+:root[data-theme="light"] .checkResult p,
+:root[data-theme="light"] .newsHero p,
+:root[data-theme="light"] .heroSystem p {
+  color:#334155!important;
+  -webkit-text-fill-color:#334155!important;
+}
+
+/* Inputs/selects in light */
+:root[data-theme="light"] input,
+:root[data-theme="light"] select,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] .input,
+:root[data-theme="light"] select.input,
+:root[data-theme="light"] textarea.input {
+  background:#ffffff!important;
+  color:#0f172a!important;
+  -webkit-text-fill-color:#0f172a!important;
+  border-color:rgba(15,23,42,.14)!important;
+  opacity:1!important;
+  color-scheme:light!important;
+}
+
+:root[data-theme="light"] input::placeholder,
+:root[data-theme="light"] textarea::placeholder {
+  color:#64748b!important;
+  -webkit-text-fill-color:#64748b!important;
+  opacity:1!important;
+}
+
+/* Make browser text selection not confuse contrast checks */
+:root[data-theme="light"] ::selection {
+  background:#2563eb!important;
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+}
+/* v47.20.7 — FINAL light mode washed text fix */
+/* Solo afecta modo claro. No toca dark mode. */
+
+:root[data-theme="light"] .ruleMini span,
+:root[data-theme="light"] .ruleMini span *,
+:root[data-theme="light"] .readingProtocol div,
+:root[data-theme="light"] .readingProtocol div *,
+:root[data-theme="light"] .patternCard,
+:root[data-theme="light"] .patternCard *,
+:root[data-theme="light"] .checkBlockHeader,
+:root[data-theme="light"] .checkBlockHeader *,
+:root[data-theme="light"] .checkResult,
+:root[data-theme="light"] .checkResult *,
+:root[data-theme="light"] .answerList,
+:root[data-theme="light"] .answerList *,
+:root[data-theme="light"] .roadmapBox,
+:root[data-theme="light"] .roadmapBox *,
+:root[data-theme="light"] .mandamiento,
+:root[data-theme="light"] .mandamiento *,
+:root[data-theme="light"] .patternGrid .patternCard h3,
+:root[data-theme="light"] .patternGrid .patternCard p,
+:root[data-theme="light"] .card .ruleMini span,
+:root[data-theme="light"] .card .ruleMini span *,
+:root[data-theme="light"] .card .readingProtocol p,
+:root[data-theme="light"] .card .readingProtocol b,
+:root[data-theme="light"] .card .patternCard p,
+:root[data-theme="light"] .card .patternCard h3 {
+  color: #0f172a !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #0f172a !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* Subtítulos secundarios, pero legibles */
+:root[data-theme="light"] .card small,
+:root[data-theme="light"] .card .muted,
+:root[data-theme="light"] .cardHead p,
+:root[data-theme="light"] .ruleMini small,
+:root[data-theme="light"] .patternCard small,
+:root[data-theme="light"] .readingProtocol small,
+:root[data-theme="light"] .checkResult small,
+:root[data-theme="light"] .answerList small {
+  color: #334155 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #334155 !important;
+}
+
+/* Títulos dentro de esos bloques */
+:root[data-theme="light"] .patternCard h3,
+:root[data-theme="light"] .readingProtocol b,
+:root[data-theme="light"] .ruleBox h3,
+:root[data-theme="light"] .checkBlockHeader b,
+:root[data-theme="light"] .card h3,
+:root[data-theme="light"] .cardHead h3 {
+  color: #020617 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #020617 !important;
+}
+
+/* Labels dorados como BLOQUE 1, Antes del trade, etc. */
+:root[data-theme="light"] .checkBlockHeader span,
+:root[data-theme="light"] .readingProtocol b,
+:root[data-theme="light"] .ruleBox h3,
+:root[data-theme="light"] .field > span,
+:root[data-theme="light"] .metric span {
+  color: #92400e !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #92400e !important;
+}
+
+/* Bloques tipo protocolo/listas de Noticias */
+:root[data-theme="light"] .ruleMini span {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Cards de patrones / sistema / noticias más legibles */
+:root[data-theme="light"] .patternCard,
+:root[data-theme="light"] .readingProtocol div,
+:root[data-theme="light"] .ruleMini span {
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Por si algún bloque trae color inline lavado */
+:root[data-theme="light"] [class*="Protocol"],
+:root[data-theme="light"] [class*="protocol"],
+:root[data-theme="light"] [class*="Pattern"],
+:root[data-theme="light"] [class*="pattern"],
+:root[data-theme="light"] [class*="Rule"],
+:root[data-theme="light"] [class*="rule"] {
+  opacity: 1 !important;
+}
+
+/* Texto dentro de botones/pills en white mode */
+:root[data-theme="light"] .pill,
+:root[data-theme="light"] .quality,
+:root[data-theme="light"] .buy,
+:root[data-theme="light"] .sell,
+:root[data-theme="light"] .statusBadge {
+  opacity: 1 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+/* v47.20.8 — Restore landing/paywall readability after light-mode patches
+   Safe: only overrides public landing + paywall surfaces, without touching app dark dashboard. */
+
+/* 1) Public landing must always read as dark/premium, even when app theme is light */
+.publicLanding,
+.publicLanding *,
+.landingHero,
+.landingHero *,
+.landingHeroText,
+.landingHeroText *,
+.landingSection,
+.landingSection *,
+.landingFinal,
+.landingFinal * {
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.publicLanding .landingHeroText h1,
+.publicLanding .landingSection h2,
+.publicLanding .landingFinal h2 {
+  color: #fff4d3 !important;
+  -webkit-text-fill-color: #fff4d3 !important;
+}
+
+.publicLanding .landingHeroText p,
+.publicLanding .landingSection p,
+.publicLanding .landingFinal p,
+.publicLanding .landingMicro {
+  color: #b7c0d0 !important;
+  -webkit-text-fill-color: #b7c0d0 !important;
+}
+
+.publicLanding .landingBadge,
+.publicLanding .landingBadge *,
+.publicLanding .loginBadge,
+.publicLanding .loginBadge * {
+  color: #f0c55a !important;
+  -webkit-text-fill-color: #f0c55a !important;
+}
+
+.publicLanding .landingHighlights span,
+.publicLanding .loginHighlights span,
+.publicLanding .featureGrid div,
+.publicLanding .landingFlow div,
+.publicLanding .landingFlow div * {
+  color: #e5eaf3 !important;
+  -webkit-text-fill-color: #e5eaf3 !important;
+}
+
+.publicLanding .landingFlow p {
+  color: #9aa3b5 !important;
+  -webkit-text-fill-color: #9aa3b5 !important;
+}
+
+/* 2) Paywall / activation funnel must stay dark-premium in both white and dark app mode */
+.paywallFunnel,
+.paywallFunnel *,
+.accessFunnel,
+.accessFunnel *,
+.activationFunnel,
+.activationFunnel *,
+.membershipActivation,
+.membershipActivation * {
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.paywallFunnel h1,
+.paywallFunnel h2,
+.paywallFunnel h3,
+.paywallFunnel .paywallTitle,
+.paywallFunnel .activationTitle,
+.paywallFunnel .planTitle,
+.paywallFunnel .price,
+.accessFunnel h1,
+.accessFunnel h2,
+.accessFunnel h3,
+.activationFunnel h1,
+.activationFunnel h2,
+.activationFunnel h3,
+.membershipActivation h1,
+.membershipActivation h2,
+.membershipActivation h3 {
+  color: #fff4d3 !important;
+  -webkit-text-fill-color: #fff4d3 !important;
+}
+
+.paywallFunnel p,
+.paywallFunnel li,
+.paywallFunnel small,
+.paywallFunnel .planDescription,
+.paywallFunnel .paywallSubtitle,
+.paywallFunnel .featureText,
+.accessFunnel p,
+.accessFunnel small,
+.activationFunnel p,
+.activationFunnel small,
+.membershipActivation p,
+.membershipActivation small {
   color: #d8deea !important;
-  opacity: .86 !important;
+  -webkit-text-fill-color: #d8deea !important;
+}
+
+.paywallFunnel .muted,
+.paywallFunnel .hint,
+.paywallFunnel .planMuted,
+.paywallFunnel .featureMuted,
+.accessFunnel .muted,
+.activationFunnel .muted,
+.membershipActivation .muted {
+  color: #9aa3b5 !important;
+  -webkit-text-fill-color: #9aa3b5 !important;
+}
+
+.paywallFunnel .eyebrow,
+.paywallFunnel .paywallEyebrow,
+.paywallFunnel .badge,
+.paywallFunnel .planBadge,
+.paywallFunnel .bestBadge,
+.paywallFunnel .gold,
+.paywallFunnel [class*="Badge"],
+.paywallFunnel [class*="badge"],
+.paywallFunnel [class*="eyebrow"],
+.paywallFunnel [class*="Eyebrow"],
+.paywallFunnel .brandTrading,
+.paywallFunnel .brandPreviewTitle span,
+.paywallFunnel .referencePreviewTop span,
+.paywallFunnel .referencePreviewTop small {
+  color: #f0c55a !important;
+  -webkit-text-fill-color: #f0c55a !important;
+}
+
+/* Keep buttons readable inside paywall */
+.paywallFunnel button.primary,
+.paywallFunnel .primary,
+.accessFunnel button.primary,
+.activationFunnel button.primary,
+.membershipActivation button.primary {
+  color: #07090d !important;
+  -webkit-text-fill-color: #07090d !important;
+}
+
+.paywallFunnel button.ghost,
+.paywallFunnel .ghost,
+.accessFunnel button.ghost,
+.activationFunnel button.ghost,
+.membershipActivation button.ghost {
+  color: #f4f1e8 !important;
+  -webkit-text-fill-color: #f4f1e8 !important;
+}
+
+/* 3) Narrow fix for white-mode educational cards only, avoiding landing/paywall */
+:root[data-theme="light"] .app .main .ruleMini span,
+:root[data-theme="light"] .app .main .ruleMini span *,
+:root[data-theme="light"] .app .main .readingProtocol div,
+:root[data-theme="light"] .app .main .readingProtocol div *,
+:root[data-theme="light"] .app .main .patternCard,
+:root[data-theme="light"] .app .main .patternCard *,
+:root[data-theme="light"] .app .main .checkResult,
+:root[data-theme="light"] .app .main .checkResult *,
+:root[data-theme="light"] .app .main .mandamiento,
+:root[data-theme="light"] .app .main .mandamiento * {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="light"] .app .main .patternCard h3,
+:root[data-theme="light"] .app .main .readingProtocol b,
+:root[data-theme="light"] .app .main .checkResult b,
+:root[data-theme="light"] .app .main .mandamiento b {
+  color: #020617 !important;
+  -webkit-text-fill-color: #020617 !important;
+}
+/* v47.20.9 — Restore public landing/paywall text in light mode
+   Scope: public landing + paywall only. Keeps internal app white readability intact. */
+
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="light"] .paywallFunnel *,
+:root[data-theme="light"] .landing,
+:root[data-theme="light"] .landing *,
+:root[data-theme="light"] .landingPage,
+:root[data-theme="light"] .landingPage *,
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="light"] .publicLanding *,
+:root[data-theme="light"] .heroSection,
+:root[data-theme="light"] .heroSection *,
+:root[data-theme="light"] .heroShell,
+:root[data-theme="light"] .heroShell *,
+:root[data-theme="light"] .loginHero,
+:root[data-theme="light"] .loginHero *,
+:root[data-theme="light"] .authHero,
+:root[data-theme="light"] .authHero * {
+  color: #fff7df !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #fff7df !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .72) !important;
+  filter: none !important;
+}
+
+/* Headline principal landing/paywall */
+:root[data-theme="light"] .paywallFunnel h1,
+:root[data-theme="light"] .paywallFunnel h2,
+:root[data-theme="light"] .landing h1,
+:root[data-theme="light"] .landing h2,
+:root[data-theme="light"] .landingPage h1,
+:root[data-theme="light"] .landingPage h2,
+:root[data-theme="light"] .publicLanding h1,
+:root[data-theme="light"] .publicLanding h2,
+:root[data-theme="light"] .heroSection h1,
+:root[data-theme="light"] .heroSection h2,
+:root[data-theme="light"] .heroShell h1,
+:root[data-theme="light"] .heroShell h2,
+:root[data-theme="light"] .loginHero h1,
+:root[data-theme="light"] .loginHero h2,
+:root[data-theme="light"] .authHero h1,
+:root[data-theme="light"] .authHero h2 {
+  color: #fff7df !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #fff7df !important;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, .86) !important;
+}
+
+/* Subtítulos y descripciones públicas */
+:root[data-theme="light"] .paywallFunnel p,
+:root[data-theme="light"] .paywallFunnel small,
+:root[data-theme="light"] .paywallFunnel span,
+:root[data-theme="light"] .landing p,
+:root[data-theme="light"] .landing small,
+:root[data-theme="light"] .landing span,
+:root[data-theme="light"] .landingPage p,
+:root[data-theme="light"] .landingPage small,
+:root[data-theme="light"] .landingPage span,
+:root[data-theme="light"] .publicLanding p,
+:root[data-theme="light"] .publicLanding small,
+:root[data-theme="light"] .publicLanding span,
+:root[data-theme="light"] .heroSection p,
+:root[data-theme="light"] .heroSection small,
+:root[data-theme="light"] .heroSection span,
+:root[data-theme="light"] .heroShell p,
+:root[data-theme="light"] .heroShell small,
+:root[data-theme="light"] .heroShell span,
+:root[data-theme="light"] .loginHero p,
+:root[data-theme="light"] .loginHero small,
+:root[data-theme="light"] .loginHero span,
+:root[data-theme="light"] .authHero p,
+:root[data-theme="light"] .authHero small,
+:root[data-theme="light"] .authHero span {
+  color: rgba(255, 247, 223, .94) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: rgba(255, 247, 223, .94) !important;
+}
+
+/* Dorados premium: badges, labels y Trading Club */
+:root[data-theme="light"] .paywallFunnel .brandTrading,
+:root[data-theme="light"] .paywallFunnel .brandPreviewTitle span,
+:root[data-theme="light"] .paywallFunnel .referencePreviewTop span,
+:root[data-theme="light"] .paywallFunnel [class*="brand"] span,
+:root[data-theme="light"] .paywallFunnel [class*="Brand"] span,
+:root[data-theme="light"] .landing [class*="badge"],
+:root[data-theme="light"] .landingPage [class*="badge"],
+:root[data-theme="light"] .publicLanding [class*="badge"],
+:root[data-theme="light"] .heroSection [class*="badge"],
+:root[data-theme="light"] .heroShell [class*="badge"] {
+  color: #f0c55a !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #f0c55a !important;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, .76) !important;
+}
+
+/* Botones públicos: no forzar texto crema sobre botón blanco/dorado */
+:root[data-theme="light"] .landing button,
+:root[data-theme="light"] .landing a.btn,
+:root[data-theme="light"] .landingPage button,
+:root[data-theme="light"] .landingPage a.btn,
+:root[data-theme="light"] .publicLanding button,
+:root[data-theme="light"] .publicLanding a.btn,
+:root[data-theme="light"] .heroSection button,
+:root[data-theme="light"] .heroSection a.btn,
+:root[data-theme="light"] .heroShell button,
+:root[data-theme="light"] .heroShell a.btn,
+:root[data-theme="light"] .loginHero button,
+:root[data-theme="light"] .authHero button {
+  -webkit-text-fill-color: currentColor !important;
+  text-shadow: none !important;
+}
+
+/* Quitar blur excesivo al video/imagen de landing/paywall, sin cambiar el video */
+:root[data-theme="light"] .paywallFunnel video,
+:root[data-theme="light"] .paywallFunnel img,
+:root[data-theme="light"] .landing video,
+:root[data-theme="light"] .landing img,
+:root[data-theme="light"] .landingPage video,
+:root[data-theme="light"] .landingPage img,
+:root[data-theme="light"] .publicLanding video,
+:root[data-theme="light"] .publicLanding img,
+:root[data-theme="light"] .heroSection video,
+:root[data-theme="light"] .heroSection img,
+:root[data-theme="light"] .heroShell video,
+:root[data-theme="light"] .heroShell img {
+  filter: brightness(.82) contrast(1.08) saturate(.95) !important;
+  backdrop-filter: none !important;
+}
+/* v47.20.10 — Paywall final polish
+   Objetivo: mantener el look actual, bajar un poco el blur del fondo en light/dark,
+   quitar globos laterales y eliminar el segundo "Más elegido" del plan Pro.
+   Scope: SOLO paywall/landing pública. No toca app interna, backend ni permisos. */
+
+/* 1) Quitar los globos laterales del fondo del paywall */
+.paywallFunnel .paywallFunnelBg span,
+.paywallFunnelBg span,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg span,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg span {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 2) Fondo/video del paywall: menos blur y mismo nivel en light/dark */
+.paywallFunnel .paywallFunnelBg,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg {
+  filter: blur(.65px) brightness(.82) saturate(.98) contrast(1.06) !important;
+  -webkit-filter: blur(.65px) brightness(.82) saturate(.98) contrast(1.06) !important;
+}
+
+.paywallFunnel .paywallFunnelBg video,
+.paywallFunnel .paywallFunnelBg img,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg video,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg img,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg video,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg img {
+  filter: blur(.65px) brightness(.82) saturate(.98) contrast(1.06) !important;
+  -webkit-filter: blur(.65px) brightness(.82) saturate(.98) contrast(1.06) !important;
+  transform: scale(1.01) !important;
+}
+
+/* Overlay oscuro controlado para que el texto siga premium y legible */
+.paywallFunnel .paywallFunnelBg::after,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg::after,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(90deg, rgba(0,0,0,.56), rgba(0,0,0,.38) 48%, rgba(0,0,0,.56)) !important;
+  -webkit-backdrop-filter: blur(.25px) !important;
+  backdrop-filter: blur(.25px) !important;
+}
+
+/* La grilla/textura del fondo queda más suave para no ensuciar */
+.paywallFunnel .paywallFunnelBg::before,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg::before,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg::before {
+  opacity: .28 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* 3) No tocar el video preview del producto: que siga nítido dentro del paywall */
+.paywallFunnel .paywallFunnelPreview video,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelPreview video,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelPreview video {
+  filter: saturate(.98) brightness(.78) contrast(1.06) !important;
+  -webkit-filter: saturate(.98) brightness(.78) contrast(1.06) !important;
+  transform: scale(1.01) !important;
+}
+
+/* 4) Pro: dejar solo el badge de corona "Más elegido" y quitar el segundo kicker */
+.paywallFunnel .paywallFunnelPlan.featured .paywallFunnelPlanTop > span,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelPlan.featured .paywallFunnelPlanTop > span,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelPlan.featured .paywallFunnelPlanTop > span {
+  display: none !important;
+}
+
+/* 5) Mantener los textos del paywall bien legibles en light y dark */
+.paywallFunnel .paywallFunnelHero h1,
+.paywallFunnel .paywallFunnelHero h2,
+.paywallFunnel .paywallFunnelHero p,
+.paywallFunnel .paywallFunnelBilling b,
+.paywallFunnel .paywallFunnelBilling span,
+.paywallFunnel .paywallFunnelPlanTop h3,
+.paywallFunnel .paywallFunnelPlanTop p,
+.paywallFunnel .paywallFunnelValue,
+.paywallFunnel .paywallFunnelPlan li,
+.paywallFunnel .paywallFunnelInside b,
+.paywallFunnel .paywallFunnelBenefits b,
+.paywallFunnel .paywallFunnelBenefits span {
+  opacity: 1 !important;
+  text-shadow: 0 2px 18px rgba(0,0,0,.58) !important;
+}
+
+.paywallFunnel .paywallFunnelHero h1,
+.paywallFunnel .paywallFunnelPlanTop h3 {
+  color: #fff7df !important;
+  -webkit-text-fill-color: #fff7df !important;
+}
+
+.paywallFunnel .paywallFunnelHero h2,
+.paywallFunnel .paywallFunnelPlanTop p,
+.paywallFunnel .paywallFunnelValue,
+.paywallFunnel .paywallFunnelPlan li,
+.paywallFunnel .paywallFunnelBenefits span {
+  color: rgba(255,247,223,.88) !important;
+  -webkit-text-fill-color: rgba(255,247,223,.88) !important;
+}
+
+/* 6) Landing pública: si está en white mode, mantener texto claro sobre fondo dark */
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="light"] .publicLanding * {
+  color: inherit;
+}
+:root[data-theme="light"] .publicLanding h1,
+:root[data-theme="light"] .publicLanding h2,
+:root[data-theme="light"] .publicLanding .landingHeroText h1,
+:root[data-theme="light"] .publicLanding .landingSection h2,
+:root[data-theme="light"] .publicLanding .landingFinal h2 {
+  color: #fff7df !important;
+  -webkit-text-fill-color: #fff7df !important;
+  opacity: 1 !important;
+  text-shadow: 0 4px 28px rgba(0,0,0,.78) !important;
+}
+:root[data-theme="light"] .publicLanding p,
+:root[data-theme="light"] .publicLanding small,
+:root[data-theme="light"] .publicLanding .landingHeroText p,
+:root[data-theme="light"] .publicLanding .landingSection p,
+:root[data-theme="light"] .publicLanding .landingFinal p,
+:root[data-theme="light"] .publicLanding .landingMicro {
+  color: rgba(255,247,223,.82) !important;
+  -webkit-text-fill-color: rgba(255,247,223,.82) !important;
+  opacity: 1 !important;
+}
+/* v47.20.11 — Paywall video visibility final
+   Objetivo: que el video/fondo de gráficos se perciba claramente en white y dark,
+   manteniendo textos legibles y sin tocar app interna. */
+
+/* Igualamos el tratamiento del fondo en ambos temas */
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="dark"] .publicLanding,
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="dark"] .paywallFunnel,
+:root[data-theme="light"] .paywallPage,
+:root[data-theme="dark"] .paywallPage,
+:root[data-theme="light"] .accessPage,
+:root[data-theme="dark"] .accessPage {
+  background-color: #03050a !important;
+}
+
+/* Video/fondo más visible: menos blur, menos oscuridad */
+:root[data-theme="light"] .publicLanding video,
+:root[data-theme="dark"] .publicLanding video,
+:root[data-theme="light"] .paywallFunnel video,
+:root[data-theme="dark"] .paywallFunnel video,
+:root[data-theme="light"] .paywallPage video,
+:root[data-theme="dark"] .paywallPage video,
+:root[data-theme="light"] .accessPage video,
+:root[data-theme="dark"] .accessPage video,
+:root[data-theme="light"] .heroBg video,
+:root[data-theme="dark"] .heroBg video,
+:root[data-theme="light"] .paywallBg video,
+:root[data-theme="dark"] .paywallBg video,
+:root[data-theme="light"] .premiumBg video,
+:root[data-theme="dark"] .premiumBg video {
+  opacity: .50 !important;
+  filter: blur(2px) brightness(.92) contrast(1.08) saturate(1.05) !important;
+  transform: scale(1.015) !important;
+}
+
+/* Si el fondo es imagen/overlay con pseudo-elementos, también lo dejamos visible */
+:root[data-theme="light"] .publicLanding::before,
+:root[data-theme="dark"] .publicLanding::before,
+:root[data-theme="light"] .paywallFunnel::before,
+:root[data-theme="dark"] .paywallFunnel::before,
+:root[data-theme="light"] .paywallPage::before,
+:root[data-theme="dark"] .paywallPage::before,
+:root[data-theme="light"] .accessPage::before,
+:root[data-theme="dark"] .accessPage::before {
+  opacity: .62 !important;
+  filter: blur(2px) brightness(.95) contrast(1.08) !important;
+}
+
+/* Oscurecedor general más suave para que se note el gráfico detrás */
+:root[data-theme="light"] .publicLanding::after,
+:root[data-theme="dark"] .publicLanding::after,
+:root[data-theme="light"] .paywallFunnel::after,
+:root[data-theme="dark"] .paywallFunnel::after,
+:root[data-theme="light"] .paywallPage::after,
+:root[data-theme="dark"] .paywallPage::after,
+:root[data-theme="light"] .accessPage::after,
+:root[data-theme="dark"] .accessPage::after {
+  opacity: .28 !important;
+  backdrop-filter: blur(1px) !important;
+  -webkit-backdrop-filter: blur(1px) !important;
+}
+
+/* Refuerzo contra overlays internos demasiado negros */
+:root[data-theme="light"] .publicLanding .bgOverlay,
+:root[data-theme="dark"] .publicLanding .bgOverlay,
+:root[data-theme="light"] .paywallFunnel .bgOverlay,
+:root[data-theme="dark"] .paywallFunnel .bgOverlay,
+:root[data-theme="light"] .paywallPage .bgOverlay,
+:root[data-theme="dark"] .paywallPage .bgOverlay,
+:root[data-theme="light"] .accessPage .bgOverlay,
+:root[data-theme="dark"] .accessPage .bgOverlay,
+:root[data-theme="light"] .heroOverlay,
+:root[data-theme="dark"] .heroOverlay,
+:root[data-theme="light"] .paywallOverlay,
+:root[data-theme="dark"] .paywallOverlay {
+  opacity: .30 !important;
+  background: linear-gradient(90deg, rgba(0,0,0,.58), rgba(0,0,0,.30), rgba(0,0,0,.48)) !important;
+  backdrop-filter: blur(1px) !important;
+  -webkit-backdrop-filter: blur(1px) !important;
+}
+
+/* Conserva legibilidad del bloque principal sobre el video más visible */
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="dark"] .paywallFunnel,
+:root[data-theme="light"] .paywallShell,
+:root[data-theme="dark"] .paywallShell,
+:root[data-theme="light"] .accessShell,
+:root[data-theme="dark"] .accessShell {
+  background: rgba(5, 8, 15, .84) !important;
+  border-color: rgba(240, 197, 90, .20) !important;
+  box-shadow: 0 30px 90px rgba(0,0,0,.46) !important;
+}
+/* v47.20.12 — Paywall/Landing video near-zero blur, same in light and dark
+   Objetivo: que el video/fondo se entienda y sea visible sin robar protagonismo.
+   Scope: solo landing pública + paywall. */
+
+/* 1) Video e imágenes del fondo/preview: casi sin blur, misma config en white y dark */
+:root[data-theme="light"] .paywallFunnel video,
+:root[data-theme="dark"] .paywallFunnel video,
+:root[data-theme="light"] .paywallFunnel img,
+:root[data-theme="dark"] .paywallFunnel img,
+:root[data-theme="light"] .landing video,
+:root[data-theme="dark"] .landing video,
+:root[data-theme="light"] .landing img,
+:root[data-theme="dark"] .landing img,
+:root[data-theme="light"] .landingPage video,
+:root[data-theme="dark"] .landingPage video,
+:root[data-theme="light"] .landingPage img,
+:root[data-theme="dark"] .landingPage img,
+:root[data-theme="light"] .publicLanding video,
+:root[data-theme="dark"] .publicLanding video,
+:root[data-theme="light"] .publicLanding img,
+:root[data-theme="dark"] .publicLanding img,
+:root[data-theme="light"] .heroSection video,
+:root[data-theme="dark"] .heroSection video,
+:root[data-theme="light"] .heroSection img,
+:root[data-theme="dark"] .heroSection img,
+:root[data-theme="light"] .heroShell video,
+:root[data-theme="dark"] .heroShell video,
+:root[data-theme="light"] .heroShell img,
+:root[data-theme="dark"] .heroShell img,
+:root[data-theme="light"] .loginHero video,
+:root[data-theme="dark"] .loginHero video,
+:root[data-theme="light"] .loginHero img,
+:root[data-theme="dark"] .loginHero img,
+:root[data-theme="light"] .authHero video,
+:root[data-theme="dark"] .authHero video,
+:root[data-theme="light"] .authHero img,
+:root[data-theme="dark"] .authHero img {
+  filter: blur(.25px) brightness(.92) contrast(1.08) saturate(1.02) !important;
+  -webkit-filter: blur(.25px) brightness(.92) contrast(1.08) saturate(1.02) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: .92 !important;
+}
+
+/* 2) Si algún contenedor/pseudo-overlay estaba metiendo blur fuerte, lo bajamos casi a cero */
+:root[data-theme="light"] .paywallFunnel::before,
+:root[data-theme="dark"] .paywallFunnel::before,
+:root[data-theme="light"] .paywallFunnel::after,
+:root[data-theme="dark"] .paywallFunnel::after,
+:root[data-theme="light"] .landing::before,
+:root[data-theme="dark"] .landing::before,
+:root[data-theme="light"] .landing::after,
+:root[data-theme="dark"] .landing::after,
+:root[data-theme="light"] .landingPage::before,
+:root[data-theme="dark"] .landingPage::before,
+:root[data-theme="light"] .landingPage::after,
+:root[data-theme="dark"] .landingPage::after,
+:root[data-theme="light"] .publicLanding::before,
+:root[data-theme="dark"] .publicLanding::before,
+:root[data-theme="light"] .publicLanding::after,
+:root[data-theme="dark"] .publicLanding::after,
+:root[data-theme="light"] .heroSection::before,
+:root[data-theme="dark"] .heroSection::before,
+:root[data-theme="light"] .heroSection::after,
+:root[data-theme="dark"] .heroSection::after,
+:root[data-theme="light"] .heroShell::before,
+:root[data-theme="dark"] .heroShell::before,
+:root[data-theme="light"] .heroShell::after,
+:root[data-theme="dark"] .heroShell::after,
+:root[data-theme="light"] .loginHero::before,
+:root[data-theme="dark"] .loginHero::before,
+:root[data-theme="light"] .loginHero::after,
+:root[data-theme="dark"] .loginHero::after,
+:root[data-theme="light"] .authHero::before,
+:root[data-theme="dark"] .authHero::before,
+:root[data-theme="light"] .authHero::after,
+:root[data-theme="dark"] .authHero::after {
+  backdrop-filter: blur(.25px) !important;
+  -webkit-backdrop-filter: blur(.25px) !important;
+}
+
+/* 3) Si existen capas de fondo dedicadas, misma config visible */
+:root[data-theme="light"] [class*="paywall"] [class*="bg"],
+:root[data-theme="dark"] [class*="paywall"] [class*="bg"],
+:root[data-theme="light"] [class*="paywall"] [class*="Bg"],
+:root[data-theme="dark"] [class*="paywall"] [class*="Bg"],
+:root[data-theme="light"] [class*="landing"] [class*="bg"],
+:root[data-theme="dark"] [class*="landing"] [class*="bg"],
+:root[data-theme="light"] [class*="landing"] [class*="Bg"],
+:root[data-theme="dark"] [class*="landing"] [class*="Bg"],
+:root[data-theme="light"] [class*="hero"] [class*="bg"],
+:root[data-theme="dark"] [class*="hero"] [class*="bg"],
+:root[data-theme="light"] [class*="hero"] [class*="Bg"],
+:root[data-theme="dark"] [class*="hero"] [class*="Bg"] {
+  filter: blur(.25px) brightness(.9) contrast(1.08) saturate(1.03) !important;
+  -webkit-filter: blur(.25px) brightness(.9) contrast(1.08) saturate(1.03) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 4) Overlays: menos oscuros para que se entienda el video, pero conservan lectura del paywall */
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="dark"] .paywallFunnel,
+:root[data-theme="light"] .landing,
+:root[data-theme="dark"] .landing,
+:root[data-theme="light"] .landingPage,
+:root[data-theme="dark"] .landingPage,
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="dark"] .publicLanding,
+:root[data-theme="light"] .heroSection,
+:root[data-theme="dark"] .heroSection,
+:root[data-theme="light"] .heroShell,
+:root[data-theme="dark"] .heroShell,
+:root[data-theme="light"] .loginHero,
+:root[data-theme="dark"] .loginHero,
+:root[data-theme="light"] .authHero,
+:root[data-theme="dark"] .authHero {
+  background-blend-mode: normal !important;
+}
+/* ==========================================================================
+   v47.20.13 — PAYWALL BACKGROUND VIDEO FINAL FIX
+   Objetivo:
+   1) Video del fondo totalmente visible y entendible sin competir con el paywall.
+   2) Misma visibilidad en white y dark.
+   3) Quitar blur/backdrop-filter pesados que trababan el fondo.
+   Scope: solo landing pública + paywall. No toca app interna.
+   ========================================================================== */
+
+/* Base pública/paywall: mismo tratamiento en ambos temas */
+.paywallFunnel,
+.paywallPage,
+.accessPage,
+.publicLanding,
+.landing,
+.landingPage,
+.heroSection,
+.heroShell,
+.loginHero,
+.authHero,
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="dark"] .paywallFunnel,
+:root[data-theme="light"] .paywallPage,
+:root[data-theme="dark"] .paywallPage,
+:root[data-theme="light"] .accessPage,
+:root[data-theme="dark"] .accessPage,
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="dark"] .publicLanding,
+:root[data-theme="light"] .landing,
+:root[data-theme="dark"] .landing,
+:root[data-theme="light"] .landingPage,
+:root[data-theme="dark"] .landingPage {
+  background-color:#03050a !important;
+  background-blend-mode:normal !important;
+}
+
+/* Reactivar el video de fondo fullscreen si reglas anteriores lo ocultaron */
+.paywallFunnelVideoBg,
+.paywallFunnel .paywallFunnelVideoBg,
+:root[data-theme="light"] .paywallFunnelVideoBg,
+:root[data-theme="dark"] .paywallFunnelVideoBg,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelVideoBg,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelVideoBg {
+  display:block !important;
+  visibility:visible !important;
+  opacity:.76 !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  overflow:hidden !important;
+  background:#03050a !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  transform:translateZ(0) !important;
+  backface-visibility:hidden !important;
+  contain:paint !important;
+}
+
+/* Video de fondo: SIN BLUR. La profundidad la da el overlay, no filtros pesados. */
+.paywallFunnelVideoBg video,
+.paywallFunnel .paywallFunnelVideoBg video,
+.paywallFunnelVideoBg img,
+.paywallFunnel .paywallFunnelVideoBg img,
+.paywallFunnel .paywallFunnelBg video,
+.paywallFunnel .paywallFunnelBg img,
+:root[data-theme="light"] .paywallFunnelVideoBg video,
+:root[data-theme="dark"] .paywallFunnelVideoBg video,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelVideoBg video,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelVideoBg video,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg video,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg video {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  opacity:1 !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  transform:translate3d(0,0,0) scale(1.002) !important;
+  backface-visibility:hidden !important;
+  will-change:auto !important;
+}
+
+/* Si el fondo viene como imagen/pseudo-elemento, también queda visible y liviano */
+.paywallFunnel::before,
+.paywallPage::before,
+.accessPage::before,
+.publicLanding::before,
+.landing::before,
+.landingPage::before,
+.heroSection::before,
+.heroShell::before,
+.loginHero::before,
+.authHero::before,
+:root[data-theme="light"] .paywallFunnel::before,
+:root[data-theme="dark"] .paywallFunnel::before,
+:root[data-theme="light"] .publicLanding::before,
+:root[data-theme="dark"] .publicLanding::before {
+  opacity:.76 !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Overlay oscuro suave: permite leer texto sin esconder el video */
+.paywallFunnelVideoBgOverlay,
+.paywallFunnel .paywallFunnelVideoBgOverlay,
+.paywallFunnel .paywallFunnelBg::after,
+.paywallBackdrop::after,
+.referencePaywallGate .paywallBackdrop::after,
+:root[data-theme="light"] .paywallFunnelVideoBgOverlay,
+:root[data-theme="dark"] .paywallFunnelVideoBgOverlay,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelVideoBgOverlay,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelVideoBgOverlay,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg::after,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg::after {
+  display:block !important;
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  opacity:1 !important;
+  background:
+    linear-gradient(90deg, rgba(3,5,10,.50), rgba(3,5,10,.23) 46%, rgba(3,5,10,.48)),
+    linear-gradient(180deg, rgba(3,5,10,.16), rgba(3,5,10,.36) 72%, rgba(3,5,10,.54)) !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Quitar glows/globos laterales, sin tocar el video */
+.paywallFunnel .paywallFunnelBg span,
+.paywallFunnelBg span,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg span,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg span {
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+
+/* Evitar que contenedores genéricos vuelvan a meter blur */
+.paywallFunnel .paywallFunnelBg,
+.paywallFunnel .paywallBg,
+.paywallFunnel .premiumBg,
+.paywallFunnel .heroBg,
+.referencePaywallGate,
+.referencePaywallGate .dashboardBackdrop,
+.referencePaywallGate .paywallBackdrop,
+:root[data-theme="light"] .paywallFunnel .paywallFunnelBg,
+:root[data-theme="dark"] .paywallFunnel .paywallFunnelBg,
+:root[data-theme="light"] .referencePaywallGate,
+:root[data-theme="dark"] .referencePaywallGate {
+  opacity:1 !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Paywall viejo tipo reference: imagen/dashboard de fondo visible y liviana */
+.referencePaywallGate .dashboardBackdrop img,
+.referencePaywallGate .paywallBackdrop img,
+.referencePaywallGate video,
+.referencePaywallGate img,
+:root[data-theme="light"] .referencePaywallGate .dashboardBackdrop img,
+:root[data-theme="dark"] .referencePaywallGate .dashboardBackdrop img,
+:root[data-theme="light"] .referencePaywallGate video,
+:root[data-theme="dark"] .referencePaywallGate video {
+  display:block !important;
+  opacity:.78 !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  transform:translate3d(0,0,0) scale(1.002) !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  backface-visibility:hidden !important;
+}
+
+/* Videos públicos/landing: misma visibilidad en ambos temas, sin blur */
+.publicLanding video,
+.landing video,
+.landingPage video,
+.heroSection video,
+.heroShell video,
+.loginHero video,
+.authHero video,
+:root[data-theme="light"] .publicLanding video,
+:root[data-theme="dark"] .publicLanding video,
+:root[data-theme="light"] .landing video,
+:root[data-theme="dark"] .landing video,
+:root[data-theme="light"] .landingPage video,
+:root[data-theme="dark"] .landingPage video {
+  opacity:.88 !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  transform:translate3d(0,0,0) scale(1.002) !important;
+  backface-visibility:hidden !important;
+  will-change:auto !important;
+}
+
+/* No tocar el video del producto dentro de la card: queda nítido y estable */
+.paywallProductVideo,
+.paywallProductDemo,
+.paywallFunnelPreview video,
+.paywallVideoFrame video,
+.referencePaywallModal video {
+  opacity:1 !important;
+  filter:none !important;
+  -webkit-filter:none !important;
+  transform:none !important;
+  object-fit:cover !important;
+  backface-visibility:hidden !important;
+}
+
+/* Textos públicos siguen claros sobre el fondo visible */
+.paywallFunnel,
+.paywallFunnel *,
+.publicLanding,
+.publicLanding *,
+.landing,
+.landing *,
+.landingPage,
+.landingPage *,
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="light"] .paywallFunnel *,
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="light"] .publicLanding * {
+  text-shadow:0 2px 18px rgba(0,0,0,.62) !important;
+}
+
+.paywallFunnel h1,
+.paywallFunnel h2,
+.paywallFunnel p,
+.paywallFunnel small,
+.paywallFunnel span,
+.publicLanding h1,
+.publicLanding h2,
+.publicLanding p,
+.publicLanding small,
+.publicLanding span,
+:root[data-theme="light"] .paywallFunnel h1,
+:root[data-theme="light"] .paywallFunnel h2,
+:root[data-theme="light"] .paywallFunnel p,
+:root[data-theme="light"] .paywallFunnel small,
+:root[data-theme="light"] .paywallFunnel span,
+:root[data-theme="light"] .publicLanding h1,
+:root[data-theme="light"] .publicLanding h2,
+:root[data-theme="light"] .publicLanding p,
+:root[data-theme="light"] .publicLanding small,
+:root[data-theme="light"] .publicLanding span {
+  opacity:1 !important;
+  color:#fff7df !important;
+  -webkit-text-fill-color:#fff7df !important;
+}
+
+/* Botones no heredan text-fill crema si tienen fondo dorado/blanco */
+.paywallFunnel button,
+.paywallFunnel a,
+.publicLanding button,
+.publicLanding a,
+:root[data-theme="light"] .paywallFunnel button,
+:root[data-theme="light"] .paywallFunnel a,
+:root[data-theme="light"] .publicLanding button,
+:root[data-theme="light"] .publicLanding a {
+  -webkit-text-fill-color:currentColor !important;
+}
+
+/* Mobile: mismo look, sin blur pesado para evitar trabas */
+@media(max-width:768px){
+  .paywallFunnelVideoBg,
+  .paywallFunnel .paywallFunnelVideoBg{
+    display:block !important;
+    opacity:.70 !important;
+  }
+
+  .paywallFunnelVideoBg video,
+  .paywallFunnel .paywallFunnelVideoBg video,
+  .referencePaywallGate .dashboardBackdrop img,
+  .referencePaywallGate video {
+    opacity:1 !important;
+    filter:none !important;
+    -webkit-filter:none !important;
+    transform:translate3d(0,0,0) scale(1.002) !important;
+  }
+
+  .paywallFunnelVideoBgOverlay,
+  .paywallFunnel .paywallFunnelVideoBgOverlay,
+  .paywallFunnel .paywallFunnelBg::after,
+  .referencePaywallGate .paywallBackdrop::after {
+    background:
+      linear-gradient(90deg, rgba(3,5,10,.56), rgba(3,5,10,.30) 48%, rgba(3,5,10,.56)),
+      linear-gradient(180deg, rgba(3,5,10,.20), rgba(3,5,10,.48)) !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
 }
