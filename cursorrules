@@ -1,0 +1,150 @@
+# Moisés Trading Club (MTC) — Cursor AI Context
+
+## Qué es esta app
+SaaS B2B premium para traders discrecionales hispanos. Equivalente a TradeZella pero con
+foco en psicología, disciplina y comunidad privada. El valor central es convertir cada
+operación en evidencia medible del comportamiento del trader.
+
+Frase guía del producto:
+"Dejá de operar por sensación. Medí tu proceso, protegé tu riesgo y encontrá tu edge real."
+
+## Stack tecnológico
+- Frontend: JavaScript (Vanilla JS) + CSS
+- Backend: Python
+- Base de datos y auth: Firebase (Firestore + Firebase Auth)
+- Deploy: Render (backend) + GitHub (repo)
+- Estado: ~8,000 líneas, funcional, camino a nivel comercial premium
+
+## Módulos principales de la app
+1. Dashboard operativo — P/L, winrate, drawdown, profit factor, equity curve, señales de comportamiento
+2. Journal de trades — registro completo: activo, dirección, resultado, setup, emoción, riesgo, R múltiple, lecciones
+3. Checklist pre-trade — validación antes de entrar: contexto, zona, sesgo, emoción, riesgo, plan
+4. Risk Guard diario — límites de riesgo, drawdown, bloqueo emocional, revenge trading
+5. Analytics accionables — insights por setup, horario, emoción, activo, sesión, equity curve
+6. Calendario operativo — rendimiento por día, rachas, días peligrosos, frecuencia
+7. Comunidad privada — basada en proceso y evidencia, no en señales
+8. Academia / Biblioteca — clases, manuales, psicología, gestión de riesgo, recursos
+9. Planes / Paywall — Club / Pro / Mentoría con acceso diferenciado por feature
+
+## Usuarios objetivo
+Traders discrecionales hispanos (LATAM + España). Operan oro, forex, índices, cuentas
+fondeadas (prop firms). Necesitan estructura operativa, no señales. Quieren ser profesionales.
+
+## Stack Firebase — patrones obligatorios
+- Siempre usar Firebase SDK v9+ (modular imports): `import { getFirestore, doc, getDoc } from 'firebase/firestore'`
+- Nunca usar SDK v8 (compat): prohibido `firebase.firestore()` o `firebase.auth()`
+- Reglas de Firestore: cada usuario solo accede a su propia data (`request.auth.uid`)
+- Estructura de colecciones:
+  users/{uid}/trades/{tradeId}
+  users/{uid}/checklists/{checklistId}
+  users/{uid}/riskguard/{date}
+  users/{uid}/settings
+  community/posts/{postId}
+  academy/content/{contentId}
+  plans/{planId}
+- Siempre manejar errores de Firebase con try/catch y mensajes útiles al usuario
+- Nunca exponer API keys ni credenciales en el frontend. Usar variables de entorno.
+
+## Backend Python — patrones obligatorios
+- Siempre usar Firebase Admin SDK para operaciones del servidor
+- Endpoints REST con manejo explícito de errores y códigos HTTP correctos
+- Validar datos de entrada antes de escribir en Firestore
+- Logging estructurado para debugging en Render
+- Variables de entorno para todas las credenciales (nunca hardcodeadas)
+
+## Estilo de código — reglas estrictas
+- JavaScript moderno: ES6+, async/await, destructuring, módulos nativos
+- Sin jQuery. Sin librerías innecesarias.
+- Funciones pequeñas y con una sola responsabilidad
+- Nombres descriptivos en inglés: `calculateWinRate()`, `renderTradeCard()`, `fetchUserTrades()`
+- Comentarios en español cuando explican lógica de negocio compleja
+- Manejo de errores en TODOS los fetch/Firebase calls — nunca silenciar errores
+- Sin console.log en producción. Usar un logger con niveles (debug/info/error).
+
+## CSS — reglas estrictas
+- Variables CSS para todo: colores, tipografía, espaciado, border-radius, shadows
+  Definir en :root y nunca usar valores hex hardcodeados fuera de :root
+- Mobile-first. Breakpoints: 768px (tablet), 1024px (desktop)
+- Sin frameworks externos de CSS. Design system propio en /styles/tokens.css
+- BEM para naming de clases: .trade-card, .trade-card__header, .trade-card--winning
+- Transiciones solo en: opacity, transform, background-color (nunca en layout)
+- No usar !important. Si lo necesitás, refactorizar la especificidad.
+
+## Design system — estética objetivo
+Visual reference: Linear.app + Vercel Dashboard + Stripe
+Personalidad: premium, oscuro, confiable, profesional, datos claros
+
+Paleta base (definir en tokens.css):
+--color-bg-primary: #0a0a0f       /* fondo principal oscuro */
+--color-bg-secondary: #111118     /* superficies/cards */
+--color-bg-tertiary: #1a1a24      /* hover states, inputs */
+--color-accent-primary: #6366f1   /* indigo — acción principal */
+--color-accent-success: #22c55e   /* verde — ganancia, TP */
+--color-accent-danger: #ef4444    /* rojo — pérdida, SL */
+--color-accent-warning: #f59e0b   /* amber — alerta, drawdown */
+--color-text-primary: #f1f5f9     /* texto principal */
+--color-text-secondary: #94a3b8   /* texto secundario/muted */
+--color-border: rgba(255,255,255,0.08)  /* bordes sutiles */
+
+## Componentes UI prioritarios
+Cada uno debe tener: estados vacíos, estados de carga (skeleton), estados de error.
+
+- TradeCard — card de operación con color por resultado (verde/rojo/gris)
+- MetricCard — número grande + label + variación porcentual + mini sparkline
+- ChecklistItem — checkbox animado + label + estado completado
+- RiskMeter — indicador visual de riesgo usado vs disponible
+- EmotionBadge — badge por estado emocional con color semántico
+- EquityCurve — gráfica de evolución del balance
+- CalendarHeatmap — rendimiento por día tipo GitHub contributions
+- SetupTag — tag clicable por tipo de setup
+- TradeForm — formulario completo de registro de trade
+- PlanBadge — badge de plan (Club/Pro/Mentoría) con acceso diferenciado
+
+## Métricas clave del dominio (usar estos nombres consistentemente)
+- winRate: % de trades ganadores
+- profitFactor: ganancia bruta / pérdida bruta (objetivo > 1.5)
+- avgR: R múltiple promedio por trade
+- maxDrawdown: caída máxima desde equity máxima
+- consistencyScore: % de días donde se siguió el checklist
+- riskPerTrade: % de cuenta arriesgado por operación (objetivo ≤ 1%)
+- dailyRiskUsed: riesgo acumulado del día vs límite
+
+## Estructura de archivos esperada
+/frontend
+  /components     — componentes reutilizables
+  /pages          — vistas principales
+  /styles         — tokens.css + componentes CSS
+  /utils          — helpers: formatters, calculators, firebase helpers
+  /services       — firebase.js, api.js
+/backend
+  /routes         — endpoints por módulo
+  /services       — lógica de negocio
+  /utils          — helpers Python
+  /config         — configuración Firebase Admin
+
+## Lo que NUNCA hacer
+- Nunca hardcodear UIDs, IDs de planes o precios en el código
+- Nunca escribir en Firestore sin validar autenticación
+- Nunca mostrar datos de un usuario a otro (verificar uid en cada query)
+- Nunca usar colores hardcodeados fuera de tokens.css
+- Nunca crear componentes con más de 200 líneas — dividir si crece
+- Nunca dejar un fetch/promise sin manejo de error
+- Nunca usar innerHTML con datos del usuario (XSS)
+- Nunca exponer credenciales de Firebase en el código
+
+## Tono del producto (para textos UI)
+- Directo, profesional, sin condescendencia
+- Orientado al proceso, no al resultado
+- Ejemplos de mensajes:
+  ✓ "Checklist incompleto. Validá tu contexto antes de entrar."
+  ✓ "Alcanzaste tu límite de riesgo diario. La cuenta se protege sola."
+  ✓ "Tu setup más rentable este mes: Sweep + Displacement."
+  ✗ "¡Felicitaciones! ¡Ganaste un trade!"
+  ✗ "Error desconocido."
+
+## Prioridad de desarrollo actual
+1. Solidez técnica (errores, validaciones, seguridad Firebase)
+2. UI premium (design system, consistencia visual, empty states)
+3. Analytics accionables (insights con narrativa, no solo números)
+4. Onboarding profesional (primera impresión = percepción de valor)
+5. Performance (lazy loading, paginación en Firestore, cache)
