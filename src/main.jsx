@@ -1,6 +1,4 @@
-import HeroSection from './components/HeroSection/HeroSection';
-import * as React from 'react';
-import { Component, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserLocalPersistence } from 'firebase/auth';
@@ -20,6 +18,9 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch((e) => {
+  console.warn('auth_persistence_warning', e?.code || e?.message || e);
+});
 const db = getFirestore(app);
 const storage = getStorage(app);
 const ADMIN_EMAILS = String(import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
@@ -557,13 +558,10 @@ function accessLabel(status){
   return labels[s] || 'Activación pendiente';
 }
 
-/** Única fuente local de precios del paywall cuando /api/plans no responde. En producción manda GET /api/plans (backend). */
-const PAYWALL_PRICING_FALLBACK={
-  basic:{monthly:14.99,currency:'USD',name:'Club'},
-  premium:{monthly:24.99,currency:'USD',name:'Pro'},
-  mentorship:{monthly:250,currency:'USD',name:'Mentoría'}
+const PLAN_PRICING={
+  basic:{monthly:14.99,currency:'USD'},
+  premium:{monthly:24.99,currency:'USD'}
 };
-const PAYWALL_VIDEO_SRC='/paywall-premium-loop.mp4';
 const BILLING_CYCLES={
   monthly:{id:'monthly',label:'Mensual',short:'1 mes',suffix:'/mes',months:1,badge:null,featured:false},
   quarterly:{id:'quarterly',label:'Trimestral',short:'3 meses',suffix:'/trim.',months:3,badge:'Ahorro 20%',featured:false},
@@ -583,35 +581,12 @@ const PAYMENT_CONFIG={
   membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
 };
 const ACCESS_PLANS=[
-  {id:'basic',name:'Club',kicker:'Estructura base',headline:'Ordená tu operativa diaria con journal, checklist y comunidad privada.',cta:'Activar Club',tone:'base',valueNote:'El punto de entrada al ecosistema. Dejá de improvisar y empezá a registrar con criterio.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist de Moisés antes de ejecutar','Biblioteca privada del club','Comunidad privada']},
-  {id:'premium',name:'Pro',kicker:'Profundidad operativa',headline:'Detectá edge, fugas y patrones reales con analytics y Risk Guard.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'La opción más elegida: máxima claridad sobre tu ejecución sin pagar de más.',features:['Todo lo del plan Club','Analytics avanzado de ejecución','Heatmap de horarios, setups y sesiones','Risk Guard para frenar sobreoperación','Revisión de trades y comportamiento','Reportes para medir disciplina']},
-  {id:'mentorship',name:'Mentoría',kicker:'Alto impacto · 1 a 1',headline:'Aceleración directa con revisión del mentor y plan de mejora personal.',cta:'Aplicar a mentoría',tone:'mentor',valueNote:'Para traders serios que buscan corrección directa, accountability y evolución acelerada.',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
+  {id:'basic',name:'Club',kicker:'Base operativa',headline:'Para ordenar tu proceso y dejar de registrar trades a medias.',cta:'Activar Club',tone:'base',valueNote:'Ideal si querés pasar de improvisar a trabajar con checklist, journal y evidencia.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist de Moisés antes de ejecutar','Biblioteca privada del club','Comunidad privada']},
+  {id:'premium',name:'Pro',kicker:'Más elegido',headline:'Para traders activos que quieren detectar edge, fugas y patrones reales.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'La mejor relación entre precio, claridad y profundidad operativa.',features:['Todo lo del plan Club','Analytics avanzado de ejecución','Heatmap de horarios, setups y sesiones','Risk Guard para frenar sobreoperación','Revisión de trades y comportamiento','Reportes para medir disciplina']},
+  {id:'mentorship',name:'Mentoría',kicker:'Acompañamiento 1 a 1',headline:'Para acelerar resultados con revisión directa y plan de mejora.',cta:'Aplicar a mentoría',tone:'mentor',valueNote:'Feedback personalizado para traders que quieren corrección directa y seguimiento.',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
 ];
-function planPricingFromApiPayload(payload){
-  const map={};
-  (payload?.plans||[]).forEach(p=>{
-    if(!p?.id) return;
-    map[p.id]={monthly:Number(p.monthly),currency:p.currency||payload.currency||'USD',name:p.name||p.id};
-  });
-  return Object.keys(map).length?map:null;
-}
-function mergePaywallPricing(apiMap){
-  return {...PAYWALL_PRICING_FALLBACK,...apiMap};
-}
-async function fetchPlanPricing(){
-  if(!API_BASE_URL) return {...PAYWALL_PRICING_FALLBACK};
-  try{
-    const res=await fetch(apiUrl('/api/plans'));
-    const payload=await res.json().catch(()=>({}));
-    if(res.ok){
-      const fromApi=planPricingFromApiPayload(payload);
-      if(fromApi) return mergePaywallPricing(fromApi);
-    }
-  }catch(_e){}
-  return {...PAYWALL_PRICING_FALLBACK};
-}
-function calculatePlanPrice(planId,cycleId='monthly',pricingMap=PAYWALL_PRICING_FALLBACK){
-  const pricing=pricingMap?.[planId];
+function calculatePlanPrice(planId,cycleId='monthly'){
+  const pricing=PLAN_PRICING[planId];
   if(!pricing) return null;
   const monthly=pricing.monthly;
   if(cycleId==='monthly') return {currency:pricing.currency,monthly,regular:monthly,total:monthly,savePct:0,saveAmount:0,months:1};
@@ -633,14 +608,10 @@ function formatCurrencyValue(value,currency='USD',options={}){
   const decimals=options.decimals ?? hasDecimals;
   return `${currency} ${amount.toLocaleString('en-US',{minimumFractionDigits:decimals?2:0,maximumFractionDigits:decimals?2:0})}`;
 }
-function planCycleSummary(planId,cycleId,pricingMap){
-  const price=calculatePlanPrice(planId,cycleId,pricingMap);
+function planCycleSummary(planId,cycleId){
+  const price=calculatePlanPrice(planId,cycleId);
   if(!price) return null;
   return {price,final:formatCurrencyValue(price.total,price.currency),regular:price.regular>price.total?formatCurrencyValue(price.regular,price.currency):null,perMonth:cycleId==='monthly'?null:`Equiv. ${formatCurrencyValue(price.total/price.months,price.currency)}/mes`};
-}
-function mentorshipMonthlyQuote(pricingMap=PAYWALL_PRICING_FALLBACK){
-  const p=pricingMap?.mentorship||PAYWALL_PRICING_FALLBACK.mentorship;
-  return {final:formatCurrencyValue(p.monthly,p.currency),suffix:'/mes',note:'Mentoría personalizada 1 a 1'};
 }
 function membershipDurationMonths(cycleId){return cycleId==='annual'?12:cycleId==='quarterly'?3:1}
 function membershipDurationDays(cycleId){return cycleId==='annual'?365:cycleId==='quarterly'?90:30}
@@ -837,8 +808,8 @@ function PublicLanding(){
       <div className="landingHeroText">
         <img className="landingBrandLogo" src="/moises-logo.jpg" alt="Moisés Trading Club"/>
         <span className="landingBadge subtleHero"><Crown size={16}/> Centro operativo para traders disciplinados</span>
-        <h1>Operá con estructura.<br/>Corregí con evidencia.<br/>Evolucioná con sistema.</h1>
-        <p>Journal profesional, checklist, analytics y comunidad privada para traders discrecionales que quieren medir, corregir y escalar con evidencia.</p>
+        <h1>Opera con estructura.<br/>Corrige con evidencia.<br/>Evoluciona con sistema.</h1>
+        <p>Journal profesional, Checklist de Moisés, analytics, academia y comunidad privada en un solo centro operativo.</p>
         <div className="landingActions">
           <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
           <button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button>
@@ -881,7 +852,7 @@ function Login({initialMode='login'}){
   async function submit(){
     setErr('');setOk('');setBusy(true);
     try{
-      await setPersistence(auth,browserLocalPersistence);
+      await authPersistenceReady;
       if(mode==='login'){
         await signInWithEmailAndPassword(auth,email,password);
       }else{
@@ -902,7 +873,7 @@ function Login({initialMode='login'}){
   async function googleLogin(){
     setErr('');setOk('');setBusy(true);
     try{
-      await setPersistence(auth,browserLocalPersistence);
+      await authPersistenceReady;
       const provider=new GoogleAuthProvider();
       provider.setCustomParameters({prompt:'select_account'});
       if(isMobileOrStandalone()){
@@ -971,8 +942,17 @@ function SparklineMini({data=[],tone='neutral'}){
   const max=Math.max(1,...values.map(v=>Math.abs(Number(v)||0)));
   return <div className="sparklineMini" aria-hidden="true">{values.map((v,i)=>{const n=Number(v)||0; const h=14+(Math.abs(n)/max)*26; return <span key={i} className={n>0?'pos':n<0?'neg':tone} style={{height:h}}/>})}</div>
 }
+function metricPremiumSlug(label=''){
+  return String(label)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'') || 'metric';
+}
 function MetricCardPremium({label,value,sub,icon:Icon,state='neutral',sparkData=[]}){
-  return <div className={`metricPremium ${state}`}><div className="metricPremiumTop"><span>{label}</span>{Icon&&<Icon size={17}/>}</div><b>{value}</b>{sub&&<small>{sub}</small>}<SparklineMini data={sparkData} tone={state}/></div>
+  const slug = metricPremiumSlug(label);
+  return <div className={`metricPremium ${state} metric-${slug}`} data-metric={slug}><div className="metricPremiumTop"><span>{label}</span>{Icon&&<Icon size={17}/>}</div><b>{value}</b>{sub&&<small>{sub}</small>}<SparklineMini data={sparkData} tone={state}/></div>
 }
 function greetingNY(){
   const h=Number(new Intl.DateTimeFormat('en-US',{hour:'numeric',hour12:false,timeZone:'America/New_York'}).format(new Date()));
@@ -1880,21 +1860,6 @@ function AccessGate({profile}){
   const [cycle,setCycle]=useState('monthly');
   const [selected,setSelected]=useState('premium');
   const [busy,setBusy]=useState(null);
-  const [planPricing,setPlanPricing]=useState(null);
-  const [plansLoading,setPlansLoading]=useState(true);
-  useEffect(()=>{
-    document.documentElement.classList.add('mtc-paywall-open');
-    document.body.classList.add('mtc-paywall-open');
-    return()=>{
-      document.documentElement.classList.remove('mtc-paywall-open');
-      document.body.classList.remove('mtc-paywall-open');
-    };
-  },[]);
-  useEffect(()=>{
-    let cancelled=false;
-    fetchPlanPricing().then(pricing=>{if(!cancelled){setPlanPricing(pricing);setPlansLoading(false);}});
-    return ()=>{cancelled=true;};
-  },[]);
   const status=effectiveStatus(profile);
   const isBlocked=status==='denied'||status==='suspended'||status==='blocked';
   const billingOptions=[
@@ -1917,6 +1882,7 @@ function AccessGate({profile}){
       window.open(whatsappUrl,'_blank','noopener,noreferrer');
       return;
     }
+    const quote=calculatePlanPrice(plan.id,cycle);
     const endpoint=PAYMENT_CONFIG.provider==='paypal' ? PAYMENT_CONFIG.paypalCreateOrderEndpoint : PAYMENT_CONFIG.checkoutEndpoint;
     if(!PAYMENT_CONFIG.enabled || !endpoint){
       toast('Los pagos todavía no están activos. Contactá al administrador para activar tu acceso.','info');
@@ -1928,8 +1894,14 @@ function AccessGate({profile}){
       const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({
         planId:plan.id,
         billingCycle:cycle,
+        provider:PAYMENT_CONFIG.provider,
+        amount:quote?.total,
+        currency:quote?.currency,
+        durationMonths:membershipDurationMonths(cycle),
         successUrl:PAYMENT_CONFIG.successUrl,
-        cancelUrl:PAYMENT_CONFIG.cancelUrl
+        cancelUrl:PAYMENT_CONFIG.cancelUrl,
+        uid:profile?.uid,
+        email:profile?.email || auth.currentUser?.email || ''
       })});
       const payload=await res.json().catch(()=>({}));
       if(!res.ok) throw new Error(payload?.error || 'checkout_failed');
@@ -1942,55 +1914,51 @@ function AccessGate({profile}){
     }finally{setBusy(null)}
   }
   return <div className="paywallFunnel">
-    <div className="paywallFunnelVideoBg" aria-hidden="true">
-      <video src={PAYWALL_VIDEO_SRC} autoPlay muted loop playsInline preload="metadata"/>
-      <span className="paywallFunnelVideoBgOverlay"/>
-    </div>
     <div className="paywallFunnelBg" aria-hidden="true"><span></span><span></span><span></span></div>
     <section className="paywallFunnelShell" aria-label="Activación de acceso">
       <header className="paywallFunnelHeader">
         <div className="paywallFunnelBrand"><img src="/moises-logo.jpg" alt="Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Ecosystem</span></div></div>
-        <div className="paywallFunnelActions"><span className={`paywallFunnelStatus ${status}`}>{accessLabel(status)}</span><button className="paywallFunnelSignOut" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
+        <div className="paywallFunnelActions"><span className={`paywallFunnelStatus ${status}`}>{accessLabel(status)}</span><button onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
       </header>
       <div className="paywallFunnelLayout">
-        <div className="paywallFunnelActivation">
+        <div className="paywallFunnelMain">
           <div className="paywallFunnelHero">
-            <p>Activación pendiente</p>
-            <h1>Activá tu centro operativo.</h1>
-            <h2>Tu cuenta ya está lista. Ahora elegí cómo querés operar: con estructura, con profundidad o con acompañamiento directo.</h2>
+            <p>Activación de membresía</p>
+            <h1>Dejá de operar por sensación. Mejorá con evidencia.</h1>
+            <h2>El ecosistema privado para traders discrecionales que quieren medir ejecución, detectar patrones reales y corregir errores antes de que vuelvan a costar dinero.</h2>
             <div className="paywallFunnelChips"><span><Target size={14}/> Checklist antes de arriesgar</span><span><BarChart3 size={14}/> Analytics accionables</span><span><Shield size={14}/> Risk Guard diario</span></div>
           </div>
-        </div>
-        <div className="paywallFunnelProductStrip">
-          <div className="paywallFunnelPreview">
-            <video src={PAYWALL_VIDEO_SRC} autoPlay muted loop playsInline preload="metadata"/>
+          <div className="paywallFunnelBilling">
+            <div><b>Un mes te muestra datos. Tres meses te muestran patrones.</b><span>Elegí mensual, trimestral o anual según tu proceso.</span></div>
+            <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
           </div>
-          <div className="paywallFunnelInside"><b>Lo que desbloqueás al activar</b><div><span>Equity curve + drawdown</span><span>Heatmap horario</span><span>Setups rentables</span><span>Errores repetidos</span><span>Risk Guard</span><span>Checklist A+</span></div></div>
+          {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
+          <div className="paywallFunnelPlans">
+            {ACCESS_PLANS.map(plan=>{
+              const quote=planCycleSummary(plan.id,cycle);
+              const active=selected===plan.id;
+              return <article key={plan.id} className={`paywallFunnelPlan ${plan.tone} ${plan.recommended?'featured':''} ${active?'selected':''}`} onClick={()=>setSelected(plan.id)}>
+                {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
+                <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
+                <div className="paywallFunnelPrice">
+                  {quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>USD 250</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
+                </div>
+                <p className="paywallFunnelValue">{plan.valueNote}</p>
+                <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
+                <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
+              </article>
+            })}
+          </div>
         </div>
-        <div className="paywallFunnelBilling">
-          <div><b>Un mes te muestra datos. Tres meses te muestran patrones.</b><span>Elegí mensual, trimestral o anual según tu proceso.</span></div>
-          <div className="paywallFunnelBillingSwitch">{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
-        </div>
-        {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
-        <div className="paywallFunnelPlans">
-          {ACCESS_PLANS.map(plan=>{
-            const pricing=planPricing||PAYWALL_PRICING_FALLBACK;
-            const quote=plan.id==='mentorship'?null:planCycleSummary(plan.id,cycle,pricing);
-            const mentorQuote=plan.id==='mentorship'?mentorshipMonthlyQuote(pricing):null;
-            const active=selected===plan.id;
-            return <article key={plan.id} className={`paywallFunnelPlan ${plan.tone} ${plan.recommended?'featured':''} ${active?'selected':''}`} onClick={()=>setSelected(plan.id)}>
-              {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
-              <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
-              <div className="paywallFunnelPrice">
-                {plansLoading&&plan.id!=='mentorship'?<><b>…</b><em>Cargando precios</em></>:quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : mentorQuote? <><b>{mentorQuote.final}</b><em>{mentorQuote.suffix}</em><small>{mentorQuote.note}</small></> : null}
-              </div>
-              <p className="paywallFunnelValue">{plan.valueNote}</p>
-              <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
-              <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
-            </article>
-          })}
-        </div>
-        <div className="paywallFunnelLock"><Lock size={15}/> Tu cuenta está creada. Activá tu plan y entrás directo al dashboard.</div>
+        <aside className="paywallFunnelProof">
+          <div className="paywallFunnelLogo"><b>MOISES</b><span>TRADING CLUB</span><small>Hecho por traders para traders.</small></div>
+          <div className="paywallFunnelPreview">
+            <video src="/paywall-product-demo.mp4" poster="/paywall-dashboard-preview.png" autoPlay muted loop playsInline preload="metadata" />
+          </div>
+          <div className="paywallFunnelInside"><b>Lo que desbloqueás</b><div><span>Equity curve + drawdown</span><span>Heatmap horario</span><span>Setups rentables</span><span>Errores repetidos</span><span>Risk Guard</span><span>Checklist A+</span></div></div>
+          <div className="paywallFunnelBenefits"><div><Target size={18}/><b>Operá con estructura</b><span>Validá contexto, zona, patrón y ejecución antes de entrar.</span></div><div><BarChart3 size={18}/><b>Medí lo que hacés</b><span>Transformá cada trade en evidencia para corregir.</span></div><div><Rocket size={18}/><b>Evolucioná más rápido</b><span>Menos ruido, más claridad y un proceso repetible.</span></div></div>
+          <div className="paywallFunnelLock"><Lock size={15}/> Tu cuenta está creada. Activá tu plan y entrás directo al dashboard.</div>
+        </aside>
       </div>
     </section>
   </div>
@@ -2146,7 +2114,7 @@ function HelpBot(){
 
 
 
-class SectionBoundary extends Component {constructor(props){super(props);this.state={error:null};} static getDerivedStateFromError(error){return {error};} componentDidCatch(error,info){console.error('MTC section error',error,info);} render(){if(this.state.error){return <main className="page"><section className="errorSection"><h2>Esta sección tuvo un error</h2><p>La app sigue activa. Copiá este mensaje y enviámelo para corregirlo.</p><code>{String(this.state.error?.message||this.state.error)}</code><button className="primary" onClick={()=>this.setState({error:null})}>Reintentar sección</button></section></main>;} return this.props.children;}}
+class SectionBoundary extends React.Component {constructor(props){super(props);this.state={error:null};} static getDerivedStateFromError(error){return {error};} componentDidCatch(error,info){console.error('MTC section error',error,info);} render(){if(this.state.error){return <main className="page"><section className="errorSection"><h2>Esta sección tuvo un error</h2><p>La app sigue activa. Copiá este mensaje y enviámelo para corregirlo.</p><code>{String(this.state.error?.message||this.state.error)}</code><button className="primary" onClick={()=>this.setState({error:null})}>Reintentar sección</button></section></main>;} return this.props.children;}}
 
 
 function desktopMainWheelHandler(e){
@@ -2173,7 +2141,7 @@ function PullToRefresh({children}){
   // Refresh remains available through browser/PWA reload; internal pages keep normal vertical scroll.
   return <div className="pullWrap noPullRefresh">{children}</div>
 }
-function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true),[tab,setTab]=useState('dashboard'),[cmdOpen,setCmdOpen]=useState(false),[publicPath,setPublicPath]=useState(()=>window.location.pathname); const [theme,setTheme]=useState(()=>localStorage.getItem('mtc-theme')||'dark'); useEffect(()=>{document.documentElement.setAttribute('data-theme',theme); localStorage.setItem('mtc-theme',theme);},[theme]); const toggleTheme=()=>setTheme(t=>t==='dark'?'light':'dark'); useEffect(()=>{const h=e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setCmdOpen(v=>!v)}}; window.addEventListener('keydown',h); return()=>window.removeEventListener('keydown',h)},[]); useEffect(()=>{const sync=()=>setPublicPath(window.location.pathname); window.addEventListener('popstate',sync); window.addEventListener('mtc-public-route',sync); return()=>{window.removeEventListener('popstate',sync); window.removeEventListener('mtc-public-route',sync)}},[]); useEffect(()=>{setPersistence(auth,browserLocalPersistence).then(()=>getRedirectResult(auth)).then(res=>{if(res?.user)return ensureGoogleUserProfile(res.user)}).catch(e=>{console.warn('Google redirect result:',e?.code||e?.message||e)});},[]); useEffect(()=>{const h=e=>{if(e?.detail)setTab(e.detail)}; window.addEventListener('mtc-tab',h); return()=>window.removeEventListener('mtc-tab',h)},[]); useEffect(()=>onAuthStateChanged(auth,async u=>{setFbUser(u); if(!u){setProfile(null);setLoading(false);return;} setLoading(true); const unsub=onSnapshot(doc(db,'users',u.uid),async snap=>{if(snap.exists()){const p={uid:u.uid,...snap.data()}; if(p.active===false){await signOut(auth); return;} const adminEmail=ADMIN_EMAILS.includes(u.email?.toLowerCase()); if(adminEmail && p.role!=='admin') console.warn('Admin email detectado, pero el rol debe estar aprobado desde backend/Admin SDK.'); setProfile(p);} else {const displayName=u.displayName||u.email?.split('@')[0]||'Trader'; const p={uid:u.uid,email:u.email,name:displayName,displayName,role:'alumno',avatar:(displayName||'MT').slice(0,2).toUpperCase(),photoURL:u.photoURL||'',type:'Day Trader',gender:'masculino',avatarChoice:'trader-m',level:'Inicial',active:true,status:'pending',approved:false,provider:u.providerData?.[0]?.providerId||'password',accessStatus:'pending_payment',subscriptionStatus:'none',accessSource:'self_signup',plan:'free',createdAt:serverTimestamp(),lastLoginAt:serverTimestamp()}; await setDoc(doc(db,'users',u.uid),p,{merge:true}); await setDoc(doc(db,'settings',u.uid),settingsDefault,{merge:true}); setProfile(p);} setLoading(false);}); return unsub;}),[]); useEffect(()=>{if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{})},[]); useEffect(()=>{
+function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true),[tab,setTab]=useState('dashboard'),[cmdOpen,setCmdOpen]=useState(false),[publicPath,setPublicPath]=useState(()=>window.location.pathname); const [theme,setTheme]=useState(()=>localStorage.getItem('mtc-theme')||'dark'); useEffect(()=>{document.documentElement.setAttribute('data-theme',theme); localStorage.setItem('mtc-theme',theme);},[theme]); const toggleTheme=()=>setTheme(t=>t==='dark'?'light':'dark'); useEffect(()=>{const h=e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setCmdOpen(v=>!v)}}; window.addEventListener('keydown',h); return()=>window.removeEventListener('keydown',h)},[]); useEffect(()=>{const sync=()=>setPublicPath(window.location.pathname); window.addEventListener('popstate',sync); window.addEventListener('mtc-public-route',sync); return()=>{window.removeEventListener('popstate',sync); window.removeEventListener('mtc-public-route',sync)}},[]); useEffect(()=>{authPersistenceReady.then(()=>getRedirectResult(auth)).then(res=>{if(res?.user)return ensureGoogleUserProfile(res.user)}).catch(e=>{console.warn('Google redirect result:',e?.code||e?.message||e)});},[]); useEffect(()=>{const h=e=>{if(e?.detail)setTab(e.detail)}; window.addEventListener('mtc-tab',h); return()=>window.removeEventListener('mtc-tab',h)},[]); useEffect(()=>onAuthStateChanged(auth,async u=>{setFbUser(u); if(!u){setProfile(null);setLoading(false);return;} setLoading(true); const unsub=onSnapshot(doc(db,'users',u.uid),async snap=>{if(snap.exists()){const p={uid:u.uid,...snap.data()}; if(p.active===false){await signOut(auth); return;} const adminEmail=ADMIN_EMAILS.includes(u.email?.toLowerCase()); if(adminEmail && p.role!=='admin') console.warn('Admin email detectado, pero el rol debe estar aprobado desde backend/Admin SDK.'); setProfile(p);} else {const displayName=u.displayName||u.email?.split('@')[0]||'Trader'; const p={uid:u.uid,email:u.email,name:displayName,displayName,role:'alumno',avatar:(displayName||'MT').slice(0,2).toUpperCase(),photoURL:u.photoURL||'',type:'Day Trader',gender:'masculino',avatarChoice:'trader-m',level:'Inicial',active:true,status:'pending',approved:false,provider:u.providerData?.[0]?.providerId||'password',accessStatus:'pending_payment',subscriptionStatus:'none',accessSource:'self_signup',plan:'free',createdAt:serverTimestamp(),lastLoginAt:serverTimestamp()}; await setDoc(doc(db,'users',u.uid),p,{merge:true}); await setDoc(doc(db,'settings',u.uid),settingsDefault,{merge:true}); setProfile(p);} setLoading(false);}); return unsub;}),[]); useEffect(()=>{if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(reg=>{reg.update?.(); if(reg.waiting) reg.waiting.postMessage?.({type:'SKIP_WAITING'});}).catch(()=>{})}},[]); useEffect(()=>{
   if(!profile?.uid || isPrivileged(profile) || profile.accessStatus==='manual_approved') return;
   const info=membershipInfo(profile);
   if(!info.expired || profile.subscriptionStatus==='expired' || profile.accessStatus==='inactive') return;
@@ -2181,7 +2149,7 @@ function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useS
   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
 },[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
 
-class ErrorBoundary extends Component {
+class ErrorBoundary extends React.Component {
   constructor(props){
     super(props);
     this.state={error:null};

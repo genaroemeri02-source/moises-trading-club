@@ -313,9 +313,8 @@ const PAYPAL_BASE_URL =
     ? 'https://api-m.paypal.com'
     : 'https://api-m.sandbox.paypal.com';
 
-/** Single source of truth for checkout and GET /api/plans */
 const PLAN_PRICING = {
-  basic: { name: 'Club', monthly: 29, currency: 'USD' },
+  basic: { name: 'Esencial', monthly: 29, currency: 'USD' },
   premium: { name: 'Pro', monthly: 49, currency: 'USD' },
 };
 
@@ -416,7 +415,7 @@ async function requireUser(req) {
     const err = new Error('invalid_auth_token');
     err.status = 401;
     throw err;
-  }
+  
 }
 
 async function paypalAccessToken() {
@@ -442,35 +441,6 @@ async function paypalAccessToken() {
   return payload.access_token;
 }
 
-async function paypalRequest(path, options = {}) {
-  const accessToken = await paypalAccessToken();
-
-  const response = await fetch(`${PAYPAL_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  });
-
-  const payload = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    console.error('paypal_request_error', {
-      path,
-      status: response.status,
-      payload,
-    });
-    const err = new Error(payload?.message || payload?.name || 'paypal_request_failed');
-    err.status = response.status;
-    err.payload = payload;
-    throw err;
-  }
-
-  return payload;
-}
-
 async function verifyPayPalWebhook(req) {
   const event = req.body || {};
 
@@ -492,6 +462,41 @@ async function verifyPayPalWebhook(req) {
   const err = new Error('paypal_webhook_verification_not_configured');
   err.status = 400;
   throw err;
+}
+
+
+  // Fallback temporal para live: no procesar si no está implementada verificación real.
+  const err = new Error('paypal_webhook_verification_not_configured');
+  err.status = 400;
+  throw err;
+
+    }
+
+    const err = new Error('paypal_webhook_missing_headers');
+    err.status = 400;
+    throw err;
+  }
+
+  const verification = await paypalRequest('/v1/notifications/verify-webhook-signature', {
+    method: 'POST',
+    body: JSON.stringify({
+      auth_algo: authAlgo,
+      cert_url: certUrl,
+      transmission_id: transmissionId,
+      transmission_sig: transmissionSig,
+      transmission_time: transmissionTime,
+      webhook_id: PAYPAL_WEBHOOK_ID,
+      webhook_event: event,
+    }),
+  });
+
+  if (verification.verification_status !== 'SUCCESS') {
+    const err = new Error('paypal_webhook_verification_failed');
+    err.status = 400;
+    throw err;
+  }
+
+  return event;
 }
 
 async function activateMembership({ uid, planId, billingCycle, paymentId, paypalOrderId, paypalCaptureId }) {
@@ -556,7 +561,6 @@ async function createPayPalOrderHandler(req, res) {
 
     const user = await requireUser(req);
     const { planId, billingCycle = 'monthly', successUrl, cancelUrl } = req.body || {};
-    // Price is always resolved server-side from PLAN_PRICING; ignore client-sent amount/currency.
     if (!PLAN_PRICING[planId]) return res.status(400).json({ error: 'invalid_plan' });
     if (!BILLING_MONTHS[billingCycle]) return res.status(400).json({ error: 'invalid_billing_cycle' });
 
@@ -1033,43 +1037,16 @@ app.get('/health', (_req, res) => res.status(200).json({ ok: true, service: 'mtc
 app.get('/api/health', (_req, res) => res.status(200).json({ ok: true, service: 'mtc-render-backend', version: '44.1' }));
 
 
-function buildPlansPayload() {
-  return {
-    ok: true,
-    currency: DEFAULT_CURRENCY,
-    billingCycles: Object.keys(BILLING_MONTHS),
-    plans: Object.entries(PLAN_PRICING).map(([id, plan]) => ({
-      id,
-      name: plan.name,
-      monthly: plan.monthly,
-      currency: plan.currency || DEFAULT_CURRENCY,
-      quotes: Object.fromEntries(
-        Object.keys(BILLING_MONTHS).map((cycle) => {
-          const quote = calculatePlanPrice(id, cycle);
-          return [cycle, {
-            total: Number(quote.total.toFixed(2)),
-            regular: Number(quote.regular.toFixed(2)),
-            currency: quote.currency || DEFAULT_CURRENCY,
-            months: quote.months,
-            savePct: quote.savePct,
-          }];
-        })
-      ),
-    })),
-  };
-}
-
 app.get('/api/plans', (req, res) => {
   setCors(req, res);
-  return res.status(200).json(buildPlansPayload());
+  return res.status(200).json({
+    ok: true,
+    currency: DEFAULT_CURRENCY,
+    plans: Object.entries(PLAN_PRICING).map(([id, plan]) => ({ id, name: plan.name, monthly: plan.monthly, currency: plan.currency }))
+  });
 });
 app.post('/api/createPayPalOrder', createPayPalOrderHandler);
 app.post('/api/capturePayPalOrder', capturePayPalOrderHandler);
-
-// Compatibility aliases for deployed frontend versions that call kebab-case PayPal endpoints.
-app.post('/api/paypal/create-order', createPayPalOrderHandler);
-app.post('/api/paypal/capture-order', capturePayPalOrderHandler);
-
 app.post('/api/paypalWebhook', paypalWebhookHandler);
 app.post('/api/paypal/webhook', paypalWebhookHandler);
 app.post('/api/updateMembershipStatus', updateMembershipStatusHandler);
