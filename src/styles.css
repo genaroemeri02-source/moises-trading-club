@@ -7298,3 +7298,40 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPreview.neg::befo
   background: linear-gradient(180deg, #ffffff, #fff8e6) !important;
   border-color: rgba(212, 166, 58, .32) !important;
 }
+.paywallFunnel .paywallBrand span,
+.paywallFunnel .paywallBrand small,
+.paywallFunnel .paywallLogo span,
+.paywallFunnel .paywallLogo small,
+.paywallFunnel .paywallPreviewBrand span,
+.paywallFunnel .paywallPreviewBrand small {
+  color: #f5ead0 !important;
+  opacity: 0.95 !important;
+}
+
+/* v47.20.1 — Paywall brand subtitle color fix
+   Cambia TRADING CLUB del bloque del logo del paywall a blanco cálido premium. */
+.referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandTrading,
+.referencePaywallModal .referencePreviewTop.brandPreviewTitle .brandTrading,
+.referenceVideoCard .referencePreviewTop.brandPreviewTitle .brandTrading,
+.referencePreviewTop.brandPreviewTitle .brandTradingRow .brandTrading,
+.referencePreviewTop.brandPreviewTitle span.brandTrading {
+  color: #fff7df !important;
+  opacity: 1 !important;
+  text-shadow: 0 0 18px rgba(255,247,223,.18), 0 10px 28px rgba(218,165,64,.16) !important;
+}
+
+/* Refuerzo por si el texto TRADING CLUB quedó como span genérico dentro del logo. */
+.referencePaywallGate .referencePreviewTop.brandPreviewTitle .brandTradingRow span,
+.referencePaywallModal .referencePreviewTop.brandPreviewTitle .brandTradingRow span,
+.referenceVideoCard .referencePreviewTop.brandPreviewTitle .brandTradingRow span {
+  color: #fff7df !important;
+  opacity: 1 !important;
+}
+
+/* Mantiene el texto inferior más sutil, pero legible. */
+.referencePaywallGate .referencePreviewTop.brandPreviewTitle span:not(.brandMoises):not(.brandTrading):not(.brandTradingRow):not(.brandLine),
+.referencePaywallModal .referencePreviewTop.brandPreviewTitle span:not(.brandMoises):not(.brandTrading):not(.brandTradingRow):not(.brandLine),
+.referenceVideoCard .referencePreviewTop.brandPreviewTitle span:not(.brandMoises):not(.brandTrading):not(.brandTradingRow):not(.brandLine) {
+  color: #d8deea !important;
+  opacity: .86 !important;
+}
