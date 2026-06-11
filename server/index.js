@@ -1065,6 +1065,11 @@ app.get('/api/plans', (req, res) => {
 });
 app.post('/api/createPayPalOrder', createPayPalOrderHandler);
 app.post('/api/capturePayPalOrder', capturePayPalOrderHandler);
+
+// Compatibility aliases for deployed frontend versions that call kebab-case PayPal endpoints.
+app.post('/api/paypal/create-order', createPayPalOrderHandler);
+app.post('/api/paypal/capture-order', capturePayPalOrderHandler);
+
 app.post('/api/paypalWebhook', paypalWebhookHandler);
 app.post('/api/paypal/webhook', paypalWebhookHandler);
 app.post('/api/updateMembershipStatus', updateMembershipStatusHandler);
