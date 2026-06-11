@@ -333,6 +333,105 @@ const ACCESS_CONTROL_FIELDS = {
   status: 'approved',
 };
 
+
+const PLAN_ALIASES = { basic: 'club', premium: 'pro', mentorship: 'mentor', founder: 'club', alumno: 'free' };
+function normalizeCommercialPlan(plan = 'free') {
+  const raw = String(plan || 'free').toLowerCase();
+  return PLAN_ALIASES[raw] || raw;
+}
+function defaultPlanFeatures(plan = 'free') {
+  const p = normalizeCommercialPlan(plan);
+  const base = { journal: true, checklist: true, analytics: false, riskGuard: false, mt5Sync: false, academy: true, community: true };
+  if (p === 'club') return { ...base, analytics: true };
+  if (p === 'pro' || p === 'mentor' || p === 'admin') return { ...base, analytics: true, riskGuard: true, mt5Sync: true };
+  if (p === 'influencer_trial') return { ...base, analytics: true, riskGuard: true, mt5Sync: false };
+  return base;
+}
+function defaultPlanLimits(plan = 'free') {
+  const p = normalizeCommercialPlan(plan);
+  if (p === 'pro' || p === 'mentor' || p === 'admin') return { maxAccounts: 10, maxTradesPerMonth: 1000, mt5SyncEnabled: true, mt5SyncAccounts: p === 'pro' ? 1 : 3 };
+  if (p === 'club' || p === 'influencer_trial') return { maxAccounts: 3, maxTradesPerMonth: 300, mt5SyncEnabled: false, mt5SyncAccounts: 0 };
+  return { maxAccounts: 1, maxTradesPerMonth: 50, mt5SyncEnabled: false, mt5SyncAccounts: 0 };
+}
+function featureSet(profile = {}) {
+  return { ...defaultPlanFeatures(profile.plan), ...(profile.features || {}) };
+}
+function isPrivilegedProfile(profile = {}) {
+  const role = String(profile.role || '').toLowerCase();
+  return ['admin', 'moderador', 'mentor', 'owner', 'fundador'].includes(role) || profile.isAdmin === true || profile.admin === true;
+}
+function timestampToMillis(value) {
+  if (!value) return null;
+  if (value.toMillis) return value.toMillis();
+  if (value.toDate) return value.toDate().getTime();
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d.getTime();
+}
+function hasActiveCommercialAccess(profile = {}) {
+  if (!profile) return false;
+  if (isPrivilegedProfile(profile)) return true;
+  if (profile.accessStatus === 'blocked' || ['denied', 'suspended'].includes(profile.status)) return false;
+  const endMs = timestampToMillis(profile.currentPeriodEnd || profile.trialEndsAt);
+  if (endMs && endMs <= Date.now() && profile.accessStatus !== 'manual_approved') return false;
+  if (profile.accessStatus === 'active' || profile.accessStatus === 'manual_approved' || profile.subscriptionStatus === 'active') return true;
+  return profile.approved === true || profile.status === 'approved';
+}
+function canUseFeature(profile = {}, feature) {
+  if (!feature) return false;
+  if (isPrivilegedProfile(profile)) return true;
+  if (!hasActiveCommercialAccess(profile)) return false;
+  return featureSet(profile)[feature] === true;
+}
+function makeCommercialAccessPatch(plan, { source = 'admin', features = null, limits = null, days = null, provider = null } = {}) {
+  const normalized = normalizeCommercialPlan(plan);
+  const mergedFeatures = { ...defaultPlanFeatures(normalized), ...(features || {}) };
+  const mergedLimits = { ...defaultPlanLimits(normalized), ...(limits || {}) };
+  const now = new Date();
+  const patch = {
+    plan: normalized,
+    accessStatus: normalized === 'admin' ? 'manual_approved' : 'active',
+    subscriptionStatus: normalized === 'free' ? 'none' : 'active',
+    accessSource: source,
+    approved: true,
+    status: 'approved',
+    active: true,
+    features: mergedFeatures,
+    limits: mergedLimits,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+  if (provider) patch.paymentProvider = provider;
+  if (days) {
+    const end = new Date(now);
+    end.setDate(end.getDate() + Number(days));
+    patch.currentPeriodStart = admin.firestore.Timestamp.fromDate(now);
+    patch.currentPeriodEnd = admin.firestore.Timestamp.fromDate(end);
+    patch.trialEndsAt = admin.firestore.Timestamp.fromDate(end);
+  }
+  return patch;
+}
+async function getUserProfile(uid) {
+  const snap = await db.collection('users').doc(uid).get();
+  return snap.exists ? { uid: snap.id, ...snap.data() } : null;
+}
+async function requireAdminUser(uid) {
+  const profile = await getUserProfile(uid);
+  if (!isPrivilegedProfile(profile)) {
+    const err = new Error('admin_required');
+    err.status = 403;
+    throw err;
+  }
+  return profile;
+}
+async function requireFeatureForUser(uid, feature) {
+  const profile = await getUserProfile(uid);
+  if (!canUseFeature(profile, feature)) {
+    const err = new Error(`${feature}_not_included_in_plan`);
+    err.status = 403;
+    throw err;
+  }
+  return profile;
+}
+
 function allowedOrigin(origin = '') {
   if (!origin) return true;
   const configured = String(process.env.ALLOWED_ORIGINS || '')
@@ -415,7 +514,7 @@ async function requireUser(req) {
     const err = new Error('invalid_auth_token');
     err.status = 401;
     throw err;
-  
+  }
 }
 
 async function paypalAccessToken() {
@@ -479,6 +578,7 @@ async function activateMembership({ uid, planId, billingCycle, paymentId, paypal
       userRef,
       {
         ...ACCESS_CONTROL_FIELDS,
+        ...makeCommercialAccessPatch(planId, { source: 'paypal', provider: 'paypal' }),
         plan: planId,
         billingCycle,
         currentPeriodStart: admin.firestore.Timestamp.fromDate(now),
@@ -807,6 +907,7 @@ async function mtConnectHandler(req, res) {
   try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const user = await requireUser(req);
+    await requireFeatureForUser(user.uid, 'mt5Sync');
     const body = req.body || {};
     const platform = String(body.platform || '').toLowerCase();
     if (!['mt4', 'mt5'].includes(platform)) return res.status(400).json({ error: 'invalid_platform' });
@@ -858,6 +959,7 @@ async function mtConnectionStatusHandler(req, res) {
   try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const user = await requireUser(req);
+    await requireFeatureForUser(user.uid, 'mt5Sync');
     const connectionId = assertRequiredString(req.body?.connectionId, 'connectionId');
     const ref = db.collection('brokerConnections').doc(connectionId);
     const snap = await ref.get();
@@ -881,6 +983,7 @@ async function mtSyncHandler(req, res) {
   try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
     const user = await requireUser(req);
+    await requireFeatureForUser(user.uid, 'mt5Sync');
     const connectionId = assertRequiredString(req.body?.connectionId, 'connectionId');
     const snap = await db.collection('brokerConnections').doc(connectionId).get();
     if (!snap.exists) return res.status(404).json({ error: 'connection_not_found' });
@@ -929,6 +1032,79 @@ async function mtDisconnectHandler(req, res) {
 
 }
 
+
+async function createInviteHandler(req, res) {
+  if (handlePreflight(req, res)) return;
+  setCors(req, res);
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
+    const user = await requireUser(req);
+    await requireAdminUser(user.uid);
+    const body = req.body || {};
+    const email = String(body.email || '').trim().toLowerCase();
+    if (!email || !email.includes('@')) return res.status(400).json({ error: 'invalid_email' });
+    const plan = normalizeCommercialPlan(body.plan || 'influencer_trial');
+    const days = Math.max(1, Math.min(365, Number(body.days || 30)));
+    const token = randomBytes(18).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + days);
+    const features = { ...defaultPlanFeatures(plan), ...(body.features || {}) };
+    const limits = { ...defaultPlanLimits(plan), ...(body.limits || {}) };
+    await db.collection('invites').doc(token).set({
+      token,
+      email,
+      plan,
+      days,
+      features,
+      limits,
+      status: 'active',
+      used: false,
+      createdBy: user.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+      source: 'invite',
+    }, { merge: true });
+    return res.status(200).json({ ok: true, token, link: `${APP_URL}/invite/${token}`, expiresAt: expiresAt.toISOString() });
+  } catch (e) {
+    console.error('createInvite_failed', e);
+    return res.status(e.status || 500).json({ error: e.message || 'create_invite_failed' });
+  }
+}
+
+async function acceptInviteHandler(req, res) {
+  if (handlePreflight(req, res)) return;
+  setCors(req, res);
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
+    const user = await requireUser(req);
+    const token = assertRequiredString(req.body?.token, 'token');
+    const ref = db.collection('invites').doc(token);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'invite_not_found' });
+    const invite = snap.data() || {};
+    if (invite.used === true || invite.status === 'used') return res.status(409).json({ error: 'invite_already_used' });
+    if (invite.status && invite.status !== 'active') return res.status(403).json({ error: 'invite_inactive' });
+    const expiresMs = timestampToMillis(invite.expiresAt);
+    if (expiresMs && expiresMs <= Date.now()) return res.status(403).json({ error: 'invite_expired' });
+    const authEmail = String(user.email || '').trim().toLowerCase();
+    const inviteEmail = String(invite.email || '').trim().toLowerCase();
+    if (inviteEmail && authEmail && inviteEmail !== authEmail) return res.status(403).json({ error: 'invite_email_mismatch' });
+    const plan = normalizeCommercialPlan(invite.plan || 'influencer_trial');
+    const patch = makeCommercialAccessPatch(plan, { source: 'invite', features: invite.features || null, limits: invite.limits || null, days: invite.days || 30 });
+    patch.email = user.email || invite.email || '';
+    patch.role = patch.role || 'alumno';
+    patch.inviteId = token;
+    await db.runTransaction(async (tx) => {
+      tx.set(db.collection('users').doc(user.uid), patch, { merge: true });
+      tx.set(ref, { used: true, status: 'used', usedBy: user.uid, usedEmail: user.email || '', usedAt: admin.firestore.FieldValue.serverTimestamp(), updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    });
+    return res.status(200).json({ ok: true, plan, features: patch.features, currentPeriodEnd: patch.currentPeriodEnd?.toDate?.()?.toISOString?.() || null });
+  } catch (e) {
+    console.error('acceptInvite_failed', e);
+    return res.status(e.status || 500).json({ error: e.message || 'accept_invite_failed' });
+  }
+}
+
 async function expireMembershipsScheduledJob() {
 
     const now = admin.firestore.Timestamp.now();
@@ -971,6 +1147,12 @@ async function mtAutoSyncJob() {
     let failed = 0;
     for (const docSnap of q.docs) {
       try {
+        const connection = docSnap.data() || {};
+        const ownerProfile = connection.userId ? await getUserProfile(connection.userId) : null;
+        if (!canUseFeature(ownerProfile, 'mt5Sync')) {
+          await docSnap.ref.set({ autoSync: false, lastSyncStatus: 'blocked_by_plan', lastSyncError: 'mt5Sync_not_included_in_plan', updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+          continue;
+        }
         await syncConnectionDoc(docSnap);
         ok++;
       } catch (e) {
@@ -1016,6 +1198,8 @@ app.post('/api/capturePayPalOrder', capturePayPalOrderHandler);
 app.post('/api/paypalWebhook', paypalWebhookHandler);
 app.post('/api/paypal/webhook', paypalWebhookHandler);
 app.post('/api/updateMembershipStatus', updateMembershipStatusHandler);
+app.post('/api/invites/create', createInviteHandler);
+app.post('/api/invites/accept', acceptInviteHandler);
 
 app.post('/api/mtConnect', mtConnectHandler);
 app.post('/api/mtConnectionStatus', mtConnectionStatusHandler);

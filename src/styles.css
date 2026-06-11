@@ -7261,3 +7261,40 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .resultPreview.neg::befo
     padding:14px!important;
   }
 }
+
+/* v47.15 Commercial Access System — admin-only UI polish */
+.featureToggles{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.featureToggles label{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:999px;padding:8px 11px;color:var(--muted);font-size:12px;font-weight:900}.featureToggles input{accent-color:var(--gold)}.compactFeatures{max-width:420px;margin:0}.compactFeatures label{padding:6px 8px;font-size:11px}.commercialAccessRow{grid-template-columns:minmax(220px,1fr) 130px 170px minmax(260px,.9fr) auto!important;align-items:start}.commercialAccessRow small{display:block;color:var(--muted2);line-height:1.45;margin-top:7px}.inviteResult{border:1px solid rgba(34,197,94,.25);background:rgba(34,197,94,.08);border-radius:16px;padding:14px;margin-top:12px}.inviteResult b{display:block;color:var(--text)}.inviteResult p{color:#8ed0ff;overflow-wrap:anywhere;margin:6px 0}.inviteResult small{color:var(--muted)}.brokerHeroStats span:nth-child(2){border-color:rgba(212,168,67,.26);color:var(--gold2)}
+:root[data-theme="light"] .featureToggles label{background:#fff;border-color:rgba(15,23,42,.12);color:#334155}
+:root[data-theme="light"] .inviteResult{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.24)}
+@media(max-width:1100px){.commercialAccessRow{grid-template-columns:1fr!important}.compactFeatures{max-width:100%}.commercialAccessRow .accessActions{justify-content:flex-start}}
+
+/* v47.15.1 — Light mode online users readability */
+:root[data-theme="light"] .onlineRow,
+:root[data-theme="light"] .onlineAdminGrid .onlineRow,
+:root[data-theme="light"] .memberList button {
+  background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+  border-color: rgba(15, 23, 42, .10) !important;
+  color: #0f172a !important;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .06) !important;
+}
+
+:root[data-theme="light"] .onlineRow b,
+:root[data-theme="light"] .onlineAdminGrid .onlineRow b,
+:root[data-theme="light"] .memberList button b,
+:root[data-theme="light"] .memberList button strong {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .onlineRow small,
+:root[data-theme="light"] .onlineAdminGrid .onlineRow small,
+:root[data-theme="light"] .memberList button small,
+:root[data-theme="light"] .memberList button span {
+  color: #475569 !important;
+}
+
+:root[data-theme="light"] .onlineRow:hover,
+:root[data-theme="light"] .memberList button:hover,
+:root[data-theme="light"] .memberList button.active {
+  background: linear-gradient(180deg, #ffffff, #fff8e6) !important;
+  border-color: rgba(212, 166, 58, .32) !important;
+}

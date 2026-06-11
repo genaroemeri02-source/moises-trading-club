@@ -50,7 +50,11 @@ service cloud.firestore {
         'role',
         'isAdmin',
         'admin',
-        'createdByAdmin'
+        'createdByAdmin',
+        'features',
+        'limits',
+        'trialEndsAt',
+        'inviteId'
       ];
     }
 
@@ -137,6 +141,11 @@ service cloud.firestore {
     match /payments/{paymentId} {
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow create, update, delete: if false;
+    }
+
+
+    match /invites/{inviteId} {
+      allow read, create, update, delete: if isAdmin();
     }
 
     match /paypalWebhookEvents/{eventId} {

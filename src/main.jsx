@@ -395,7 +395,7 @@ function parseCsv(text,userId){const [h,...lines]=text.trim().split(/\r?\n/); co
 function safeDate(v){return typeof v==='string'?v:(v?.toDate?.()?.toISOString?.().slice(0,10)||today());}
 function useLiveData(profile){
   const [data,setData]=useState({
-    trades:[],posts:[],ideas:[],books:[],academyLessons:[],dailyPlans:[],checklists:[],brokerConnections:[],notifications:[],messages:[],resultPosts:[],users:[],courses:courseSeed,settings:settingsDefault,loading:true
+    trades:[],posts:[],ideas:[],books:[],academyLessons:[],dailyPlans:[],checklists:[],brokerConnections:[],notifications:[],messages:[],resultPosts:[],invites:[],users:[],courses:courseSeed,settings:settingsDefault,loading:true
   });
 
   useEffect(()=>{
@@ -476,6 +476,12 @@ function useLiveData(profile){
         collection(db,'users'),
         snap=>setData(d=>({...d,users:snap.docs.map(x=>({uid:x.id,...x.data()}))}))
       ));
+
+      off.push(onSnapshot(
+        collection(db,'invites'),
+        snap=>setData(d=>({...d,invites:snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>String(b.createdAt?.toDate?.()?.toISOString?.()||b.createdAt||'').localeCompare(String(a.createdAt?.toDate?.()?.toISOString?.()||a.createdAt||'')))})),
+        err=>{console.warn('invites listener blocked',err?.message); setData(d=>({...d,invites:[]}));}
+      ));
     } else {
       off.push(onSnapshot(
         query(collection(db,'users'),where('status','==','approved')),
@@ -520,7 +526,7 @@ function membershipInfo(profile){
   const now=new Date();
   const ms=end?end.getTime()-now.getTime():null;
   const daysRemaining=ms==null?null:Math.max(0,Math.ceil(ms/86400000));
-  const expired=!!end && ms<=0 && profile?.accessStatus!=='manual_approved' && profile?.role!=='admin' && profile?.role!=='moderador';
+  const expired=!!end && ms<=0 && profile?.accessStatus!=='manual_approved' && !['admin','moderador'].includes(String(profile?.role||'').toLowerCase());
   return {start,end,daysRemaining,expired};
 }
 function formatMembershipDate(value){
@@ -532,7 +538,7 @@ function hasActiveAccess(profile){
   if(!profile) return false;
   if(profile.accessStatus==='blocked' || profile.status==='denied' || profile.status==='suspended') return false;
   if(profile.accessStatus==='manual_approved') return true;
-  if(membershipInfo(profile).expired && profile.accessSource==='payment') return false;
+  if(membershipInfo(profile).expired) return false;
   if(profile.accessStatus==='active' || profile.subscriptionStatus==='active') return !membershipInfo(profile).expired;
   return (profile.approved===true || profile.status==='approved') && !membershipInfo(profile).expired;
 }
@@ -544,7 +550,7 @@ function effectiveStatus(uOrStatus){
   if(uOrStatus.status==='denied') return 'denied';
   if(uOrStatus.status==='suspended') return 'suspended';
   if(uOrStatus.accessStatus==='manual_approved') return 'approved';
-  if(membershipInfo(uOrStatus).expired && uOrStatus.accessSource==='payment') return 'expired';
+  if(membershipInfo(uOrStatus).expired) return 'expired';
   if(uOrStatus.subscriptionStatus==='past_due') return 'past_due';
   if(uOrStatus.subscriptionStatus==='canceled') return 'canceled';
   if(uOrStatus.subscriptionStatus==='expired') return 'expired';
@@ -557,6 +563,98 @@ function accessLabel(status){
   const labels={approved:'Acceso activo',pending:'Pendiente',pending_payment:'Activación pendiente',denied:'Acceso denegado',suspended:'Acceso suspendido',blocked:'Acceso bloqueado',past_due:'Pago pendiente',canceled:'Suscripción cancelada',expired:'Membresía vencida'};
   return labels[s] || 'Activación pendiente';
 }
+
+
+const COMMERCIAL_FEATURES=[
+  {id:'journal',label:'Journal'},
+  {id:'checklist',label:'Checklist'},
+  {id:'analytics',label:'Analytics'},
+  {id:'riskGuard',label:'Risk Guard'},
+  {id:'mt5Sync',label:'MT5 Sync'},
+  {id:'academy',label:'Academia'},
+  {id:'community',label:'Comunidad'}
+];
+const COMMERCIAL_PLAN_OPTIONS=[
+  {id:'free',label:'Free / alumno',note:'Acceso básico sin costos externos'},
+  {id:'club',label:'Club',note:'Plan pago base'},
+  {id:'pro',label:'Pro',note:'Plan principal comercial'},
+  {id:'mentor',label:'Mentoría',note:'Acceso completo'},
+  {id:'influencer_trial',label:'Influencer Trial',note:'Prueba gratuita controlada'},
+  {id:'admin',label:'Admin',note:'Acceso total'}
+];
+const PLAN_ALIASES={basic:'club',premium:'pro',mentorship:'mentor',founder:'club',alumno:'free'};
+function normalizeCommercialPlan(plan){return PLAN_ALIASES[String(plan||'free').toLowerCase()]||String(plan||'free').toLowerCase()}
+function commercialPlanLabel(plan){const id=normalizeCommercialPlan(plan); return COMMERCIAL_PLAN_OPTIONS.find(p=>p.id===id)?.label || id}
+function defaultPlanFeatures(plan){
+  const p=normalizeCommercialPlan(plan);
+  const base={journal:true,checklist:true,analytics:false,riskGuard:false,mt5Sync:false,academy:true,community:true};
+  if(p==='club') return {...base,analytics:true};
+  if(p==='pro') return {...base,analytics:true,riskGuard:true,mt5Sync:true};
+  if(p==='mentor'||p==='admin') return {...base,analytics:true,riskGuard:true,mt5Sync:true};
+  if(p==='influencer_trial') return {...base,analytics:true,riskGuard:true,mt5Sync:false};
+  return base;
+}
+function defaultPlanLimits(plan){
+  const p=normalizeCommercialPlan(plan);
+  if(p==='pro'||p==='mentor'||p==='admin') return {maxAccounts:10,maxTradesPerMonth:1000,mt5SyncEnabled:true,mt5SyncAccounts:p==='pro'?1:3};
+  if(p==='club') return {maxAccounts:3,maxTradesPerMonth:300,mt5SyncEnabled:false,mt5SyncAccounts:0};
+  if(p==='influencer_trial') return {maxAccounts:3,maxTradesPerMonth:300,mt5SyncEnabled:false,mt5SyncAccounts:0};
+  return {maxAccounts:1,maxTradesPerMonth:50,mt5SyncEnabled:false,mt5SyncAccounts:0};
+}
+function featureSet(profile){return {...defaultPlanFeatures(profile?.plan),...(profile?.features||{})}}
+function canUseFeature(profile,feature){
+  if(!profile || !feature) return false;
+  if(isPrivileged(profile)) return true;
+  if(!hasActiveAccess(profile)) return false;
+  return featureSet(profile)[feature]===true;
+}
+function featureSummary(profile){
+  const f=featureSet(profile);
+  return COMMERCIAL_FEATURES.filter(x=>f[x.id]).map(x=>x.label).join(' · ') || 'Sin features activas';
+}
+function accessPatchForPlan(plan,{source='admin',days=null,features=null}={}){
+  const normalized=normalizeCommercialPlan(plan);
+  const active=normalized!=='pending';
+  const baseFeatures={...defaultPlanFeatures(normalized),...(features||{})};
+  const patch={
+    plan:normalized,
+    features:baseFeatures,
+    limits:defaultPlanLimits(normalized),
+    active:true,
+    status:active?'approved':'pending',
+    approved:active,
+    accessStatus:active?'active':'pending_payment',
+    subscriptionStatus:active?'active':'none',
+    accessSource:source,
+    updatedAt:serverTimestamp()
+  };
+  if(normalized==='free') patch.subscriptionStatus='none';
+  if(normalized==='admin') Object.assign(patch,{role:'admin',accessStatus:'manual_approved',subscriptionStatus:'active'});
+  if(days){
+    const end=new Date(); end.setDate(end.getDate()+Number(days));
+    patch.currentPeriodStart=new Date();
+    patch.currentPeriodEnd=end;
+    patch.trialEndsAt=end;
+  }
+  return patch;
+}
+function inviteTokenFromPath(path=window.location.pathname){
+  const m=String(path||'').match(/^\/invite\/([^/?#]+)/);
+  if(m) return decodeURIComponent(m[1]);
+  return new URLSearchParams(window.location.search).get('invite') || '';
+}
+async function callBackendApi(path,payload={}){
+  if(!API_BASE_URL) throw new Error('api_base_missing');
+  const user=auth.currentUser;
+  if(!user) throw new Error('session_required');
+  const token=await user.getIdToken();
+  const res=await fetch(apiUrl(path),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(payload)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error||'backend_error');
+  return data;
+}
+async function acceptInviteToken(token){return callBackendApi('/api/invites/accept',{token})}
+async function createInviteBackend(payload){return callBackendApi('/api/invites/create',payload)}
 
 const PLAN_CURRENCY = import.meta.env.VITE_PLAN_CURRENCY || 'USD';
 const PLAN_PRICING = {
@@ -869,7 +967,7 @@ function Login({initialMode='login'}){
         await setDoc(doc(db,'users',cred.user.uid),{
           uid:cred.user.uid,email,name,displayName:name,role:'alumno',country:'',type:'Day Trader',gender:'masculino',avatarChoice:'trader-m',level:'Inicial',avatar:name.slice(0,2).toUpperCase(),photoURL:'',active:true,
           status:'pending',approved:false,
-          accessStatus:'pending_payment',subscriptionStatus:'none',accessSource:'self_signup',plan:'free',
+          accessStatus:'pending_payment',subscriptionStatus:'none',accessSource:'self_signup',plan:'free',features:defaultPlanFeatures('free'),limits:defaultPlanLimits('free'),
           createdAt:serverTimestamp(),updatedAt:serverTimestamp()
         });
         await setDoc(doc(db,'settings',cred.user.uid),settingsDefault);
@@ -1596,17 +1694,18 @@ function BrokerStatusPill({status}) {
 }
 function BrokerSync({data,profile}){
   const [notify,setNotify]=useState(()=>localStorage.getItem('mtc-mt5-notify')==='1');
+  const canMt5=canUseFeature(profile,'mt5Sync');
   const importedTrades=(data.trades||[]).filter(t=>t.brokerSource==='metaapi');
   function activateReminder(){localStorage.setItem('mtc-mt5-notify','1'); setNotify(true); toast('Listo. Te avisaremos cuando las integraciones estén disponibles.','success')}
   return <main className="page brokerSyncPage comingSoonBrokerPage">
     <section className="brokerHero cleanBrokerHero">
       <div>
-        <span className="brokerBadge"><Activity size={15}/> Próxima versión</span>
+        <span className="brokerBadge"><Activity size={15}/> {canMt5?'Acceso habilitado':'Feature Pro protegida'}</span>
         <h2>Integraciones MT4 / MT5</h2>
-        <p>La plataforma comercial ya está activa con Journal, Checklist, Analytics, Comunidad y Membresías. La importación automática queda reservada para una actualización posterior, sin depender de terceros en esta primera etapa.</p>
-        <div className="brokerHeroStats"><span>Journal profesional</span><span>Membresías privadas</span><span>Automatización futura</span></div>
+        <p>{canMt5?'Tu plan tiene MT5 Sync habilitado. El backend también valida este permiso antes de conectar o sincronizar para proteger costos.':'MT5 Sync queda reservado para Pro, Mentoría o trials aprobados. Los usuarios free/Club pueden usar Journal, Checklist y comunidad sin consumir servicios externos.'}</p>
+        <div className="brokerHeroStats"><span>Plan: {commercialPlanLabel(profile?.plan)}</span><span>{canMt5?'MT5 Sync ON':'MT5 Sync bloqueado'}</span><span>Protección backend</span></div>
       </div>
-      <div className="brokerHeroPanel"><b>Próxima mejora</b><small>Las integraciones automáticas se activarán cuando aporten valor real sin fricción para el usuario.</small></div>
+      <div className="brokerHeroPanel"><b>{canMt5?'Permiso activo':'Disponible en Pro'}</b><small>{canMt5?'Podés conectar cuando la integración esté operativa.':'Pedí upgrade o habilitación manual desde Admin si estás en trial/influencer.'}</small></div>
     </section>
 
     <div className="brokerGrid">
@@ -1614,7 +1713,7 @@ function BrokerSync({data,profile}){
         <div className="comingSoonStack">
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Los alumnos ya pueden cargar operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Analytics disponible</b><p>La app ya puede medir rendimiento, comportamiento, sesiones, errores y evolución.</p></div></div>
-          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Automatización en preparación</b><p>Se incorporará como mejora posterior cuando el proveedor sea estable, rentable y simple para el usuario.</p></div></div>
+          <div className={canMt5?'comingSoonItem':'comingSoonItem muted'}><Clock3 size={18}/><div><b>MT5 Sync protegido por plan</b><p>{canMt5?'Tu usuario tiene permiso comercial para usar integraciones cuando estén activas.':'Free y Club no consumen MetaApi. Pro, Mentoría o trial aprobado sí pueden tenerlo.'}</p></div></div>
         </div>
         <div className="brokerActions"><button className="primary" onClick={activateReminder}>{notify?'Aviso activado':'Avisarme cuando esté disponible'}</button></div>
       </Card>
@@ -1806,61 +1905,102 @@ function Admin({data}){
   const [announcement,setAnnouncement]=useState('');
   const [search,setSearch]=useState('');
   const [filter,setFilter]=useState('all');
-  const [openGroups,setOpenGroups]=useState({pending:true,approved:true,suspended:false,denied:false});
+  const [openGroups,setOpenGroups]=useState({pending:true,approved:true,suspended:false,denied:false,expired:false});
+  const [invite,setInvite]=useState({email:'',plan:'influencer_trial',days:30,mt5Sync:false,analytics:true,riskGuard:true});
+  const [lastInvite,setLastInvite]=useState(null);
+
   async function role(u,r){
-    const st=effectiveStatus(u);
-    const nextStatus=(r==='admin'||r==='moderador')?'approved':st;
     const privileged=(r==='admin'||r==='moderador');
-    await setDoc(doc(db,'users',u.uid),{
-      role:r,
-      status:nextStatus,
-      approved:nextStatus==='approved',
-      active:true,
-      accessStatus:privileged?'manual_approved':(u.accessStatus||'pending_payment'),
-      accessSource:privileged?'admin':(u.accessSource||'manual'),
-      updatedAt:serverTimestamp()
-    },{merge:true});
+    const patch={role:r,active:true,updatedAt:serverTimestamp()};
+    if(privileged) Object.assign(patch,{status:'approved',approved:true,accessStatus:'manual_approved',subscriptionStatus:'active',accessSource:'admin',plan:r==='admin'?'admin':(u.plan||'pro'),features:defaultPlanFeatures('admin'),limits:defaultPlanLimits('admin')});
+    await setDoc(doc(db,'users',u.uid),patch,{merge:true});
     toast('Rol actualizado');
   }
+
+  async function updateUserCommercial(u,patch){
+    await setDoc(doc(db,'users',u.uid),{...patch,updatedAt:serverTimestamp()},{merge:true});
+    toast('Acceso comercial actualizado');
+  }
+
+  async function setPlan(u,plan){
+    const normalized=normalizeCommercialPlan(plan);
+    const patch=accessPatchForPlan(normalized,{source:u.accessSource==='paypal'?'paypal':'admin'});
+    if(normalized==='free') Object.assign(patch,{subscriptionStatus:'none',accessSource:'admin'});
+    await updateUserCommercial(u,patch);
+  }
+
   async function setAccess(u,status){
-    const patch={
-      status,
-      approved:status==='approved',
-      active:true,
-      approvedAt:status==='approved'?serverTimestamp():(u.approvedAt||null),
-      updatedAt:serverTimestamp()
-    };
-    if(status==='approved') Object.assign(patch,{accessStatus:'manual_approved',subscriptionStatus:u.subscriptionStatus||'none',accessSource:'admin',plan:u.plan&&u.plan!=='free'?u.plan:'founder'});
+    const patch={status,approved:status==='approved',active:true,updatedAt:serverTimestamp()};
+    if(status==='approved') Object.assign(patch,accessPatchForPlan(u.plan||'free',{source:u.accessSource==='paypal'?'paypal':'admin'}));
     if(status==='pending') Object.assign(patch,{accessStatus:'pending_payment',subscriptionStatus:u.subscriptionStatus==='active'?'active':'none',accessSource:u.accessSource||'manual'});
     if(status==='denied'||status==='suspended') Object.assign(patch,{accessStatus:'blocked',subscriptionStatus:u.subscriptionStatus==='active'?'canceled':(u.subscriptionStatus||'none')});
     await setDoc(doc(db,'users',u.uid),patch,{merge:true});
-    toast(status==='approved'?'Usuario aprobado manualmente':status==='denied'?'Usuario denegado':status==='suspended'?'Usuario suspendido/bloqueado':'Usuario pendiente de pago');
+    toast(status==='approved'?'Usuario activado':status==='denied'?'Usuario denegado':status==='suspended'?'Usuario suspendido/bloqueado':'Usuario pendiente');
   }
+
+  async function toggleFeature(u,feature,value){
+    const features={...featureSet(u),[feature]:value};
+    const limits={...defaultPlanLimits(u.plan),...(u.limits||{})};
+    if(feature==='mt5Sync') Object.assign(limits,{mt5SyncEnabled:value,mt5SyncAccounts:value?Math.max(1,Number(limits.mt5SyncAccounts||1)):0});
+    await updateUserCommercial(u,{features,limits});
+  }
+
+  async function createInvite(){
+    const email=String(invite.email||'').trim().toLowerCase();
+    if(!email || !email.includes('@')) return toast('Ingresá un email válido para la invitación.','error');
+    const features={...defaultPlanFeatures(invite.plan),analytics:!!invite.analytics,riskGuard:!!invite.riskGuard,mt5Sync:!!invite.mt5Sync};
+    const payload={email,plan:invite.plan,days:Number(invite.days||30),features,limits:{...defaultPlanLimits(invite.plan),mt5SyncEnabled:!!invite.mt5Sync,mt5SyncAccounts:invite.mt5Sync?1:0},source:'invite'};
+    try{
+      let created;
+      try{created=await createInviteBackend(payload);}catch(apiErr){
+        const token=uid().replaceAll('-','');
+        const expiresAt=new Date(); expiresAt.setDate(expiresAt.getDate()+Number(invite.days||30));
+        await setDoc(doc(db,'invites',token),{...payload,token,status:'active',used:false,createdAt:serverTimestamp(),expiresAt},{merge:true});
+        created={token,link:`${window.location.origin}/invite/${token}`};
+      }
+      const link=created.link||`${window.location.origin}/invite/${created.token}`;
+      setLastInvite({email,link,plan:invite.plan,mt5Sync:!!invite.mt5Sync});
+      await copyText(link,'Link de invitación copiado');
+      setInvite(v=>({...v,email:''}));
+    }catch(e){console.error(e); toast('No se pudo crear la invitación. Revisá permisos/API.','error')}
+  }
+
   async function sendAnnouncement(){if(!announcement.trim())return; await addDoc(collection(db,'posts'),{authorId:'admin',authorName:'Moisés Trading Club',authorAvatar:'MT',category:'Anuncio',body:announcement,likes:[],comments:[],pinned:true,createdAt:serverTimestamp(),createdDate:today()}); await notifyUsers(data.users,`Nuevo anuncio del mentor: ${announcement.slice(0,80)}${announcement.length>80?'...':''}`,'announcement',{target:'announcements'}); setAnnouncement(''); toast('Anuncio publicado y notificado')}
   async function removeTrade(t){if(!confirm(`¿Borrar trade ${t.asset || ''} de ${t.userId || ''}?`))return; await deleteDoc(doc(db,'trades',t.id)); toast('Trade borrado')}
   async function removeIdea(i){if(!confirm(`¿Borrar idea ${i.asset}?`))return; await deleteDoc(doc(db,'ideas',i.id)); toast('Idea borrada');}
   const q=search.toLowerCase().trim();
   const users=(data.users||[]).filter(u=>{
     const status=effectiveStatus(u);
-    const matchesFilter=filter==='all'||status===filter||u.role===filter;
-    const hay=[u.name,u.email,u.role,status,u.uid].join(' ').toLowerCase();
+    const plan=normalizeCommercialPlan(u.plan);
+    const matchesFilter=filter==='all'||status===filter||u.role===filter||plan===filter;
+    const hay=[u.name,u.email,u.role,status,plan,u.uid,featureSummary(u)].join(' ').toLowerCase();
     return matchesFilter && (!q || hay.includes(q));
   });
-  const groups=['pending','approved','suspended','denied'].map(status=>({status,items:users.filter(u=>effectiveStatus(u)===status)})).filter(g=>g.items.length || filter===g.status || filter==='all');
+  const groups=['pending','pending_payment','approved','expired','suspended','denied','blocked'].map(status=>({status,items:users.filter(u=>effectiveStatus(u)===status)})).filter(g=>g.items.length || filter===g.status || filter==='all');
   const counts=(data.users||[]).reduce((a,u)=>{const st=effectiveStatus(u); a[st]=(a[st]||0)+1; return a;},{});
+  const planCounts=(data.users||[]).reduce((a,u)=>{const p=normalizeCommercialPlan(u.plan); a[p]=(a[p]||0)+1; return a;},{});
   const reviewTrades=(data.trades||[]).filter(t=>t.mentorReviewRequested).sort((a,b)=>String(b.mentorReviewRequestedAt||b.createdAt||'').localeCompare(String(a.mentorReviewRequestedAt||a.createdAt||'')));
   async function updateReview(t,patch){try{await setDoc(doc(db,'trades',t.id),{...patch,mentorReviewedAt:serverTimestamp(),mentorReviewedBy:'admin'},{merge:true}); toast('Revisión guardada','success')}catch(e){toast('No se pudo guardar la revisión','error')}}
-  return <main className="page"><div className="metrics"><Metric label="Usuarios" value={data.users.length} sub="registrados"/><Metric label="Pendientes" value={counts.pending||0} sub="por aprobar"/><Metric label="Revisión mentor" value={reviewTrades.filter(t=>(t.mentorReviewStatus||'pending')==='pending').length} sub="trades pendientes"/><Metric label="Trades" value={data.trades.length} sub="registrados"/></div>
+  return <main className="page"><div className="metrics"><Metric label="Usuarios" value={data.users.length} sub="registrados"/><Metric label="Free" value={planCounts.free||0} sub="sin MT5 Sync"/><Metric label="Pro" value={(planCounts.pro||0)+(planCounts.mentor||0)} sub="MT5 habilitable"/><Metric label="Invites" value={(data.invites||[]).length} sub="creadas"/></div>
+  <Card title="Control comercial" sub="Separá free, Club, Pro, Mentoría e influencers. MT5 Sync queda como feature protegida.">
+    <div className="accessSummary"><span>Free: <b>{planCounts.free||0}</b></span><span>Club: <b>{planCounts.club||0}</b></span><span>Pro: <b>{planCounts.pro||0}</b></span><span>Influencer: <b>{planCounts.influencer_trial||0}</b></span></div>
+    <div className="formGrid labeled"><Field label="Email para invitación"><input className="input" value={invite.email} onChange={e=>setInvite({...invite,email:e.target.value})} placeholder="trader@email.com"/></Field><Field label="Tipo de acceso"><select className="input" value={invite.plan} onChange={e=>setInvite({...invite,plan:e.target.value})}>{COMMERCIAL_PLAN_OPTIONS.filter(p=>p.id!=='admin').map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select></Field><Field label="Duración días"><input className="input" type="number" min="1" value={invite.days} onChange={e=>setInvite({...invite,days:e.target.value})}/></Field></div>
+    <div className="featureToggles"><label><input type="checkbox" checked={invite.analytics} onChange={e=>setInvite({...invite,analytics:e.target.checked})}/> Analytics</label><label><input type="checkbox" checked={invite.riskGuard} onChange={e=>setInvite({...invite,riskGuard:e.target.checked})}/> Risk Guard</label><label><input type="checkbox" checked={invite.mt5Sync} onChange={e=>setInvite({...invite,mt5Sync:e.target.checked})}/> MT5 Sync</label></div>
+    <div className="row"><button className="primary" onClick={createInvite}><Copy size={16}/>Crear y copiar invitación</button>{lastInvite&&<button className="ghost" onClick={()=>copyText(lastInvite.link,'Link copiado otra vez')}>Copiar último link</button>}</div>
+    {lastInvite&&<div className="inviteResult"><b>Invitación lista para {lastInvite.email}</b><p>{lastInvite.link}</p><small>Plan: {commercialPlanLabel(lastInvite.plan)} · MT5 Sync: {lastInvite.mt5Sync?'sí':'no'}</small></div>}
+  </Card>
   <Card title="Trades para revisar" sub="Solicitudes enviadas por alumnos para devolución del mentor."><div className="mentorReviewList">{reviewTrades.map(t=><MentorReviewAdminCard key={t.id} trade={t} users={data.users||[]} onSave={updateReview}/>)}</div>{!reviewTrades.length&&<Empty title="Sin trades pendientes" text="Cuando los alumnos pidan revisión aparecerán acá."/>}</Card>
-  <Card title="Usuarios online" sub="Control rápido de presencia dentro de la app."><div className="onlineAdminGrid">{(data.users||[]).filter(isUserOnline).map(u=><div className="onlineRow" key={u.uid}><span className="avatar small">{u.avatar||String(u.name||u.email||'MT').slice(0,2)}</span><div><b>{u.name||u.email}</b><small>{u.role||'alumno'} · online ahora</small></div><span className="onlineDot on"/></div>)}{!(data.users||[]).filter(isUserOnline).length&&<Empty title="Nadie online" text="Cuando haya alumnos activos aparecerán acá."/>}</div></Card>
+  <Card title="Usuarios online" sub="Control rápido de presencia dentro de la app."><div className="onlineAdminGrid">{(data.users||[]).filter(isUserOnline).map(u=><div className="onlineRow" key={u.uid}><span className="avatar small">{u.avatar||String(u.name||u.email||'MT').slice(0,2)}</span><div><b>{u.name||u.email}</b><small>{u.role||'alumno'} · {commercialPlanLabel(u.plan)} · online ahora</small></div><span className="onlineDot on"/></div>)}{!(data.users||[]).filter(isUserOnline).length&&<Empty title="Nadie online" text="Cuando haya alumnos activos aparecerán acá."/>}</div></Card>
   <Card title="Anuncios globales" sub="Publica un anuncio fijo en comunidad y envía notificación a todos."><TextareaWithEmoji className="input" value={announcement} onChange={e=>setAnnouncement(e.target.value)} placeholder="Escribe un anuncio para toda la comunidad..."/><button className="primary" onClick={sendAnnouncement}><Megaphone size={16}/>Publicar y notificar</button></Card>
-  <Card title="Gestión de accesos" sub="Buscá por nombre, email, rol o estado. La lista está agrupada para manejar cientos o miles de alumnos sin volverte loco.">
-    <div className="adminFilters"><div className="search"><Search size={16}/><input placeholder="Buscar alumno por nombre o email..." value={search} onChange={e=>setSearch(e.target.value)}/></div><select className="input small" value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">Todos</option><option value="pending">Pendientes</option><option value="approved">Aprobados</option><option value="suspended">Suspendidos</option><option value="denied">Denegados</option><option value="admin">Admins</option><option value="moderador">Moderadores</option><option value="alumno">Alumnos</option></select></div>
-    <div className="accessSummary"><span>Pendientes: <b>{counts.pending||0}</b></span><span>Aprobados: <b>{counts.approved||0}</b></span><span>Suspendidos: <b>{counts.suspended||0}</b></span><span>Denegados: <b>{counts.denied||0}</b></span></div>
-    {groups.map(g=><section className="accessGroup" key={g.status}><button className="accessGroupHead" onClick={()=>setOpenGroups(o=>({...o,[g.status]:!o[g.status]}))}>{openGroups[g.status]?<ChevronDown size={18}/>:<ChevronRight size={18}/>}<span>{accessLabel(g.status)}</span><b>{g.items.length}</b></button>{openGroups[g.status]&&<div>{g.items.map(u=><div className="adminRow accessRow" key={u.uid}><div><b>{u.name||'Sin nombre'}</b><p>{u.email}</p><span className={`statusBadge ${effectiveStatus(u)}`}>{accessLabel(effectiveStatus(u))}</span></div><select className="input small" value={u.role||'alumno'} onChange={e=>role(u,e.target.value)}>{['alumno','moderador','admin','invitado'].map(r=><option key={r}>{r}</option>)}</select><div className="accessActions"><button className="primary" onClick={()=>setAccess(u,'approved')}>Aprobar</button><button className="ghost" onClick={()=>setAccess(u,'pending')}>Pendiente</button><button className="ghost danger" onClick={()=>setAccess(u,'denied')}>Denegar</button><button className="ghost danger" onClick={()=>setAccess(u,'suspended')}>Suspender</button></div></div>)}</div>}</section>)}
+  <Card title="Gestión de accesos" sub="Buscá por nombre, email, rol, plan o feature. MT5 Sync puede activarse solo en casos aprobados.">
+    <div className="adminFilters"><div className="search"><Search size={16}/><input placeholder="Buscar alumno por nombre, email, plan o feature..." value={search} onChange={e=>setSearch(e.target.value)}/></div><select className="input small" value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">Todos</option><option value="pending">Pendientes</option><option value="approved">Aprobados</option><option value="expired">Vencidos</option><option value="suspended">Suspendidos</option><option value="denied">Denegados</option><option value="free">Free</option><option value="club">Club</option><option value="pro">Pro</option><option value="influencer_trial">Influencer Trial</option><option value="admin">Admins</option><option value="moderador">Moderadores</option><option value="alumno">Alumnos</option></select></div>
+    <div className="accessSummary"><span>Pendientes: <b>{counts.pending||0}</b></span><span>Activos: <b>{counts.approved||0}</b></span><span>Vencidos: <b>{counts.expired||0}</b></span><span>Bloqueados: <b>{(counts.blocked||0)+(counts.suspended||0)+(counts.denied||0)}</b></span></div>
+    {groups.map(g=><section className="accessGroup" key={g.status}><button className="accessGroupHead" onClick={()=>setOpenGroups(o=>({...o,[g.status]:!o[g.status]}))}>{openGroups[g.status]?<ChevronDown size={18}/>:<ChevronRight size={18}/>}<span>{accessLabel(g.status)}</span><b>{g.items.length}</b></button>{openGroups[g.status]&&<div>{g.items.map(u=>{
+      const features=featureSet(u); const plan=normalizeCommercialPlan(u.plan);
+      return <div className="adminRow accessRow commercialAccessRow" key={u.uid}><div><b>{u.name||'Sin nombre'}</b><p>{u.email}</p><span className={`statusBadge ${effectiveStatus(u)}`}>{accessLabel(effectiveStatus(u))}</span><small>{commercialPlanLabel(plan)} · {featureSummary(u)}</small></div><select className="input small" value={u.role||'alumno'} onChange={e=>role(u,e.target.value)}>{['alumno','moderador','admin','invitado'].map(r=><option key={r}>{r}</option>)}</select><select className="input small" value={plan} onChange={e=>setPlan(u,e.target.value)}>{COMMERCIAL_PLAN_OPTIONS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select><div className="featureToggles compactFeatures">{COMMERCIAL_FEATURES.map(f=><label key={f.id}><input type="checkbox" checked={!!features[f.id]} onChange={e=>toggleFeature(u,f.id,e.target.checked)}/>{f.label}</label>)}</div><div className="accessActions"><button className="primary" onClick={()=>setAccess(u,'approved')}>Activar</button><button className="ghost" onClick={()=>setAccess(u,'pending')}>Pendiente</button><button className="ghost danger" onClick={()=>setAccess(u,'suspended')}>Bloquear</button></div></div>})}</div>}</section>)}
     {!users.length&&<Empty title="Sin resultados" text="No encontré usuarios con ese nombre, email o filtro."/>}
   </Card>
-  <div className="grid two"><Card title="Ideas publicadas" sub="Como admin podés limpiar ideas antiguas o inválidas.">{data.ideas.map(i=><div className="adminRow" key={i.id}><div><b>{i.asset} · {i.bias}</b><p>{i.status} · {i.timeframe}</p></div><button className="ghost compact" onClick={()=>copyText(`${i.asset} | ${i.bias} | ${i.timeframe} | Zona: ${i.zone} | Riesgo: ${i.risk}`,'Código copiado')}><Copy size={14}/>Copiar</button><button className="ghost danger" onClick={()=>removeIdea(i)}><Trash2 size={16}/>Borrar</button></div>)}{!data.ideas.length&&<Empty title="Sin ideas" text="Todavía no hay ideas publicadas."/>}</Card>
+  <div className="grid two"><Card title="Invitaciones creadas" sub="Links para trials comerciales e influencers.">{(data.invites||[]).slice(0,20).map(inv=><div className="adminRow" key={inv.id}><div><b>{inv.email}</b><p>{commercialPlanLabel(inv.plan)} · {inv.used?'Usada':'Disponible'} · MT5 {inv.features?.mt5Sync?'sí':'no'}</p></div><button className="ghost compact" onClick={()=>copyText(`${window.location.origin}/invite/${inv.token||inv.id}`,'Invitación copiada')}><Copy size={14}/>Copiar</button></div>)}{!(data.invites||[]).length&&<Empty title="Sin invitaciones" text="Creá el primer trial para un trader o influencer."/>}</Card>
   <Card title="Trades registrados" sub="Vista administrativa. Usar solo para borrar pruebas o errores.">{data.trades.slice(0,30).map(t=><div className="adminRow" key={t.id}><div><b>{t.asset} · {t.side}</b><p>{t.date} · {money(t.resultMoney)} · {t.userId}</p></div><button className="ghost danger" onClick={()=>removeTrade(t)}><Trash2 size={16}/>Borrar</button></div>)}{!data.trades.length&&<Empty title="Sin trades" text="Todavía no hay trades."/>}</Card></div></main>}
 
 
@@ -2149,13 +2289,13 @@ function PullToRefresh({children}){
   // Refresh remains available through browser/PWA reload; internal pages keep normal vertical scroll.
   return <div className="pullWrap noPullRefresh">{children}</div>
 }
-function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true),[tab,setTab]=useState('dashboard'),[cmdOpen,setCmdOpen]=useState(false),[publicPath,setPublicPath]=useState(()=>window.location.pathname); const [theme,setTheme]=useState(()=>localStorage.getItem('mtc-theme')||'dark'); useEffect(()=>{document.documentElement.setAttribute('data-theme',theme); localStorage.setItem('mtc-theme',theme);},[theme]); const toggleTheme=()=>setTheme(t=>t==='dark'?'light':'dark'); useEffect(()=>{const h=e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setCmdOpen(v=>!v)}}; window.addEventListener('keydown',h); return()=>window.removeEventListener('keydown',h)},[]); useEffect(()=>{const sync=()=>setPublicPath(window.location.pathname); window.addEventListener('popstate',sync); window.addEventListener('mtc-public-route',sync); return()=>{window.removeEventListener('popstate',sync); window.removeEventListener('mtc-public-route',sync)}},[]); useEffect(()=>{authPersistenceReady.then(()=>getRedirectResult(auth)).then(res=>{if(res?.user)return ensureGoogleUserProfile(res.user)}).catch(e=>{console.warn('Google redirect result:',e?.code||e?.message||e)});},[]); useEffect(()=>{const h=e=>{if(e?.detail)setTab(e.detail)}; window.addEventListener('mtc-tab',h); return()=>window.removeEventListener('mtc-tab',h)},[]); useEffect(()=>onAuthStateChanged(auth,async u=>{setFbUser(u); if(!u){setProfile(null);setLoading(false);return;} setLoading(true); const unsub=onSnapshot(doc(db,'users',u.uid),async snap=>{if(snap.exists()){const p={uid:u.uid,...snap.data()}; if(p.active===false){await signOut(auth); return;} const adminEmail=ADMIN_EMAILS.includes(u.email?.toLowerCase()); if(adminEmail && p.role!=='admin') console.warn('Admin email detectado, pero el rol debe estar aprobado desde backend/Admin SDK.'); setProfile(p);} else {const displayName=u.displayName||u.email?.split('@')[0]||'Trader'; const p={uid:u.uid,email:u.email,name:displayName,displayName,role:'alumno',avatar:(displayName||'MT').slice(0,2).toUpperCase(),photoURL:u.photoURL||'',type:'Day Trader',gender:'masculino',avatarChoice:'trader-m',level:'Inicial',active:true,status:'pending',approved:false,provider:u.providerData?.[0]?.providerId||'password',accessStatus:'pending_payment',subscriptionStatus:'none',accessSource:'self_signup',plan:'free',createdAt:serverTimestamp(),lastLoginAt:serverTimestamp()}; await setDoc(doc(db,'users',u.uid),p,{merge:true}); await setDoc(doc(db,'settings',u.uid),settingsDefault,{merge:true}); setProfile(p);} setLoading(false);}); return unsub;}),[]); useEffect(()=>{if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(reg=>{reg.update?.(); if(reg.waiting) reg.waiting.postMessage?.({type:'SKIP_WAITING'});}).catch(()=>{})}},[]); useEffect(()=>{
+function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true),[tab,setTab]=useState('dashboard'),[cmdOpen,setCmdOpen]=useState(false),[publicPath,setPublicPath]=useState(()=>window.location.pathname); const [theme,setTheme]=useState(()=>localStorage.getItem('mtc-theme')||'dark'); useEffect(()=>{document.documentElement.setAttribute('data-theme',theme); localStorage.setItem('mtc-theme',theme);},[theme]); const toggleTheme=()=>setTheme(t=>t==='dark'?'light':'dark'); useEffect(()=>{const h=e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setCmdOpen(v=>!v)}}; window.addEventListener('keydown',h); return()=>window.removeEventListener('keydown',h)},[]); useEffect(()=>{const sync=()=>setPublicPath(window.location.pathname); window.addEventListener('popstate',sync); window.addEventListener('mtc-public-route',sync); return()=>{window.removeEventListener('popstate',sync); window.removeEventListener('mtc-public-route',sync)}},[]); useEffect(()=>{const token=inviteTokenFromPath(publicPath); if(token)localStorage.setItem('mtc-pending-invite-token',token);},[publicPath]); useEffect(()=>{authPersistenceReady.then(()=>getRedirectResult(auth)).then(res=>{if(res?.user)return ensureGoogleUserProfile(res.user)}).catch(e=>{console.warn('Google redirect result:',e?.code||e?.message||e)});},[]); useEffect(()=>{const h=e=>{if(e?.detail)setTab(e.detail)}; window.addEventListener('mtc-tab',h); return()=>window.removeEventListener('mtc-tab',h)},[]); useEffect(()=>onAuthStateChanged(auth,async u=>{setFbUser(u); if(!u){setProfile(null);setLoading(false);return;} setLoading(true); const unsub=onSnapshot(doc(db,'users',u.uid),async snap=>{if(snap.exists()){const p={uid:u.uid,...snap.data()}; if(p.active===false){await signOut(auth); return;} const adminEmail=ADMIN_EMAILS.includes(u.email?.toLowerCase()); if(adminEmail && p.role!=='admin') console.warn('Admin email detectado, pero el rol debe estar aprobado desde backend/Admin SDK.'); setProfile(p);} else {const displayName=u.displayName||u.email?.split('@')[0]||'Trader'; const p={uid:u.uid,email:u.email,name:displayName,displayName,role:'alumno',avatar:(displayName||'MT').slice(0,2).toUpperCase(),photoURL:u.photoURL||'',type:'Day Trader',gender:'masculino',avatarChoice:'trader-m',level:'Inicial',active:true,status:'pending',approved:false,provider:u.providerData?.[0]?.providerId||'password',accessStatus:'pending_payment',subscriptionStatus:'none',accessSource:'self_signup',plan:'free',features:defaultPlanFeatures('free'),limits:defaultPlanLimits('free'),createdAt:serverTimestamp(),lastLoginAt:serverTimestamp()}; await setDoc(doc(db,'users',u.uid),p,{merge:true}); await setDoc(doc(db,'settings',u.uid),settingsDefault,{merge:true}); setProfile(p);} setLoading(false);}); return unsub;}),[]); useEffect(()=>{const token=localStorage.getItem('mtc-pending-invite-token'); if(!token||!fbUser?.uid||!profile?.uid||!API_BASE_URL)return; acceptInviteToken(token).then(()=>{localStorage.removeItem('mtc-pending-invite-token'); toast('Invitación aplicada. Acceso activado.','success'); if(window.location.pathname.startsWith('/invite/')) routeTo('/');}).catch(e=>{console.warn('invite_accept_failed',e?.message||e); toast('No se pudo aplicar la invitación automáticamente. Contactá al admin.','error');});},[fbUser?.uid,profile?.uid]); useEffect(()=>{if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(reg=>{reg.update?.(); if(reg.waiting) reg.waiting.postMessage?.({type:'SKIP_WAITING'});}).catch(()=>{})}},[]); useEffect(()=>{
   if(!profile?.uid || isPrivileged(profile) || profile.accessStatus==='manual_approved') return;
   const info=membershipInfo(profile);
   if(!info.expired || profile.subscriptionStatus==='expired' || profile.accessStatus==='inactive') return;
   if(!PAYMENT_CONFIG.membershipSyncEndpoint) return;
   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
-},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const adminEmailAllowed=ADMIN_EMAILS.includes(String(profile?.email||fbUser?.email||'').toLowerCase()); const allowed=profile && (isApproved(profile) || adminEmailAllowed); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
+},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const adminEmailAllowed=ADMIN_EMAILS.includes(String(profile?.email||fbUser?.email||'').toLowerCase()); const allowed=profile && (isApproved(profile) || adminEmailAllowed); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ const inviteToken=inviteTokenFromPath(publicPath); if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register'||inviteToken) return <><Login initialMode={inviteToken?'register':'register'}/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
 
 class ErrorBoundary extends React.Component {
   constructor(props){
