@@ -1286,6 +1286,11 @@ const emotionalInitial={
   freeWriting:''
 };
 const emotionalStates=['Calmo','Neutral','Ansioso','Confiado','Frustrado','Cansado','Enfocado'];
+const avgEmotion=(items,key)=>items.length?Number((items.reduce((sum,item)=>sum+Number(item[key]||0),0)/items.length).toFixed(1)):0;
+function mostRepeatedMood(items=[]){
+  const counts=items.reduce((acc,item)=>{const mood=item.mood||'Neutral'; acc[mood]=(acc[mood]||0)+1; return acc;},{});
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+}
 function emotionalEntryFromDoc(docEntry={}){
   return {
     state:docEntry.mood||'Neutral',
@@ -1332,6 +1337,20 @@ function EmotionalToggle({label,checked,onChange}){
 function EmotionalJournalPage({data,profile}){
   const dayKey=today();
   const journals=useMemo(()=>(data.emotionalJournals||[]).filter(x=>x.userId===profile.uid).sort((a,b)=>String(b.date||safeDate(b.createdAt)||'').localeCompare(String(a.date||safeDate(a.createdAt)||''))),[data.emotionalJournals,profile.uid]);
+  const weeklySummary=useMemo(()=>{
+    const items=journals.slice(0,7);
+    const anxiety=avgEmotion(items,'anxietyLevel');
+    const confidence=avgEmotion(items,'confidenceLevel');
+    const discipline=avgEmotion(items,'disciplineLevel');
+    const signals=[];
+    if(items.length){
+      if(anxiety>=7) signals.push('Alta carga emocional');
+      if(discipline>=7) signals.push('Buena adherencia al proceso');
+      if(confidence<=4) signals.push('Confianza baja');
+      signals.push(items.length>=3?'Patrón inicial detectable':'Necesitás más cierres para detectar patrones');
+    }
+    return {items,count:items.length,anxiety,confidence,discipline,mood:mostRepeatedMood(items),signals};
+  },[journals]);
   const todayEntry=useMemo(()=>journals.find(x=>x.date===dayKey),[journals,dayKey]);
   const [entry,setEntry]=useState(emotionalInitial);
   const [editingDate,setEditingDate]=useState(dayKey);
@@ -1451,12 +1470,19 @@ function EmotionalJournalPage({data,profile}){
       </Card>
 
       <div className="emotionalSideStack">
+        <Card title="Resumen emocional semanal" sub="Últimos cierres registrados.">
+          {weeklySummary.count?<div className="emotionalWeekly">
+            <p>Tu consistencia emocional empieza a verse cuando repetís el hábito. Cada cierre suma evidencia sobre cómo tomás decisiones.</p>
+            <div className="emotionalWeeklyMetrics"><div><span>Ansiedad</span><b>{weeklySummary.anxiety}/10</b></div><div><span>Confianza</span><b>{weeklySummary.confidence}/10</b></div><div><span>Disciplina</span><b>{weeklySummary.discipline}/10</b></div><div><span>Estado frecuente</span><b>{weeklySummary.mood}</b></div><div><span>Cierres</span><b>{weeklySummary.count}</b></div></div>
+            <div className="emotionalSignalList">{weeklySummary.signals.map(signal=><span key={signal}>{signal}</span>)}</div>
+          </div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Completá tu primer cierre para empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+        </Card>
         <Card title="Lectura del patrón" sub="Calidad emocional de la ejecución.">
           <div className="emotionalPattern"><Heart size={20}/><p>Este módulo está diseñado para ayudarte a observar cómo tu estado interno afecta tu ejecución. Con el tiempo, tus respuestas empiezan a revelar patrones: cuándo respetás tu plan, cuándo te exponés de más y qué emociones aparecen antes de tus peores decisiones.</p></div>
           <div className="emotionalPatternChips"><span>FOMO</span><span>Impulso</span><span>Disciplina</span></div>
         </Card>
         <Card title="Historial" sub="Reflexiones de tus sesiones.">
-          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,5).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><div className="emotionalHistoryTop"><span>{index===0?'Último cierre':'Cierre'}</span><button className="ghost compact" onClick={()=>editJournal(item)}>Editar</button></div><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Cuando completes tu primera reflexión, vas a empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,6).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><div className="emotionalHistoryTop"><span>{index===0?'Último cierre':'Cierre'}</span>{index===0&&<button className="ghost compact" onClick={()=>editJournal(item)}>Editar</button>}</div><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Completá tu primer cierre para empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
         </Card>
       </div>
     </div>
