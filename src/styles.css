@@ -3312,10 +3312,14 @@ body:not(.mtc-paywall-open){
   position:fixed!important;
   inset:0!important;
   z-index:-2!important;
-  background:url('/paywall-dashboard-preview.png') center top / cover no-repeat!important;
-  opacity:.90!important;
-  filter:blur(1.1px) saturate(1.02) brightness(.78) contrast(1.03)!important;
-  transform:scale(1.012)!important;
+  background:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px),
+    url('/brand/mtc-dashboard-motion.svg') center / min(980px,92vw) auto no-repeat!important;
+  background-size:56px 56px,56px 56px,min(980px,92vw) auto!important;
+  opacity:.64!important;
+  filter:blur(3px) saturate(.95) brightness(.58) contrast(1.04)!important;
+  transform:scale(1.05)!important;
   pointer-events:none!important;
 }
 .authPage::after{
@@ -3323,9 +3327,11 @@ body:not(.mtc-paywall-open){
   position:fixed!important;
   inset:0!important;
   z-index:-1!important;
-  background:radial-gradient(circle at 50% 18%,rgba(212,166,58,.10),transparent 34%),rgba(2,3,5,.32)!important;
-  -webkit-backdrop-filter:blur(.8px)!important;
-  backdrop-filter:blur(.8px)!important;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(212,166,58,.15),transparent 32%),
+    linear-gradient(180deg,rgba(2,3,5,.54),rgba(2,3,5,.82))!important;
+  -webkit-backdrop-filter:blur(2px)!important;
+  backdrop-filter:blur(2px)!important;
   pointer-events:none!important;
 }
 .authShell{
@@ -9477,3 +9483,93 @@ html[data-theme="light"] .emotionalReady{color:#12803a!important;background:rgba
 html[data-theme="light"] .emotionalReady.error{color:#be123c!important;background:rgba(244,63,94,.08)!important;border-color:rgba(244,63,94,.18)!important}
 @media(max-width:1100px){.emotionalHero,.emotionalGrid{grid-template-columns:1fr}.emotionalHeroPanel{max-width:620px}.emotionalSideStack{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.emotionalHero{min-height:auto;padding:22px!important;gap:18px}.emotionalHeroPanel{padding:20px;border-radius:20px}.emotionalCloseBlock{grid-template-columns:1fr;padding:18px}.emotionalCloseSteps{justify-content:flex-start}.emotionalSectionGrid,.emotionalToggleGrid,.emotionalSideStack,.emotionalWeeklyMetrics{grid-template-columns:1fr}.emotionalFormSection{padding:14px}.emotionalToggle{min-height:auto}.emotionalActions{align-items:stretch;position:sticky;bottom:calc(92px + env(safe-area-inset-bottom));z-index:4;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px}.emotionalActions .primary,.emotionalActions .ghost,.emotionalReady{width:100%;justify-content:center}.emotionalHistoryTop{align-items:flex-start}.emotionalPattern{display:grid}.emotionalJournalPage{padding-bottom:calc(154px + env(safe-area-inset-bottom))!important}}
+/* Visual stabilization: landing, login, paywall and theme sanity. */
+html{scroll-padding-top:96px;}
+.publicLanding #plataforma,.publicLanding #modulos,.publicLanding #precios,.publicLanding #faq,.publicLanding section,.landingSection,.landingFinal{scroll-margin-top:96px!important;}
+
+.publicLanding{padding-top:20px!important;padding-bottom:68px!important;}
+.landingNav{position:sticky!important;top:12px!important;z-index:70!important;min-height:60px!important;max-width:1320px!important;margin:0 auto 28px!important;padding:8px 12px!important;border-radius:18px!important;background:rgba(7,9,13,.78)!important;border:1px solid rgba(255,255,255,.10)!important;box-shadow:0 16px 48px rgba(0,0,0,.30)!important;backdrop-filter:blur(16px)!important;}
+.landingNavBrand{min-width:220px!important;max-width:280px!important;flex:0 0 auto!important;}
+.landingNavBrand picture{display:block!important;line-height:0!important;}
+.landingNavBrand img{display:block!important;width:auto!important;height:46px!important;max-width:270px!important;object-fit:contain!important;border:0!important;background:transparent!important;box-shadow:none!important;}
+.landingNav nav a{color:#aeb7c7!important;}
+.landingNavActions .landingCta{min-height:40px!important;}
+
+.landingHero{padding-top:24px!important;margin-bottom:clamp(44px,6vw,84px)!important;}
+.landingFlow,.landingSection{margin-bottom:clamp(56px,7vw,92px)!important;}
+.landingPricingSection{margin-bottom:clamp(64px,8vw,104px)!important;}
+.landingHeroMetrics{padding:16px!important;gap:14px!important;}
+.landingDashboardMotion{grid-column:1/-1;display:block;width:100%;height:auto;aspect-ratio:720/460;object-fit:cover;border-radius:20px;border:1px solid rgba(255,255,255,.10);background:#05070b;box-shadow:0 22px 70px rgba(0,0,0,.28);animation:none!important;}
+.landingFinal{margin-top:0!important;border-radius:28px!important;border:1px solid rgba(255,255,255,.09)!important;background:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.020))!important;box-shadow:0 30px 90px rgba(0,0,0,.24)!important;}
+.landingPlanCard.featured{border-color:rgba(240,197,90,.42)!important;box-shadow:0 30px 90px rgba(0,0,0,.34),0 0 0 1px rgba(240,197,90,.10) inset!important;}
+.landingPlanCard.featured:after{content:"Recomendado para performance";position:absolute;top:16px;right:16px;max-width:150px;padding:7px 10px;border-radius:999px;border:1px solid rgba(240,197,90,.26);background:rgba(240,197,90,.12);color:#f7d877;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.06em;text-align:center;}
+.landingPlanCard.featured .landingPlanTop{padding-top:28px;}
+
+.authPage{isolation:isolate!important;background:#05070a!important;overflow:hidden auto!important;}
+.authPage::before{content:""!important;position:fixed!important;inset:0!important;z-index:-2!important;background:url('/brand/mtc-dashboard-motion.svg') center / min(920px,92vw) auto no-repeat!important;opacity:.44!important;filter:blur(4px) saturate(.85) brightness(.58) contrast(.96)!important;transform:scale(1.04)!important;pointer-events:none!important;}
+.authPage::after{content:""!important;position:fixed!important;inset:0!important;z-index:-1!important;background:radial-gradient(circle at 50% 12%,rgba(212,168,67,.13),transparent 34%),linear-gradient(180deg,rgba(3,5,10,.62),rgba(3,5,10,.86))!important;backdrop-filter:blur(1px)!important;pointer-events:none!important;}
+.authPage .loginCard.premiumAuth{background:linear-gradient(180deg,rgba(18,22,30,.92),rgba(8,10,15,.96))!important;border-color:rgba(255,255,255,.11)!important;box-shadow:0 28px 80px rgba(0,0,0,.46)!important;}
+.authPage .loginCard h1{color:#fff4d6!important;}
+.authPage .loginCard p,.authPage .hint{color:#aeb8c7!important;}
+.authPage .input,.authPage .seg{background:rgba(255,255,255,.045)!important;border-color:rgba(255,255,255,.10)!important;color:#f4f7fb!important;}
+.authPage .seg button.on{background:rgba(212,168,67,.14)!important;color:#f0c55a!important;}
+.authPage .backLanding{background:rgba(255,255,255,.055)!important;border-color:rgba(255,255,255,.12)!important;color:#d6dde9!important;}
+.authPage .googleBtn{background:#f8fafc!important;color:#111827!important;border-color:rgba(15,23,42,.10)!important;}
+
+.paywallFunnel,.referencePaywallGate{background:#05070b!important;color:#f7eed8!important;}
+.paywallFunnel::before{opacity:.62!important;filter:none!important;background:radial-gradient(circle at 18% 12%,rgba(212,168,67,.16),transparent 30%),linear-gradient(90deg,rgba(2,3,7,.72),rgba(2,3,7,.44),rgba(2,3,7,.78))!important;}
+.paywallFunnelShell,.referencePaywallModal{background:linear-gradient(145deg,rgba(18,22,30,.96),rgba(8,10,15,.98))!important;border-color:rgba(212,168,67,.26)!important;box-shadow:0 42px 128px rgba(0,0,0,.68),0 0 0 1px rgba(255,255,255,.045) inset!important;}
+.paywallFunnelPreview{position:relative!important;min-height:260px!important;aspect-ratio:16/10!important;background:#03050a!important;border-color:rgba(212,168,67,.22)!important;}
+.paywallFunnelPreview>video{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;opacity:.20!important;filter:saturate(.72) brightness(.40) contrast(1.04)!important;}
+.paywallFunnelPreview:after{content:""!important;position:absolute!important;inset:0!important;pointer-events:none!important;background:linear-gradient(180deg,rgba(3,5,10,.16),rgba(3,5,10,.70))!important;}
+.paywallProductInterface{position:absolute!important;inset:16px!important;z-index:2!important;display:grid!important;grid-template-rows:auto auto 1fr auto auto!important;gap:10px!important;padding:14px!important;border-radius:18px!important;border:1px solid rgba(255,255,255,.12)!important;background:linear-gradient(180deg,rgba(8,11,17,.88),rgba(4,6,10,.94))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 18px 52px rgba(0,0,0,.34)!important;overflow:hidden!important;}
+.productInterfaceKpis{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;}
+.productInterfaceCurve{min-height:78px!important;background:linear-gradient(180deg,rgba(239,198,91,.055),rgba(255,255,255,.018))!important;border-color:rgba(239,198,91,.14)!important;}
+.productInterfaceHeatmap i:nth-child(4n){background:rgba(35,209,139,.28)!important;}
+
+:root[data-theme="light"] body:has(.publicLanding),:root[data-theme="light"] body:has(.authPage){background:#f4f6f9!important;}
+:root[data-theme="light"] .publicLanding{color:#111827!important;background:linear-gradient(180deg,#fbfcff 0%,#f3f6fb 55%,#ffffff 100%)!important;}
+:root[data-theme="light"] .publicLanding:before{opacity:.34!important;background-image:linear-gradient(rgba(15,23,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.030) 1px,transparent 1px)!important;}
+:root[data-theme="light"] .landingNav{background:rgba(255,255,255,.86)!important;border-color:rgba(15,23,42,.10)!important;box-shadow:0 16px 42px rgba(15,23,42,.10)!important;}
+:root[data-theme="light"] .landingNav nav a{color:#475569!important;}
+:root[data-theme="light"] .landingHeroText h1,:root[data-theme="light"] .landingSection h2,:root[data-theme="light"] .landingFinal h2{color:#111827!important;}
+:root[data-theme="light"] .landingHeroText p,:root[data-theme="light"] .landingSection p,:root[data-theme="light"] .landingFinal p,:root[data-theme="light"] .landingFlow p{color:#526070!important;}
+:root[data-theme="light"] .landingHeroMetrics,:root[data-theme="light"] .landingSection,:root[data-theme="light"] .landingPanel,:root[data-theme="light"] .landingFlow div,:root[data-theme="light"] .featureGrid div,:root[data-theme="light"] .landingPlanCard,:root[data-theme="light"] .landingFinal{background:#ffffff!important;border-color:rgba(15,23,42,.09)!important;box-shadow:0 16px 44px rgba(15,23,42,.075)!important;}
+:root[data-theme="light"] .landingMetricTile b,:root[data-theme="light"] .mockStats b,:root[data-theme="light"] .landingFlow b,:root[data-theme="light"] .landingPanel b,:root[data-theme="light"] .featureGrid div,:root[data-theme="light"] .landingPlanCard h3,:root[data-theme="light"] .landingPlanPrice strong{color:#111827!important;}
+:root[data-theme="light"] .landingMetricTile span,:root[data-theme="light"] .mockStats span,:root[data-theme="light"] .landingPlanCard p,:root[data-theme="light"] .landingPlanCard li{color:#5b6678!important;}
+:root[data-theme="light"] .landingBadge,:root[data-theme="light"] .landingBadge.soft{color:#8a640d!important;background:#fff8e7!important;border-color:rgba(184,134,11,.18)!important;}
+:root[data-theme="light"] .landingDashboardMotion{background:#080b12!important;border-color:rgba(15,23,42,.12)!important;box-shadow:0 18px 56px rgba(15,23,42,.14)!important;}
+:root[data-theme="light"] .authPage{background:#f4f6f9!important;}
+:root[data-theme="light"] .authPage::before{opacity:.24!important;filter:blur(5px) saturate(.78) brightness(1.06) contrast(.90)!important;}
+:root[data-theme="light"] .authPage::after{background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(248,250,252,.90))!important;}
+:root[data-theme="light"] .authPage .loginCard.premiumAuth{background:rgba(255,255,255,.92)!important;border-color:rgba(15,23,42,.10)!important;box-shadow:0 24px 70px rgba(15,23,42,.12)!important;}
+:root[data-theme="light"] .authPage .loginCard h1{color:#111827!important;}
+:root[data-theme="light"] .authPage .loginCard p,:root[data-theme="light"] .authPage .hint{color:#5b6678!important;}
+:root[data-theme="light"] .authPage .input,:root[data-theme="light"] .authPage .seg{background:#f8fafc!important;border-color:rgba(15,23,42,.10)!important;color:#111827!important;}
+:root[data-theme="light"] .authPage .seg button.on{background:#fff8e7!important;color:#8a640d!important;}
+:root[data-theme="light"] .paywallFunnel,:root[data-theme="light"] .referencePaywallGate{background:#05070b!important;color:#f7eed8!important;}
+
+@media(max-width:920px){
+  html{scroll-padding-top:74px;}
+  .publicLanding #plataforma,.publicLanding #modulos,.publicLanding #precios,.publicLanding #faq,.publicLanding section,.landingSection,.landingFinal{scroll-margin-top:74px!important;}
+  .publicLanding{padding-top:12px!important;}
+  .landingNav{top:8px!important;min-height:54px!important;gap:8px!important;padding:8px 10px!important;margin-bottom:16px!important;display:flex!important;}
+  .landingNavBrand{min-width:58px!important;max-width:68px!important;flex:0 0 58px!important;}
+  .landingNavBrand img{height:38px!important;max-width:58px!important;}
+  .landingNav nav{display:none!important;}
+  .landingNavActions{display:flex!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;gap:7px!important;}
+  .landingNavActions .landingCta{flex:1 1 0!important;width:auto!important;min-width:0!important;min-height:38px!important;padding:9px 8px!important;font-size:12px!important;}
+  .landingHero{padding-top:8px!important;margin-bottom:52px!important;}
+  .landingFlow,.landingSection,.landingPricingSection{margin-bottom:56px!important;}
+  .landingPlanCard.featured:after{position:static!important;width:max-content!important;max-width:100%!important;margin-bottom:2px!important;}
+  .landingPlanCard.featured .landingPlanTop{padding-top:0!important;}
+  .productInterfaceKpis{grid-template-columns:1fr!important;}
+}
+
+@media(max-width:520px){
+  .landingNav{border-radius:16px!important;}
+  .landingDashboardMotion{border-radius:16px!important;}
+  .paywallFunnelPreview{min-height:300px!important;}
+  .paywallProductInterface{inset:12px!important;padding:12px!important;gap:8px!important;}
+  .authPage .loginCard{max-width:100%!important;}
+}

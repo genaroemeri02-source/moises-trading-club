@@ -23,8 +23,8 @@ function HeroSection() {
         <a className="mtcHeroBrand" href="/">
           <span className="mtcHeroBrandMark">M</span>
           <span>
-            <strong>Moisés Trading Club</strong>
-            <small>Private Trading Ecosystem</small>
+            <strong>MTC Analytics</strong>
+            <small>Trading performance platform</small>
           </span>
         </a>
 
@@ -58,8 +58,8 @@ function HeroSection() {
           </h1>
 
           <p>
-            Journal profesional, checklist, analytics y comunidad privada para traders
-            discrecionales que quieren resultados reales.
+            Infraestructura de performance para medir ejecución, riesgo, conducta y
+            revisión en traders discrecionales.
           </p>
 
           <div className="mtcHeroButtons">
