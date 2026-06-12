@@ -1334,11 +1334,14 @@ function EmotionalJournalPage({data,profile}){
   const journals=useMemo(()=>(data.emotionalJournals||[]).filter(x=>x.userId===profile.uid).sort((a,b)=>String(b.date||safeDate(b.createdAt)||'').localeCompare(String(a.date||safeDate(a.createdAt)||''))),[data.emotionalJournals,profile.uid]);
   const todayEntry=useMemo(()=>journals.find(x=>x.date===dayKey),[journals,dayKey]);
   const [entry,setEntry]=useState(emotionalInitial);
+  const [editingDate,setEditingDate]=useState(dayKey);
   const [ready,setReady]=useState(false);
   const [saving,setSaving]=useState(false);
   const [saveError,setSaveError]=useState('');
+  const editingDoc=useMemo(()=>journals.find(x=>x.date===editingDate),[journals,editingDate]);
   useEffect(()=>{
     setEntry(todayEntry?emotionalEntryFromDoc(todayEntry):emotionalInitial);
+    setEditingDate(dayKey);
     setReady(false);
     setSaveError('');
   },[todayEntry?.id,todayEntry?.updatedAt]);
@@ -1347,19 +1350,47 @@ function EmotionalJournalPage({data,profile}){
     setSaving(true);
     setSaveError('');
     try{
-      const id=`${profile.uid}_${dayKey}`;
-      const payload=emotionalPayloadFromEntry(entry,profile,dayKey);
-      await setDoc(doc(db,'emotionalJournals',id),todayEntry?payload:{...payload,createdAt:serverTimestamp()},{merge:true});
+      const id=`${profile.uid}_${editingDate}`;
+      const payload=emotionalPayloadFromEntry(entry,profile,editingDate);
+      await setDoc(doc(db,'emotionalJournals',id),editingDoc?payload:{...payload,createdAt:serverTimestamp()},{merge:true});
       setReady(true);
-      toast('Cierre emocional guardado. Tu proceso queda registrado para futuras revisiones.','success');
+      toast(editingDoc?'Cierre emocional actualizado.':'Cierre emocional guardado. Tu proceso queda registrado para futuras revisiones.','success');
     }catch(e){
       console.error('save emotional journal',e);
-      setSaveError('No pudimos guardar el cierre. Revisá tu conexión e intentá de nuevo.');
-      toast('No pudimos guardar el cierre. Revisá tu conexión e intentá de nuevo.','error');
+      setSaveError('No pudimos completar la acción. Revisá tu conexión e intentá de nuevo.');
+      toast('No pudimos completar la acción. Revisá tu conexión e intentá de nuevo.','error');
     }finally{
       setSaving(false);
     }
   };
+  const clearForm=()=>{setEntry(emotionalInitial); setReady(false); setSaveError('');};
+  const editJournal=item=>{
+    setEditingDate(item.date||safeDate(item.createdAt));
+    setEntry(emotionalEntryFromDoc(item));
+    setReady(false);
+    setSaveError('');
+    document.querySelector('.emotionalForm')?.scrollIntoView?.({behavior:'smooth',block:'start'});
+  };
+  const deleteToday=async()=>{
+    if(!todayEntry) return;
+    if(!confirm('¿Querés borrar el cierre emocional de hoy?')) return;
+    setSaving(true);
+    setSaveError('');
+    try{
+      await deleteDoc(doc(db,'emotionalJournals',`${profile.uid}_${dayKey}`));
+      setEntry(emotionalInitial);
+      setEditingDate(dayKey);
+      setReady(false);
+      toast('Cierre emocional eliminado.','success');
+    }catch(e){
+      console.error('delete emotional journal',e);
+      setSaveError('No pudimos completar la acción. Revisá tu conexión e intentá de nuevo.');
+      toast('No pudimos completar la acción. Revisá tu conexión e intentá de nuevo.','error');
+    }finally{
+      setSaving(false);
+    }
+  };
+  const isEditingToday=!!todayEntry && editingDate===dayKey;
   return <main className="page emotionalJournalPage">
     <section className="heroSystem emotionalHero">
       <div className="emotionalHeroCopy">
@@ -1383,6 +1414,7 @@ function EmotionalJournalPage({data,profile}){
 
     <div className="emotionalGrid">
       <Card title="Registro del día" sub="Una lectura breve para ordenar tu sesión desde adentro.">
+        {isEditingToday&&<div className="emotionalEditNotice"><span>Editando cierre de hoy</span><p>Podés ajustar tu reflexión y volver a guardarla sin duplicar entradas.</p></div>}
         <div className="emotionalForm">
           <div className="emotionalFormSection">
             <h3>Estado mental</h3>
@@ -1415,7 +1447,7 @@ function EmotionalJournalPage({data,profile}){
             </div>
           </div>
         </div>
-        <div className="emotionalActions"><button className="primary" onClick={saveReflection} disabled={saving}><CheckCircle2 size={16}/>{saving?'Guardando cierre...':'Guardar reflexión'}</button>{ready&&<span className="emotionalReady"><CheckCircle2 size={15}/>Cierre emocional guardado. Tu proceso queda registrado para futuras revisiones.</span>}{saveError&&<span className="emotionalReady error"><AlertTriangle size={15}/>{saveError}</span>}</div>
+        <div className="emotionalActions"><button className="primary" onClick={saveReflection} disabled={saving}><CheckCircle2 size={16}/>{saving?'Guardando cierre...':editingDoc?'Actualizar cierre':'Guardar reflexión'}</button><button className="ghost" onClick={clearForm} disabled={saving}>Limpiar formulario</button>{isEditingToday&&<button className="ghost danger" onClick={deleteToday} disabled={saving}>Borrar cierre</button>}{ready&&<span className="emotionalReady"><CheckCircle2 size={15}/>{editingDoc?'Cierre emocional actualizado.':'Cierre emocional guardado. Tu proceso queda registrado para futuras revisiones.'}</span>}{saveError&&<span className="emotionalReady error"><AlertTriangle size={15}/>{saveError}</span>}</div>
       </Card>
 
       <div className="emotionalSideStack">
@@ -1424,7 +1456,7 @@ function EmotionalJournalPage({data,profile}){
           <div className="emotionalPatternChips"><span>FOMO</span><span>Impulso</span><span>Disciplina</span></div>
         </Card>
         <Card title="Historial" sub="Reflexiones de tus sesiones.">
-          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,5).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><span>{index===0?'Último cierre':'Cierre'}</span><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Cuando completes tu primera reflexión, vas a empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,5).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><div className="emotionalHistoryTop"><span>{index===0?'Último cierre':'Cierre'}</span><button className="ghost compact" onClick={()=>editJournal(item)}>Editar</button></div><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Cuando completes tu primera reflexión, vas a empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
         </Card>
       </div>
     </div>
