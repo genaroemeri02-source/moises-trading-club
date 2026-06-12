@@ -833,15 +833,35 @@ function goPublic(path){
 
 
 function PublicLanding(){
-  const features=['Checklist de Moisés','Journal profesional','Analytics operativos','Academia privada','Comunidad','Control de riesgo'];
+  const landingPlans=[
+    {name:'Club',badge:'Base operativa',price:'USD 14.99',copy:'Para ordenar tu proceso, validar tu operativa y dejar de registrar trades a medias.',items:['Dashboard operativo','Journal de trading','Checklist operativo','Gu\u00eda del ecosistema','Registro de ideas','Cierre emocional b\u00e1sico']},
+    {name:'Pro',badge:'M\u00e1s elegido',price:'USD 24.99',copy:'Para traders activos que quieren detectar edge, fugas de rendimiento y patrones reales.',featured:true,items:['Todo lo del plan Club','Analytics','Risk Lab','Journal emocional completo','Historial emocional','Resumen semanal','Lectura de patrones','M\u00e9tricas de consistencia']},
+    {name:'Mentor\u00eda',badge:'Acompa\u00f1amiento 1 a 1',price:'USD 250',copy:'Para acelerar resultados con revisi\u00f3n directa, estructura profesional y plan de mejora.',items:['Todo lo del plan Pro','Feedback personalizado','Revisi\u00f3n de proceso','Correcci\u00f3n operativa','Seguimiento privado','Plan de mejora individual']}
+  ];
+  const features=['Checklist operativo','Journal profesional','Analytics operativos','Risk management','Revisión emocional','Control de riesgo'];
+  const painCards=['Entrar antes de que exista confirmaci\u00f3n','Romper riesgo cuando la sesi\u00f3n se acelera','Cambiar el plan despu\u00e9s de una p\u00e9rdida','No replicar los d\u00edas buenos','Registrar resultado sin conducta','Revisar gr\u00e1fico sin revisar proceso'];
+  const modules=['Trading Journal','Risk Lab','Checklist Operativo','Analytics','Emotional Journal','Weekly Review','Setup Library','Performance Dashboard'];
+  const audiences=['Traders discrecionales','Prop firm traders','Mentores privados','Comunidades de trading','Equipos de traders','Operadores que necesitan consistencia medible'];
+  const faqs=[
+    ['\u00bfMTC Analytics me da una estrategia?','No. La plataforma ordena tu proceso, registra evidencia y te ayuda a detectar patrones de ejecuci\u00f3n, riesgo y conducta.'],
+    ['\u00bfSirve para prop firms?','S\u00ed. Est\u00e1 pensada para traders que necesitan controlar riesgo, disciplina, consistencia y revisi\u00f3n antes de escalar capital.'],
+    ['\u00bfNecesito experiencia previa?','No necesit\u00e1s ser avanzado, pero s\u00ed tener una operativa real que quieras medir con seriedad.'],
+    ['\u00bfPuedo cancelar?','S\u00ed. Los planes mensuales est\u00e1n pensados para acceso flexible y evoluci\u00f3n progresiva del proceso.'],
+    ['\u00bfIncluye IA?','La inteligencia asistida est\u00e1 en roadmap. La base actual prioriza datos propios, estructura y lectura operativa sin prometer automatismos.'],
+    ['\u00bfQu\u00e9 mercados son compatibles?','Funciona para forex, \u00edndices, commodities, cripto y cualquier mercado donde puedas registrar ejecuci\u00f3n, riesgo y contexto.']
+  ];
   return <div className="publicLanding">
+    <header className="landingNav">
+      <button className="landingNavBrand" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} aria-label="MTC Analytics inicio"><img src="/brand/mtc-analytics-logo-horizontal.png" alt="MTC Analytics"/></button>
+      <nav><a href="#plataforma">Plataforma</a><a href="#modulos">M&oacute;dulos</a><a href="#precios">Precios</a><a href="#faq">FAQ</a></nav>
+      <div className="landingNavActions"><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesi&oacute;n</button><button className="primary landingCta" onClick={()=>goPublic('/register')}>Solicitar acceso</button></div>
+    </header>
     <section className="landingHero">
       <div className="landingHalo"></div>
       <div className="landingHeroText">
-        <img className="landingBrandLogo" src="/moises-logo.jpg" alt="Moisés Trading Club"/>
         <span className="landingBadge subtleHero"><Crown size={16}/> Centro operativo para traders disciplinados</span>
-        <h1>Opera con estructura.<br/>Corrige con evidencia.<br/>Evoluciona con sistema.</h1>
-        <p>Journal profesional, Checklist de Moisés, analytics, academia y comunidad privada en un solo centro operativo.</p>
+        <h1>Oper&aacute; con estructura.<br/>Correg&iacute; con evidencia.<br/>Evolucion&aacute; con sistema.</h1>
+        <p>Journal profesional, checklist operativo, risk management, analytics y revisi&oacute;n emocional para traders discrecionales que quieren convertir cada sesi&oacute;n en informaci&oacute;n &uacute;til.</p>
         <div className="landingActions">
           <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
           <button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button>
@@ -850,8 +870,13 @@ function PublicLanding(){
         <small className="landingMicro">Accedé al ecosistema y empezá a ordenar tu proceso como trader.</small>
       </div>
       <div className="landingMediaStack">
-        <div className="landingVideoCard clean">
-          <video src="/landing-trading-video.mp4" autoPlay muted loop playsInline preload="metadata" poster="/landing-trader-bg.jpg" aria-label="Moisés Trading Club trading visual"/>
+        <div className="landingHeroMetrics" aria-label="Resumen visual de MTC Analytics">
+          <div className="landingMetricsTop"><img src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><span>Live operating desk</span></div>
+          <div className="landingMetricTile strong"><span>Win rate</span><b>62%</b><small>Lectura por setup y sesi&oacute;n</small></div>
+          <div className="landingMetricTile"><span>Risk score</span><b>8.4</b><small>Exposici&oacute;n bajo control</small></div>
+          <div className="landingMetricTile"><span>Disciplina</span><b>91%</b><small>Proceso antes que impulso</small></div>
+          <div className="landingMetricTile wide"><span>Journal emocional</span><b>Cierre completo</b><small>Ansiedad, confianza y lecci&oacute;n operativa</small></div>
+          <div className="landingChecklistPreview"><span>Checklist validado</span><b>Contexto · Riesgo · Setup · Ejecuci&oacute;n</b></div>
         </div>
       </div>
     </section>
@@ -861,16 +886,27 @@ function PublicLanding(){
       <div><span>03</span><b>Medí lo que realmente importa</b><p>No mires solo ganancias o pérdidas. Medí disciplina, ejecución, emociones, patrones y consistencia.</p></div>
       <div><span>04</span><b>Convertí datos en mejora</b><p>Detectá qué repetir, qué corregir y qué eliminar para construir un proceso cada vez más sólido.</p></div>
     </section>
-    <section className="landingSection split">
+    <section className="landingSection split" id="plataforma">
       <div><span className="landingBadge soft">No operes impulsos</span><h2>Operá estructura.</h2><p>El Checklist de Moisés transforma una idea en un proceso observable. Si falta contexto, zona, liquidez o RR, la app te obliga a esperar.</p></div>
       <div className="landingPanel"><b>Validador de Alta Probabilidad</b><ul><li>Luz verde / luz roja</li><li>Setups A+ medibles</li><li>Riesgo antes de ejecución</li><li>Patrones reales del sistema</li></ul></div>
     </section>
-    <section className="landingSection">
+    <section className="landingSection" id="modulos">
       <span className="landingBadge soft">Todo tu proceso en un lugar</span>
       <h2>Medí lo que realmente importa.</h2>
       <div className="featureGrid">{features.map(f=><div key={f}>{f}</div>)}</div>
     </section>
-    <section className="landingFinal">
+    <section className="landingSection landingPricingSection" id="precios">
+      <span className="landingBadge soft">Planes MTC Analytics</span>
+      <h2>Eleg&iacute; el nivel de estructura que exige tu operativa.</h2>
+      <p>Acceso premium para traders que quieren convertir actividad en evidencia, criterio y mejora continua.</p>
+      <div className="landingPlanGrid">{landingPlans.map(plan=><article className={`landingPlanCard ${plan.featured?'featured':''}`} key={plan.name}>
+        <div className="landingPlanTop"><span>{plan.badge}</span><h3>{plan.name}</h3><p>{plan.copy}</p></div>
+        <div className="landingPlanPrice"><b>{plan.price}</b><em>/ mes</em></div>
+        <ul>{plan.items.map(item=><li key={item}>{item}</li>)}</ul>
+        <button className={plan.featured?'primary landingCta':'ghost landingCta'} onClick={()=>goPublic('/register')}>Activar {plan.name}</button>
+      </article>)}</div>
+    </section>
+    <section className="landingFinal" id="faq">
       <h2>Activá tu acceso al ecosistema.</h2>
       <p>Creá tu cuenta y prepará tu espacio operativo. Si ya tenés acceso por mentoría o comunidad, el administrador podrá habilitarte manualmente.</p>
       <div className="landingActions center"><button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button></div>
