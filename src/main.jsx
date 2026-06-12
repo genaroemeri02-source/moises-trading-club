@@ -933,7 +933,7 @@ function Login({initialMode='login'}){
   </div></div>
 }
 
-function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['brokers','Integraciones',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal]]],['SISTEMA',[['analytics','Analytics',BarChart3],['results','Resultados',Trophy]]],['COMUNIDAD',[['academy','Academia',BookOpen],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
+function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['emotional','Emocional',Heart],['brokers','Integraciones',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal]]],['SISTEMA',[['analytics','Analytics',BarChart3],['results','Resultados',Trophy]]],['COMUNIDAD',[['academy','Academia',BookOpen],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['ecosystem','Guía',Sparkles],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><div><b>Moisés Trading Club</b><span>Private Trading Club</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
   onClick={toggleTheme}
   className="icon"
   title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
@@ -945,9 +945,9 @@ function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPER
   }
 </button><div className="user"><div className="avatar">{profile.avatar||profile.name?.slice(0,2)||'MT'}</div><div><b>{profile.name}</b><span>{profile.role==='admin'?'mentor/admin':'trader'}</span></div><button onClick={()=>signOut(auth)} title="Salir"><LogOut size={16}/></button></div></aside>}
 
-function MobileNav({profile,tab,setTab,data}){const items=[['dashboard','Inicio',Home],['journal','Journal',LineChart],['brokers','Integraciones',Activity],['risk','Riesgo',SlidersHorizontal],['checklist','Checklist',CheckCircle2],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['ideas','Ideas',Lightbulb],['notifications','Avisos',Bell],['settings','Perfil',Settings]]; if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]); return <div className="mobileNav">{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}<button className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button></div>}
+function MobileNav({profile,tab,setTab,data}){const items=[['dashboard','Inicio',Home],['journal','Journal',LineChart],['emotional','Emocional',Heart],['brokers','Integraciones',Activity],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal],['ecosystem','Guía',Sparkles],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['system','Sistema',Shield],['reading','Libros',BookOpen],['news','Noticias',Newspaper],['community','Comunidad',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['notifications','Avisos',Bell],['settings','Perfil',Settings]]; if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]); return <div className="mobileNav">{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}<button className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button></div>}
 
-function Topbar({tab,profile,theme,toggleTheme}){const names={dashboard:'Dashboard principal',journal:'Journal de trading',brokers:'Integraciones',risk:'Riesgo y lotaje',checklist:'Checklist de Moisés',system:'Sistema',reading:'Libros y lectura',news:'Noticias económicas',analytics:'Analytics',academy:'Academia privada',community:'Comunidad',announcements:'Anuncios del mentor',chat:'Chat privado',online:'Usuarios online',ideas:'Ideas de trading',results:'Resultados',notifications:'Notificaciones',settings:'Perfil y configuración',admin:'Panel Admin'}; return <header className="top premiumTop"><div><h1>{names[tab]||'Moisés Trading Club'}</h1><p>{profile.name} · {profile.role}</p></div><div className="topActions"><button className="topCta ghost" onClick={()=>window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}))}><CheckCircle2 size={15}/> Checklist</button><button
+function Topbar({tab,profile,theme,toggleTheme}){const names={dashboard:'Dashboard principal',journal:'Journal de trading',brokers:'Integraciones',risk:'Riesgo y lotaje',checklist:'Checklist de Moisés',ecosystem:'Cómo usar el ecosistema',emotional:'Journal emocional',system:'Sistema',reading:'Libros y lectura',news:'Noticias económicas',analytics:'Analytics',academy:'Academia privada',community:'Comunidad',announcements:'Anuncios del mentor',chat:'Chat privado',online:'Usuarios online',ideas:'Ideas de trading',results:'Resultados',notifications:'Notificaciones',settings:'Perfil y configuración',admin:'Panel Admin'}; return <header className="top premiumTop"><div><h1>{names[tab]||'Moisés Trading Club'}</h1><p>{profile.name} · {profile.role}</p></div><div className="topActions"><button className="topCta ghost" onClick={()=>window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}))}><CheckCircle2 size={15}/> Checklist</button><button
   className="icon"
   onClick={toggleTheme}
   title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
@@ -1136,7 +1136,7 @@ function TradeForm({form,setForm,profile,data}){
     if(!String(form.asset||'').trim()){toast('Falta seleccionar activo.','error'); return;}
     if(!String(form.result||'').trim()){toast('Falta seleccionar resultado.','error'); return;}
     if(!hasResultMetric){toast('Cargá al menos P/L en $, resultado en R o porcentaje.','error'); return;}
-    let captureUrl=form.captureUrl||''; if(captureFileObj){try{captureUrl=await uploadFile(`users/${profile.uid}/trades/${uid()}-${captureFileObj.name}`,captureFileObj);}catch(e){console.warn('Storage no disponible',e?.message);}}
+    let captureUrl=form.captureUrl||''; if(captureFileObj){try{captureUrl=await uploadFile(`users/${profile.uid}/trades/${uid()}-${captureFileObj.name}`,captureFileObj);}catch(e){console.warn('Captura no guardada',e?.message);}}
     const reviewPatch=form.mentorReviewRequested?{
       mentorReviewRequested:true,
       mentorReviewStatus:form.mentorReviewStatus||'pending',
@@ -1199,7 +1199,7 @@ function TradeForm({form,setForm,profile,data}){
       <div className="formNote wide"><b>Resultado cargado arriba</b><span>Los campos de $, % y R se completan en las tarjetas superiores. El R se calcula automático si cargas Riesgo $.</span></div>
       <Field label="Calidad"><select className="input" value={form.quality} onChange={e=>ch('quality',e.target.value)}>{['A+','A','B','C','Impulsivo'].map(x=><option key={x}>{x}</option>)}</select></Field>
       <Field label="Link de captura" hint="Drive, Discord, Telegram o imagen externa."><input className="input" placeholder="https://..." value={form.captureLink||''} onChange={e=>ch('captureLink',e.target.value)}/></Field>
-      <Field label="Archivo de captura futuro" hint="Preparado para Storage. Por ahora no sube a Firebase."><label className="ghost file futureUpload"><ImageIcon size={16}/>Seleccionar imagen<input type="file" accept="image/*" onChange={captureFile}/></label>{form.captureFileName&&<small className="fileName">Seleccionado: {form.captureFileName}</small>}</Field>
+      <Field label="Captura del trade" hint="Sumá una imagen para documentar la ejecución y revisar tu proceso con más claridad."><label className="ghost file futureUpload"><ImageIcon size={16}/>Seleccionar imagen<input type="file" accept="image/*" onChange={captureFile}/></label>{form.captureFileName&&<small className="fileName">Seleccionado: {form.captureFileName}</small>}</Field>
       <TextareaWithEmoji className="input wide" placeholder="Notas / lección / por qué era válido / qué mejorar" value={form.lesson||''} onChange={e=>ch('lesson',e.target.value)}/>
     </div>
 
@@ -1218,6 +1218,155 @@ function MentorReviewRequest({form,ch}){
 }
 
 function SystemPage(){return <main className="page"><section className="heroSystem"><span className="pill gold">Sistema operativo del club</span><h2>Canal de Moisés</h2><p>Una guía rápida para consultar antes, durante y después de operar. El objetivo es evitar improvisación y convertir cada entrada en una decisión medible.</p></section><div className="grid2"><Card title="Los 7 Mandamientos de Moisés" sub="Checklist madre del sistema"><div className="mandamientos">{mandamientos.map((m,i)=><div key={i} className="mandamiento"><b>{i+1}</b><span>{m}</span></div>)}</div></Card><Card title="Regla de ejecución" sub="Filtro para no anticipar"><div className="ruleBox"><h3>Contexto → Liquidez → ChoCH → Trigger → RR</h3><p>No se entra por ansiedad. Se entra cuando el mercado entrega contexto, toma liquidez, confirma cambio de carácter y ofrece ubicación lógica de stop.</p></div><div className="ruleMini"><span>Si la distancia M15 → ChoCH es corta, se puede ejecutar más directo.</span><span>Si la distancia es amplia, esperar descuento o zona refinada.</span><span>Si el trade no llega a 1:2, se descarta o se reduce expectativa.</span></div></Card></div><Card title="Patrones de Moisés" sub="Modelos visuales que debe reconocer el alumno"><div className="patternGrid">{patronesMoises.map((p,i)=><article key={i} className="patternCard"><Lightbulb size={18}/><h3>{p.title}</h3><p>{p.text}</p></article>)}</div></Card><Card title="Cómo usar esta sección"><div className="readingProtocol"><div><b>Antes del trade</b><p>Revisar los 7 mandamientos y validar que el setup no sea impulsivo.</p></div><div><b>Después del trade</b><p>Registrar en Journal el patrón usado, el resultado en $, %, R y la lección.</p></div><div><b>Fin de semana</b><p>Buscar el patrón que más dinero generó y el error que más dinero costó.</p></div></div></Card></main>}
+
+const ecosystemStages=[
+  {title:'Antes de operar',label:'Preparación',icon:Shield,text:'Antes de buscar una entrada, prepará el contexto. Un proceso profesional no empieza por el gráfico: empieza por el estado, el riesgo y el plan.',points:['Dashboard','Contexto','Checklist','Riesgo del día','Reglas personales']},
+  {title:'Durante la sesión',label:'Ejecución',icon:Target,text:'Durante la sesión, el objetivo no es operar más: es operar mejor. Cada decisión debe estar respaldada por contexto, gestión y una razón clara.',points:['Registrar ideas','Validar checklist','Respetar riesgo','Evitar sobreoperar']},
+  {title:'Después de operar',label:'Registro',icon:LineChart,text:'Después de operar, la sesión todavía no terminó. El progreso aparece cuando cada ejecución se convierte en información útil.',points:['Cargar trade','Resultado','Captura','Setup','Error','Lección']},
+  {title:'Cierre emocional',label:'Criterio',icon:Heart,text:'Cerrá tu jornada con una revisión honesta: qué sentiste, qué pensamiento dominó tu sesión y qué decisión querés mejorar mañana.',points:[]},
+  {title:'Revisión semanal',label:'Mejora',icon:BarChart3,text:'Una semana de operaciones sin revisión es solo actividad. Una semana medida se convierte en criterio.',points:['Analytics','Errores repetidos','Mejores setups','Peores horarios','Ajustes al plan']},
+  {title:'Mentalidad del ecosistema',label:'Sistema',icon:Sparkles,text:'La plataforma está diseñada para transformar actividad operativa en evidencia, criterio y mejora continua.',points:[]}
+];
+const ecosystemMetrics=[['15 min/día','Rutina diaria'],['5 etapas','Proceso completo'],['1 proceso','Evolución continua']];
+const idealRoutine=['3 min revisar dashboard y contexto','3 min checklist y riesgo','Operar solo si hay setup','5 min registrar trade','4 min revisar lección y estado mental'];
+function EcosystemGuidePage(){
+  return <main className="page ecosystemGuidePage">
+    <section className="heroSystem ecosystemHero">
+      <div className="ecosystemHeroCopy">
+        <span className="pill gold"><Sparkles size={14}/> Sistema diario</span>
+        <h2>Cómo usar el ecosistema</h2>
+        <p>Una guía diaria para convertir tu operativa en un proceso medible, repetible y profesional.</p>
+        <div className="ecosystemHeroMeta"><span>Plan</span><span>Ejecución</span><span>Registro</span><span>Revisión</span></div>
+      </div>
+      <aside className="ecosystemHeroPanel" aria-label="Resumen del sistema diario">
+        <span>Sistema diario</span>
+        <b>Plan → Ejecución → Registro → Revisión</b>
+        <div className="ecosystemMetricStrip">{ecosystemMetrics.map(([value,label])=><div key={value}><strong>{value}</strong><small>{label}</small></div>)}</div>
+      </aside>
+    </section>
+    <div className="ecosystemStageGrid">
+      {ecosystemStages.map((stage,index)=>{
+        const Icon=stage.icon;
+        return <article className="ecosystemStageCard" key={stage.title}>
+          <div className="ecosystemStageTop"><span>{String(index+1).padStart(2,'0')}</span><em>{stage.label}</em><Icon size={19}/></div>
+          <div className="ecosystemStageBody"><h3>{stage.title}</h3>
+          <p>{stage.text}</p>
+          </div>
+          {!!stage.points.length&&<div className="ecosystemPointList">{stage.points.map(point=><span key={point}>{point}</span>)}</div>}
+        </article>
+      })}
+    </div>
+    <Card title="Rutina ideal en 15 minutos" sub="Un recorrido simple para sostener criterio todos los días.">
+      <div className="idealRoutine">
+        {idealRoutine.map((step,index)=><div key={step} className="idealRoutineStep"><b>{index+1}</b><span>{step}</span></div>)}
+      </div>
+    </Card>
+  </main>
+}
+
+const emotionalInitial={
+  state:'Neutral',
+  anxiety:4,
+  confidence:6,
+  discipline:7,
+  followedPlan:'Sí',
+  fomo:false,
+  recoveryImpulse:false,
+  anxiousTrade:false,
+  dominantThought:'',
+  emotionalWin:'',
+  tomorrowCorrection:'',
+  lesson:'',
+  freeWriting:''
+};
+const emotionalStates=['Calmo','Neutral','Ansioso','Confiado','Frustrado','Cansado','Enfocado'];
+function EmotionalScale({label,value,onChange}){
+  return <label className="emotionalScale"><span>{label}</span><div><input type="range" min="1" max="10" value={value} onChange={e=>onChange(Number(e.target.value))}/><b>{value}/10</b></div></label>
+}
+function EmotionalToggle({label,checked,onChange}){
+  return <button type="button" className={`emotionalToggle ${checked?'on':''}`} onClick={()=>onChange(!checked)}><span>{checked?'Sí':'No'}</span>{label}</button>
+}
+function EmotionalJournalPage(){
+  const [savedEntry,setSavedEntry]=useState(()=>{try{return JSON.parse(localStorage.getItem('mtc-emotional-last-entry')||'null')}catch{return null}});
+  const [entry,setEntry]=useState(()=>savedEntry?.entry||emotionalInitial);
+  const [ready,setReady]=useState(false);
+  const ch=(key,value)=>{setEntry(v=>({...v,[key]:value})); setReady(false);};
+  const saveReflection=()=>{
+    const next={date:today(),entry};
+    localStorage.setItem('mtc-emotional-last-entry',JSON.stringify(next));
+    setSavedEntry(next);
+    setReady(true);
+  };
+  return <main className="page emotionalJournalPage">
+    <section className="heroSystem emotionalHero">
+      <div className="emotionalHeroCopy">
+        <span className="pill gold"><Heart size={14}/> Cierre operativo</span>
+        <h2>Journal emocional</h2>
+        <p>Cerrá cada sesión con claridad mental, detectá patrones de conducta y convertí tus emociones en información útil.</p>
+      </div>
+      <aside className="emotionalHeroPanel">
+        <span>Cierre operativo</span>
+        <div><b>1 entrada diaria</b><small>Un cierre simple para observar tu proceso.</small></div>
+        <div><b>Estado mental</b><small>Claridad antes, durante y después de operar.</small></div>
+        <div><b>Lección para mañana</b><small>Una decisión concreta para mejorar tu próxima sesión.</small></div>
+        <p>La consistencia no se mide solo por el resultado. También se mide por la calidad de tus decisiones.</p>
+      </aside>
+    </section>
+
+    <section className="emotionalCloseBlock">
+      <div><span className="pill gold"><CheckCircle2 size={13}/> Hábito diario</span><h3>Cierre obligatorio de sesión</h3><p>Antes de dar por terminada tu jornada, registrá cómo operaste por dentro. Este cierre te ayuda a separar resultado de proceso y a detectar patrones que se repiten.</p></div>
+      <div className="emotionalCloseSteps"><span>Estado</span><span>Conducta</span><span>Lección</span></div>
+    </section>
+
+    <div className="emotionalGrid">
+      <Card title="Registro del día" sub="Una lectura breve para ordenar tu sesión desde adentro.">
+        <div className="emotionalForm">
+          <div className="emotionalFormSection">
+            <h3>Estado mental</h3>
+            <div className="emotionalSectionGrid">
+              <label className="emotionalField"><span>Estado emocional principal</span><select className="input" value={entry.state} onChange={e=>ch('state',e.target.value)}>{emotionalStates.map(x=><option key={x}>{x}</option>)}</select></label>
+              <EmotionalScale label="Ansiedad antes de operar" value={entry.anxiety} onChange={v=>ch('anxiety',v)}/>
+              <EmotionalScale label="Confianza" value={entry.confidence} onChange={v=>ch('confidence',v)}/>
+              <EmotionalScale label="Disciplina" value={entry.discipline} onChange={v=>ch('discipline',v)}/>
+            </div>
+          </div>
+          <div className="emotionalFormSection">
+            <h3>Conducta operativa</h3>
+            <div className="emotionalSectionGrid">
+              <label className="emotionalField"><span>¿Seguiste tu plan?</span><select className="input" value={entry.followedPlan} onChange={e=>ch('followedPlan',e.target.value)}><option>Sí</option><option>Parcialmente</option><option>No</option></select></label>
+              <div className="emotionalToggleGrid">
+                <EmotionalToggle label="¿Sentiste FOMO?" checked={entry.fomo} onChange={v=>ch('fomo',v)}/>
+                <EmotionalToggle label="¿Sentiste impulso de recuperar?" checked={entry.recoveryImpulse} onChange={v=>ch('recoveryImpulse',v)}/>
+                <EmotionalToggle label="¿Operaste por ansiedad o aburrimiento?" checked={entry.anxiousTrade} onChange={v=>ch('anxiousTrade',v)}/>
+              </div>
+            </div>
+          </div>
+          <div className="emotionalFormSection">
+            <h3>Reflexión</h3>
+            <div className="emotionalSectionGrid">
+              <label className="emotionalField wide"><span>Pensamiento dominante del día</span><input className="input" value={entry.dominantThought} onChange={e=>ch('dominantThought',e.target.value)} placeholder="Ej: necesitaba recuperar, pude esperar, estaba apurado..."/></label>
+              <label className="emotionalField"><span>Qué hiciste bien emocionalmente</span><textarea className="input" value={entry.emotionalWin} onChange={e=>ch('emotionalWin',e.target.value)} placeholder="Reconocí una señal interna y cuidé mi decisión."/></label>
+              <label className="emotionalField"><span>Qué querés corregir mañana</span><textarea className="input" value={entry.tomorrowCorrection} onChange={e=>ch('tomorrowCorrection',e.target.value)} placeholder="Una acción simple para mejorar tu próxima sesión."/></label>
+              <label className="emotionalField"><span>Lección del día</span><textarea className="input" value={entry.lesson} onChange={e=>ch('lesson',e.target.value)} placeholder="La decisión más importante que te dejó la jornada."/></label>
+              <label className="emotionalField"><span>Escritura libre</span><textarea className="input tall" value={entry.freeWriting} onChange={e=>ch('freeWriting',e.target.value)} placeholder="Escribí sin filtro: emoción, pensamiento, decisión, aprendizaje."/></label>
+            </div>
+          </div>
+        </div>
+        <div className="emotionalActions"><button className="primary" onClick={saveReflection}><CheckCircle2 size={16}/>Guardar reflexión</button>{ready&&<span className="emotionalReady"><CheckCircle2 size={15}/>Cierre emocional completado. Mañana vas a tener más claridad sobre tu proceso.</span>}</div>
+      </Card>
+
+      <div className="emotionalSideStack">
+        <Card title="Lectura del patrón" sub="Calidad emocional de la ejecución.">
+          <div className="emotionalPattern"><Heart size={20}/><p>Este módulo está diseñado para ayudarte a observar cómo tu estado interno afecta tu ejecución. Con el tiempo, tus respuestas empiezan a revelar patrones: cuándo respetás tu plan, cuándo te exponés de más y qué emociones aparecen antes de tus peores decisiones.</p></div>
+          <div className="emotionalPatternChips"><span>FOMO</span><span>Impulso</span><span>Disciplina</span></div>
+        </Card>
+        <Card title="Historial" sub="Reflexiones de tus sesiones.">
+          {savedEntry?<div className="emotionalHistoryCard"><span>Último cierre</span><b>{formatDateLabel(savedEntry.date)}</b><p>{savedEntry.entry.state} · Ansiedad {savedEntry.entry.anxiety}/10 · Confianza {savedEntry.entry.confidence}/10 · Disciplina {savedEntry.entry.discipline}/10</p><small>{savedEntry.entry.lesson||'Sin lección escrita todavía.'}</small></div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Cuando completes tu primera reflexión, vas a empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+        </Card>
+      </div>
+    </div>
+  </main>
+}
 function driveThumb(url=''){
   const s=String(url||'');
   const m=s.match(/\/d\/([^/]+)/)||s.match(/[?&]id=([^&]+)/);
@@ -1610,30 +1759,30 @@ function BrokerSync({data,profile}){
   return <main className="page brokerSyncPage comingSoonBrokerPage">
     <section className="brokerHero cleanBrokerHero">
       <div>
-        <span className="brokerBadge"><Activity size={15}/> Próxima versión</span>
+        <span className="brokerBadge"><Activity size={15}/> Integraciones profesionales</span>
         <h2>Integraciones MT4 / MT5</h2>
-        <p>La plataforma comercial ya está activa con Journal, Checklist, Analytics, Comunidad y Membresías. La importación automática queda reservada para una actualización posterior, sin depender de terceros en esta primera etapa.</p>
-        <div className="brokerHeroStats"><span>Journal profesional</span><span>Membresías privadas</span><span>Automatización futura</span></div>
+        <p>Centralizá tu operativa y mantené tu proceso conectado con las herramientas clave del ecosistema. Las integraciones disponibles dependen de tu membresía y del nivel de acceso activo.</p>
+        <div className="brokerHeroStats"><span>Journal profesional</span><span>Membresías privadas</span><span>Ecosistema conectado</span></div>
       </div>
-      <div className="brokerHeroPanel"><b>Próxima mejora</b><small>Las integraciones automáticas se activarán cuando aporten valor real sin fricción para el usuario.</small></div>
+      <div className="brokerHeroPanel"><b>Conexión operativa</b><small>Usá esta sección para centralizar herramientas externas y mantener tu proceso ordenado según tu plan.</small></div>
     </section>
 
     <div className="brokerGrid">
-      <Card title="Estado comercial" sub="La versión actual se enfoca en lo que ya puede venderse con una experiencia sólida y clara.">
+      <Card title="Herramientas activas del ecosistema" sub="Tu plataforma centraliza operativa, gestión, revisión y evolución como trader.">
         <div className="comingSoonStack">
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Los alumnos ya pueden cargar operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Analytics disponible</b><p>La app ya puede medir rendimiento, comportamiento, sesiones, errores y evolución.</p></div></div>
-          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Automatización en preparación</b><p>Se incorporará como mejora posterior cuando el proveedor sea estable, rentable y simple para el usuario.</p></div></div>
+          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Integraciones según membresía</b><p>El acceso a conexiones externas se organiza por plan para mantener una experiencia clara, segura y profesional.</p></div></div>
         </div>
         <div className="brokerActions"><button className="primary" onClick={activateReminder}>{notify?'Aviso activado':'Avisarme cuando esté disponible'}</button></div>
       </Card>
-      <Card title="Modelo comercial actual" sub="Funciones disponibles para vender el acceso hoy.">
-        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Membresía</span><p>Acceso con PayPal y roles por usuario.</p></div><div><b>2</b><span>Journal</span><p>Registro manual profesional.</p></div><div><b>3</b><span>Checklist</span><p>Validación operativa antes de ejecutar.</p></div><div><b>4</b><span>Analytics</span><p>Medición y mejora continua.</p></div></div>
+      <Card title="Flujo del ecosistema" sub="Herramientas diseñadas para registrar, validar, medir y mejorar tu operativa diaria.">
+        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Membresía</span><p>Acceso privado al ecosistema según tu plan activo.</p></div><div><b>2</b><span>Journal</span><p>Registro profesional de operaciones, emociones y lecciones.</p></div><div><b>3</b><span>Checklist</span><p>Validación operativa antes de ejecutar una idea.</p></div><div><b>4</b><span>Analytics</span><p>Medición objetiva para convertir datos en disciplina.</p></div></div>
       </Card>
     </div>
 
-    <Card title="Historial de integraciones" sub="Espacio reservado para futuras versiones automáticas.">
-      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">La importación automática estará disponible en una próxima versión.</p>}</div>
+    <Card title="Registro de integraciones" sub="Cuando conectes una fuente operativa, este espacio te ayudará a revisar actividad y consistencia.">
+      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">Todavía no hay actividad importada. Mientras tanto, podés mantener tu proceso completo desde Journal, Checklist y Analytics.</p>}</div>
     </Card>
   </main>
 }
@@ -1790,7 +1939,7 @@ function CoachIA({data,profile}){
   ];
   parts.push('Regla de cierre: si tu estado emocional busca alivio, validación o recuperación, no estás operando: estás reaccionando. Volvé al checklist.'); setAns(parts.join('\n\n'));}
   const prompt=`Actúa como psicólogo de trading de Moisés Trading Club. Analiza mi situación sin motivación vacía, detecta sesgos emocionales, riesgo de venganza/sobreoperativa y dame una regla concreta. Contexto: ${q}`;
-  return <main className="page"><Card title="Coach psicológico de trading" sub="IA-lite con memoria ampliada: psicología, riesgo, noticias, fondeo y ejecución."><div className="coachFaqs">{faqs.map(f=><button key={f} onClick={()=>{setQ(f); analyze(f)}}>{f}</button>)}</div><TextareaWithEmoji className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Escribí cómo te sentís, qué trade querés tomar o qué error repetiste..."/><div className="actions"><button className="primary" onClick={()=>analyze()}><Activity size={16}/>Analizar estado mental</button><button className="ghost" onClick={()=>copyText(prompt,'Prompt para IA copiado')}><Copy size={16}/>Copiar prompt avanzado</button></div>{ans&&<div className="coachAnswer"><h3>Lectura del coach</h3>{ans.split('\n\n').map((p,i)=><p key={i}>{p}</p>)}</div>}</Card><Card title="API IA real" sub="Lista para fase segura"><p className="muted">Para conectarme como IA real dentro de la app hace falta backend seguro o Firebase Functions. Esta versión deja el coach local fuerte y prompts copiables sin exponer API keys.</p></Card></main>
+  return <main className="page"><Card title="Coach psicológico de trading" sub="IA-lite con memoria ampliada: psicología, riesgo, noticias, fondeo y ejecución."><div className="coachFaqs">{faqs.map(f=><button key={f} onClick={()=>{setQ(f); analyze(f)}}>{f}</button>)}</div><TextareaWithEmoji className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Escribí cómo te sentís, qué trade querés tomar o qué error repetiste..."/><div className="actions"><button className="primary" onClick={()=>analyze()}><Activity size={16}/>Analizar estado mental</button><button className="ghost" onClick={()=>copyText(prompt,'Prompt para IA copiado')}><Copy size={16}/>Copiar prompt avanzado</button></div>{ans&&<div className="coachAnswer"><h3>Lectura del coach</h3>{ans.split('\n\n').map((p,i)=><p key={i}>{p}</p>)}</div>}</Card><Card title="Coach avanzado" sub="Análisis guiado para mejorar conducta, riesgo y ejecución."><p className="muted">Usá este espacio para ordenar tus pensamientos, detectar patrones repetidos y convertir cada sesión en una decisión más consciente.</p></Card></main>
 }
 
 function Notifications({data,profile,setTab}){async function read(n){await markNotificationAsRead(n.id); const target=n.target||n.type; if(target==='announcement'||target==='announcements') setTab('announcements'); else if(target==='idea'||target==='ideas') setTab('ideas'); else if(target==='academy') setTab('academy'); else if(target==='community') setTab('community'); else if(target==='chat') setTab('chat'); else toast('Notificación leída');} const ordered=[...(data.notifications||[])].sort((a,b)=>(a.read===b.read?0:a.read?1:-1)); return <main className="page"><Card title="Centro de notificaciones" sub="Tocá una notificación para ir directo a la sección correspondiente.">{ordered.map(n=><button className="notif clickable" key={n.id} onClick={()=>read(n)}><span className={n.read?'read':''}></span><div><b>{n.text}</b><p>{safeDate(n.createdAt)||n.date} · {n.type||'general'}</p></div><ChevronRight size={16}/></button>)}{!ordered.length&&<Empty title="Sin notificaciones" text="Las alertas aparecerán acá."/>}</Card></main>}
@@ -2031,14 +2180,14 @@ function PaymentSuccessPage({profile}){
     }catch(e){
       console.warn('payment success verification',e);
       setState('error');
-      setError('No pudimos capturar o consultar el estado de tu membresía en este momento. Si PayPal debitó el dinero, no vuelvas a pagar todavía.');
+      setError('No pudimos confirmar tu membresía en este momento. Si PayPal debitó el dinero, no vuelvas a pagar todavía.');
     }
   }
   useEffect(()=>{verify({capture:true}); const id=setTimeout(()=>verify({capture:false}),3000); return()=>clearTimeout(id)},[]);
   useEffect(()=>{if(active) setState('active')},[profile?.accessStatus,profile?.subscriptionStatus,profile?.currentPeriodEnd]);
   const icon=state==='active'?<CheckCircle2 size={34}/>:state==='checking'?<Clock3 size={34}/>:state==='error'?<AlertTriangle size={34}/>:<Info size={34}/>;
   const title=state==='active'?'Acceso activado correctamente':state==='checking'?'Verificando tu pago…':state==='error'?'No pudimos confirmar el pago todavía.':'Pago recibido. Estamos terminando de activar tu acceso.';
-  const text=state==='active'?'Tu membresía ya está activa. Ya podés entrar al Dashboard de Moisés Trading Club.':state==='checking'?'Estamos capturando/verificando tu orden con PayPal y revisando tu estado de acceso. Esto puede tardar unos segundos.':state==='error'?'Si el dinero fue debitado, no intentes pagar nuevamente. Esperá unos minutos o contactá soporte.': 'Si PayPal ya confirmó el pago, el backend activará tu acceso automáticamente en unos segundos.';
+  const text=state==='active'?'Tu membresía ya está activa. Ya podés entrar al Dashboard de Moisés Trading Club.':state==='checking'?'Estamos confirmando tu acceso. Esto puede tardar unos segundos.':state==='error'?'Si el dinero fue debitado, no intentes pagar nuevamente. Esperá unos minutos o contactá soporte.': 'Si PayPal ya confirmó el pago, tu acceso se habilitará automáticamente en unos segundos.';
   return <div className="paymentResultPage">
     <div className="paymentResultGlow" />
     <section className={`paymentResultCard ${state}`}>
@@ -2099,7 +2248,7 @@ function GamePlanPanel(){
 }
 function CommandPalette({open,setOpen,setTab}){
   const [q,setQ]=useState('');
-  const actions=[['dashboard','Ir al Dashboard','📊'],['journal','Nuevo trade / Journal','📝'],['brokers','Sync Broker','🔄'],['system','Sistema de Moisés','🛡️'],['reading','Biblioteca','📚'],['academy','Academia','🎓'],['community','Comunidad','🤝'],['announcements','Anuncios del mentor','📌'],['chat','Chat privado','💬'],['online','Usuarios online','🟢'],['ideas','Ideas de trading','💡'],['analytics','Analytics','📈'],['risk','Riesgo y lotaje','🛡️'],['settings','Perfil','⚙️']].filter(a=>a[1].toLowerCase().includes(q.toLowerCase()));
+  const actions=[['dashboard','Ir al Dashboard','📊'],['journal','Nuevo trade / Journal','📝'],['emotional','Journal emocional','🤍'],['brokers','Sync Broker','🔄'],['ecosystem','Cómo usar el ecosistema','✨'],['system','Sistema de Moisés','🛡️'],['reading','Biblioteca','📚'],['academy','Academia','🎓'],['community','Comunidad','🤝'],['announcements','Anuncios del mentor','📌'],['chat','Chat privado','💬'],['online','Usuarios online','🟢'],['ideas','Ideas de trading','💡'],['analytics','Analytics','📈'],['risk','Riesgo y lotaje','🛡️'],['settings','Perfil','⚙️']].filter(a=>a[1].toLowerCase().includes(q.toLowerCase()));
   if(!open)return null;
   return <div className="cmdOverlay" onClick={()=>setOpen(false)}><div className="cmdPalette" onClick={e=>e.stopPropagation()}><div className="cmdSearch"><span>⌘K</span><input autoFocus placeholder="Buscar sección o acción rápida..." value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==='Escape')setOpen(false)}}/></div><div className="cmdList">{actions.map(([id,label,ico])=><button key={id} onClick={()=>{setTab(id); setOpen(false); toast(`Abriendo ${label}`)}}><span>{ico}</span><b>{label}</b></button>)}</div></div></div>
 }
@@ -2168,7 +2317,7 @@ function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useS
   if(!info.expired || profile.subscriptionStatus==='expired' || profile.accessStatus==='inactive') return;
   if(!PAYMENT_CONFIG.membershipSyncEndpoint) return;
   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
-},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
+},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,ecosystem:<EcosystemGuidePage/>,emotional:<EmotionalJournalPage/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
 
 class ErrorBoundary extends React.Component {
   constructor(props){
