@@ -421,7 +421,7 @@ function parseCsv(text,userId){const [h,...lines]=text.trim().split(/\r?\n/); co
 function safeDate(v){return typeof v==='string'?v:(v?.toDate?.()?.toISOString?.().slice(0,10)||today());}
 function useLiveData(profile){
   const [data,setData]=useState({
-    trades:[],posts:[],ideas:[],books:[],academyLessons:[],dailyPlans:[],checklists:[],brokerConnections:[],notifications:[],messages:[],resultPosts:[],users:[],courses:courseSeed,settings:settingsDefault,loading:true
+    trades:[],posts:[],ideas:[],books:[],academyLessons:[],dailyPlans:[],emotionalJournals:[],checklists:[],brokerConnections:[],notifications:[],messages:[],resultPosts:[],users:[],courses:courseSeed,settings:settingsDefault,loading:true
   });
 
   useEffect(()=>{
@@ -482,6 +482,12 @@ function useLiveData(profile){
       query(collection(db,'dailyPlans'),where('userId','==',userId)),
       snap=>setData(d=>({...d,dailyPlans:snap.docs.map(x=>({id:x.id,...x.data()}))})),
       err=>{console.warn('dailyPlans listener blocked',err?.message); setData(d=>({...d,dailyPlans:[]}));}
+    ));
+
+    off.push(onSnapshot(
+      query(collection(db,'emotionalJournals'),where('userId','==',userId)),
+      snap=>setData(d=>({...d,emotionalJournals:snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>String(b.date||safeDate(b.createdAt)||'').localeCompare(String(a.date||safeDate(a.createdAt)||'')))})),
+      err=>{console.warn('emotionalJournals listener blocked',err?.message); setData(d=>({...d,emotionalJournals:[]}));}
     ));
 
 
@@ -1280,22 +1286,79 @@ const emotionalInitial={
   freeWriting:''
 };
 const emotionalStates=['Calmo','Neutral','Ansioso','Confiado','Frustrado','Cansado','Enfocado'];
+function emotionalEntryFromDoc(docEntry={}){
+  return {
+    state:docEntry.mood||'Neutral',
+    anxiety:Number(docEntry.anxietyLevel||4),
+    confidence:Number(docEntry.confidenceLevel||6),
+    discipline:Number(docEntry.disciplineLevel||7),
+    followedPlan:docEntry.followedPlan||'Sí',
+    fomo:docEntry.feltFomo===true,
+    recoveryImpulse:docEntry.feltRevengeImpulse===true,
+    anxiousTrade:docEntry.tradedFromAnxiety===true,
+    dominantThought:docEntry.dominantThought||'',
+    emotionalWin:docEntry.didWell||'',
+    tomorrowCorrection:docEntry.needsCorrection||'',
+    lesson:docEntry.lesson||'',
+    freeWriting:docEntry.freeWriting||''
+  };
+}
+function emotionalPayloadFromEntry(entry,profile,date){
+  return sanitizeFirestoreObject({
+    userId:profile.uid,
+    date,
+    mood:entry.state,
+    anxietyLevel:Number(entry.anxiety||0),
+    confidenceLevel:Number(entry.confidence||0),
+    disciplineLevel:Number(entry.discipline||0),
+    followedPlan:entry.followedPlan,
+    feltFomo:entry.fomo===true,
+    feltRevengeImpulse:entry.recoveryImpulse===true,
+    tradedFromAnxiety:entry.anxiousTrade===true,
+    dominantThought:entry.dominantThought,
+    didWell:entry.emotionalWin,
+    needsCorrection:entry.tomorrowCorrection,
+    lesson:entry.lesson,
+    freeWriting:entry.freeWriting,
+    updatedAt:serverTimestamp()
+  });
+}
 function EmotionalScale({label,value,onChange}){
   return <label className="emotionalScale"><span>{label}</span><div><input type="range" min="1" max="10" value={value} onChange={e=>onChange(Number(e.target.value))}/><b>{value}/10</b></div></label>
 }
 function EmotionalToggle({label,checked,onChange}){
   return <button type="button" className={`emotionalToggle ${checked?'on':''}`} onClick={()=>onChange(!checked)}><span>{checked?'Sí':'No'}</span>{label}</button>
 }
-function EmotionalJournalPage(){
-  const [savedEntry,setSavedEntry]=useState(()=>{try{return JSON.parse(localStorage.getItem('mtc-emotional-last-entry')||'null')}catch{return null}});
-  const [entry,setEntry]=useState(()=>savedEntry?.entry||emotionalInitial);
+function EmotionalJournalPage({data,profile}){
+  const dayKey=today();
+  const journals=useMemo(()=>(data.emotionalJournals||[]).filter(x=>x.userId===profile.uid).sort((a,b)=>String(b.date||safeDate(b.createdAt)||'').localeCompare(String(a.date||safeDate(a.createdAt)||''))),[data.emotionalJournals,profile.uid]);
+  const todayEntry=useMemo(()=>journals.find(x=>x.date===dayKey),[journals,dayKey]);
+  const [entry,setEntry]=useState(emotionalInitial);
   const [ready,setReady]=useState(false);
+  const [saving,setSaving]=useState(false);
+  const [saveError,setSaveError]=useState('');
+  useEffect(()=>{
+    setEntry(todayEntry?emotionalEntryFromDoc(todayEntry):emotionalInitial);
+    setReady(false);
+    setSaveError('');
+  },[todayEntry?.id,todayEntry?.updatedAt]);
   const ch=(key,value)=>{setEntry(v=>({...v,[key]:value})); setReady(false);};
-  const saveReflection=()=>{
-    const next={date:today(),entry};
-    localStorage.setItem('mtc-emotional-last-entry',JSON.stringify(next));
-    setSavedEntry(next);
-    setReady(true);
+  const saveReflection=async()=>{
+    setSaving(true);
+    setSaveError('');
+    try{
+      const id=`${profile.uid}_${dayKey}`;
+      const payload=emotionalPayloadFromEntry(entry,profile,dayKey);
+      await setDoc(doc(db,'emotionalJournals',id),todayEntry?payload:{...payload,createdAt:serverTimestamp()},{merge:true});
+      setReady(true);
+      toast('Cierre emocional guardado. Tu proceso queda registrado para futuras revisiones.','success');
+    }catch(e){
+      console.error('save emotional journal',e);
+      setSaveError('No pudimos guardar el cierre. Revisá tu conexión e intentá de nuevo.');
+      toast('No pudimos guardar el cierre. Revisá tu conexión e intentá de nuevo.','error');
+    }finally{
+      setSaving(false);
+    }
   };
   return <main className="page emotionalJournalPage">
     <section className="heroSystem emotionalHero">
@@ -1352,7 +1415,7 @@ function EmotionalJournalPage(){
             </div>
           </div>
         </div>
-        <div className="emotionalActions"><button className="primary" onClick={saveReflection}><CheckCircle2 size={16}/>Guardar reflexión</button>{ready&&<span className="emotionalReady"><CheckCircle2 size={15}/>Cierre emocional completado. Mañana vas a tener más claridad sobre tu proceso.</span>}</div>
+        <div className="emotionalActions"><button className="primary" onClick={saveReflection} disabled={saving}><CheckCircle2 size={16}/>{saving?'Guardando cierre...':'Guardar reflexión'}</button>{ready&&<span className="emotionalReady"><CheckCircle2 size={15}/>Cierre emocional guardado. Tu proceso queda registrado para futuras revisiones.</span>}{saveError&&<span className="emotionalReady error"><AlertTriangle size={15}/>{saveError}</span>}</div>
       </Card>
 
       <div className="emotionalSideStack">
@@ -1361,7 +1424,7 @@ function EmotionalJournalPage(){
           <div className="emotionalPatternChips"><span>FOMO</span><span>Impulso</span><span>Disciplina</span></div>
         </Card>
         <Card title="Historial" sub="Reflexiones de tus sesiones.">
-          {savedEntry?<div className="emotionalHistoryCard"><span>Último cierre</span><b>{formatDateLabel(savedEntry.date)}</b><p>{savedEntry.entry.state} · Ansiedad {savedEntry.entry.anxiety}/10 · Confianza {savedEntry.entry.confidence}/10 · Disciplina {savedEntry.entry.discipline}/10</p><small>{savedEntry.entry.lesson||'Sin lección escrita todavía.'}</small></div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Cuando completes tu primera reflexión, vas a empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,5).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><span>{index===0?'Último cierre':'Cierre'}</span><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Cuando completes tu primera reflexión, vas a empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
         </Card>
       </div>
     </div>
@@ -2317,7 +2380,7 @@ function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useS
   if(!info.expired || profile.subscriptionStatus==='expired' || profile.accessStatus==='inactive') return;
   if(!PAYMENT_CONFIG.membershipSyncEndpoint) return;
   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
-},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,ecosystem:<EcosystemGuidePage/>,emotional:<EmotionalJournalPage/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
+},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/moises-logo.jpg" alt="Logo Moisés Trading Club"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,ecosystem:<EcosystemGuidePage/>,emotional:<EmotionalJournalPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
 
 class ErrorBoundary extends React.Component {
   constructor(props){
