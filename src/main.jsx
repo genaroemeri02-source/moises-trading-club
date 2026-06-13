@@ -101,7 +101,7 @@ function groupTradesByDay(trades=[]){
   return trades.reduce((acc,t)=>{
     const date=String(t.tradingDay || t.date || safeDate(t.createdAt) || today()).slice(0,10);
     if(!acc[date]) acc[date]={date,total:0,count:0,wins:0,losses:0,trades:[]};
-    const v=Number(t.resultMoney||0);
+    const v=toNumberSafe(t.resultMoney);
     acc[date].total+=v;
     acc[date].count+=1;
     if(v>0) acc[date].wins+=1;
@@ -245,10 +245,10 @@ function evaluateRiskGuard(trades=[],settings=getRiskSettings(),initial=10000,da
   const todayStr=tradingDayKey(), weekStart=weekStartISO();
   const todayTrades=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)===todayStr);
   const weekTrades=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)>=weekStart);
-  const previousPnL=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)<todayStr).reduce((a,t)=>a+Number(t.resultMoney||0),0);
+  const previousPnL=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)<todayStr).reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
   const dayStartEquity=Number(initial||0)+previousPnL;
-  const dailyPnL=todayTrades.reduce((a,t)=>a+Number(t.resultMoney||0),0);
-  const weeklyPnL=weekTrades.reduce((a,t)=>a+Number(t.resultMoney||0),0);
+  const dailyPnL=todayTrades.reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
+  const weeklyPnL=weekTrades.reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
   const dayStats=calc(todayTrades,dayStartEquity||initial);
   const reasons=[];
   if(settings.maxTradesDay>0 && todayTrades.length>=settings.maxTradesDay) reasons.push(`Máximo de trades diarios alcanzado: ${todayTrades.length}/${settings.maxTradesDay}`);
@@ -307,13 +307,14 @@ function normalizeTradeSetup(trade){
 }
 function calc(trades,initial=10000){
   const closed=trades||[];
-  const results=closed.map(t=>Number(t.resultMoney||0));
+  const resultValue=t=>toNumberSafe(t.resultMoney);
+  const results=closed.map(resultValue);
   const rVals=closed.map(realizedRValue);
   const total=results.reduce((a,b)=>a+b,0);
-  const wins=closed.filter(t=>Number(t.resultMoney)>0);
-  const losses=closed.filter(t=>Number(t.resultMoney)<0);
-  const grossProfit=wins.reduce((sum,t)=>sum+Number(t.resultMoney||0),0);
-  const grossLoss=Math.abs(losses.reduce((sum,t)=>sum+Number(t.resultMoney||0),0));
+  const wins=closed.filter(t=>resultValue(t)>0);
+  const losses=closed.filter(t=>resultValue(t)<0);
+  const grossProfit=wins.reduce((sum,t)=>sum+resultValue(t),0);
+  const grossLoss=Math.abs(losses.reduce((sum,t)=>sum+resultValue(t),0));
   const avgWin=wins.length?grossProfit/wins.length:0;
   const avgLoss=losses.length?grossLoss/losses.length:0;
   const profitFactor=grossLoss?grossProfit/grossLoss:(grossProfit?grossProfit:0);
@@ -326,9 +327,9 @@ function calc(trades,initial=10000){
   const sharpeLike=stdR?meanR/stdR*Math.sqrt(Math.min(252,Math.max(1,closed.length))):0;
   let eq=initial, peak=initial, maxDD=0, ddMoney=0;
   const curve=[{name:'Inicio',equity:initial}];
-  [...closed].sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach((t,i)=>{eq+=Number(t.resultMoney||0); peak=Math.max(peak,eq); const dd=peak-eq; ddMoney=Math.max(ddMoney,dd); maxDD=Math.max(maxDD,peak?dd/peak*100:0); curve.push({name:`T${i+1}`,equity:Math.round(eq)});});
-  const by=k=>Object.values(closed.reduce((a,t)=>{const n=t[k]||'N/A'; a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=Number(t.resultMoney||0); a[n].count++; return a;},{}));
-  const byBias=Object.values(closed.reduce((a,t)=>{const n=t.bias||t.side||'N/A'; a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=Number(t.resultMoney||0); a[n].count++; return a;},{})).sort((a,b)=>b.value-a.value);
+  [...closed].sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach((t,i)=>{eq+=resultValue(t); peak=Math.max(peak,eq); const dd=peak-eq; ddMoney=Math.max(ddMoney,dd); maxDD=Math.max(maxDD,peak?dd/peak*100:0); curve.push({name:`T${i+1}`,equity:Math.round(eq)});});
+  const by=k=>Object.values(closed.reduce((a,t)=>{const n=t[k]||'N/A'; a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=resultValue(t); a[n].count++; return a;},{}));
+  const byBias=Object.values(closed.reduce((a,t)=>{const n=t.bias||t.side||'N/A'; a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=resultValue(t); a[n].count++; return a;},{})).sort((a,b)=>b.value-a.value);
   const bestBias=byBias[0]||{name:'—',value:0,count:0};
   const avgR=validRVals.length?validRVals.reduce((s,x)=>s+x,0)/validRVals.length:0;
   const plan=closed.filter(t=>t.followedPlan);
@@ -342,11 +343,11 @@ function calc(trades,initial=10000){
   const freq=(arr)=>{const items=(arr||[]).filter(Boolean); if(!items.length)return null; return Object.values(items.reduce((a,x)=>{a[x]=a[x]||{name:x,count:0}; a[x].count++; return a;},{})).sort((a,b)=>b.count-a.count)[0]?.name||null;};
   const allBehaviors=closed.flatMap(t=>t.executionBehaviors||[]);
   const repeatedErrors=closed.flatMap(t=>{const behaviors=Array.isArray(t.executionBehaviors)?t.executionBehaviors:[]; const negativeExecution=behaviors.filter(x=>negativeBehaviorOptions.includes(x)); const post=negativeBehaviorOptions.includes(t.postTradeBehavior)?[t.postTradeBehavior]:[]; return [...negativeExecution,...post];});
-  const lossEmotions=closed.filter(t=>Number(t.resultMoney||0)<0).map(t=>t.emotionBefore).filter(Boolean);
-  const goodLosses=closed.filter(t=>Number(t.resultMoney||0)<0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))>=70);
-  const badWins=closed.filter(t=>Number(t.resultMoney||0)>0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))<70);
+  const lossEmotions=closed.filter(t=>resultValue(t)<0).map(t=>t.emotionBefore).filter(Boolean);
+  const goodLosses=closed.filter(t=>resultValue(t)<0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))>=70);
+  const badWins=closed.filter(t=>resultValue(t)>0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))<70);
   const behaviorAvg=closed.length?closed.reduce((sum,t)=>sum+Number(t.behaviorScore||behaviorScoreFromTrade(t)),0)/closed.length:0;
-  return {initial,equity:initial+total,total,profitPct:initial?total/initial*100:0,count:closed.length,wins:wins.length,losses:losses.length,winrate:closed.length?wins.length/closed.length*100:0,avgR,expectancy,maxDD,ddMoney,best:Math.max(0,...results),worst:Math.min(0,...results),curve,byAsset:by('asset'),bySession:by('session'),bySetup:Object.values(closed.reduce((a,t)=>{const n=normalizeTradeSetup(t); a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=Number(t.resultMoney||0); a[n].count++; return a;},{})).sort((a,b)=>b.value-a.value),byBias,bestBias,byQuality:by('quality'),discipline:closed.length?closed.reduce((s,t)=>s+(t.followedPlan?1:0),0)/closed.length*100:0,qualityAvg:closed.length?closed.reduce((s,t)=>s+(qualityScore[t.quality]||0),0)/closed.length:0,planWinrate:plan.length?plan.filter(t=>t.resultMoney>0).length/plan.length*100:0,grossProfit,grossLoss,avgWin,avgLoss,profitFactor,payoffRatio,sharpeLike,recovery,meanR,stdR,behaviorAvg,planFollowedPct:closed.length?planFollowed.length/closed.length*100:0,impulseTrades:impulseTrades.length,errorMostRepeated:freq(repeatedErrors)||'Sin error dominante',emotionBeforeLoss:freq(lossEmotions),lateEntries:lateEntries.length,movedSL:movedSL.length,goodLosses:goodLosses.length,badWins:badWins.length};
+  return {initial,equity:initial+total,total,profitPct:initial?total/initial*100:0,count:closed.length,wins:wins.length,losses:losses.length,winrate:closed.length?wins.length/closed.length*100:0,avgR,expectancy,maxDD,ddMoney,best:Math.max(0,...results),worst:Math.min(0,...results),curve,byAsset:by('asset'),bySession:by('session'),bySetup:Object.values(closed.reduce((a,t)=>{const n=normalizeTradeSetup(t); a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=resultValue(t); a[n].count++; return a;},{})).sort((a,b)=>b.value-a.value),byBias,bestBias,byQuality:by('quality'),discipline:closed.length?closed.reduce((s,t)=>s+(t.followedPlan?1:0),0)/closed.length*100:0,qualityAvg:closed.length?closed.reduce((s,t)=>s+(qualityScore[t.quality]||0),0)/closed.length:0,planWinrate:plan.length?plan.filter(t=>resultValue(t)>0).length/plan.length*100:0,grossProfit,grossLoss,avgWin,avgLoss,profitFactor,payoffRatio,sharpeLike,recovery,meanR,stdR,behaviorAvg,planFollowedPct:closed.length?planFollowed.length/closed.length*100:0,impulseTrades:impulseTrades.length,errorMostRepeated:freq(repeatedErrors)||'Sin error dominante',emotionBeforeLoss:freq(lossEmotions),lateEntries:lateEntries.length,movedSL:movedSL.length,goodLosses:goodLosses.length,badWins:badWins.length};
 }
 function insights(s){
   const cards=[];
@@ -1101,7 +1102,7 @@ function ActivityFeed({data,setTab}){
   ].sort((a,b)=>b.time-a.time).slice(0,8);
   return <Card title="Actividad reciente" sub="Últimos movimientos del ecosistema."><div className="activityFeed">{items.map((it,i)=><button key={`${it.type}-${i}`} onClick={()=>setTab(it.target)}><span>{it.type}</span><b>{it.text}</b><small>{it.meta}</small></button>)}{!items.length&&<PremiumEmptyState title="Sin actividad reciente" text="Cuando haya trades, checklists o publicaciones apareceran aca." cta="Registrar trade" icon={Activity} onClick={()=>setTab('journal')}/>}</div></Card>
 }
-function CalendarHeatmapPreview({trades=[]}){const stats=groupTradesByDay(trades); const key=monthKey(); const cells=daysInMonth(key); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key); const total=monthStats.reduce((a,b)=>a+b.total,0); return <Card title="Calendario P/L" sub={`${monthStats.length} días operados · ${total>=0?'+':''}${formatMoneyClean(total)}`} className="calendarPreviewCard"><div className="calendarMiniGrid">{cells.map((d,i)=>{if(!d)return <span key={i}/>; const st=stats[d]; const cls=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const daily=st?`${st.total>0?'+':st.total<0?'-':''}$${formatCompactNumber(Math.abs(st.total),1)}`:''; return <button key={d} className={cls} title={st?`${d} · ${money(st.total)}`:d}><b>{Number(d.slice(-2))}</b>{st&&<em>{daily}</em>}</button>})}</div></Card>}
+function CalendarHeatmapPreview({trades=[],setTab}){const stats=groupTradesByDay(trades); const key=monthKey(); const cells=daysInMonth(key); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key); const total=monthStats.reduce((a,b)=>a+b.total,0); const openDay=d=>{localStorage.setItem('mtc-open-journal-date',d); setTab?.('journal');}; return <Card title="Calendario P/L" sub={`${monthStats.length} días operados · ${total>=0?'+':''}${formatMoneyClean(total)}`} className="calendarPreviewCard"><div className="calendarMiniGrid">{cells.map((d,i)=>{if(!d)return <span key={i}/>; const st=stats[d]; const cls=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const daily=st?`${st.total>0?'+':st.total<0?'-':''}$${formatCompactNumber(Math.abs(st.total),1)}`:''; return <button key={d} className={cls} title={st?`${d} · ${money(st.total)}`:d} onClick={()=>st&&openDay(d)} disabled={!st}><b>{Number(d.slice(-2))}</b>{st&&<em>{daily}</em>}</button>})}</div></Card>}
 function EquityCurvePreview({s}){const change=s.total; return <Card title="Curva de equity" sub={`Equity actual ${money(s.equity)} · ${change>=0?'+':''}${money(change)}`} className="equityPreviewCard"><ResponsiveContainer width="100%" height={300}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.045)"/><XAxis dataKey="name"/><YAxis/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card>}
 function Dashboard({data,profile,setTab}){
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
@@ -1111,7 +1112,7 @@ function Dashboard({data,profile,setTab}){
   const byDay=groupTradesByDay(filtered);
   const monthly=Object.values(byDay).filter(d=>d.date.slice(0,7)===monthKey()).reduce((a,d)=>({days:a.days+1,total:a.total+d.total,wins:a.wins+(d.total>0?1:0),losses:a.losses+(d.total<0?1:0)}),{days:0,total:0,wins:0,losses:0});
   const spark=s.curve.slice(-8).map((p,i,arr)=>i?Number(p.equity||0)-Number(arr[i-1].equity||0):0);
-  return <main className="page dashboardV38"><DashboardControlCenter profile={profile} s={s} monthly={monthly} setTab={setTab} filtered={filtered}/><MarketClocks/><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><div className="dashboardGuidanceGrid"><RecommendedActionCard data={data} setTab={setTab} s={s}/><ProcessSummaryCard data={data} setTab={setTab}/></div><StructuredOnboardingCard data={data} setTab={setTab}/><div className="metrics premiumMetricGrid"><MetricCardPremium label="Equity" value={formatMoneyClean(s.equity)} sub={`Inicial ${formatMoneyClean(s.initial)}`} icon={BarChart3} state="neutral" sparkData={spark}/><MetricCardPremium label="P/L total" value={formatMoneyCompactCard(s.total)} sub={pct(s.profitPct)} icon={LineChart} state={s.total>=0?'positive':'negative'} sparkData={spark}/><MetricCardPremium label="Win rate" value={formatPercentCard(s.winrate)} sub={`${s.wins}W / ${s.losses}L`} icon={Trophy} state={s.winrate>=50?'positive':'neutral'} sparkData={spark}/><MetricCardPremium label="R promedio" value={formatR(s.avgR)} sub={`DD ${pct(s.maxDD)}`} icon={Activity} state={s.avgR>0?'positive':s.avgR<0?'negative':'neutral'} sparkData={spark}/><MetricCardPremium label="Profit factor" value={s.count?formatMetricCard(s.profitFactor,0):'—'} sub="Salud del sistema" icon={Shield} state={s.profitFactor>=1.5?'positive':'neutral'} sparkData={spark}/><MetricCardPremium label="Disciplina" value={`${Math.round(s.discipline||0)}%`} sub="Score operativo" icon={CheckCircle2} state={s.discipline>=80?'positive':'neutral'} sparkData={spark}/></div><DashboardEmptyStates data={data} setTab={setTab} s={s}/><div className="dashboardCommandGrid"><ChecklistStatusCard data={data} setTab={setTab}/><Card title="Pulso del mes" sub="Días verdes, rojos y rendimiento mensual."><div className="pulseGrid premiumPulse"><div><span>Días operados</span><b>{formatMetricCard(monthly.days)}</b><small>{monthly.wins} verdes · {monthly.losses} rojos</small></div><div className={monthly.total>=0?'pos':'neg'}><span>P/L mensual</span><b>{formatMoneyCompactCard(monthly.total)}</b><small>Rendimiento consolidado</small></div><div><span>Rollover NY</span><b><ResetTicker/></b><small>Cierre operativo 17:00 NY</small></div></div></Card><TradeStreak trades={filtered}/></div><div className="dashboardVisualGrid"><EquityCurvePreview s={s}/><CalendarHeatmapPreview trades={filtered}/></div><div className="grid2"><DailyPlanPanel profile={profile} data={data} dayKey={tradingDayKey()}/><ActivityFeed data={data} setTab={setTab}/></div><div className="grid2"><Card title="Insights accionables" sub="Lectura directa de tu comportamiento operativo."><InsightGrid items={insightCards}/><button className="primary" onClick={()=>setTab('journal')}><Plus/>Registrar trade</button></Card><Card title="Panel profesional del trader" sub="Edge, consistencia, riesgo y calidad."><TraderStats s={s}/></Card></div></main>
+  return <main className="page dashboardV38"><DashboardControlCenter profile={profile} s={s} monthly={monthly} setTab={setTab} filtered={filtered}/><MarketClocks/><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><div className="dashboardGuidanceGrid"><RecommendedActionCard data={data} setTab={setTab} s={s}/><ProcessSummaryCard data={data} setTab={setTab}/></div><StructuredOnboardingCard data={data} setTab={setTab}/><div className="metrics premiumMetricGrid"><MetricCardPremium label="Equity" value={formatMoneyClean(s.equity)} sub={`Inicial ${formatMoneyClean(s.initial)}`} icon={BarChart3} state="neutral" sparkData={spark}/><MetricCardPremium label="P/L total" value={formatMoneyCompactCard(s.total)} sub={pct(s.profitPct)} icon={LineChart} state={s.total>=0?'positive':'negative'} sparkData={spark}/><MetricCardPremium label="Win rate" value={formatPercentCard(s.winrate)} sub={`${s.wins}W / ${s.losses}L`} icon={Trophy} state={s.winrate>=50?'positive':'neutral'} sparkData={spark}/><MetricCardPremium label="R promedio" value={formatR(s.avgR)} sub={`DD ${pct(s.maxDD)}`} icon={Activity} state={s.avgR>0?'positive':s.avgR<0?'negative':'neutral'} sparkData={spark}/><MetricCardPremium label="Profit factor" value={s.count?formatMetricCard(s.profitFactor,0):'—'} sub="Salud del sistema" icon={Shield} state={s.profitFactor>=1.5?'positive':'neutral'} sparkData={spark}/><MetricCardPremium label="Disciplina" value={`${Math.round(s.discipline||0)}%`} sub="Score operativo" icon={CheckCircle2} state={s.discipline>=80?'positive':'neutral'} sparkData={spark}/></div><DashboardEmptyStates data={data} setTab={setTab} s={s}/><div className="dashboardCommandGrid"><ChecklistStatusCard data={data} setTab={setTab}/><Card title="Pulso del mes" sub="Días verdes, rojos y rendimiento mensual."><div className="pulseGrid premiumPulse"><div><span>Días operados</span><b>{formatMetricCard(monthly.days)}</b><small>{monthly.wins} verdes · {monthly.losses} rojos</small></div><div className={monthly.total>=0?'pos':'neg'}><span>P/L mensual</span><b>{formatMoneyCompactCard(monthly.total)}</b><small>Rendimiento consolidado</small></div><div><span>Rollover NY</span><b><ResetTicker/></b><small>Cierre operativo 17:00 NY</small></div></div></Card><TradeStreak trades={filtered}/></div><div className="dashboardVisualGrid"><EquityCurvePreview s={s}/><CalendarHeatmapPreview trades={filtered} setTab={setTab}/></div><div className="grid2"><DailyPlanPanel profile={profile} data={data} dayKey={tradingDayKey()}/><ActivityFeed data={data} setTab={setTab}/></div><div className="grid2"><Card title="Insights accionables" sub="Lectura directa de tu comportamiento operativo."><InsightGrid items={insightCards}/><button className="primary" onClick={()=>setTab('journal')}><Plus/>Registrar trade</button></Card><Card title="Panel profesional del trader" sub="Edge, consistencia, riesgo y calidad."><TraderStats s={s}/></Card></div></main>
 }
 function ResetTicker(){const [now,setNow]=useState(new Date()); useEffect(()=>{const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id)},[]); return <>{resetCountdown(now)}</>}
 
@@ -1130,7 +1131,7 @@ function Journal({data,profile}){
     .filter(t=>JSON.stringify(t).toLowerCase().includes(search.toLowerCase()))
     .filter(t=>checklistFilterMatch(t,checklistFilter));
   async function del(trade){await deleteTradeSafely(trade);}
-  async function importCsv(e){const f=e.target.files[0]; if(!f)return; const rows=parseCsv(await f.text(),profile.uid); for(const r of rows)await addDoc(collection(db,'trades'),{...r,tradingDay:r.tradingDay||r.date||tradingDayKey(),createdAt:serverTimestamp()});}
+  async function importCsv(e){const f=e.target.files[0]; if(!f)return; const rows=parseCsv(await f.text(),profile.uid); const signature=t=>[profile.uid,String(t.tradingDay||t.date||'').slice(0,10),String(t.asset||'').toUpperCase(),String(t.side||''),toNumberSafe(t.resultMoney),toNumberSafe(t.resultR),normalizeTradeSetup(t)].join('|'); const existing=new Set((data.trades||[]).map(signature)); let imported=0,skipped=0; for(const r of rows){const clean={...r,tradingDay:r.tradingDay||r.date||tradingDayKey(),date:r.date||r.tradingDay||tradingDayKey()}; const sig=signature(clean); if(existing.has(sig)){skipped++; continue;} existing.add(sig); imported++; await addDoc(collection(db,'trades'),{...clean,createdAt:serverTimestamp()});} toast(`${imported} trades importados${skipped?` · ${skipped} duplicados omitidos`:''}`); e.target.value='';}
   const emptyForm={date:selectedDate||tradingDayKey(),tradingDay:selectedDate||tradingDayKey(),account:localStorage.getItem('mtc-last-account')||'Cuenta principal',asset:'XAUUSD',session:'NY',side:'BUY',tradeSystem:'Sistema de Moisés',pattern:'Método Estructural: ChoCH en M1',confluencesUsed:[],otherSystem:'',setup:'',riskPct:riskSettings.riskPerTradePct||.5,entry:'',sl:'',tp:'',exit:'',riskMoney:'',result:'',resultMoney:'',resultPct:'',resultR:'',quality:'A',followedPlan:true,checklist:[],captureLink:'',captureFileName:'',emotionBefore:'',emotionDuring:'',emotionAfter:'',executionBehaviors:[],postTradeBehavior:'',privateJournal:'',lesson:''};
   const openNewTrade=()=>guard.blocked?toast('Modo reflexión activo hasta el próximo rollover 17:00 NY o ajustá límites en Riesgo'):setForm({...emptyForm,date:selectedDate||tradingDayKey(),tradingDay:selectedDate||tradingDayKey()});
   useEffect(()=>{
@@ -1150,6 +1151,10 @@ function Journal({data,profile}){
     const t=(data.trades||[]).find(x=>x.id===id);
     if(t){setSelectedDate((t.tradingDay||t.date||tradingDayKey()).slice(0,10)); setSelectedTrade(t); localStorage.removeItem('mtc-open-trade');}
   },[data.trades]);
+  useEffect(()=>{
+    const d=localStorage.getItem('mtc-open-journal-date');
+    if(d){setSelectedDate(d.slice(0,10)); localStorage.removeItem('mtc-open-journal-date');}
+  },[]);
   return <main className="page journalPage">
     {!form&&<button className="mobileNewTradeFab" onClick={openNewTrade}><Plus size={18}/>Nuevo trade</button>}
     {guard.blocked&&<div className="riskAlert"><Shield size={20}/><div><b>Modo reflexión activo</b><p>{guard.reasons.join(' · ')}. Este bloqueo se calcula por jornada operativa New York y se reinicia al rollover 17:00 NY. Ajustá límites en Riesgo si corresponde.</p></div></div>}
