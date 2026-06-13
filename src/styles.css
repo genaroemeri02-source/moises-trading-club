@@ -10052,3 +10052,259 @@ html[data-theme="light"] .onboardingSteps b,html[data-theme="light"] .calendarMi
 html[data-theme="light"] .onboardingProgress{background:#fff;border-color:rgba(15,23,42,.10)}
 html[data-theme="light"] .onboardingSteps button small{color:#536074}
 @media(max-width:640px){.onboardingProgress{grid-template-columns:1fr;gap:10px}.onboardingSteps button{min-height:88px}.calendarMiniGrid{gap:5px}.calendarMiniGrid button,.calendarMiniGrid span{height:48px;border-radius:10px;padding:5px 3px}.calendarMiniGrid button b{font-size:13px}.calendarMiniGrid button em{font-size:9px}.insightPro{min-height:auto}.statMatrix>div{min-height:auto}}
+
+/* Light mode premium polish */
+html[data-theme="light"]{
+  --bg:#f3efe7;
+  --panel:#fffdf8;
+  --panel2:#f7f2e9;
+  --panel3:#eee6da;
+  --line:rgba(93,75,45,.12);
+  --line2:rgba(154,119,42,.20);
+  --text:#17140f;
+  --muted:#5f6570;
+  --muted2:#7e8793;
+  --gold:#b88417;
+  --gold2:#c99a2e;
+  --green:#15803d;
+  --red:#be123c;
+  --shadow:0 18px 52px rgba(78,58,22,.12),0 1px 0 rgba(255,255,255,.80) inset;
+}
+html[data-theme="light"] body,
+html[data-theme="light"] .app{
+  background:#f3efe7!important;
+}
+html[data-theme="light"] .main{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(201,154,46,.13),transparent 340px),
+    radial-gradient(circle at 96% 10%,rgba(21,128,61,.06),transparent 360px),
+    linear-gradient(180deg,#f7f2e9 0%,#f1eadf 42%,#eee7dc 100%)!important;
+}
+html[data-theme="light"] .top,
+html[data-theme="light"] .premiumTop{
+  background:rgba(249,245,237,.84)!important;
+  border-bottom:1px solid rgba(154,119,42,.14)!important;
+  box-shadow:0 14px 34px rgba(78,58,22,.07);
+}
+html[data-theme="light"] .side,
+html[data-theme="light"] .premiumSide{
+  background:linear-gradient(180deg,#fffaf0 0%,#f3ebdc 100%)!important;
+  border-right:1px solid rgba(154,119,42,.17)!important;
+  box-shadow:18px 0 48px rgba(78,58,22,.08);
+}
+html[data-theme="light"] .brand{
+  border-bottom-color:rgba(154,119,42,.15)!important;
+}
+html[data-theme="light"] .brand b,
+html[data-theme="light"] .top h1,
+html[data-theme="light"] .top h2{
+  color:#17140f!important;
+}
+html[data-theme="light"] .brand span,
+html[data-theme="light"] .top p,
+html[data-theme="light"] .navGroup small{
+  color:#77705f!important;
+}
+html[data-theme="light"] nav button{
+  color:#5f6570!important;
+  border-color:transparent!important;
+}
+html[data-theme="light"] nav button:hover{
+  background:rgba(184,132,23,.08)!important;
+  color:#17140f!important;
+}
+html[data-theme="light"] nav button.active{
+  background:linear-gradient(135deg,rgba(184,132,23,.16),rgba(255,253,248,.72))!important;
+  border-color:rgba(184,132,23,.25)!important;
+  color:#5f3905!important;
+  box-shadow:0 12px 28px rgba(126,91,20,.10),0 1px 0 rgba(255,255,255,.86) inset;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .metric,
+html[data-theme="light"] .metricPremium,
+html[data-theme="light"] .post,
+html[data-theme="light"] .idea,
+html[data-theme="light"] .modalCard,
+html[data-theme="light"] .nextActionCard,
+html[data-theme="light"] .processSummaryCard,
+html[data-theme="light"] .structuredOnboardingCard{
+  background:linear-gradient(180deg,rgba(255,253,248,.98),rgba(250,246,238,.96))!important;
+  border-color:rgba(154,119,42,.16)!important;
+  box-shadow:0 22px 58px rgba(78,58,22,.12),0 1px 0 rgba(255,255,255,.88) inset!important;
+}
+html[data-theme="light"] .cardHead{
+  border-bottom-color:rgba(154,119,42,.10)!important;
+}
+html[data-theme="light"] .card h3,
+html[data-theme="light"] .dashboardV38 .cardHead h3{
+  color:#22180b!important;
+}
+html[data-theme="light"] .cardHead p,
+html[data-theme="light"] .muted,
+html[data-theme="light"] .microInsight{
+  color:#69707b!important;
+}
+html[data-theme="light"] .metricPremium,
+html[data-theme="light"] .premiumControl,
+html[data-theme="light"] .controlCenter,
+html[data-theme="light"] .riskHero,
+html[data-theme="light"] .heroSystem{
+  background:
+    linear-gradient(180deg,rgba(255,253,248,.98),rgba(247,242,233,.96))!important;
+  border-color:rgba(184,132,23,.18)!important;
+}
+html[data-theme="light"] .dashboardV38 .metricPremium b,
+html[data-theme="light"] .metric b,
+html[data-theme="light"] .controlStats b,
+html[data-theme="light"] .pulseGrid b,
+html[data-theme="light"] .statMatrix b,
+html[data-theme="light"] .insightPro strong{
+  color:#1b1711!important;
+}
+html[data-theme="light"] .input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea,
+html[data-theme="light"] .search{
+  background:linear-gradient(180deg,#fffdf8,#f8f2e8)!important;
+  border-color:rgba(101,83,51,.18)!important;
+  color:#18140f!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 10px 26px rgba(78,58,22,.06);
+}
+html[data-theme="light"] .input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="light"] .search input::placeholder{
+  color:#8a8173!important;
+}
+html[data-theme="light"] .field>span,
+html[data-theme="light"] .metric span,
+html[data-theme="light"] .processSummaryGrid span,
+html[data-theme="light"] .insightPro span,
+html[data-theme="light"] .statMatrix span{
+  color:#6e604a!important;
+}
+html[data-theme="light"] .input:focus,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] textarea:focus{
+  border-color:rgba(184,132,23,.48)!important;
+  box-shadow:0 0 0 4px rgba(184,132,23,.12),0 12px 28px rgba(78,58,22,.08)!important;
+}
+html[data-theme="light"] .primary{
+  background:linear-gradient(135deg,#8f6410,#c49427,#e3c56b)!important;
+  color:#120d05!important;
+  box-shadow:0 16px 34px rgba(184,132,23,.24),0 1px 0 rgba(255,255,255,.50) inset!important;
+}
+html[data-theme="light"] .primary:hover{
+  filter:saturate(1.04) brightness(1.02);
+  transform:translateY(-1px);
+}
+html[data-theme="light"] .ghost,
+html[data-theme="light"] .icon,
+html[data-theme="light"] .actions button{
+  background:rgba(255,253,248,.68)!important;
+  border-color:rgba(101,83,51,.16)!important;
+  color:#4f5662!important;
+}
+html[data-theme="light"] .ghost:hover,
+html[data-theme="light"] .icon:hover,
+html[data-theme="light"] .actions button:hover{
+  background:rgba(184,132,23,.08)!important;
+  border-color:rgba(184,132,23,.24)!important;
+  color:#20170b!important;
+}
+html[data-theme="light"] .processSummaryGrid button,
+html[data-theme="light"] .onboardingSteps button,
+html[data-theme="light"] .premiumEmptyAction,
+html[data-theme="light"] .insightPro,
+html[data-theme="light"] .statMatrix>div,
+html[data-theme="light"] .activityFeed button,
+html[data-theme="light"] .limitCards div,
+html[data-theme="light"] .ddTracker div,
+html[data-theme="light"] .scenarioBox{
+  background:linear-gradient(180deg,rgba(255,253,248,.92),rgba(247,242,233,.86))!important;
+  border-color:rgba(154,119,42,.15)!important;
+  box-shadow:0 14px 34px rgba(78,58,22,.08),0 1px 0 rgba(255,255,255,.82) inset!important;
+}
+html[data-theme="light"] .onboardingProgress{
+  background:linear-gradient(180deg,rgba(255,253,248,.90),rgba(244,237,226,.84))!important;
+  border-color:rgba(184,132,23,.18)!important;
+}
+html[data-theme="light"] .onboardingProgress b,
+html[data-theme="light"] .onboardingSteps b,
+html[data-theme="light"] .nextActionBody b,
+html[data-theme="light"] .processSummaryGrid b{
+  color:#1c160d!important;
+}
+html[data-theme="light"] .onboardingSteps button.done{
+  background:linear-gradient(180deg,rgba(21,128,61,.10),rgba(255,253,248,.88))!important;
+  border-color:rgba(21,128,61,.24)!important;
+}
+html[data-theme="light"] .onboardingSteps button.next{
+  border-color:rgba(184,132,23,.38)!important;
+  box-shadow:0 18px 44px rgba(184,132,23,.16),0 0 0 1px rgba(184,132,23,.08) inset!important;
+}
+html[data-theme="light"] .checklistDashCard,
+html[data-theme="light"] .linkedValidationCard,
+html[data-theme="light"] .linkedTradeCard,
+html[data-theme="light"] .trade,
+html[data-theme="light"] .notif,
+html[data-theme="light"] .adminRow{
+  background:linear-gradient(180deg,rgba(255,253,248,.94),rgba(247,242,233,.88))!important;
+  border-color:rgba(154,119,42,.14)!important;
+}
+html[data-theme="light"] .tradeResult,
+html[data-theme="light"] .resultPreview,
+html[data-theme="light"] .monthCell,
+html[data-theme="light"] .calendarMiniGrid button,
+html[data-theme="light"] .calendarMiniGrid span{
+  background:linear-gradient(180deg,#fffdf8,#f6efe4)!important;
+  border-color:rgba(154,119,42,.14)!important;
+  color:#21190d!important;
+}
+html[data-theme="light"] .monthCell.win,
+html[data-theme="light"] .calendarMiniGrid button.win,
+html[data-theme="light"] .tradeResult.pos,
+html[data-theme="light"] .resultPreview.pos{
+  background:linear-gradient(180deg,rgba(21,128,61,.14),rgba(255,253,248,.90))!important;
+  border-color:rgba(21,128,61,.28)!important;
+}
+html[data-theme="light"] .monthCell.loss,
+html[data-theme="light"] .calendarMiniGrid button.loss,
+html[data-theme="light"] .tradeResult.neg,
+html[data-theme="light"] .resultPreview.neg{
+  background:linear-gradient(180deg,rgba(190,18,60,.12),rgba(255,253,248,.90))!important;
+  border-color:rgba(190,18,60,.26)!important;
+}
+html[data-theme="light"] .calendarMiniGrid button b,
+html[data-theme="light"] .monthCell b,
+html[data-theme="light"] .monthCell small{
+  color:#1b1711!important;
+}
+html[data-theme="light"] .pos,
+html[data-theme="light"] .monthCell.win small,
+html[data-theme="light"] .calendarMiniGrid button.win em{
+  color:#15803d!important;
+}
+html[data-theme="light"] .neg,
+html[data-theme="light"] .monthCell.loss small,
+html[data-theme="light"] .calendarMiniGrid button.loss em{
+  color:#be123c!important;
+}
+html[data-theme="light"] .emotionalJournalPage .card,
+html[data-theme="light"] .journalPage .card,
+html[data-theme="light"] .riskPage .card,
+html[data-theme="light"] .analyticsPro .card{
+  background:linear-gradient(180deg,rgba(255,253,248,.98),rgba(248,243,234,.95))!important;
+}
+html[data-theme="light"] .mobileNav{
+  background:rgba(255,250,240,.94)!important;
+  border-color:rgba(184,132,23,.22)!important;
+  box-shadow:0 22px 54px rgba(78,58,22,.16)!important;
+}
+html[data-theme="light"] .mobileNav button{
+  color:#626a76!important;
+}
+html[data-theme="light"] .mobileNav button.active{
+  background:rgba(184,132,23,.14)!important;
+  border-color:rgba(184,132,23,.30)!important;
+  color:#5f3905!important;
+}
