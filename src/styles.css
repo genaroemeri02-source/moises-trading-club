@@ -9968,3 +9968,74 @@ body:has(.paywallFunnel){
   .productInterfaceCurve{min-height:86px!important;padding:14px 12px 12px!important;}
   .productInterfaceHeatmap{grid-template-columns:repeat(6,minmax(0,1fr))!important;}
 }
+/* Internal dashboard premium guidance */
+.dashboardGuidanceGrid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:14px}
+.nextActionCard,.processSummaryCard,.structuredOnboardingCard{border-color:rgba(212,166,58,.16)!important;background:linear-gradient(180deg,rgba(255,255,255,.058),rgba(255,255,255,.024))!important}
+.nextActionBody{display:flex;align-items:flex-start;gap:14px}
+.nextActionBody>span,.premiumEmptyAction>span{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;flex:0 0 auto;color:#f0c55a;background:rgba(212,166,58,.10);border:1px solid rgba(212,166,58,.22)}
+.nextActionBody b{display:block;color:var(--text);font-size:18px;margin-bottom:5px}
+.nextActionBody p{margin:0 0 12px;color:var(--muted);line-height:1.5}
+.processSummaryGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.processSummaryGrid button{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.032);border-radius:16px;padding:13px 12px;text-align:left;color:var(--text);cursor:pointer;transition:160ms ease}
+.processSummaryGrid button:hover{border-color:rgba(212,166,58,.25);background:rgba(212,166,58,.07);transform:translateY(-1px)}
+.processSummaryGrid span,.onboardingSteps b{display:block;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.07em}
+.processSummaryGrid b{display:block;color:var(--text);font-size:26px;letter-spacing:-.04em;margin-top:7px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+.onboardingSteps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.onboardingSteps button{display:flex;align-items:center;gap:10px;min-height:64px;text-align:left;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.03);color:var(--text);padding:12px;cursor:pointer}
+.onboardingSteps button>span{width:30px;height:30px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#f0c55a;font-weight:1000}
+.onboardingSteps button.done{border-color:rgba(34,197,94,.24);background:rgba(34,197,94,.07)}
+.onboardingSteps button.done>span{color:#86efac;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.24)}
+.dashboardEmptyGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.premiumEmptyAction{display:flex;align-items:flex-start;gap:13px;min-height:128px}
+.premiumEmptyAction b{font-size:15px}
+.premiumEmptyAction button{margin-top:12px}
+html[data-theme="light"] .nextActionCard,html[data-theme="light"] .processSummaryCard,html[data-theme="light"] .structuredOnboardingCard{background:#fff!important;border-color:rgba(15,23,42,.10)!important}
+html[data-theme="light"] .processSummaryGrid button,html[data-theme="light"] .onboardingSteps button,html[data-theme="light"] .premiumEmptyAction{background:rgba(15,23,42,.025);border-color:rgba(15,23,42,.10)}
+html[data-theme="light"] .nextActionBody>span,html[data-theme="light"] .premiumEmptyAction>span{background:rgba(212,166,58,.14);border-color:rgba(212,166,58,.25)}
+@media(max-width:1180px){.dashboardGuidanceGrid,.dashboardEmptyGrid{grid-template-columns:1fr}.processSummaryGrid,.onboardingSteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.dashboardGuidanceGrid,.dashboardEmptyGrid,.processSummaryGrid,.onboardingSteps{grid-template-columns:1fr!important}.nextActionBody,.premiumEmptyAction{display:grid;grid-template-columns:auto 1fr}.processSummaryGrid b{font-size:24px}.onboardingSteps button{min-height:58px}.premiumEmptyAction{min-height:auto}}
+
+/* Internal dashboard UX premium hotfix */
+.dashboardV38 .card{box-shadow:0 24px 80px rgba(0,0,0,.30),0 1px 0 rgba(255,255,255,.035) inset}
+.dashboardV38 .cardHead h3{color:#fff1cf;font-size:17px;letter-spacing:-.025em}
+.dashboardV38 .cardHead p{color:#9aa5b8;font-size:13px}
+.dashboardV38 .metricPremium{border-color:rgba(212,166,58,.13);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));box-shadow:0 18px 58px rgba(0,0,0,.24)}
+.dashboardV38 .metricPremium b{color:#fff6dc;font-size:clamp(24px,1.95vw,31px)!important;letter-spacing:-.055em}
+.dashboardV38 .metricPremium small{color:#9aa5b8}
+.structuredOnboardingCard{position:relative;overflow:hidden}
+.structuredOnboardingCard:before{content:"";position:absolute;left:20px;right:20px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,166,58,.42),transparent)}
+.onboardingSteps button{position:relative;min-height:82px;border-color:rgba(212,166,58,.18);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));box-shadow:0 14px 42px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.035) inset;transition:180ms ease}
+.onboardingSteps button:after{content:"›";margin-left:auto;color:#d4a63a;font-size:25px;line-height:1;opacity:.78;transition:180ms ease}
+.onboardingSteps button:hover{transform:translateY(-2px);border-color:rgba(212,166,58,.36);background:linear-gradient(180deg,rgba(212,166,58,.10),rgba(255,255,255,.032));box-shadow:0 20px 60px rgba(0,0,0,.26)}
+.onboardingSteps button:hover:after{transform:translateX(2px);opacity:1}
+.onboardingSteps b{color:#e8edf7;font-size:12px;letter-spacing:.05em;line-height:1.28}
+.onboardingSteps button>span{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,rgba(212,166,58,.18),rgba(255,255,255,.045));border-color:rgba(212,166,58,.25);color:#f8d77d;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.onboardingSteps button.done{border-color:rgba(34,197,94,.22);background:linear-gradient(180deg,rgba(34,197,94,.095),rgba(255,255,255,.025))}
+.calendarMiniGrid{gap:8px}
+.calendarMiniGrid button,.calendarMiniGrid span{height:54px;border-radius:13px;padding:7px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;line-height:1;overflow:hidden}
+.calendarMiniGrid button b{display:block;color:#eef3fb;font-size:14px;font-weight:950;letter-spacing:-.02em}
+.calendarMiniGrid button em{display:block;max-width:100%;font-style:normal;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(9px,1vw,11px);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calendarMiniGrid button.none b{color:#6d7789}
+.calendarMiniGrid button.win em{color:#9bf1bd}
+.calendarMiniGrid button.loss em{color:#ffadba}
+.calendarMiniGrid button.be em{color:#f1cf76}
+.calendarMiniGrid button.win{background:linear-gradient(180deg,rgba(34,197,94,.18),rgba(34,197,94,.07))}
+.calendarMiniGrid button.loss{background:linear-gradient(180deg,rgba(255,77,106,.17),rgba(255,77,106,.065))}
+.insightGrid{gap:14px}
+.insightPro{position:relative;min-height:132px;border-color:rgba(212,166,58,.12);background:linear-gradient(180deg,rgba(255,255,255,.058),rgba(255,255,255,.022));box-shadow:0 16px 50px rgba(0,0,0,.20)}
+.insightPro:before,.statMatrix>div:before{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,166,58,.34),transparent);opacity:.65}
+.insightPro div{align-items:flex-start}
+.insightPro span,.statMatrix span{color:#8793a8;letter-spacing:.09em}
+.insightPro strong{color:#fff4d6;font-size:clamp(21px,1.7vw,28px);white-space:normal;text-wrap:balance;overflow-wrap:anywhere}
+.insightPro p{color:#a9b3c4;font-size:13.5px;line-height:1.55;overflow-wrap:anywhere}
+.insightPro.good{border-color:rgba(34,197,94,.20);background:linear-gradient(180deg,rgba(34,197,94,.09),rgba(255,255,255,.022))}
+.insightPro.warn{border-color:rgba(212,166,58,.24);background:linear-gradient(180deg,rgba(212,166,58,.105),rgba(255,255,255,.022))}
+.statMatrix{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.statMatrix>div{position:relative;min-height:92px;border-color:rgba(212,166,58,.12);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));box-shadow:0 14px 42px rgba(0,0,0,.18)}
+.statMatrix b{color:#fff4d6;font-size:clamp(18px,1.25vw,22px);line-height:1.12;white-space:normal;overflow-wrap:anywhere}
+.grid2 .card:has(.insightGrid) .primary{min-height:46px;padding-inline:18px;box-shadow:0 14px 36px rgba(212,166,58,.16)}
+html[data-theme="light"] .dashboardV38 .cardHead h3,html[data-theme="light"] .dashboardV38 .metricPremium b,html[data-theme="light"] .insightPro strong,html[data-theme="light"] .statMatrix b{color:#0f172a!important}
+html[data-theme="light"] .dashboardV38 .cardHead p,html[data-theme="light"] .insightPro p{color:#536074!important}
+html[data-theme="light"] .onboardingSteps button,html[data-theme="light"] .insightPro,html[data-theme="light"] .statMatrix>div{background:#fff!important;border-color:rgba(15,23,42,.11)!important;box-shadow:0 16px 46px rgba(15,23,42,.08)}
+html[data-theme="light"] .onboardingSteps b,html[data-theme="light"] .calendarMiniGrid button b{color:#111827!important}
+@media(max-width:640px){.onboardingSteps button{min-height:72px}.calendarMiniGrid{gap:5px}.calendarMiniGrid button,.calendarMiniGrid span{height:48px;border-radius:10px;padding:5px 3px}.calendarMiniGrid button b{font-size:13px}.calendarMiniGrid button em{font-size:9px}.insightPro{min-height:auto}.statMatrix>div{min-height:auto}}
