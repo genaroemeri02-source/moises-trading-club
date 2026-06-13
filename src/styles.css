@@ -10316,3 +10316,5 @@ html[data-theme="light"] .mobileNav button.active{
 html[data-theme="light"] .sampleNotice{background:linear-gradient(180deg,rgba(255,253,248,.96),rgba(247,242,233,.88))!important;border-color:rgba(184,132,23,.24)!important;box-shadow:0 14px 34px rgba(78,58,22,.09),0 1px 0 rgba(255,255,255,.82) inset}
 html[data-theme="light"] .sampleNotice b{color:#1c160d!important}
 html[data-theme="light"] .sampleNotice p{color:#69707b!important}
+.emptyIcon{width:36px;height:36px;border-radius:12px;display:inline-grid;place-items:center;margin-bottom:10px;color:var(--gold2);background:rgba(212,168,67,.10);border:1px solid rgba(212,168,67,.22)}
+.empty .ghost.compact{margin-top:12px}
