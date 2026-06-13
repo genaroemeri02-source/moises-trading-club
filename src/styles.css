@@ -9573,3 +9573,398 @@ html{scroll-padding-top:96px;}
   .paywallProductInterface{inset:12px!important;padding:12px!important;gap:8px!important;}
   .authPage .loginCard{max-width:100%!important;}
 }
+
+/* v45 hotfix: public/auth/paywall stay dark regardless of app theme. */
+:root[data-theme="light"] body:has(.publicLanding),
+:root[data-theme="light"] body:has(.authPage),
+:root[data-theme="light"] body:has(.paymentResultPage),
+:root[data-theme="light"] body:has(.paywallFunnel),
+body:has(.publicLanding),
+body:has(.authPage),
+body:has(.paymentResultPage),
+body:has(.paywallFunnel){
+  background:#05070b!important;
+}
+
+:root[data-theme="light"] .publicLanding,
+:root[data-theme="dark"] .publicLanding,
+.publicLanding{
+  color:#eef1f6!important;
+  background:
+    radial-gradient(circle at 18% 8%,rgba(212,166,58,.16),transparent 28%),
+    radial-gradient(circle at 84% 22%,rgba(59,130,246,.10),transparent 30%),
+    linear-gradient(180deg,#07090D 0%,#0B0F17 48%,#07090D 100%)!important;
+}
+
+:root[data-theme="light"] .authPage,
+:root[data-theme="dark"] .authPage,
+.authPage{
+  color:#eef1f6!important;
+  background:#05070a!important;
+}
+
+:root[data-theme="light"] .authPage::before,
+:root[data-theme="dark"] .authPage::before,
+.authPage::before{
+  opacity:.44!important;
+  filter:blur(4px) saturate(.85) brightness(.58) contrast(.96)!important;
+}
+
+:root[data-theme="light"] .authPage::after,
+:root[data-theme="dark"] .authPage::after,
+.authPage::after{
+  background:radial-gradient(circle at 50% 12%,rgba(212,168,67,.13),transparent 34%),linear-gradient(180deg,rgba(3,5,10,.62),rgba(3,5,10,.86))!important;
+}
+
+:root[data-theme="light"] .authPage .loginCard,
+:root[data-theme="dark"] .authPage .loginCard,
+.authPage .loginCard{
+  background:linear-gradient(180deg,rgba(18,22,30,.92),rgba(8,10,15,.96))!important;
+  border-color:rgba(255,255,255,.11)!important;
+  color:#eef1f6!important;
+}
+
+:root[data-theme="light"] .authPage .loginCard h1,
+:root[data-theme="dark"] .authPage .loginCard h1,
+.authPage .loginCard h1,
+:root[data-theme="light"] .paymentResultCard h1,
+:root[data-theme="dark"] .paymentResultCard h1,
+.paymentResultCard h1{
+  color:#fff4d6!important;
+  -webkit-text-fill-color:#fff4d6!important;
+}
+
+:root[data-theme="light"] .authPage .loginCard p,
+:root[data-theme="light"] .authPage .hint,
+:root[data-theme="dark"] .authPage .loginCard p,
+:root[data-theme="dark"] .authPage .hint,
+.authPage .loginCard p,
+.authPage .hint{
+  color:#aeb8c7!important;
+  -webkit-text-fill-color:#aeb8c7!important;
+}
+
+:root[data-theme="light"] .authPage .input,
+:root[data-theme="light"] .authPage .seg,
+:root[data-theme="dark"] .authPage .input,
+:root[data-theme="dark"] .authPage .seg,
+.authPage .input,
+.authPage .seg{
+  background:rgba(255,255,255,.045)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color:#f4f7fb!important;
+  -webkit-text-fill-color:#f4f7fb!important;
+}
+
+:root[data-theme="light"] .publicLanding h1,
+:root[data-theme="light"] .publicLanding h2,
+:root[data-theme="light"] .publicLanding h3,
+:root[data-theme="dark"] .publicLanding h1,
+:root[data-theme="dark"] .publicLanding h2,
+:root[data-theme="dark"] .publicLanding h3,
+.publicLanding h1,
+.publicLanding h2,
+.publicLanding h3{
+  color:#fff5d7!important;
+  -webkit-text-fill-color:#fff5d7!important;
+  text-shadow:none!important;
+}
+
+:root[data-theme="light"] .publicLanding p,
+:root[data-theme="light"] .publicLanding li,
+:root[data-theme="light"] .publicLanding small,
+:root[data-theme="dark"] .publicLanding p,
+:root[data-theme="dark"] .publicLanding li,
+:root[data-theme="dark"] .publicLanding small,
+.publicLanding p,
+.publicLanding li,
+.publicLanding small{
+  color:#b7c0d0!important;
+  -webkit-text-fill-color:#b7c0d0!important;
+  text-shadow:none!important;
+}
+
+:root[data-theme="light"] .publicLanding .landingBadge,
+:root[data-theme="light"] .publicLanding .landingPlanTop span,
+:root[data-theme="dark"] .publicLanding .landingBadge,
+:root[data-theme="dark"] .publicLanding .landingPlanTop span,
+.publicLanding .landingBadge,
+.publicLanding .landingPlanTop span{
+  color:#f0c55a!important;
+  -webkit-text-fill-color:#f0c55a!important;
+}
+
+:root[data-theme="light"] .publicLanding .landingHeroMetrics,
+:root[data-theme="light"] .publicLanding .landingSection,
+:root[data-theme="light"] .publicLanding .landingPanel,
+:root[data-theme="light"] .publicLanding .landingFlow div,
+:root[data-theme="light"] .publicLanding .featureGrid div,
+:root[data-theme="light"] .publicLanding .landingPlanCard,
+:root[data-theme="light"] .publicLanding .landingFinal,
+:root[data-theme="dark"] .publicLanding .landingHeroMetrics,
+:root[data-theme="dark"] .publicLanding .landingSection,
+:root[data-theme="dark"] .publicLanding .landingPanel,
+:root[data-theme="dark"] .publicLanding .landingFlow div,
+:root[data-theme="dark"] .publicLanding .featureGrid div,
+:root[data-theme="dark"] .publicLanding .landingPlanCard,
+:root[data-theme="dark"] .publicLanding .landingFinal,
+.publicLanding .landingHeroMetrics,
+.publicLanding .landingSection,
+.publicLanding .landingPanel,
+.publicLanding .landingFlow div,
+.publicLanding .featureGrid div,
+.publicLanding .landingPlanCard,
+.publicLanding .landingFinal{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+}
+
+:root[data-theme="light"] .paywallFunnel,
+:root[data-theme="dark"] .paywallFunnel,
+.paywallFunnel,
+:root[data-theme="light"] .paymentResultPage,
+:root[data-theme="dark"] .paymentResultPage,
+.paymentResultPage{
+  color:#f7eed8!important;
+  background:#05070b!important;
+}
+
+:root[data-theme="light"] .paywallFunnel h1,
+:root[data-theme="light"] .paywallFunnel h2,
+:root[data-theme="light"] .paywallFunnel h3,
+:root[data-theme="dark"] .paywallFunnel h1,
+:root[data-theme="dark"] .paywallFunnel h2,
+:root[data-theme="dark"] .paywallFunnel h3,
+.paywallFunnel h1,
+.paywallFunnel h2,
+.paywallFunnel h3{
+  color:#fff4d3!important;
+  -webkit-text-fill-color:#fff4d3!important;
+  text-shadow:none!important;
+}
+
+:root[data-theme="light"] .paywallFunnel p,
+:root[data-theme="light"] .paywallFunnel li,
+:root[data-theme="light"] .paywallFunnel small,
+:root[data-theme="dark"] .paywallFunnel p,
+:root[data-theme="dark"] .paywallFunnel li,
+:root[data-theme="dark"] .paywallFunnel small,
+.paywallFunnel p,
+.paywallFunnel li,
+.paywallFunnel small{
+  color:#d8deea!important;
+  -webkit-text-fill-color:#d8deea!important;
+  text-shadow:none!important;
+}
+
+.paywallFunnelVideoBg video,
+.paywallFunnelPreview>video{
+  display:none!important;
+}
+
+.paywallFunnelVideoBg{
+  background:url('/paywall-premium-bg-final.jpg') center / cover no-repeat!important;
+  opacity:.72!important;
+}
+
+.paywallFunnelPreview{
+  min-height:300px!important;
+  background:
+    radial-gradient(circle at 18% 10%,rgba(240,197,90,.12),transparent 38%),
+    linear-gradient(180deg,#07101a,#03050a)!important;
+}
+
+.paywallFunnelPreview:after{
+  display:none!important;
+}
+
+.paywallProductInterface{
+  position:absolute!important;
+  inset:16px!important;
+  z-index:2!important;
+  display:grid!important;
+  grid-template-rows:auto auto 1fr auto auto!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+
+.productInterfaceTop,
+.productInterfaceKpis,
+.productInterfaceReview,
+.productInterfaceHeatmap{
+  min-width:0!important;
+}
+
+.productInterfaceTop span,
+.productInterfaceTop b,
+.productInterfaceKpis span,
+.productInterfaceKpis b,
+.productInterfaceReview span,
+.productInterfaceReview b{
+  display:block!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+@media(max-width:520px){
+  .paywallFunnelPreview{min-height:340px!important;}
+  .paywallProductInterface{inset:10px!important;}
+  .productInterfaceKpis{grid-template-columns:1fr!important;}
+}
+
+/* v45 paywall demo: stable SaaS dashboard preview, no video dependency. */
+.paywallFunnelPreview{
+  display:block!important;
+  position:relative!important;
+  overflow:hidden!important;
+  border-radius:26px!important;
+}
+
+.paywallProductInterface{
+  grid-template-rows:auto auto minmax(92px,1fr) auto auto!important;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(240,197,90,.12),transparent 34%),
+    linear-gradient(180deg,rgba(10,14,22,.96),rgba(4,6,11,.98))!important;
+}
+
+.productInterfaceTop{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding-bottom:10px!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+
+.productInterfaceTop span{
+  color:#8e98aa!important;
+  font-size:10px!important;
+  font-weight:1000!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+}
+
+.productInterfaceTop b{
+  flex:0 0 auto!important;
+  color:#24d38f!important;
+  font-size:11px!important;
+  font-weight:1000!important;
+  letter-spacing:.06em!important;
+}
+
+.productInterfaceKpis{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+
+.productInterfaceKpis div{
+  min-width:0!important;
+  padding:11px 10px!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:14px!important;
+  background:rgba(255,255,255,.035)!important;
+}
+
+.productInterfaceKpis span,
+.productInterfaceReview span{
+  color:#798496!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+}
+
+.productInterfaceKpis b{
+  margin-top:5px!important;
+  color:#f8ead0!important;
+  font-size:clamp(15px,2vw,22px)!important;
+  line-height:1!important;
+  font-weight:1000!important;
+}
+
+.productInterfaceCurve{
+  position:relative!important;
+  display:flex!important;
+  align-items:end!important;
+  gap:8px!important;
+  min-height:96px!important;
+  padding:18px 16px 14px!important;
+  border:1px solid rgba(240,197,90,.14)!important;
+  border-radius:16px!important;
+  background:linear-gradient(180deg,rgba(240,197,90,.055),rgba(255,255,255,.018))!important;
+  overflow:hidden!important;
+}
+
+.productInterfaceCurve:before{
+  content:""!important;
+  position:absolute!important;
+  left:14px!important;
+  right:14px!important;
+  top:30px!important;
+  height:48px!important;
+  border-top:2px solid rgba(240,197,90,.72)!important;
+  border-radius:50% 44% 0 0!important;
+  transform:skewY(-8deg)!important;
+  filter:drop-shadow(0 8px 16px rgba(240,197,90,.18))!important;
+}
+
+.productInterfaceCurve i{
+  position:relative!important;
+  z-index:1!important;
+  flex:1 1 0!important;
+  min-width:8px!important;
+  border-radius:9px 9px 3px 3px!important;
+  background:linear-gradient(180deg,#f0c55a,rgba(240,197,90,.22))!important;
+  box-shadow:0 10px 20px rgba(240,197,90,.12)!important;
+}
+
+.productInterfaceCurve i:nth-child(1){height:42%!important;}
+.productInterfaceCurve i:nth-child(2){height:58%!important;}
+.productInterfaceCurve i:nth-child(3){height:48%!important;}
+.productInterfaceCurve i:nth-child(4){height:74%!important;}
+.productInterfaceCurve i:nth-child(5){height:66%!important;}
+.productInterfaceCurve i:nth-child(6){height:90%!important;}
+
+.productInterfaceReview{
+  display:grid!important;
+  gap:4px!important;
+  padding:11px 12px!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:14px!important;
+  background:rgba(255,255,255,.035)!important;
+}
+
+.productInterfaceReview b{
+  color:#e9eef8!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+  white-space:normal!important;
+}
+
+.productInterfaceHeatmap{
+  display:grid!important;
+  grid-template-columns:repeat(12,minmax(0,1fr))!important;
+  gap:5px!important;
+}
+
+.productInterfaceHeatmap i{
+  display:block!important;
+  height:13px!important;
+  border-radius:5px!important;
+  background:rgba(240,197,90,.13)!important;
+}
+
+.productInterfaceHeatmap i:nth-child(3n){background:rgba(240,197,90,.34)!important;}
+.productInterfaceHeatmap i:nth-child(4n){background:rgba(35,209,139,.26)!important;}
+.productInterfaceHeatmap i:nth-child(7n){background:rgba(240,197,90,.56)!important;}
+
+@media(max-width:520px){
+  .paywallProductInterface{grid-template-rows:auto auto auto auto auto!important;}
+  .productInterfaceTop{align-items:flex-start!important;flex-direction:column!important;gap:4px!important;}
+  .productInterfaceKpis{grid-template-columns:1fr!important;}
+  .productInterfaceCurve{min-height:86px!important;padding:14px 12px 12px!important;}
+  .productInterfaceHeatmap{grid-template-columns:repeat(6,minmax(0,1fr))!important;}
+}
