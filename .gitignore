@@ -26,3 +26,5 @@ service-account*.txt
 *.key
 # Local Netlify folder
 .netlify
+
+.vercel
