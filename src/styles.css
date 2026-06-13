@@ -9985,6 +9985,11 @@ body:has(.paywallFunnel){
 .onboardingSteps button>span{width:30px;height:30px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#f0c55a;font-weight:1000}
 .onboardingSteps button.done{border-color:rgba(34,197,94,.24);background:rgba(34,197,94,.07)}
 .onboardingSteps button.done>span{color:#86efac;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.24)}
+.onboardingProgress{display:grid;grid-template-columns:auto minmax(180px,1fr);gap:16px;align-items:center;margin-bottom:14px;padding:12px 14px;border:1px solid rgba(212,166,58,.14);border-radius:16px;background:rgba(255,255,255,.028)}
+.onboardingProgress span{display:block;color:var(--muted2);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.10em}
+.onboardingProgress b{display:block;color:#fff4d6;font-size:20px;margin-top:4px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+.onboardingProgressTrack{height:9px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.onboardingProgressTrack i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#8a6a1a,#d4a63a,#f0c55a);box-shadow:0 0 24px rgba(212,166,58,.25)}
 .dashboardEmptyGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .premiumEmptyAction{display:flex;align-items:flex-start;gap:13px;min-height:128px}
 .premiumEmptyAction b{font-size:15px}
@@ -10004,13 +10009,19 @@ html[data-theme="light"] .nextActionBody>span,html[data-theme="light"] .premiumE
 .dashboardV38 .metricPremium small{color:#9aa5b8}
 .structuredOnboardingCard{position:relative;overflow:hidden}
 .structuredOnboardingCard:before{content:"";position:absolute;left:20px;right:20px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,166,58,.42),transparent)}
-.onboardingSteps button{position:relative;min-height:82px;border-color:rgba(212,166,58,.18);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));box-shadow:0 14px 42px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.035) inset;transition:180ms ease}
+.onboardingSteps button{position:relative;min-height:104px;border-color:rgba(212,166,58,.18);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));box-shadow:0 14px 42px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.035) inset;transition:180ms ease}
 .onboardingSteps button:after{content:"›";margin-left:auto;color:#d4a63a;font-size:25px;line-height:1;opacity:.78;transition:180ms ease}
 .onboardingSteps button:hover{transform:translateY(-2px);border-color:rgba(212,166,58,.36);background:linear-gradient(180deg,rgba(212,166,58,.10),rgba(255,255,255,.032));box-shadow:0 20px 60px rgba(0,0,0,.26)}
 .onboardingSteps button:hover:after{transform:translateX(2px);opacity:1}
 .onboardingSteps b{color:#e8edf7;font-size:12px;letter-spacing:.05em;line-height:1.28}
+.onboardingSteps button div{display:grid;gap:4px;min-width:0}
+.onboardingSteps button em{font-style:normal;color:#f0c55a;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em}
+.onboardingSteps button small{color:#aab4c5;font-size:12px;font-weight:850;line-height:1.25}
 .onboardingSteps button>span{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,rgba(212,166,58,.18),rgba(255,255,255,.045));border-color:rgba(212,166,58,.25);color:#f8d77d;box-shadow:0 10px 28px rgba(0,0,0,.18)}
 .onboardingSteps button.done{border-color:rgba(34,197,94,.22);background:linear-gradient(180deg,rgba(34,197,94,.095),rgba(255,255,255,.025))}
+.onboardingSteps button.done em{color:#86efac}
+.onboardingSteps button.done small{color:#9fd9b6}
+.onboardingSteps button.next{border-color:rgba(212,166,58,.42);box-shadow:0 20px 62px rgba(0,0,0,.28),0 0 0 1px rgba(212,166,58,.10) inset}
 .calendarMiniGrid{gap:8px}
 .calendarMiniGrid button,.calendarMiniGrid span{height:54px;border-radius:13px;padding:7px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;line-height:1;overflow:hidden}
 .calendarMiniGrid button b{display:block;color:#eef3fb;font-size:14px;font-weight:950;letter-spacing:-.02em}
@@ -10037,5 +10048,7 @@ html[data-theme="light"] .nextActionBody>span,html[data-theme="light"] .premiumE
 html[data-theme="light"] .dashboardV38 .cardHead h3,html[data-theme="light"] .dashboardV38 .metricPremium b,html[data-theme="light"] .insightPro strong,html[data-theme="light"] .statMatrix b{color:#0f172a!important}
 html[data-theme="light"] .dashboardV38 .cardHead p,html[data-theme="light"] .insightPro p{color:#536074!important}
 html[data-theme="light"] .onboardingSteps button,html[data-theme="light"] .insightPro,html[data-theme="light"] .statMatrix>div{background:#fff!important;border-color:rgba(15,23,42,.11)!important;box-shadow:0 16px 46px rgba(15,23,42,.08)}
-html[data-theme="light"] .onboardingSteps b,html[data-theme="light"] .calendarMiniGrid button b{color:#111827!important}
-@media(max-width:640px){.onboardingSteps button{min-height:72px}.calendarMiniGrid{gap:5px}.calendarMiniGrid button,.calendarMiniGrid span{height:48px;border-radius:10px;padding:5px 3px}.calendarMiniGrid button b{font-size:13px}.calendarMiniGrid button em{font-size:9px}.insightPro{min-height:auto}.statMatrix>div{min-height:auto}}
+html[data-theme="light"] .onboardingSteps b,html[data-theme="light"] .calendarMiniGrid button b,html[data-theme="light"] .onboardingProgress b{color:#111827!important}
+html[data-theme="light"] .onboardingProgress{background:#fff;border-color:rgba(15,23,42,.10)}
+html[data-theme="light"] .onboardingSteps button small{color:#536074}
+@media(max-width:640px){.onboardingProgress{grid-template-columns:1fr;gap:10px}.onboardingSteps button{min-height:88px}.calendarMiniGrid{gap:5px}.calendarMiniGrid button,.calendarMiniGrid span{height:48px;border-radius:10px;padding:5px 3px}.calendarMiniGrid button b{font-size:13px}.calendarMiniGrid button em{font-size:9px}.insightPro{min-height:auto}.statMatrix>div{min-height:auto}}

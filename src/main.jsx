@@ -1056,14 +1056,27 @@ function ProcessSummaryCard({data,setTab}){
 }
 function StructuredOnboardingCard({data,setTab}){
   const settingsReady=Boolean(data.settings?.initialBalance||data.settings?.accounts?.length);
+  const dayKey=tradingDayKey();
+  const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===dayKey);
+  const completedCount=[
+    settingsReady,
+    (data.checklists||[]).length>0,
+    (data.trades||[]).length>0,
+    !!todayPlan,
+    (data.emotionalJournals||[]).length>0,
+    (data.trades||[]).length>=5
+  ].filter(Boolean).length;
   const steps=[
-    ['Configura tu cuenta',settingsReady,'settings'],
-    ['Valida tu checklist',(data.checklists||[]).length>0,'checklist'],
-    ['Registra tu primer trade',(data.trades||[]).length>0,'journal'],
-    ['Cerra tu sesion emocional',(data.emotionalJournals||[]).length>0,'emotional'],
-    ['Revisa tus metricas semanales',(data.trades||[]).length>=5,'analytics']
+    {label:'Configurar cuenta/base operativa',done:settingsReady,target:'settings',cta:'Configurar',icon:Settings},
+    {label:'Crear primera validacion de checklist',done:(data.checklists||[]).length>0,target:'checklist',cta:'Abrir checklist',icon:CheckCircle2},
+    {label:'Registrar primer trade',done:(data.trades||[]).length>0,target:'journal',cta:'Registrar trade',icon:Plus},
+    {label:'Guardar jornada del dia',done:!!todayPlan,target:'journal',cta:'Guardar jornada',icon:CalendarDays},
+    {label:'Completar cierre emocional',done:(data.emotionalJournals||[]).length>0,target:'emotional',cta:'Cerrar sesion',icon:Heart},
+    {label:'Revisar analytics/insights',done:(data.trades||[]).length>=5,target:'analytics',cta:'Revisar analytics',icon:BarChart3}
   ];
-  return <Card title="Empeza con estructura" sub="Secuencia recomendada para ordenar tu uso del workspace." className="structuredOnboardingCard"><div className="onboardingSteps">{steps.map(([label,done,target],i)=><button key={label} className={done?'done':''} onClick={()=>setTab(target)}><span>{done?<CheckCircle2 size={16}/>:i+1}</span><b>{label}</b></button>)}</div></Card>
+  const nextIndex=steps.findIndex(s=>!s.done);
+  const progress=Math.round(completedCount/steps.length*100);
+  return <Card title="Prepará tu workspace operativo" sub="Completá estos pasos para convertir cada sesión en información útil." className="structuredOnboardingCard"><div className="onboardingProgress"><div><span>Progreso real</span><b>{completedCount}/{steps.length}</b></div><div className="onboardingProgressTrack"><i style={{width:`${progress}%`}}/></div></div><div className="onboardingSteps">{steps.map((step,i)=>{const Icon=step.icon; const status=step.done?'Completado':i===nextIndex?'Siguiente acción':'Pendiente'; return <button key={step.label} className={`${step.done?'done':''} ${i===nextIndex?'next':''}`} onClick={()=>setTab(step.target)}><span>{step.done?<CheckCircle2 size={16}/>:<Icon size={16}/>}</span><div><em>{status}</em><b>{step.label}</b><small>{step.done?'Listo':step.cta}</small></div></button>})}</div></Card>
 }
 function DashboardEmptyStates({data,setTab,s}){
   const items=[
