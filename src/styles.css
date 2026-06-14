@@ -9574,6 +9574,450 @@ html{scroll-padding-top:96px;}
   .authPage .loginCard{max-width:100%!important;}
 }
 
+/* Definitive commercial funnel/paywall cleanup */
+.finalCommercialSurface .mobileHeroVideoFrame{
+  display:none!important;
+}
+.finalCommercialSurface .finalJournalDifference,
+.finalCommercialSurface .finalModuleSection,
+.finalCommercialSurface .finalDemoGallery,
+.finalCommercialSurface .finalValueSection,
+.finalCommercialSurface .finalPricingSection{
+  width:min(1180px,100%)!important;
+  max-width:1180px!important;
+  margin:0 auto clamp(28px,4vw,48px)!important;
+  padding:clamp(22px,3vw,34px)!important;
+  border-radius:26px!important;
+}
+.finalCommercialSurface .finalJournalDifference h2,
+.finalCommercialSurface .finalModuleSection h2,
+.finalCommercialSurface .finalDemoGallery h2,
+.finalCommercialSurface .finalValueSection h2{
+  max-width:860px!important;
+}
+.finalCommercialSurface .finalJournalDifference>p,
+.finalCommercialSurface .finalModuleSection>p,
+.finalCommercialSurface .finalDemoGallery>p,
+.finalCommercialSurface .finalValueSection>p{
+  max-width:740px!important;
+  margin-bottom:22px!important;
+}
+.finalCommercialSurface .finalDemoImageGrid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important;
+  align-items:stretch!important;
+}
+.finalCommercialSurface .finalDemoImageCard,
+.finalCommercialSurface .finalDemoImageCard:first-child{
+  grid-column:auto!important;
+  max-width:none!important;
+  display:grid!important;
+  grid-template-rows:auto auto 1fr!important;
+  gap:10px!important;
+  padding:14px!important;
+  border-radius:20px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022))!important;
+  border:1px solid rgba(240,197,90,.13)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.22)!important;
+}
+.finalCommercialSurface .finalDemoImageCard h3{
+  margin:0!important;
+  min-height:0!important;
+  font-size:17px!important;
+  line-height:1.15!important;
+}
+.finalCommercialSurface .finalDemoImageCard p{
+  margin:0!important;
+  color:#aeb8c8!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+.finalCommercialSurface .finalDemoImageButton{
+  display:block!important;
+  width:100%!important;
+  aspect-ratio:16/9!important;
+  max-height:230px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+  background:#05070a!important;
+  cursor:default!important;
+}
+.finalCommercialSurface .finalDemoImageButton img,
+.finalCommercialSurface .finalDemoImageCard img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-height:230px!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  border-radius:16px!important;
+}
+.finalCommercialSurface .finalValueGrid{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.finalPaywallSurface.paywallFunnel{
+  display:block!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  padding:clamp(16px,2.5vw,30px)!important;
+}
+.finalPaywallShell.paywallFunnelShell{
+  width:min(1180px,96vw)!important;
+  max-height:none!important;
+  height:auto!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+}
+.finalPaywallMain{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:visible!important;
+}
+.finalPaywallLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(360px,520px)!important;
+  gap:clamp(18px,3vw,34px)!important;
+  align-items:center!important;
+  margin:0 0 18px!important;
+}
+.finalPaywallHero h1{
+  max-width:720px!important;
+}
+.finalPaywallHero h2{
+  max-width:680px!important;
+}
+.finalPaywallDemoFrame{
+  width:100%!important;
+  max-width:520px!important;
+  justify-self:end!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  overflow:hidden!important;
+  border-radius:24px!important;
+  background:#05070a!important;
+}
+.finalPaywallDemoFrame .paywallDemoVideo,
+.finalPaywallDemoFrame img,
+.finalPaywallDemoFrame video{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  border-radius:24px!important;
+}
+.finalPaywallProof,
+.finalPaywallMobileImage{
+  display:none!important;
+}
+.finalPaywallBilling{
+  margin:18px 0!important;
+}
+.finalPaywallPlans{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important;
+  align-items:stretch!important;
+}
+.finalPaywallPlans .paywallFunnelPlan{
+  min-height:0!important;
+}
+.paywallFunnelDisclaimer{
+  max-width:760px!important;
+  margin:16px auto 0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:rgba(207,215,229,.72)!important;
+  text-align:center!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+@media(max-width:980px){
+  .finalCommercialSurface .finalDemoImageGrid{
+    grid-template-columns:1fr!important;
+  }
+  .finalCommercialSurface .finalDemoImageButton,
+  .finalCommercialSurface .finalDemoImageButton img,
+  .finalCommercialSurface .finalDemoImageCard img{
+    max-height:none!important;
+  }
+  .finalCommercialSurface .finalValueGrid{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .finalPaywallLayout,
+  .finalPaywallPlans{
+    grid-template-columns:1fr!important;
+  }
+  .finalPaywallDemoFrame{
+    justify-self:start!important;
+    max-width:680px!important;
+  }
+}
+@media(max-width:768px){
+  .commercialSurface.publicLanding .finalLandingHero,
+  .finalCommercialSurface .finalLandingHero{
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .finalCommercialSurface .finalLandingCopy{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .finalCommercialSurface .mobileHeroVideoFrame{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:20px 0 12px!important;
+    overflow:visible!important;
+  }
+  .finalCommercialSurface .landingMediaStack.finalLandingVisual{
+    display:none!important;
+  }
+  .finalCommercialSurface .mobileHeroVideoFrame .landingDemoVideo,
+  .finalCommercialSurface .mobileHeroVideoFrame img,
+  .finalCommercialSurface .mobileHeroVideoFrame video{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+    object-fit:contain!important;
+    border-radius:18px!important;
+  }
+  .finalCommercialSurface .finalJournalDifference,
+  .finalCommercialSurface .finalModuleSection,
+  .finalCommercialSurface .finalDemoGallery,
+  .finalCommercialSurface .finalValueSection,
+  .finalCommercialSurface .finalPricingSection{
+    padding:22px 16px!important;
+    border-radius:22px!important;
+  }
+  .finalCommercialSurface .finalValueGrid{
+    grid-template-columns:1fr!important;
+  }
+  .finalPaywallSurface.paywallFunnel{
+    padding:12px!important;
+  }
+  .finalPaywallShell.paywallFunnelShell{
+    width:100%!important;
+    padding:16px!important;
+    border-radius:22px!important;
+  }
+  .finalPaywallDemoFrame{
+    max-width:100%!important;
+  }
+  .finalPaywallBilling{
+    display:grid!important;
+  }
+  .finalPaywallBilling>div:last-child{
+    width:100%!important;
+    overflow-x:auto!important;
+  }
+}
+
+/* Final landing conversion section: premium narrative, not a gallery */
+.finalCommercialSurface .finalConversionSection{
+  width:min(1400px,100%)!important;
+  max-width:1400px!important;
+  margin:0 auto clamp(34px,5vw,62px)!important;
+  padding:clamp(26px,4vw,46px)!important;
+  border-radius:30px!important;
+  border:1px solid rgba(240,197,90,.16)!important;
+  background:
+    radial-gradient(circle at 14% 0%,rgba(240,197,90,.12),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025))!important;
+  box-shadow:0 34px 110px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.05)!important;
+  overflow:hidden!important;
+}
+.finalConversionSection .conversionIntro{
+  max-width:850px;
+}
+.finalConversionSection .conversionIntro h2{
+  max-width:850px!important;
+  margin:18px 0 14px!important;
+  font-size:clamp(34px,4.2vw,58px)!important;
+  line-height:1.02!important;
+  letter-spacing:-.055em!important;
+  color:#fff4d6!important;
+}
+.finalConversionSection .conversionIntro p{
+  max-width:760px!important;
+  margin:0!important;
+  color:#b9c3d2!important;
+  font-size:clamp(16px,1.4vw,19px)!important;
+  line-height:1.68!important;
+}
+.outcomePillGrid{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:12px!important;
+  margin:clamp(22px,3vw,34px) 0 clamp(26px,4vw,42px)!important;
+}
+.outcomePill{
+  min-height:96px;
+  display:grid;
+  align-content:center;
+  gap:10px;
+  padding:18px 16px;
+  border-radius:20px;
+  border:1px solid rgba(240,197,90,.15);
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px rgba(255,255,255,.05);
+}
+.outcomePill span{
+  width:max-content;
+  color:#d8aa3b;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.16em;
+}
+.outcomePill b{
+  color:#f7ecd0;
+  font-size:15px;
+  line-height:1.2;
+  letter-spacing:0;
+}
+.conversionTimeline{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:20px!important;
+  align-items:stretch!important;
+}
+.conversionPanel{
+  display:grid;
+  grid-template-columns:minmax(260px,.38fr) minmax(0,.62fr);
+  align-items:center;
+  gap:clamp(18px,3vw,34px);
+  padding:clamp(18px,2.4vw,28px);
+  border-radius:26px;
+  border:1px solid rgba(255,255,255,.09);
+  background:linear-gradient(180deg,rgba(10,14,20,.96),rgba(5,7,11,.98));
+  box-shadow:0 26px 80px rgba(0,0,0,.34);
+}
+.conversionPanelCopy span{
+  display:inline-flex;
+  margin-bottom:10px;
+  color:#d8aa3b;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.conversionPanelCopy h3{
+  margin:0 0 8px!important;
+  color:#fff2d3!important;
+  font-size:clamp(22px,2vw,30px)!important;
+  line-height:1.05!important;
+  letter-spacing:-.035em!important;
+}
+.conversionPanelCopy p{
+  margin:0!important;
+  color:#aeb8c8!important;
+  font-size:14px!important;
+  line-height:1.58!important;
+}
+.conversionPanelVisual{
+  align-self:end;
+  width:100%;
+  aspect-ratio:16/9;
+  min-height:clamp(300px,24vw,390px);
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(240,197,90,.14);
+  background:#05070a;
+  box-shadow:0 18px 60px rgba(0,0,0,.38);
+}
+.conversionPanelVisual img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  border-radius:18px!important;
+}
+.conversionClose{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  margin-top:clamp(22px,3vw,34px);
+  padding:18px 20px;
+  border-radius:22px;
+  border:1px solid rgba(240,197,90,.16);
+  background:rgba(240,197,90,.065);
+}
+.conversionClose b{
+  color:#fff1cc;
+  font-size:clamp(20px,2vw,28px);
+  line-height:1.1;
+  letter-spacing:-.035em;
+}
+.conversionClose p{
+  max-width:620px;
+  margin:0!important;
+  color:#b8c2d0!important;
+  font-size:14px!important;
+  line-height:1.55!important;
+}
+@media(max-width:1080px){
+  .outcomePillGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .conversionTimeline{
+    grid-template-columns:1fr!important;
+  }
+  .conversionPanel{
+    grid-template-columns:minmax(0,.88fr) minmax(320px,1.12fr);
+    grid-template-rows:auto;
+    align-items:center;
+  }
+  .conversionClose{
+    display:grid;
+  }
+}
+@media(max-width:720px){
+  .finalCommercialSurface .finalConversionSection{
+    padding:22px 16px!important;
+    border-radius:24px!important;
+  }
+  .outcomePillGrid{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  .outcomePill{
+    min-height:76px;
+    padding:16px;
+  }
+  .conversionPanel{
+    grid-template-columns:1fr;
+    padding:14px;
+    border-radius:20px;
+  }
+  .conversionPanelVisual{
+    aspect-ratio:16/9;
+    border-radius:16px;
+  }
+  .conversionClose{
+    padding:16px;
+    border-radius:18px;
+  }
+}
+
 /* v45 hotfix: public/auth/paywall stay dark regardless of app theme. */
 :root[data-theme="light"] body:has(.publicLanding),
 :root[data-theme="light"] body:has(.authPage),
@@ -10318,3 +10762,1320 @@ html[data-theme="light"] .sampleNotice b{color:#1c160d!important}
 html[data-theme="light"] .sampleNotice p{color:#69707b!important}
 .emptyIcon{width:36px;height:36px;border-radius:12px;display:inline-grid;place-items:center;margin-bottom:10px;color:var(--gold2);background:rgba(212,168,67,.10);border:1px solid rgba(212,168,67,.22)}
 .empty .ghost.compact{margin-top:12px}
+
+/* Final commercial polish: real image demos */
+.finalCommercialSurface.publicLanding{
+  padding:26px clamp(16px,4vw,58px) 48px!important;
+  background:linear-gradient(180deg,#030407 0%,#070a0f 46%,#030407 100%)!important;
+}
+.finalCommercialSurface.publicLanding:before{opacity:.42!important}
+.finalLandingHero{
+  min-height:min(760px,calc(100dvh - 72px))!important;
+  grid-template-columns:minmax(0,.82fr) minmax(460px,1.18fr)!important;
+  gap:clamp(32px,5vw,78px)!important;
+  align-items:center!important;
+}
+.finalLandingCopy h1{
+  font-size:clamp(46px,5.6vw,78px)!important;
+  line-height:.98!important;
+  letter-spacing:-.06em!important;
+  color:#fff4d8!important;
+  margin:24px 0 18px!important;
+}
+.finalLandingCopy p{
+  max-width:660px!important;
+  font-size:clamp(17px,1.55vw,20px)!important;
+  line-height:1.62!important;
+  color:#c3ccda!important;
+}
+.finalLandingVisual{
+  position:relative;
+  border:1px solid rgba(240,197,90,.18);
+  border-radius:28px;
+  background:#05070b;
+  box-shadow:0 30px 90px rgba(0,0,0,.54);
+  overflow:hidden;
+}
+.finalLandingVisual img{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  object-position:center;
+}
+.finalJournalDifference,.finalModuleSection,.finalPricingSection{
+  border-radius:24px!important;
+  border-color:rgba(240,197,90,.12)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.046),rgba(255,255,255,.018))!important;
+  box-shadow:0 18px 60px rgba(0,0,0,.24)!important;
+}
+.finalJournalDifference .differenceGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.finalFeatureGrid{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.finalFeatureGrid div{
+  border-radius:16px!important;
+  border-color:rgba(240,197,90,.12)!important;
+  background:rgba(255,255,255,.035)!important;
+  color:#f5ead4!important;
+}
+.finalPaywallSurface.paywallFunnel{
+  background:#030407!important;
+  padding:24px!important;
+}
+.finalPaywallShell{
+  width:min(1260px,96vw)!important;
+  max-height:none!important;
+  border-radius:28px!important;
+  border-color:rgba(240,197,90,.20)!important;
+  background:linear-gradient(145deg,rgba(12,15,21,.98),rgba(5,7,10,.99))!important;
+  box-shadow:0 34px 110px rgba(0,0,0,.64),0 0 0 1px rgba(255,255,255,.035) inset!important;
+}
+.finalPaywallHeader{align-items:center!important}
+.paywallLogout{
+  opacity:.72!important;
+  min-height:36px!important;
+  background:rgba(255,255,255,.035)!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+.paywallLogout:hover{opacity:1!important}
+.finalPaywallLayout{
+  grid-template-columns:minmax(0,1.04fr) minmax(380px,.96fr)!important;
+  align-items:start!important;
+}
+.finalPaywallHero h1{
+  max-width:720px!important;
+  font-size:clamp(42px,4.5vw,66px)!important;
+  line-height:.96!important;
+  letter-spacing:-.055em!important;
+}
+.finalPaywallHero h2{
+  max-width:720px!important;
+  font-size:16px!important;
+  line-height:1.58!important;
+}
+.finalPaywallProof{
+  position:sticky;
+  top:18px;
+  display:block!important;
+}
+.finalPaywallImage{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  object-position:center;
+  border-radius:24px;
+  border:1px solid rgba(240,197,90,.22);
+  box-shadow:0 28px 80px rgba(0,0,0,.54);
+}
+.finalPaywallMobileImage{display:none}
+.finalPaywallBilling{
+  border-radius:20px!important;
+  padding:15px!important;
+}
+.finalPaywallPlans .paywallFunnelPlan{
+  border-radius:22px!important;
+  padding:19px!important;
+  min-height:0!important;
+}
+.paywallFunnelDisclaimer{
+  margin:16px 0 0!important;
+  padding:13px 15px!important;
+  border:1px solid rgba(240,197,90,.18)!important;
+  border-radius:16px!important;
+  background:rgba(240,197,90,.07)!important;
+  color:#cfd7e5!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+@media(max-width:1080px){
+  .finalLandingHero,.finalPaywallLayout{grid-template-columns:1fr!important}
+  .finalLandingVisual{order:2}
+  .finalPaywallProof{display:none!important}
+  .finalPaywallMobileImage{display:block;margin:18px 0 18px}
+  .finalPaywallMobileImage img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:22px;border:1px solid rgba(240,197,90,.20)}
+  .finalFeatureGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:640px){
+  .finalCommercialSurface.publicLanding{padding:18px 14px 36px!important}
+  .finalLandingHero{gap:24px!important}
+  .finalLandingCopy h1{font-size:clamp(38px,11vw,54px)!important}
+  .finalLandingCopy p{font-size:15px!important;line-height:1.55!important}
+  .finalLandingVisual{border-radius:20px}
+  .finalJournalDifference .differenceGrid,.finalFeatureGrid{grid-template-columns:1fr!important}
+  .finalPaywallSurface.paywallFunnel{padding:12px!important}
+  .finalPaywallShell{width:100%!important;border-radius:22px!important;padding:16px!important}
+  .finalPaywallHeader{gap:12px!important;align-items:flex-start!important}
+  .paywallFunnelActions{align-items:flex-end!important}
+  .paywallLogout{font-size:11px!important;padding:0 10px!important}
+  .finalPaywallHero h1{font-size:clamp(34px,10vw,48px)!important}
+  .finalPaywallHero h2{font-size:14px!important}
+  .finalPaywallBilling{display:grid!important}
+  .finalPaywallBilling>div:last-child{width:100%;overflow-x:auto}
+  .finalPaywallPlans{grid-template-columns:1fr!important}
+}
+
+/* Commercial surface demos: landing + paywall premium trust */
+.commercialSurface.publicLanding{background:radial-gradient(circle at 18% 4%,rgba(240,197,90,.18),transparent 28%),radial-gradient(circle at 82% 12%,rgba(20,122,82,.12),transparent 30%),linear-gradient(180deg,#030407 0%,#080b10 44%,#030407 100%)!important}
+.commercialSurface .landingHero{grid-template-columns:minmax(0,1fr) minmax(420px,.9fr)!important;gap:clamp(28px,5vw,76px)!important}
+.commercialSurface .landingHeroText h1{color:#fff3cf!important;letter-spacing:-.07em!important}.commercialSurface .landingHeroText p{max-width:720px!important;color:#c3ccda!important}
+.commercialHeroDemo{grid-template-columns:repeat(3,minmax(0,1fr))!important;width:min(100%,620px)!important;padding:18px!important;border-radius:30px!important;background:radial-gradient(circle at 12% 0%,rgba(240,197,90,.16),transparent 240px),linear-gradient(180deg,rgba(12,16,23,.96),rgba(4,6,10,.98))!important;border:1px solid rgba(240,197,90,.18)!important;box-shadow:0 34px 120px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.08)!important}
+.commercialHeroDemo .landingMetricsTop{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.04)}.commercialHeroDemo .landingMetricsTop img{width:34px;height:34px;border-radius:10px}.commercialHeroDemo .landingMetricsTop span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#f0c55a;font-weight:1000}.commercialHeroDemo .landingMetricsTop b{margin-left:auto;color:#8ef0bd;font-size:12px}
+.commercialEquityPanel{grid-column:1/-1;display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:end;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.024))}.commercialEquityPanel span,.commercialCalendar span,.commercialDemoCopy span{display:block;color:#778297;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:1000}.commercialEquityPanel b{display:block;margin-top:5px;color:#fff3cf;font-size:30px;letter-spacing:-.04em}.commercialEquityPanel small{color:#8995a8}
+.commercialCurve{height:96px;display:flex;align-items:end;gap:8px}.commercialCurve i{flex:1;min-width:7px;border-radius:9px 9px 2px 2px;background:linear-gradient(180deg,#f0c55a,rgba(240,197,90,.14))}.commercialCurve i:nth-child(1){height:34%}.commercialCurve i:nth-child(2){height:46%}.commercialCurve i:nth-child(3){height:42%}.commercialCurve i:nth-child(4){height:64%}.commercialCurve i:nth-child(5){height:58%}.commercialCurve i:nth-child(6){height:78%}.commercialCurve i:nth-child(7){height:90%}
+.commercialCalendar{grid-column:1/-1;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035)}.commercialCalendar div{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin-top:10px}.commercialCalendar i{height:24px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}.commercialCalendar i.win{background:rgba(35,209,139,.2);border-color:rgba(35,209,139,.32)}.commercialCalendar i.loss{background:rgba(239,77,93,.18);border-color:rgba(239,77,93,.3)}.commercialCalendar i.flat{background:rgba(240,197,90,.12);border-color:rgba(240,197,90,.22)}
+.recentTrades b{font-size:18px!important}.journalDifference .differenceGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}.differenceGrid div,.commercialDemoCard{border:1px solid rgba(255,255,255,.09);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.024));box-shadow:0 18px 70px rgba(0,0,0,.20)}.differenceGrid div{padding:20px}.differenceGrid span{display:block;color:#f0c55a;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:1000}.differenceGrid b{display:block;color:#fff3cf;font-size:22px;margin:8px 0}.differenceGrid p{margin:0!important}
+.commercialDemoSection{max-width:1320px!important}.commercialDemoGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:24px}.commercialDemoCard{display:flex;flex-direction:column;gap:16px;padding:18px;min-height:330px}.commercialDemoCopy h3{margin:8px 0 8px;color:#fff3cf;font-size:20px;letter-spacing:-.035em}.commercialDemoCopy p{font-size:13px!important;line-height:1.55!important;margin:0!important;color:#aeb8c8!important}.commercialDemoVisual{margin-top:auto}.commercialDemoBars{height:100px;display:flex;align-items:end;gap:7px;padding:12px;border-radius:16px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.07)}.commercialDemoBars i{flex:1;border-radius:8px 8px 2px 2px;background:linear-gradient(180deg,#f0c55a,rgba(240,197,90,.16))}.commercialDemoKpis{display:grid;grid-template-columns:1fr;gap:7px;margin-top:10px}.commercialDemoKpis div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}.commercialDemoKpis span{color:#778297;font-size:10px;text-transform:uppercase;font-weight:900}.commercialDemoKpis b{color:#f5ead4}
+.paywallFunnelDisclaimer{margin:16px 0 0!important;padding:13px 15px;border:1px solid rgba(240,197,90,.18);border-radius:16px;background:rgba(240,197,90,.07);color:#cfd7e5!important;font-size:12px!important;line-height:1.55!important}.productInterfaceKpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}.productInterfaceTrades{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035);display:grid;gap:4px}.productInterfaceTrades span{color:#778297;font-size:10px;text-transform:uppercase;font-weight:1000;letter-spacing:.1em}.productInterfaceTrades b{color:#fff3cf}.productInterfaceTrades small{color:#8f9aaf}.paywallFunnel .paywallFunnelVideoBg{display:none!important}.paywallFunnelPlan{min-height:0!important}.paywallFunnelPlans{align-items:stretch}.paywallFunnelPlanTop h3{font-size:28px!important}.paywallFunnelPrice b{font-size:34px!important}.paywallFunnelPlan ul{gap:9px!important}.paywallFunnelPlan li{line-height:1.35!important}
+@media(max-width:1180px){.commercialDemoGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.commercialSurface .landingHero{grid-template-columns:1fr!important}.commercialHeroDemo{justify-self:center}}
+@media(max-width:720px){.commercialHeroDemo{grid-template-columns:1fr!important;border-radius:24px!important;padding:14px!important}.commercialEquityPanel{grid-template-columns:1fr}.commercialCurve{height:82px}.journalDifference .differenceGrid,.commercialDemoGrid{grid-template-columns:1fr}.commercialDemoCard{min-height:0}.productInterfaceKpis{grid-template-columns:1fr 1fr!important}.paywallFunnelDisclaimer{font-size:12px!important}.commercialSurface .landingHeroText{text-align:left!important}}
+@media(max-width:430px){.commercialCalendar div{grid-template-columns:repeat(6,1fr)}.productInterfaceKpis{grid-template-columns:1fr!important}.commercialSurface .landingHeroText h1{font-size:clamp(38px,12vw,52px)!important}}
+
+/* Final commercial polish: real image demos */
+.finalCommercialSurface.publicLanding{
+  overflow-x:hidden!important;
+}
+.commercialSurface.publicLanding .finalLandingHero{
+  grid-template-columns:minmax(0,.72fr) minmax(540px,1.28fr)!important;
+  max-width:1500px!important;
+  gap:clamp(28px,4vw,68px)!important;
+  align-items:center!important;
+}
+.finalLandingVisual{
+  border-radius:26px!important;
+  background:#04070b!important;
+  border:1px solid rgba(240,197,90,.18)!important;
+  box-shadow:0 36px 100px rgba(0,0,0,.54),0 0 0 1px rgba(255,255,255,.035) inset!important;
+}
+.finalLandingVisual img{
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  filter:none!important;
+}
+.finalLandingCopy h1{
+  max-width:690px!important;
+}
+.finalLandingCopy p{
+  max-width:650px!important;
+}
+.finalDemoGallery{
+  max-width:1380px!important;
+  padding:clamp(22px,3vw,34px)!important;
+  border-radius:24px!important;
+  border:1px solid rgba(240,197,90,.12)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.016))!important;
+  box-shadow:0 18px 60px rgba(0,0,0,.24)!important;
+}
+.finalDemoGallery h2{
+  max-width:820px!important;
+}
+.finalDemoImageGrid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:14px;
+  margin-top:24px;
+}
+.finalDemoImageCard{
+  display:grid;
+  gap:12px;
+  align-content:start;
+  padding:12px;
+  border-radius:22px;
+  border:1px solid rgba(240,197,90,.13);
+  background:linear-gradient(180deg,rgba(12,16,23,.92),rgba(4,6,10,.96));
+  box-shadow:0 20px 70px rgba(0,0,0,.26);
+}
+.finalDemoImageCard h3{
+  margin:2px 4px 0;
+  color:#fff3cf;
+  font-size:15px;
+  line-height:1.25;
+  letter-spacing:-.02em;
+}
+.finalDemoImageCard img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.075);
+  background:#04070b;
+  box-shadow:0 16px 48px rgba(0,0,0,.26);
+}
+.finalPaywallSurface.paywallFunnel{
+  min-height:100dvh!important;
+  height:auto!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  place-items:start center!important;
+  align-items:start!important;
+}
+.finalPaywallShell{
+  max-height:none!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+}
+.finalPaywallLayout{
+  min-height:0!important;
+}
+.finalPaywallProof{
+  align-self:start!important;
+}
+.finalPaywallImage{
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  filter:none!important;
+}
+.finalPaywallPlans{
+  align-items:stretch!important;
+}
+.paywallFunnel .paywallLogout{
+  color:#d9dfeb!important;
+  box-shadow:none!important;
+}
+@media(max-width:1180px){
+  .commercialSurface.publicLanding .finalLandingHero{
+    grid-template-columns:1fr!important;
+    max-width:1180px!important;
+  }
+  .finalLandingVisual{
+    max-width:980px!important;
+    justify-self:center!important;
+  }
+  .finalDemoImageGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:720px){
+  .finalDemoGallery{
+    padding:18px!important;
+  }
+  .finalDemoImageGrid{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+  .finalDemoImageCard{
+    padding:10px;
+    border-radius:20px;
+  }
+  .finalDemoImageCard h3{
+    font-size:16px;
+  }
+  .finalDemoImageCard img{
+    border-radius:15px;
+  }
+  .finalPaywallSurface.paywallFunnel{
+    display:block!important;
+    padding:12px!important;
+  }
+  .finalPaywallShell{
+    width:100%!important;
+    overflow:visible!important;
+  }
+  .finalPaywallMobileImage img{
+    aspect-ratio:auto!important;
+    object-fit:contain!important;
+  }
+  .finalPaywallPlans{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* Urgent final fix: larger demos and paywall scroll */
+html:has(.finalPaywallSurface),
+body:has(.finalPaywallSurface){
+  height:auto!important;
+  min-height:100dvh!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+body:has(.finalPaywallSurface) #root,
+body:has(.finalPaywallSurface) .app,
+body:has(.finalPaywallSurface) .main{
+  height:auto!important;
+  min-height:100dvh!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+.finalPaywallSurface.paywallFunnel{
+  display:block!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+  padding:clamp(14px,2.4vw,28px)!important;
+}
+.finalPaywallShell.paywallFunnelShell{
+  width:min(1320px,96vw)!important;
+  max-height:none!important;
+  height:auto!important;
+  overflow:visible!important;
+}
+.finalPaywallLayout,
+.finalPaywallLayout .paywallFunnelMain,
+.finalPaywallPlans,
+.finalPaywallPlans .paywallFunnelPlan{
+  max-height:none!important;
+  overflow:visible!important;
+}
+.commercialSurface.publicLanding .finalLandingHero{
+  grid-template-columns:minmax(430px,.45fr) minmax(640px,.55fr)!important;
+  max-width:1640px!important;
+  min-height:calc(100dvh - 96px)!important;
+  gap:clamp(20px,2.8vw,48px)!important;
+}
+.finalLandingVisual{
+  width:100%!important;
+  max-width:none!important;
+  justify-self:stretch!important;
+  margin-right:clamp(-34px,-2vw,-10px)!important;
+}
+.finalLandingVisual img{
+  width:100%!important;
+  min-height:clamp(520px,58vw,820px)!important;
+  object-fit:contain!important;
+}
+.finalLandingCopy h1{
+  font-size:clamp(46px,5vw,76px)!important;
+}
+.finalDemoGallery{
+  max-width:1500px!important;
+}
+.finalDemoImageGrid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:22px!important;
+}
+.finalDemoImageCard{
+  padding:16px!important;
+  border-radius:24px!important;
+}
+.finalDemoImageCard:first-child{
+  grid-column:1/-1;
+}
+.finalDemoImageCard h3{
+  font-size:clamp(18px,1.55vw,24px)!important;
+  margin:4px 4px 2px!important;
+}
+.finalDemoImageButton{
+  display:block;
+  width:100%;
+  padding:0;
+  border:0;
+  border-radius:18px;
+  background:#04070b;
+  cursor:zoom-in;
+  overflow:hidden;
+}
+.finalDemoImageButton img,
+.finalDemoImageCard img{
+  display:block;
+  width:100%!important;
+  height:auto!important;
+  border-radius:18px!important;
+  object-fit:contain!important;
+}
+.commercialLightbox{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:grid;
+  place-items:center;
+  padding:clamp(14px,3vw,34px);
+  background:rgba(1,3,7,.88);
+  backdrop-filter:blur(10px);
+}
+.commercialLightbox figure{
+  width:min(1180px,96vw);
+  max-height:92dvh;
+  margin:0;
+  display:grid;
+  gap:10px;
+}
+.commercialLightbox img{
+  display:block;
+  width:100%;
+  max-height:86dvh;
+  object-fit:contain;
+  border-radius:22px;
+  border:1px solid rgba(240,197,90,.28);
+  box-shadow:0 34px 120px rgba(0,0,0,.72);
+  background:#04070b;
+}
+.commercialLightbox figcaption{
+  color:#f7ead0;
+  font-weight:900;
+  text-align:center;
+}
+.commercialLightboxClose{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:1;
+  min-height:40px;
+  padding:0 14px;
+  border-radius:999px;
+  border:1px solid rgba(240,197,90,.24);
+  background:rgba(8,10,14,.88);
+  color:#f7ead0;
+  font-weight:900;
+}
+@media(max-width:1180px){
+  .commercialSurface.publicLanding .finalLandingHero{
+    grid-template-columns:1fr!important;
+    min-height:auto!important;
+  }
+  .finalLandingVisual{
+    margin-right:0!important;
+  }
+  .finalLandingVisual img{
+    min-height:0!important;
+  }
+}
+@media(max-width:720px){
+  .finalDemoImageGrid{
+    grid-template-columns:1fr!important;
+    gap:18px!important;
+  }
+  .finalDemoImageCard:first-child{
+    grid-column:auto;
+  }
+  .finalDemoImageCard{
+    padding:10px!important;
+  }
+  .commercialLightbox{
+    padding:12px;
+  }
+  .commercialLightbox img{
+    max-height:82dvh;
+    border-radius:16px;
+  }
+  .commercialLightboxClose{
+    top:10px;
+    right:10px;
+  }
+}
+
+/* Micro hotfix: final proportions and access-gate scrolling */
+.publicLanding #plataforma,
+.publicLanding #modulos,
+.publicLanding #precios,
+.publicLanding section,
+.landingSection,
+.landingFinal{
+  scroll-margin-top:118px!important;
+}
+#root:has(.finalPaywallSurface),
+html:has(#root > .finalPaywallSurface),
+body:has(#root > .finalPaywallSurface){
+  height:auto!important;
+  min-height:100dvh!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:auto!important;
+  touch-action:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+#root:has(.finalPaywallSurface){
+  display:block!important;
+  overflow:visible!important;
+}
+#root:has(.finalPaywallSurface) .finalPaywallSurface,
+#root:has(.finalPaywallSurface) .finalPaywallShell,
+#root:has(.finalPaywallSurface) .finalPaywallLayout,
+#root:has(.finalPaywallSurface) .paywallFunnelMain,
+#root:has(.finalPaywallSurface) .finalPaywallPlans,
+#root:has(.finalPaywallSurface) .paywallFunnelPlan{
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+#root:has(.finalPaywallSurface) .finalPaywallSurface{
+  min-height:100dvh!important;
+  padding-bottom:56px!important;
+}
+#root:has(.finalPaywallSurface) .paywallFunnelBg{
+  position:fixed!important;
+}
+.commercialSurface.publicLanding .finalLandingHero{
+  grid-template-columns:minmax(420px,.45fr) minmax(620px,.55fr)!important;
+  min-height:auto!important;
+  padding-top:clamp(16px,2vw,26px)!important;
+  padding-bottom:clamp(18px,2vw,30px)!important;
+}
+.finalLandingVisual{
+  aspect-ratio:16/9!important;
+}
+.finalLandingVisual img{
+  height:clamp(500px,50vw,720px)!important;
+  min-height:0!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+.finalDemoImageButton{
+  max-height:560px;
+}
+.finalDemoImageCard:first-child .finalDemoImageButton{
+  max-height:720px;
+}
+.finalDemoImageButton img,
+.finalDemoImageCard img{
+  height:100%!important;
+  max-height:inherit!important;
+  object-fit:cover!important;
+  object-position:top center!important;
+}
+@media(max-width:1180px){
+  .publicLanding #plataforma,
+  .publicLanding #modulos,
+  .publicLanding #precios,
+  .publicLanding section,
+  .landingSection,
+  .landingFinal{
+    scroll-margin-top:92px!important;
+  }
+  .finalLandingVisual{
+    aspect-ratio:auto!important;
+  }
+  .finalLandingVisual img{
+    height:auto!important;
+    object-fit:contain!important;
+  }
+}
+@media(max-width:720px){
+  .publicLanding #plataforma,
+  .publicLanding #modulos,
+  .publicLanding #precios,
+  .publicLanding section,
+  .landingSection,
+  .landingFinal{
+    scroll-margin-top:82px!important;
+  }
+  .finalDemoImageButton,
+  .finalDemoImageCard:first-child .finalDemoImageButton{
+    max-height:none;
+  }
+  .finalDemoImageButton img,
+  .finalDemoImageCard img{
+    height:auto!important;
+    max-height:none!important;
+    object-fit:contain!important;
+  }
+}
+
+/* Animated image product demo: no video, real screenshots only */
+.animatedProductDemo{
+  position:relative;
+  width:100%;
+  isolation:isolate;
+  border-radius:inherit;
+}
+.animatedProductGlow{
+  position:absolute;
+  inset:8% 4% -6%;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 24% 18%,rgba(240,197,90,.18),transparent 28%),
+    radial-gradient(circle at 78% 72%,rgba(25,209,138,.10),transparent 30%);
+  filter:blur(26px);
+  opacity:.62;
+  animation:productGlowDrift 8s ease-in-out infinite alternate;
+}
+.animatedProductStage{
+  position:relative;
+  z-index:1;
+  overflow:hidden;
+  border-radius:inherit;
+  background:#04070b;
+}
+.animatedProductStage img,
+.animatedProductStage video{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:cover;
+  object-position:center;
+  transform:scale(1) translate3d(0,0,0);
+  animation:productStillLoop 14s ease-in-out infinite alternate;
+  will-change:transform;
+}
+.animatedProductStage video{
+  aspect-ratio:16/9;
+  background:#04070b;
+  pointer-events:none;
+}
+.animatedProductFallback{
+  display:none!important;
+}
+.animatedProductStage img+img{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  animation:productFrameFade 18s ease-in-out infinite;
+  animation-delay:calc(var(--frame-index) * 5s);
+}
+.animatedProductDemo.paywall .animatedProductGlow{
+  inset:10% 2% -10%;
+  opacity:.55;
+}
+.finalLandingVisual .animatedProductDemo,
+.finalLandingVisual .animatedProductStage,
+.finalLandingVisual .animatedProductStage img,
+.finalLandingVisual .animatedProductStage video{
+  height:100%!important;
+}
+.finalLandingVisual .animatedProductStage img,
+.finalLandingVisual .animatedProductStage video{
+  min-height:clamp(500px,50vw,720px)!important;
+}
+.finalPaywallImage.animatedProductDemo{
+  display:block!important;
+  border-radius:24px!important;
+  border:1px solid rgba(240,197,90,.22)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.54)!important;
+  background:#04070b!important;
+}
+.finalPaywallImage .animatedProductStage img,
+.finalPaywallImage .animatedProductStage video{
+  height:auto!important;
+  max-height:none!important;
+  object-fit:cover!important;
+}
+.finalDemoImageCard{
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.finalDemoImageCard:hover{
+  transform:translateY(-3px);
+  border-color:rgba(240,197,90,.24)!important;
+  box-shadow:0 26px 80px rgba(0,0,0,.34),0 0 0 1px rgba(240,197,90,.08) inset!important;
+}
+.finalDemoImageButton img{
+  transition:transform .7s ease,filter .7s ease;
+}
+.finalDemoImageButton:hover img{
+  transform:scale(1.018);
+  filter:saturate(1.04) contrast(1.03);
+}
+@keyframes productStillLoop{
+  0%{transform:scale(1) translate3d(0,0,0)}
+  50%{transform:scale(1.018) translate3d(-.4%,.25%,0)}
+  100%{transform:scale(1.035) translate3d(.55%,-.35%,0)}
+}
+@keyframes productGlowDrift{
+  0%{opacity:.46;transform:translate3d(-1%,0,0) scale(.98)}
+  100%{opacity:.68;transform:translate3d(1.2%,-1%,0) scale(1.02)}
+}
+@keyframes productFrameFade{
+  0%,100%{opacity:0}
+  12%,42%{opacity:1}
+  54%{opacity:0}
+}
+@media(max-width:1180px){
+  .finalLandingVisual .animatedProductDemo,
+  .finalLandingVisual .animatedProductStage,
+  .finalLandingVisual .animatedProductStage img,
+  .finalLandingVisual .animatedProductStage video{
+    height:auto!important;
+  }
+  .finalLandingVisual .animatedProductStage img,
+  .finalLandingVisual .animatedProductStage video{
+    min-height:0!important;
+    object-fit:contain!important;
+  }
+}
+@media(max-width:720px){
+  .animatedProductGlow{
+    opacity:.42;
+    filter:blur(18px);
+  }
+  .animatedProductStage img{
+    animation-duration:16s;
+  }
+  #root:has(.finalPaywallSurface),
+  html:has(#root > .finalPaywallSurface),
+  body:has(#root > .finalPaywallSurface){
+    overflow-y:auto!important;
+    position:static!important;
+  }
+}
+
+/* Direct commercial video render fix */
+.commercialDemoVideo{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:320px!important;
+  aspect-ratio:16/9!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  border-radius:28px!important;
+  background:#05070a!important;
+  border:1px solid rgba(240,197,90,.22)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.54)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  position:relative!important;
+  z-index:2!important;
+  overflow:hidden!important;
+  pointer-events:none;
+}
+.finalLandingVisual .commercialDemoVideo{
+  min-height:clamp(500px,50vw,720px)!important;
+}
+.paywallDemoVideo{
+  min-height:260px!important;
+}
+.finalPaywallImage.commercialDemoVideo{
+  height:auto!important;
+  min-height:320px!important;
+}
+.finalPaywallMobileImage .commercialDemoVideo{
+  width:100%!important;
+  height:auto!important;
+}
+@media(max-width:768px){
+  .commercialDemoVideo{
+    min-height:220px!important;
+    border-radius:22px!important;
+    object-fit:cover!important;
+  }
+  .finalLandingVisual .commercialDemoVideo{
+    min-height:220px!important;
+  }
+}
+
+/* Final video proportions: keep demos legible, not cropped */
+.finalLandingVisual,
+.landingMediaStack.finalLandingVisual{
+  display:block!important;
+  width:100%!important;
+  max-width:min(860px,100%)!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  overflow:visible!important;
+  justify-self:center!important;
+  margin-right:0!important;
+}
+.commercialDemoVideo,
+.landingDemoVideo,
+.paywallDemoVideo{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:#05070a!important;
+  border-radius:24px!important;
+  border:1px solid rgba(216,170,61,.22)!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.45)!important;
+  max-width:100%!important;
+}
+.finalLandingVisual .commercialDemoVideo,
+.finalLandingVisual .landingDemoVideo{
+  height:auto!important;
+  min-height:0!important;
+  object-fit:contain!important;
+}
+.finalPaywallProof,
+.paywallFunnelProof.finalPaywallProof{
+  display:block!important;
+  align-self:start!important;
+  justify-self:center!important;
+  width:100%!important;
+  max-width:720px!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  position:sticky;
+  top:18px;
+}
+.finalPaywallImage.commercialDemoVideo,
+.paywallDemoVideo.finalPaywallImage,
+.finalPaywallMobileImage .paywallDemoVideo{
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+.finalPaywallMobileImage{
+  height:auto!important;
+  min-height:0!important;
+  margin:18px 0!important;
+  overflow:visible!important;
+}
+.finalPaywallLayout{
+  align-items:start!important;
+}
+@media(max-width:768px){
+  .commercialDemoVideo,
+  .landingDemoVideo,
+  .paywallDemoVideo{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+    object-fit:contain!important;
+    border-radius:18px!important;
+  }
+  .finalLandingVisual,
+  .landingMediaStack.finalLandingVisual,
+  .finalPaywallMobileImage,
+  .finalPaywallProof{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin-top:24px!important;
+    overflow:visible!important;
+    max-width:100%!important;
+  }
+}
+
+/* Pre-commit commercial layout fix: mobile video, compact funnel, compact paywall */
+.finalDemoGallery,
+.finalValueSection,
+.finalModuleSection,
+.finalJournalDifference,
+.finalPricingSection{
+  max-width:1180px!important;
+  margin-bottom:clamp(30px,4vw,52px)!important;
+}
+.finalDemoImageGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important;
+}
+.finalDemoImageCard,
+.finalDemoImageCard:first-child{
+  grid-column:auto!important;
+  max-width:620px!important;
+  padding:12px!important;
+}
+.finalDemoImageButton{
+  max-height:none!important;
+  aspect-ratio:16/9!important;
+}
+.finalDemoImageButton img,
+.finalDemoImageCard img{
+  height:100%!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+.finalValueGrid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+  margin-top:20px;
+}
+.finalValueGrid div{
+  padding:15px 12px;
+  border-radius:16px;
+  border:1px solid rgba(240,197,90,.13);
+  background:rgba(255,255,255,.035);
+  color:#f5ead4;
+  font-weight:900;
+  text-align:center;
+}
+.mobileHeroVideoFrame{
+  display:none;
+}
+.finalJournalDifference,
+.finalModuleSection,
+.finalDemoGallery,
+.finalValueSection{
+  text-align:left!important;
+}
+.finalJournalDifference h2,
+.finalModuleSection h2,
+.finalDemoGallery h2,
+.finalValueSection h2{
+  max-width:820px!important;
+}
+.finalJournalDifference>p,
+.finalModuleSection>p,
+.finalValueSection>p{
+  max-width:760px!important;
+}
+.finalFeatureGrid{
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+}
+.finalDemoImageCard{
+  display:grid!important;
+  grid-template-rows:auto 1fr;
+  gap:10px!important;
+}
+.finalDemoImageCard h3{
+  min-height:0!important;
+  font-size:16px!important;
+}
+.finalDemoImageCard h3::after{
+  content:"";
+  display:block;
+  width:38px;
+  height:2px;
+  margin-top:8px;
+  border-radius:99px;
+  background:rgba(240,197,90,.72);
+}
+.finalPaywallLayout{
+  display:block!important;
+}
+.finalPaywallProof{
+  display:none!important;
+}
+.finalPaywallMobileImage{
+  display:block!important;
+  width:min(720px,100%)!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:18px 0 18px!important;
+  overflow:visible!important;
+}
+.finalPaywallMobileImage .paywallDemoVideo{
+  min-height:0!important;
+  max-height:none!important;
+}
+.finalPaywallShell{
+  width:min(1180px,96vw)!important;
+}
+.finalPaywallHero h1{
+  max-width:820px!important;
+}
+.finalPaywallHero h2{
+  max-width:760px!important;
+}
+.finalPaywallBilling{
+  margin-top:18px!important;
+}
+.finalPaywallPlans{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+@media(max-width:980px){
+  .finalDemoImageGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .finalValueGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .finalPaywallPlans{
+    grid-template-columns:1fr!important;
+  }
+}
+@media(max-width:768px){
+  .commercialSurface.publicLanding .finalLandingHero,
+  .finalLandingHero{
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    gap:24px!important;
+  }
+  .landingMediaStack.finalLandingVisual,
+  .finalLandingVisual{
+    display:block!important;
+    order:2!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+    opacity:1!important;
+    visibility:visible!important;
+    position:relative!important;
+    margin:24px 0 0!important;
+    overflow:visible!important;
+    aspect-ratio:auto!important;
+  }
+  .finalLandingVisual .landingDemoVideo,
+  .landingDemoVideo{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+    object-fit:contain!important;
+    box-sizing:border-box!important;
+  }
+  .mobileHeroVideoFrame{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:20px 0 12px!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+  .mobileHeroVideoFrame .landingDemoVideo{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+    object-fit:contain!important;
+    border-radius:18px!important;
+    box-sizing:border-box!important;
+  }
+  .finalLandingCopy{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+  .finalFeatureGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .finalDemoImageGrid,
+  .finalValueGrid{
+    grid-template-columns:1fr!important;
+  }
+  .finalDemoImageCard{
+    max-width:100%!important;
+  }
+  .finalPaywallMobileImage{
+    width:100%!important;
+    margin:18px 0!important;
+  }
+}
+
+/* Definitive final override: commercial funnel, mobile hero video, clean paywall */
+.finalCommercialSurface .mobileHeroVideoFrame{display:none!important}
+.finalCommercialSurface .finalJournalDifference,
+.finalCommercialSurface .finalModuleSection,
+.finalCommercialSurface .finalDemoGallery,
+.finalCommercialSurface .finalValueSection,
+.finalCommercialSurface .finalPricingSection{
+  width:min(1180px,100%)!important;
+  max-width:1180px!important;
+  margin:0 auto clamp(28px,4vw,48px)!important;
+  padding:clamp(22px,3vw,34px)!important;
+  border-radius:26px!important;
+}
+.finalCommercialSurface .finalJournalDifference h2,
+.finalCommercialSurface .finalModuleSection h2,
+.finalCommercialSurface .finalDemoGallery h2,
+.finalCommercialSurface .finalValueSection h2{max-width:860px!important}
+.finalCommercialSurface .finalJournalDifference>p,
+.finalCommercialSurface .finalModuleSection>p,
+.finalCommercialSurface .finalDemoGallery>p,
+.finalCommercialSurface .finalValueSection>p{
+  max-width:740px!important;
+  margin-bottom:22px!important;
+}
+.finalCommercialSurface .finalDemoImageGrid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important;
+  align-items:stretch!important;
+}
+.finalCommercialSurface .finalDemoImageCard,
+.finalCommercialSurface .finalDemoImageCard:first-child{
+  grid-column:auto!important;
+  max-width:none!important;
+  display:grid!important;
+  grid-template-rows:auto auto 1fr!important;
+  gap:10px!important;
+  padding:14px!important;
+  border-radius:20px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022))!important;
+  border:1px solid rgba(240,197,90,.13)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.22)!important;
+}
+.finalCommercialSurface .finalDemoImageCard h3{
+  margin:0!important;
+  min-height:0!important;
+  font-size:17px!important;
+  line-height:1.15!important;
+}
+.finalCommercialSurface .finalDemoImageCard p{
+  margin:0!important;
+  color:#aeb8c8!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+.finalCommercialSurface .finalDemoImageButton{
+  display:block!important;
+  width:100%!important;
+  aspect-ratio:16/9!important;
+  max-height:230px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+  background:#05070a!important;
+  cursor:default!important;
+}
+.finalCommercialSurface .finalDemoImageButton img,
+.finalCommercialSurface .finalDemoImageCard img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-height:230px!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  border-radius:16px!important;
+}
+.finalCommercialSurface .finalValueGrid{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.finalPaywallSurface.paywallFunnel{
+  display:block!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  padding:clamp(16px,2.5vw,30px)!important;
+}
+.finalPaywallShell.paywallFunnelShell{
+  width:min(1180px,96vw)!important;
+  max-height:none!important;
+  height:auto!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+}
+.finalPaywallMain{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:visible!important;
+}
+.finalPaywallLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(360px,520px)!important;
+  gap:clamp(18px,3vw,34px)!important;
+  align-items:center!important;
+  margin:0 0 18px!important;
+}
+.finalPaywallHero h1{max-width:720px!important}
+.finalPaywallHero h2{max-width:680px!important}
+.finalPaywallDemoFrame{
+  width:100%!important;
+  max-width:520px!important;
+  justify-self:end!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  overflow:hidden!important;
+  border-radius:24px!important;
+  background:#05070a!important;
+}
+.finalPaywallDemoFrame .paywallDemoVideo,
+.finalPaywallDemoFrame img,
+.finalPaywallDemoFrame video{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  border-radius:24px!important;
+}
+.finalPaywallProof,
+.finalPaywallMobileImage{display:none!important}
+.finalPaywallBilling{margin:18px 0!important}
+.finalPaywallPlans{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important;
+  align-items:stretch!important;
+}
+.finalPaywallPlans .paywallFunnelPlan{min-height:0!important}
+.paywallFunnelDisclaimer{
+  max-width:760px!important;
+  margin:16px auto 0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:rgba(207,215,229,.72)!important;
+  text-align:center!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+@media(max-width:980px){
+  .finalCommercialSurface .finalDemoImageGrid{grid-template-columns:1fr!important}
+  .finalCommercialSurface .finalDemoImageButton,
+  .finalCommercialSurface .finalDemoImageButton img,
+  .finalCommercialSurface .finalDemoImageCard img{max-height:none!important}
+  .finalCommercialSurface .finalValueGrid{grid-template-columns:1fr 1fr!important}
+  .finalPaywallLayout,
+  .finalPaywallPlans{grid-template-columns:1fr!important}
+  .finalPaywallDemoFrame{
+    justify-self:start!important;
+    max-width:680px!important;
+  }
+}
+@media(max-width:768px){
+  .commercialSurface.publicLanding .finalLandingHero,
+  .finalCommercialSurface .finalLandingHero{
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .finalCommercialSurface .finalLandingCopy{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .finalCommercialSurface .mobileHeroVideoFrame{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:20px 0 12px!important;
+    overflow:visible!important;
+  }
+  .finalCommercialSurface .landingMediaStack.finalLandingVisual{
+    display:none!important;
+  }
+  .finalCommercialSurface .mobileHeroVideoFrame .landingDemoVideo,
+  .finalCommercialSurface .mobileHeroVideoFrame img,
+  .finalCommercialSurface .mobileHeroVideoFrame video{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+    object-fit:contain!important;
+    border-radius:18px!important;
+  }
+  .finalCommercialSurface .finalJournalDifference,
+  .finalCommercialSurface .finalModuleSection,
+  .finalCommercialSurface .finalDemoGallery,
+  .finalCommercialSurface .finalValueSection,
+  .finalCommercialSurface .finalPricingSection{
+    padding:22px 16px!important;
+    border-radius:22px!important;
+  }
+  .finalCommercialSurface .finalValueGrid{grid-template-columns:1fr!important}
+  .finalPaywallSurface.paywallFunnel{padding:12px!important}
+  .finalPaywallShell.paywallFunnelShell{
+    width:100%!important;
+    padding:16px!important;
+    border-radius:22px!important;
+  }
+  .finalPaywallDemoFrame{max-width:100%!important}
+  .finalPaywallBilling{display:grid!important}
+  .finalPaywallBilling>div:last-child{
+    width:100%!important;
+    overflow-x:auto!important;
+  }
+}

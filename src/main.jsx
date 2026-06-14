@@ -644,9 +644,9 @@ const PAYMENT_CONFIG={
   membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
 };
 const ACCESS_PLANS=[
-  {id:'basic',name:'Club',kicker:'Founding Access',headline:'Orden operativo para validar y registrar sin improvisar.',cta:'Activar Club',tone:'base',valueNote:'Precio preferencial durante la etapa de expansión. Base sólida para trabajar con checklist, journal y evidencia.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist operativo antes de ejecutar','Base de setups','Workspace privado']},
-  {id:'premium',name:'Pro',kicker:'Más elegido',headline:'Analytics, patrones y risk para traders activos.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'Precio preferencial durante la etapa de expansión. La mejor relación entre claridad, patrones y control de riesgo.',features:['Todo lo del plan Club','Analytics avanzado de ejecución','Heatmap de horarios, setups y sesiones','Risk Guard para frenar sobreoperación','Sistema de revisión de trades y conducta','Reportes para medir disciplina']},
-  {id:'mentorship',name:'Mentoría',kicker:'1 a 1',headline:'Revisión directa y plan de mejora personalizado.',cta:'Aplicar a mentoría',tone:'mentor',valueNote:'Feedback personalizado para traders que quieren corrección directa, revisión y seguimiento.',features:['Todo Pro','Revisión prioritaria del mentor','Feedback sobre trades y gestión','Seguimiento personalizado','Plan de mejora individual']}
+  {id:'basic',name:'Club',kicker:'Founding Access',headline:'Base operativa para registrar, validar y revisar sin improvisar.',cta:'Activar Club',tone:'base',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. Ideal para ordenar tu proceso diario con evidencia.',features:['Journal operativo','Checklist','Calendario P/L','Gesti\u00f3n b\u00e1sica de riesgo','Base / comunidad']},
+  {id:'premium',name:'Pro',kicker:'M\u00e1s elegido',headline:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. La mejor relaci\u00f3n entre datos, riesgo y revisi\u00f3n.',features:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync incluido en etapa comercial','Mayor profundidad de m\u00e9tricas']},
+  {id:'mentorship',name:'Mentor\u00eda',kicker:'1 a 1',headline:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',cta:'Aplicar a mentor\u00eda',tone:'mentor',valueNote:'Cupos limitados para traders que necesitan revisi\u00f3n directa y seguimiento.',features:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
 ];
 function calculatePlanPrice(planId,cycleId='monthly'){
   const pricing=PLAN_PRICING[planId];
@@ -862,83 +862,110 @@ function goPublic(path){
   window.dispatchEvent(new Event('mtc-public-route'));
 }
 
+function AnimatedProductDemo({images,title,className='',variant='hero',videoSrc='',videoSources=[],poster='' }){
+  const [videoFailed,setVideoFailed]=useState(false);
+  const frames=(Array.isArray(images)?images:[images]).filter(Boolean);
+  const sources=videoSources.length?videoSources:(videoSrc?[{src:videoSrc,type:'video/mp4'}]:[]);
+  const showVideo=sources.length>0&&!videoFailed;
+  return <div className={`animatedProductDemo ${variant} ${className}`} aria-label={title}>
+    <div className="animatedProductGlow" aria-hidden="true"></div>
+    <div className="animatedProductStage">
+      {showVideo?<video poster={poster||frames[0]||''} autoPlay muted loop playsInline preload="metadata" aria-label={title} onError={()=>setVideoFailed(true)}>
+        {sources.map(source=><source key={source.src} src={source.src} type={source.type}/>)}
+      </video>:frames.map((src,index)=><img key={src} src={src} alt={index===0?title:''} aria-hidden={index===0?undefined:true} style={{'--frame-index':index}}/>)}
+    </div>
+  </div>
+}
+
 
 function PublicLanding(){
+  const [landingVideoFailed,setLandingVideoFailed]=useState(false);
   const landingPlans=[
-    {name:'Club',badge:'Founding Access',price:'USD 14.99',copy:'Orden operativo para validar tu proceso y dejar de registrar trades a medias.',items:['Dashboard operativo','Journal de trading','Checklist operativo','Base de setups','Registro de ideas','Cierre emocional b\u00e1sico']},
-    {name:'Pro',badge:'M\u00e1s elegido',price:'USD 24.99',copy:'Analytics, patrones y risk para detectar edge, fugas de rendimiento y sesiones limpias.',featured:true,items:['Todo lo del plan Club','Analytics','Risk Lab','Journal emocional completo','Historial emocional','Sistema de revisión','Lectura de patrones','M\u00e9tricas de consistencia']},
-    {name:'Mentor\u00eda',badge:'1 a 1',price:'USD 250',copy:'Revisión directa, corrección operativa y plan de mejora personalizado.',items:['Todo lo del plan Pro','Feedback personalizado','Revisi\u00f3n de proceso','Correcci\u00f3n operativa','Seguimiento privado','Plan de mejora individual']}
+    {name:'Club',badge:'Founding Access',price:'USD 14.99',copy:'Base operativa para registrar, validar y revisar sin improvisar.',items:['Journal operativo','Checklist','Calendario P/L','Gesti\u00f3n b\u00e1sica de riesgo','Base / comunidad']},
+    {name:'Pro',badge:'M\u00e1s elegido',price:'USD 24.99',copy:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',featured:true,items:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync incluido en etapa comercial','Mayor profundidad de m\u00e9tricas']},
+    {name:'Mentor\u00eda',badge:'1 a 1',price:'USD 250',copy:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',items:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
   ];
-  const features=['Checklist operativo','Journal profesional','Analytics operativos','Risk management','Revisión emocional','Control de riesgo'];
-  const painCards=['Entrar antes de que exista confirmaci\u00f3n','Romper riesgo cuando la sesi\u00f3n se acelera','Cambiar el plan despu\u00e9s de una p\u00e9rdida','No replicar los d\u00edas buenos','Registrar resultado sin conducta','Revisar gr\u00e1fico sin revisar proceso'];
-  const modules=['Trading Journal','Risk Lab','Checklist Operativo','Analytics','Emotional Journal','Weekly Review','Setup Library','Performance Dashboard'];
-  const audiences=['Traders discrecionales','Prop firm traders','Mentores privados','Comunidades de trading','Equipos de traders','Operadores que necesitan consistencia medible'];
-  const faqs=[
-    ['\u00bfMTC Analytics me da una estrategia?','No. La plataforma ordena tu proceso, registra evidencia y te ayuda a detectar patrones de ejecuci\u00f3n, riesgo y conducta.'],
-    ['\u00bfSirve para prop firms?','S\u00ed. Est\u00e1 pensada para traders que necesitan controlar riesgo, disciplina, consistencia y revisi\u00f3n antes de escalar capital.'],
-    ['\u00bfNecesito experiencia previa?','No necesit\u00e1s ser avanzado, pero s\u00ed tener una operativa real que quieras medir con seriedad.'],
-    ['\u00bfPuedo cancelar?','S\u00ed. Los planes mensuales est\u00e1n pensados para acceso flexible y evoluci\u00f3n progresiva del proceso.'],
-    ['\u00bfIncluye IA?','La inteligencia asistida est\u00e1 en roadmap. La base actual prioriza datos propios, estructura y lectura operativa sin prometer automatismos.'],
-    ['\u00bfQu\u00e9 mercados son compatibles?','Funciona para forex, \u00edndices, commodities, cripto y cualquier mercado donde puedas registrar ejecuci\u00f3n, riesgo y contexto.']
+  const proofDemos=[
+    {title:'Validá antes de operar',benefit:'Checklist, contexto, setup y RR antes de poner capital en riesgo.',src:'/commercial/mtc-demo-checklist-execution.png'},
+    {title:'Protegé tu riesgo',benefit:'Límites, drawdown y exposición visibles para sostener disciplina.',src:'/commercial/mtc-demo-risk-limits.png'},
+    {title:'Revisá con evidencia',benefit:'Journal, conducta y analytics conectados para detectar patrones reales.',src:'/commercial/mtc-demo-journal-review.png'}
   ];
-  return <div className="publicLanding">
+  const landingDemoFallback='/commercial/mtc-landing-demo-premium.png';
+  const renderLandingDemo=(label='MTC Analytics product demo')=>landingVideoFailed
+    ? <img className="commercialDemoVideo landingDemoVideo landingDemoFallback" src={landingDemoFallback} alt={label}/>
+    : <video className="commercialDemoVideo landingDemoVideo" src="/commercial/mtc-landing-demo-premium.mp4" autoPlay muted loop playsInline preload="auto" poster={landingDemoFallback} aria-label={label} onLoadedData={()=>console.log('MTC video loaded:','/commercial/mtc-landing-demo-premium.mp4')} onError={(e)=>{console.error('MTC video error:',e.currentTarget.error,e.currentTarget.src);setLandingVideoFailed(true)}}></video>;
+  return <div className="publicLanding commercialSurface finalCommercialSurface">
     <header className="landingNav">
       <button className="landingNavBrand" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} aria-label="MTC Analytics inicio"><picture><source media="(max-width: 640px)" srcSet="/brand/mtc-analytics-logo-compact.png"/><img src="/brand/mtc-analytics-logo-horizontal.png" alt="MTC Analytics"/></picture></button>
-      <nav><a href="#plataforma">Plataforma</a><a href="#modulos">M&oacute;dulos</a><a href="#precios">Precios</a><a href="#faq">FAQ</a></nav>
-      <div className="landingNavActions"><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesi&oacute;n</button><button className="primary landingCta" onClick={()=>goPublic('/register')}>Solicitar acceso</button></div>
+      <nav><a href="#plataforma">Plataforma</a><a href="#modulos">Módulos</a><a href="#precios">Precios</a></nav>
+      <div className="landingNavActions"><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button><button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button></div>
     </header>
-    <section className="landingHero">
-      <div className="landingHalo"></div>
-      <div className="landingHeroText">
+    <section className="landingHero finalLandingHero">
+      <div className="landingHeroText finalLandingCopy">
         <span className="landingBadge subtleHero"><Crown size={16}/> Trading performance platform</span>
-        <h1>Oper&aacute; con estructura.<br/>Correg&iacute; con evidencia.<br/>Evolucion&aacute; con sistema.</h1>
-        <p>Infraestructura de performance para traders discrecionales. Medí ejecución, riesgo, conducta, emoción y revisión en una plataforma operativa y accionable.</p>
+        <h1>Operá con estructura.<br/>Revisá con evidencia.<br/>Mejorá con sistema.</h1>
+        <p>MTC Analytics conecta journal, checklist, riesgo, conducta y analytics para que cada sesión deje evidencia útil sobre tu proceso como trader discrecional.</p>
         <div className="landingActions">
           <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
           <button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button>
           <button className="ghost landingCta subtle" onClick={()=>goPublic('/register')}>Activar acceso</button>
         </div>
-        <small className="landingMicro">No solo journal. Proceso completo: ejecución, riesgo, conducta, emoción y revisión.</small>
-      </div>
-      <div className="landingMediaStack">
-        <div className="landingHeroMetrics" aria-label="Resumen visual de MTC Analytics">
-          <div className="landingMetricsTop"><img src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><span>Live operating desk</span></div>
-          <img className="landingDashboardMotion" src="/brand/mtc-dashboard-motion.svg" alt="Dashboard animado de MTC Analytics"/>
-          <div className="landingMetricTile strong"><span>Win rate</span><b>62%</b><small>Lectura por setup y sesi&oacute;n</small></div>
-          <div className="landingMetricTile"><span>Risk score</span><b>8.4</b><small>Exposici&oacute;n bajo control</small></div>
-          <div className="landingMetricTile"><span>Disciplina</span><b>91%</b><small>Proceso antes que impulso</small></div>
-          <div className="landingMetricTile wide"><span>Journal emocional</span><b>Cierre completo</b><small>Ansiedad, confianza y lecci&oacute;n operativa</small></div>
-          <div className="landingChecklistPreview"><span>Checklist validado</span><b>Contexto · Riesgo · Setup · Ejecuci&oacute;n</b></div>
+        <div className="mobileHeroVideoFrame">
+          {renderLandingDemo('MTC Analytics product demo mobile')}
         </div>
+        <small className="landingMicro">Software para medir, revisar y mejorar tu proceso operativo.</small>
+      </div>
+      <div className="landingMediaStack finalLandingVisual">
+        {renderLandingDemo()}
       </div>
     </section>
-    <section className="landingFlow persuasive">
-      <div><span>01</span><b>Validá antes de arriesgar</b><p>No ejecutes por impulso. Confirmá contexto, zona, RR y patrón antes de poner dinero en riesgo.</p></div>
-      <div><span>02</span><b>Conectá análisis con ejecución real</b><p>Cada trade queda vinculado a la validación que lo originó, para saber si operaste sistema o improvisación.</p></div>
-      <div><span>03</span><b>Medí lo que realmente importa</b><p>No mires solo ganancias o pérdidas. Medí disciplina, ejecución, emociones, patrones y consistencia.</p></div>
-      <div><span>04</span><b>Convertí datos en mejora</b><p>Detectá qué repetir, qué corregir y qué eliminar para construir un proceso cada vez más sólido.</p></div>
+    <section className="landingSection journalDifference finalJournalDifference">
+      <span className="landingBadge soft">No es solo un journal</span>
+      <h2>Un journal registra trades. MTC Analytics conecta tu proceso completo.</h2>
+      <p>Entrada, salida y resultado no alcanzan para mejorar. Necesitás ver contexto, riesgo, conducta, ejecución y revisión en un mismo flujo.</p>
+      <div className="differenceGrid">
+        <div><span>Journal común</span><b>Registro aislado</b><p>Entrada, salida, resultado y notas sueltas. Útil, pero limitado para leer conducta.</p></div>
+        <div><span>MTC Analytics</span><b>Sistema operativo</b><p>Contexto → Riesgo → Validación → Ejecución. Todo conectado para revisar con evidencia.</p></div>
+      </div>
     </section>
-    <section className="landingSection split" id="plataforma">
-      <div><span className="landingBadge soft">No operes impulsos</span><h2>Operá con estructura.</h2><p>El checklist operativo transforma una idea en un proceso observable. Si falta contexto, zona, liquidez o RR, la plataforma te obliga a esperar.</p></div>
-      <div className="landingPanel landingWorkflow"><b>Sistema de revisión</b><div><span>Contexto</span><i></i><span>Riesgo</span><i></i><span>Validación</span><i></i><span>Ejecución</span></div></div>
+    <section className="landingSection finalConversionSection" id="modulos" aria-label="Sistema comercial MTC Analytics">
+      <div className="conversionIntro">
+        <span className="landingBadge soft">Sistema operativo</span>
+        <h2>La solución a todo lo que afecta tu performance, en un mismo lugar.</h2>
+        <p>Checklist, journal, riesgo, conducta y analytics conectados para convertir cada sesión en evidencia accionable.</p>
+      </div>
+      <div className="outcomePillGrid" aria-label="Resultados operativos de MTC Analytics">
+        {['Menos impulso','Más estructura','Riesgo visible','Revisión con evidencia','Decisiones más claras'].map((v,index)=><div className="outcomePill" key={v}><span>{String(index+1).padStart(2,'0')}</span><b>{v}</b></div>)}
+      </div>
+      <div className="conversionTimeline" aria-label="Antes, durante y después de operar">
+        {proofDemos.map((d,index)=><article className="conversionPanel" key={d.title}>
+          <div className="conversionPanelCopy">
+            <span>{index===0?'Antes de operar':index===1?'Durante la operativa':'Después de operar'}</span>
+            <h3>{d.title}</h3>
+            <p>{d.benefit}</p>
+          </div>
+          <div className="conversionPanelVisual">
+            <img src={d.src} alt={`${d.title} en MTC Analytics`}/>
+          </div>
+        </article>)}
+      </div>
+      <div className="conversionClose">
+        <b>Menos ruido. Más criterio. Mejor revisión.</b>
+        <p>Una plataforma para ordenar tu proceso, detectar errores repetidos y llegar a Founding Members con una operación más medible.</p>
+      </div>
     </section>
-    <section className="landingSection" id="modulos">
-      <span className="landingBadge soft">Todo tu proceso en un lugar</span>
-      <h2>Medí lo que realmente importa.</h2>
-      <div className="featureGrid">{features.map(f=><div key={f}>{f}</div>)}</div>
-    </section>
-    <section className="landingSection landingPricingSection" id="precios">
-      <span className="landingBadge soft">Planes MTC Analytics</span>
-      <h2>Eleg&iacute; el nivel de estructura que exige tu operativa.</h2>
-      <p>Acceso Founding Members. Precio preferencial durante la etapa de expansión para traders que quieren convertir actividad en evidencia, criterio y mejora continua.</p>
-      <div className="landingPlanGrid">{landingPlans.map(plan=><article className={`landingPlanCard ${plan.featured?'featured':''}`} key={plan.name}>
+    <section className="landingSection landingPricingSection finalPricingSection" id="precios">
+      <span className="landingBadge soft">Acceso Founding Members</span>
+      <h2>Elegí el nivel de estructura que exige tu operativa.</h2>
+      <p>Precio preferencial durante etapa de expansión para traders que quieren convertir actividad en evidencia, criterio y mejora continua.</p>
+      <div className="landingPlanGrid">{landingPlans.map(plan=><article className={plan.featured?'landingPlanCard featured':'landingPlanCard'} key={plan.name}>
         <div className="landingPlanTop"><span>{plan.badge}</span><h3>{plan.name}</h3><p>{plan.copy}</p></div>
         <div className="landingPlanPrice"><b>{plan.price}</b><em>/ mes</em></div>
         <ul>{plan.items.map(item=><li key={item}>{item}</li>)}</ul>
         <button className={plan.featured?'primary landingCta':'ghost landingCta'} onClick={()=>goPublic('/register')}>Activar {plan.name}</button>
       </article>)}</div>
     </section>
-    <section className="landingFinal" id="faq">
+    <section className="landingFinal" id="plataforma">
       <h2>Activá tu acceso a MTC Analytics.</h2>
       <p>Creá tu cuenta y prepará tu workspace privado. Si ya tenés acceso por mentoría, el administrador podrá habilitarte manualmente.</p>
       <div className="landingActions center"><button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button></div>
@@ -2270,6 +2297,7 @@ function AccessGate({profile}){
   const [cycle,setCycle]=useState('monthly');
   const [selected,setSelected]=useState('premium');
   const [busy,setBusy]=useState(null);
+  const [paywallVideoFailed,setPaywallVideoFailed]=useState(false);
   const status=effectiveStatus(profile);
   const isBlocked=status==='denied'||status==='suspended'||status==='blocked';
   const billingOptions=[
@@ -2286,6 +2314,10 @@ function AccessGate({profile}){
     suspended:'Tu acceso está suspendido. Contactá al administrador.'
   };
   const whatsappUrl=`https://wa.me/${WHATSAPP_MENTORIA}?text=${encodeURIComponent('Estoy interesado en Mentoría personalizada de Moisés Trading Club')}`;
+  const paywallDemoFallback='/commercial/mtc-paywall-demo-premium.png';
+  const paywallDemo=paywallVideoFailed
+    ? <img className="commercialDemoVideo paywallDemoVideo paywallDemoFallback" src={paywallDemoFallback} alt="MTC Analytics product preview"/>
+    : <video className="commercialDemoVideo paywallDemoVideo" src="/commercial/mtc-paywall-demo-premium.mp4" autoPlay muted loop playsInline preload="auto" poster={paywallDemoFallback} aria-label="MTC Analytics paywall product demo" onLoadedData={()=>console.log('MTC video loaded:','/commercial/mtc-paywall-demo-premium.mp4')} onError={(e)=>{console.error('MTC video error:',e.currentTarget.error,e.currentTarget.src);setPaywallVideoFailed(true)}}></video>;
   async function startCheckout(plan){
     setSelected(plan.id);
     if(plan.id==='mentorship'){
@@ -2323,66 +2355,45 @@ function AccessGate({profile}){
       toast('No se pudo iniciar el pago. Intentá nuevamente o contactá soporte.','error');
     }finally{setBusy(null)}
   }
-  return <div className="paywallFunnel">
-    <div className="paywallFunnelVideoBg" aria-hidden="true">
-      <video src="/paywall-premium-loop.mp4" autoPlay muted loop playsInline preload="metadata" />
-      <div className="paywallFunnelVideoBgOverlay"></div>
-    </div>
+  return <div className="paywallFunnel finalPaywallSurface">
     <div className="paywallFunnelBg" aria-hidden="true"><span></span><span></span><span></span></div>
-    <section className="paywallFunnelShell" aria-label="Activación de acceso">
-      <header className="paywallFunnelHeader">
-        <div className="paywallFunnelBrand"><img src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><div><b>MTC Analytics</b><span>by Moisés Trading Club</span></div></div>
-        <div className="paywallFunnelActions"><span className={`paywallFunnelStatus ${status}`}>{accessLabel(status)}</span><button onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
+    <section className="paywallFunnelShell finalPaywallShell" aria-label="Activación de acceso">
+      <header className="paywallFunnelHeader finalPaywallHeader">
+        <div className="paywallFunnelBrand"><img src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><div><b>MTC Analytics</b><span>Trading performance platform</span></div></div>
+        <div className="paywallFunnelActions"><span className={'paywallFunnelStatus '+status}>{accessLabel(status)}</span><button className="paywallLogout" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
       </header>
-      <div className="paywallFunnelLayout">
-        <div className="paywallFunnelMain">
-          <div className="paywallFunnelHero">
+      <div className="paywallFunnelMain finalPaywallMain">
+        <div className="paywallFunnelLayout finalPaywallLayout">
+          <div className="paywallFunnelHero finalPaywallHero">
             <p>Acceso Founding Members</p>
             <h1>Dejá de operar por sensación. Mejorá con evidencia.</h1>
-            <h2>Trading performance platform para medir ejecución, riesgo, conducta y revisión. Infraestructura de performance para traders discrecionales, sin promesas de ganancias.</h2>
+            <h2>Accedé a una plataforma para medir ejecución, riesgo, conducta y revisión en un solo sistema.</h2>
             <div className="paywallFunnelChips"><span><Target size={14}/> Checklist operativo</span><span><BarChart3 size={14}/> Analytics accionables</span><span><Shield size={14}/> Sistema de revisión</span></div>
           </div>
-          <div className="paywallFunnelBilling">
-            <div><b>Precio preferencial durante la etapa de expansión.</b><span>No solo journal. Proceso completo: ejecución, riesgo, conducta, emoción y revisión.</span></div>
-            <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
-          </div>
-          {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
-          <div className="paywallFunnelPlans">
-            {ACCESS_PLANS.map(plan=>{
-              const quote=planCycleSummary(plan.id,cycle);
-              const active=selected===plan.id;
-              return <article key={plan.id} className={`paywallFunnelPlan ${plan.tone} ${plan.recommended?'featured':''} ${active?'selected':''}`} onClick={()=>setSelected(plan.id)}>
-                {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
-                <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
-                <div className="paywallFunnelPrice">
-                  {quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} · {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>USD 250</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
-                </div>
-                <p className="paywallFunnelValue">{plan.valueNote}</p>
-                <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
-                <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout…':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
-              </article>
-            })}
-          </div>
+          <div className="finalPaywallDemoFrame">{paywallDemo}</div>
         </div>
-        <aside className="paywallFunnelProof">
-          <div className="paywallFunnelLogo"><b>MTC</b><span>ANALYTICS</span><small>by Moisés Trading Club</small></div>
-          <div className="paywallFunnelPreview">
-            <div className="paywallProductInterface" aria-hidden="true">
-              <div className="productInterfaceTop"><span>PERFORMANCE DASHBOARD</span><b>Live review</b></div>
-              <div className="productInterfaceKpis">
-                <div><span>Risk score</span><b>8.4</b></div>
-                <div><span>Discipline index</span><b>91%</b></div>
-                <div><span>Checklist status</span><b>Validado</b></div>
+        <div className="paywallFunnelBilling finalPaywallBilling">
+          <div><b>Precio preferencial durante etapa de expansión.</b><span>Proceso completo: ejecución, riesgo, conducta, analytics y revisión.</span></div>
+          <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
+        </div>
+        {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
+        <div className="paywallFunnelPlans finalPaywallPlans">
+          {ACCESS_PLANS.map(plan=>{
+            const quote=planCycleSummary(plan.id,cycle);
+            const active=selected===plan.id;
+            return <article key={plan.id} className={'paywallFunnelPlan '+plan.tone+' '+(plan.recommended?'featured':'')+' '+(active?'selected':'')} onClick={()=>setSelected(plan.id)}>
+              {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
+              <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
+              <div className="paywallFunnelPrice">
+                {quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} / {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>USD 250</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
               </div>
-              <div className="productInterfaceCurve"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-              <div className="productInterfaceReview"><span>Weekly review</span><b>Ejecución estable · riesgo controlado</b></div>
-              <div className="productInterfaceHeatmap"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            </div>
-          </div>
-          <div className="paywallFunnelInside"><b>Lo que desbloqueás</b><div><span>Equity curve + drawdown</span><span>Heatmap horario</span><span>Base de setups</span><span>Errores repetidos</span><span>Risk Guard</span><span>Checklist operativo</span></div></div>
-          <div className="paywallFunnelBenefits"><div><Target size={18}/><b>Operá con estructura</b><span>Validá contexto, zona, patrón y ejecución antes de entrar.</span></div><div><BarChart3 size={18}/><b>Medí lo que hacés</b><span>Transformá cada trade en evidencia para corregir.</span></div><div><Rocket size={18}/><b>Evolucioná más rápido</b><span>Menos ruido, más claridad y un proceso repetible.</span></div></div>
-          <div className="paywallFunnelLock"><Lock size={15}/> Tu cuenta está creada. Activá tu plan y entrás directo al dashboard.</div>
-        </aside>
+              <p className="paywallFunnelValue">{plan.valueNote}</p>
+              <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
+              <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout...':plan.id==='mentorship'?'Aplicar a mentor\u00eda':plan.cta}</button>
+            </article>
+          })}
+        </div>
+        <p className="paywallFunnelDisclaimer">MTC Analytics no promete resultados financieros. Es una plataforma para registrar, analizar y mejorar tu proceso de trading.</p>
       </div>
     </section>
   </div>
