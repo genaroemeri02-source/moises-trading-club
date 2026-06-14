@@ -645,7 +645,7 @@ const PAYMENT_CONFIG={
 };
 const ACCESS_PLANS=[
   {id:'basic',name:'Club',kicker:'Founding Access',headline:'Base operativa para registrar, validar y revisar sin improvisar.',cta:'Activar Club',tone:'base',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. Ideal para ordenar tu proceso diario con evidencia.',features:['Journal operativo','Checklist','Calendario P/L','Gesti\u00f3n b\u00e1sica de riesgo','Base / comunidad']},
-  {id:'premium',name:'Pro',kicker:'M\u00e1s elegido',headline:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. La mejor relaci\u00f3n entre datos, riesgo y revisi\u00f3n.',features:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync incluido en etapa comercial','Mayor profundidad de m\u00e9tricas']},
+  {id:'premium',name:'Pro',kicker:'M\u00e1s elegido',headline:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. La mejor relaci\u00f3n entre datos, riesgo y revisi\u00f3n.',features:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync','Mayor profundidad de m\u00e9tricas']},
   {id:'mentorship',name:'Mentor\u00eda',kicker:'1 a 1',headline:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',cta:'Aplicar a mentor\u00eda',tone:'mentor',valueNote:'Cupos limitados para traders que necesitan revisi\u00f3n directa y seguimiento.',features:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
 ];
 function calculatePlanPrice(planId,cycleId='monthly'){
@@ -882,7 +882,7 @@ function PublicLanding(){
   const [landingVideoFailed,setLandingVideoFailed]=useState(false);
   const landingPlans=[
     {name:'Club',badge:'Founding Access',price:'USD 14.99',copy:'Base operativa para registrar, validar y revisar sin improvisar.',items:['Journal operativo','Checklist','Calendario P/L','Gesti\u00f3n b\u00e1sica de riesgo','Base / comunidad']},
-    {name:'Pro',badge:'M\u00e1s elegido',price:'USD 24.99',copy:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',featured:true,items:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync incluido en etapa comercial','Mayor profundidad de m\u00e9tricas']},
+    {name:'Pro',badge:'M\u00e1s elegido',price:'USD 24.99',copy:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',featured:true,items:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync','Mayor profundidad de m\u00e9tricas']},
     {name:'Mentor\u00eda',badge:'1 a 1',price:'USD 250',copy:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',items:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
   ];
   const proofDemos=[
@@ -896,7 +896,7 @@ function PublicLanding(){
     : <video className="commercialDemoVideo landingDemoVideo" src="/commercial/mtc-landing-demo-premium.mp4" autoPlay muted loop playsInline preload="auto" poster={landingDemoFallback} aria-label={label} onLoadedData={()=>console.log('MTC video loaded:','/commercial/mtc-landing-demo-premium.mp4')} onError={(e)=>{console.error('MTC video error:',e.currentTarget.error,e.currentTarget.src);setLandingVideoFailed(true)}}></video>;
   return <div className="publicLanding commercialSurface finalCommercialSurface">
     <header className="landingNav">
-      <button className="landingNavBrand" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} aria-label="MTC Analytics inicio"><picture><source media="(max-width: 640px)" srcSet="/brand/mtc-analytics-logo-compact.png"/><img src="/brand/mtc-analytics-logo-horizontal.png" alt="MTC Analytics"/></picture></button>
+      <button className="landingNavBrand" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} aria-label="MTC Analytics inicio"><picture><source media="(max-width: 640px)" srcSet="/brand/mtc-analytics-logo-horizontal.png"/><img src="/brand/mtc-analytics-logo-horizontal.png" alt="MTC Analytics"/></picture></button>
       <nav><a href="#plataforma">Plataforma</a><a href="#modulos">Módulos</a><a href="#precios">Precios</a></nav>
       <div className="landingNavActions"><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button><button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button></div>
     </header>

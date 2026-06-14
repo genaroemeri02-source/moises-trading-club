@@ -10018,6 +10018,236 @@ html{scroll-padding-top:96px;}
   }
 }
 
+/* Final UI lock: compact commercial section like approved reference */
+.finalCommercialSurface .finalConversionSection{
+  width:min(1400px,100%)!important;
+  max-width:1400px!important;
+}
+.finalConversionSection .conversionIntro{
+  max-width:900px!important;
+}
+.finalConversionSection .conversionIntro h2{
+  max-width:900px!important;
+}
+.outcomePillGrid{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+.outcomePill{
+  min-height:96px!important;
+  padding:18px 16px!important;
+  border-radius:18px!important;
+  background:linear-gradient(135deg,rgba(240,197,90,.10),rgba(255,255,255,.035) 34%,rgba(255,255,255,.025))!important;
+  border:1px solid rgba(240,197,90,.18)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.06),0 14px 42px rgba(0,0,0,.20)!important;
+}
+.conversionTimeline{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:18px!important;
+}
+.conversionPanel{
+  grid-template-columns:1fr!important;
+  grid-template-rows:auto 1fr!important;
+  gap:18px!important;
+  padding:18px!important;
+  border-radius:24px!important;
+  background:linear-gradient(180deg,rgba(8,12,18,.98),rgba(4,6,10,.99))!important;
+}
+.conversionPanelVisual{
+  width:100%!important;
+  min-height:0!important;
+  aspect-ratio:16/12!important;
+  border-radius:18px!important;
+  background:#030507!important;
+  overflow:hidden!important;
+}
+.conversionPanelVisual img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:1!important;
+  filter:none!important;
+  transform:none!important;
+}
+.finalCommercialSurface .landingNavBrand,
+.finalCommercialSurface .landingNavBrand picture,
+.finalCommercialSurface .landingNavBrand img{
+  opacity:1!important;
+  filter:none!important;
+}
+@media(max-width:1080px){
+  .outcomePillGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .conversionTimeline{
+    grid-template-columns:1fr!important;
+  }
+  .conversionPanel{
+    grid-template-columns:1fr!important;
+  }
+  .conversionPanelVisual{
+    aspect-ratio:16/9!important;
+  }
+}
+@media(max-width:768px){
+  .finalCommercialSurface .landingNavBrand{
+    min-width:74px!important;
+    max-width:96px!important;
+    flex:0 0 auto!important;
+  }
+  .finalCommercialSurface .landingNavBrand img{
+    height:40px!important;
+    max-height:42px!important;
+    max-width:92px!important;
+    object-fit:contain!important;
+    opacity:1!important;
+    filter:none!important;
+  }
+  .outcomePillGrid{
+    grid-template-columns:1fr!important;
+  }
+  .conversionPanelVisual{
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+  }
+  .conversionPanelVisual img{
+    object-fit:contain!important;
+    opacity:1!important;
+    filter:none!important;
+  }
+}
+
+.finalCommercialSurface .conversionPanelVisual > img,
+.finalCommercialSurface .conversionPanel .conversionPanelVisual > img,
+.finalCommercialSurface .landingNav .landingNavBrand img,
+.finalCommercialSurface .landingNavBrand picture img{
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+}
+
+/* Micro hotfix: clearer MTC Analytics navbar logo */
+.finalCommercialSurface .landingNav .landingNavBrand{
+  min-width:250px!important;
+  max-width:320px!important;
+  flex:0 0 auto!important;
+}
+.finalCommercialSurface .landingNav .landingNavBrand picture{
+  display:block!important;
+  line-height:0!important;
+}
+.finalCommercialSurface .landingNav .landingNavBrand img{
+  display:block!important;
+  width:auto!important;
+  height:auto!important;
+  max-height:52px!important;
+  max-width:310px!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  transform:none!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+@media(max-width:768px){
+  .finalCommercialSurface .landingNav .landingNavBrand{
+    min-width:126px!important;
+    max-width:156px!important;
+    flex:0 0 142px!important;
+  }
+  .finalCommercialSurface .landingNav .landingNavBrand img{
+    max-height:42px!important;
+    max-width:150px!important;
+    width:auto!important;
+    object-fit:contain!important;
+    opacity:1!important;
+    filter:none!important;
+    -webkit-filter:none!important;
+  }
+}
+@media(max-width:420px){
+  .finalCommercialSurface .landingNav .landingNavBrand{
+    min-width:118px!important;
+    max-width:138px!important;
+    flex-basis:128px!important;
+  }
+  .finalCommercialSurface .landingNav .landingNavBrand img{
+    max-height:40px!important;
+    max-width:136px!important;
+  }
+}
+
+/* Micro luxury atmosphere: very subtle landing background only */
+.finalCommercialSurface.publicLanding{
+  background:
+    radial-gradient(circle at 0% 0%,rgba(240,197,90,.10),transparent 24%),
+    radial-gradient(circle at 100% 20%,rgba(240,197,90,.055),transparent 22%),
+    radial-gradient(circle at 50% 100%,rgba(240,197,90,.045),transparent 28%),
+    linear-gradient(180deg,#030407 0%,#070a0f 46%,#030407 100%)!important;
+}
+.finalCommercialSurface.publicLanding::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.22;
+  background:
+    radial-gradient(circle at 8% 4%,rgba(240,197,90,.18),transparent 12%),
+    radial-gradient(circle at 94% 72%,rgba(240,197,90,.12),transparent 16%),
+    linear-gradient(115deg,transparent 0 18%,rgba(240,197,90,.05) 22%,transparent 30% 100%),
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:auto,auto,auto,72px 72px,72px 72px;
+  mask-image:radial-gradient(circle at center,transparent 0%,rgba(0,0,0,.32) 58%,black 100%);
+}
+.finalCommercialSurface.publicLanding > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Micro luxury atmosphere: very subtle paywall background only */
+.finalPaywallSurface.paywallFunnel{
+  background:
+    radial-gradient(circle at 2% 0%,rgba(240,197,90,.085),transparent 26%),
+    radial-gradient(circle at 98% 72%,rgba(240,197,90,.07),transparent 24%),
+    linear-gradient(180deg,#030407 0%,#05070b 54%,#020304 100%)!important;
+}
+
+.finalPaywallSurface .paywallFunnelBg{
+  opacity:1!important;
+  background:
+    radial-gradient(circle at 12% 6%,rgba(240,197,90,.16),transparent 24%),
+    radial-gradient(circle at 92% 70%,rgba(240,197,90,.12),transparent 22%),
+    radial-gradient(circle at 55% 0%,rgba(28,64,110,.08),transparent 30%),
+    linear-gradient(180deg,#05070a,#020304 100%)!important;
+}
+
+.finalPaywallSurface .paywallFunnelBg::before{
+  opacity:.34!important;
+  background-image:
+    linear-gradient(rgba(255,255,255,.024) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px)!important;
+  background-size:64px 64px!important;
+  mask-image:radial-gradient(circle at center,rgba(0,0,0,.18),black 74%,transparent 100%)!important;
+}
+
+.finalPaywallSurface .paywallFunnelBg::after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  pointer-events:none!important;
+  opacity:.24!important;
+  background:
+    linear-gradient(130deg,transparent 0 16%,rgba(240,197,90,.045) 23%,transparent 32% 100%),
+    radial-gradient(circle at 100% 100%,rgba(240,197,90,.12),transparent 20%)!important;
+}
+
 /* v45 hotfix: public/auth/paywall stay dark regardless of app theme. */
 :root[data-theme="light"] body:has(.publicLanding),
 :root[data-theme="light"] body:has(.authPage),
