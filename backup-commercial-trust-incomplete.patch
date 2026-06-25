@@ -1,0 +1,247 @@
+diff --git a/RELEASE-v45-COMMERCIAL-READY.md b/RELEASE-v45-COMMERCIAL-READY.md
+index 7bd10f5..f1fb50c 100644
+--- a/RELEASE-v45-COMMERCIAL-READY.md
++++ b/RELEASE-v45-COMMERCIAL-READY.md
+@@ -17,12 +17,13 @@ Backend ya incluye endpoints:
+ - `POST /api/capturePayPalOrder`
+ - `POST /api/paypalWebhook`
+ - `POST /api/paypal/webhook`
+-- `POST /api/syncMembership`
++- `POST /api/updateMembershipStatus`
+ - `GET /api/plans`
+ 
+ Planes actuales en backend:
+-- `basic` / Club: USD 29 mensual
+-- `premium` / Pro: USD 49 mensual
++- `basic` / Club: USD 14.99 mensual
++- `premium` / Pro: USD 24.99 mensual
++- `mentorship` / Mentoría: USD 250 mensual
+ 
+ Ciclos:
+ - mensual
+@@ -64,7 +65,7 @@ VITE_PAYMENTS_ENABLED=true
+ VITE_PAYMENT_PROVIDER=paypal
+ VITE_PAYPAL_CREATE_ORDER_ENDPOINT=https://mtc-backend-v2.onrender.com/api/createPayPalOrder
+ VITE_PAYPAL_CAPTURE_ORDER_ENDPOINT=https://mtc-backend-v2.onrender.com/api/capturePayPalOrder
+-VITE_MEMBERSHIP_SYNC_ENDPOINT=https://mtc-backend-v2.onrender.com/api/syncMembership
++VITE_MEMBERSHIP_SYNC_ENDPOINT=https://mtc-backend-v2.onrender.com/api/updateMembershipStatus
+ VITE_PAYMENT_SUCCESS_URL=http://localhost:5173/payment-success
+ VITE_PAYMENT_CANCEL_URL=http://localhost:5173/payment-cancel
+ ```
+diff --git a/docs/backend/payment-functions-starter.js b/docs/backend/payment-functions-starter.js
+index 5df9457..f971d28 100644
+--- a/docs/backend/payment-functions-starter.js
++++ b/docs/backend/payment-functions-starter.js
+@@ -20,8 +20,9 @@ admin.initializeApp();
+ const db = admin.firestore();
+ 
+ const PLAN_PRICING = {
+-  basic: { monthly: 29, currency: 'USD', label: 'Esencial' },
+-  premium: { monthly: 49, currency: 'USD', label: 'Pro' }
++  basic: { monthly: 14.99, currency: 'USD', label: 'Club' },
++  premium: { monthly: 24.99, currency: 'USD', label: 'Pro' },
++  mentorship: { monthly: 250, currency: 'USD', label: 'Mentoría' }
+ };
+ const BILLING_CYCLES = {
+   monthly: { months: 1 },
+diff --git a/docs/payments-architecture.md b/docs/payments-architecture.md
+index 77917d5..74c0be4 100644
+--- a/docs/payments-architecture.md
++++ b/docs/payments-architecture.md
+@@ -6,7 +6,7 @@ Esta versión deja el frontend preparado para un paywall premium, pricing real p
+ 
+ 1. Usuario crea cuenta o inicia sesión.
+ 2. Si no tiene acceso activo, ve `AccessGate` con planes, preview visual y selector mensual/trimestral/anual.
+-3. Si `VITE_PAYMENTS_ENABLED=false`, Esencial/Pro muestran placeholder limpio: “Pago online próximamente. Contactá al admin para activar tu acceso.”
++3. Si `VITE_PAYMENTS_ENABLED=false`, Club/Pro muestran placeholder limpio: “Pago online próximamente. Contactá al admin para activar tu acceso.”
+ 4. Si `VITE_PAYMENTS_ENABLED=true`, el frontend llama a `VITE_CHECKOUT_ENDPOINT` con:
+    - `planId`
+    - `billingCycle`
+@@ -23,12 +23,13 @@ Esta versión deja el frontend preparado para un paywall premium, pricing real p
+ 
+ ## Pricing centralizado
+ 
+-Los precios base viven en `PLAN_PRICING` dentro de `src/main.jsx`:
++Los precios base viven en `PLAN_PRICING` dentro de `src/main.jsx` y se reflejan en `/api/plans` desde `server/index.js`:
+ 
+ ```js
+ const PLAN_PRICING = {
+-  basic: { monthly: 29, currency: 'USD' },
+-  premium: { monthly: 49, currency: 'USD' }
++  basic: { monthly: 14.99, currency: 'USD' },
++  premium: { monthly: 24.99, currency: 'USD' },
++  mentorship: { monthly: 250, currency: 'USD' }
+ };
+ ```
+ 
+@@ -38,7 +39,7 @@ La función `calculatePlanPrice(planId, cycle)` calcula:
+ - Trimestral: `monthly * 3 * 0.8` = 20% de descuento.
+ - Anual: `(monthly * 3 * 0.8 * 4) * 0.9` = 10% adicional sobre el total trimestral anualizado.
+ 
+-Mentoría queda como precio personalizado y abre WhatsApp con el mensaje exacto requerido.
++Mentoría queda publicada como USD 250 mensual y abre WhatsApp para aplicación/revisión manual.
+ 
+ ## Campos protegidos en `users/{uid}`
+ 
+diff --git a/docs/paypal-sandbox-live-guia.md b/docs/paypal-sandbox-live-guia.md
+index 808b2de..f882c6d 100644
+--- a/docs/paypal-sandbox-live-guia.md
++++ b/docs/paypal-sandbox-live-guia.md
+@@ -172,7 +172,7 @@ firebase deploy --only functions
+ 1. Crear usuario nuevo en la app.
+ 2. Que quede sin acceso activo.
+ 3. Ver paywall.
+-4. Elegir plan Esencial o Pro.
++4. Elegir plan Club o Pro.
+ 5. Click “Activar plan”.
+ 6. Se redirige a PayPal Sandbox.
+ 7. Iniciar sesión con cuenta Buyer Sandbox.
+diff --git a/docs/paypal-sandbox-v43-2.md b/docs/paypal-sandbox-v43-2.md
+index 44b28fb..ff88ee0 100644
+--- a/docs/paypal-sandbox-v43-2.md
++++ b/docs/paypal-sandbox-v43-2.md
+@@ -5,7 +5,7 @@ Esta versión integra PayPal como primera pasarela real de pago, usando Orders A
+ ## Flujo implementado
+ 
+ 1. Usuario registrado sin acceso entra al paywall.
+-2. Elige Esencial o Pro y ciclo mensual/trimestral/anual.
++2. Elige Club o Pro y ciclo mensual/trimestral/anual.
+ 3. El frontend llama al backend `createPayPalOrder`.
+ 4. El backend valida usuario, plan y ciclo, recalcula precio, crea la orden en PayPal y guarda `payments/{paymentId}` con `status: created`.
+ 5. El usuario es redirigido a PayPal mediante `approvalUrl`.
+@@ -82,7 +82,7 @@ Usuarios `admin`, `moderador` y `manual_approved` no se expiran por esta funció
+ 7. Deploy Cloud Functions.
+ 8. Deploy frontend.
+ 9. Crear usuario normal sin acceso.
+-10. Pagar Esencial o Pro.
++10. Pagar Club o Pro.
+ 11. Confirmar que `payments/{paymentId}.status` pasa a `completed`.
+ 12. Confirmar que `users/{uid}` queda con:
+ 
+diff --git a/functions/index.js b/functions/index.js
+index fc6ec34..8dc7f00 100644
+--- a/functions/index.js
++++ b/functions/index.js
+@@ -287,8 +287,9 @@ const PAYPAL_BASE_URL =
+     : 'https://api-m.sandbox.paypal.com';
+ 
+ const PLAN_PRICING = {
+-  basic: { name: 'Esencial', monthly: 29, currency: 'USD' },
+-  premium: { name: 'Pro', monthly: 49, currency: 'USD' },
++  basic: { name: 'Club', monthly: 14.99, currency: 'USD' },
++  premium: { name: 'Pro', monthly: 24.99, currency: 'USD' },
++  mentorship: { name: 'Mentoría', monthly: 250, currency: 'USD' },
+ };
+ 
+ const BILLING_MONTHS = {
+diff --git a/server/index.js b/server/index.js
+index 49d234a..95e63b0 100644
+--- a/server/index.js
++++ b/server/index.js
+@@ -316,6 +316,7 @@ const PAYPAL_BASE_URL =
+ const PLAN_PRICING = {
+   basic: { name: 'Club', monthly: Number(process.env.PLAN_BASIC_MONTHLY || 14.99), currency: 'USD' },
+   premium: { name: 'Pro', monthly: Number(process.env.PLAN_PREMIUM_MONTHLY || 24.99), currency: 'USD' },
++  mentorship: { name: 'Mentoría', monthly: Number(process.env.PLAN_MENTORSHIP_MONTHLY || 250), currency: 'USD' },
+ };
+ 
+ const BILLING_MONTHS = {
+@@ -342,8 +343,9 @@ function normalizeCommercialPlan(plan = 'free') {
+ function defaultPlanFeatures(plan = 'free') {
+   const p = normalizeCommercialPlan(plan);
+   const base = { journal: true, checklist: true, analytics: false, riskGuard: false, mt5Sync: false, academy: true, community: true };
+-  if (p === 'club') return { ...base, analytics: true };
+-  if (p === 'pro' || p === 'mentor' || p === 'admin') return { ...base, analytics: true, riskGuard: true, mt5Sync: true };
++  if (p === 'club') return base;
++  if (p === 'pro') return { ...base, analytics: true, riskGuard: true, mt5Sync: true, reports: true };
++  if (p === 'mentor' || p === 'admin') return { ...base, analytics: true, riskGuard: true, mt5Sync: true, reports: true, mentorReview: true };
+   if (p === 'influencer_trial') return { ...base, analytics: true, riskGuard: true, mt5Sync: false };
+   return base;
+ }
+@@ -558,6 +560,7 @@ async function verifyPayPalWebhook(req) {
+     throw err;
+   }
+ 
++  // Live webhooks must verify the PayPal signature before auto-activating access outside the checkout return flow.
+   const err = new Error('paypal_webhook_verification_not_configured');
+   err.status = 400;
+   throw err;
+diff --git a/src/main.jsx b/src/main.jsx
+index 4ac1633..27b61df 100644
+--- a/src/main.jsx
++++ b/src/main.jsx
+@@ -621,9 +621,32 @@ function accessLabel(status){
+   return labels[s] || 'Activación pendiente';
+ }
+ 
++const PLAN_ALIASES={basic:'club',premium:'pro',mentorship:'mentor',founder:'club',alumno:'free'};
++const PLAN_RANK={free:0,club:1,pro:2,mentor:3,admin:4};
++const FEATURE_PLAN_REQUIREMENTS={analytics:2,results:2,brokers:2};
++function normalizePlanId(plan='free'){
++  const raw=String(plan||'free').toLowerCase();
++  return PLAN_ALIASES[raw] || raw;
++}
++function isPrivilegedPlanProfile(profile={}){
++  const role=String(profile.role||'').toLowerCase();
++  return ['admin','moderador','mentor','owner','fundador'].includes(role) || profile.isAdmin===true || profile.admin===true || profile.accessStatus==='manual_approved';
++}
++function planAccessRank(profile={}){
++  if(isPrivilegedPlanProfile(profile)) return PLAN_RANK.admin;
++  const plan=normalizePlanId(profile.plan || profile.activePlan || profile.membershipPlan || profile.subscriptionPlan || 'free');
++  return PLAN_RANK[plan] ?? 0;
++}
++function canUsePlanFeature(profile={},feature){
++  if(profile?.features?.[feature]===true) return true;
++  const required=FEATURE_PLAN_REQUIREMENTS[feature] || 0;
++  return planAccessRank(profile)>=required;
++}
++
+ const PLAN_PRICING={
+   basic:{monthly:14.99,currency:'USD'},
+-  premium:{monthly:24.99,currency:'USD'}
++  premium:{monthly:24.99,currency:'USD'},
++  mentorship:{monthly:250,currency:'USD'}
+ };
+ const BILLING_CYCLES={
+   monthly:{id:'monthly',label:'Mensual',short:'1 mes',suffix:'/mes',months:1,badge:null,featured:false},
+@@ -637,11 +660,11 @@ const PAYMENT_CONFIG={
+   enabled:String(import.meta.env.VITE_PAYMENTS_ENABLED || (API_BASE_URL ? 'true' : 'false'))==='true',
+   provider:import.meta.env.VITE_PAYMENT_PROVIDER || 'paypal',
+   checkoutEndpoint:import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
+-  paypalCreateOrderEndpoint:import.meta.env.VITE_PAYPAL_CREATE_ORDER_ENDPOINT || import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
+-  paypalCaptureOrderEndpoint:import.meta.env.VITE_PAYPAL_CAPTURE_ORDER_ENDPOINT || '',
++  paypalCreateOrderEndpoint:import.meta.env.VITE_PAYPAL_CREATE_ORDER_ENDPOINT || import.meta.env.VITE_CHECKOUT_ENDPOINT || (API_BASE_URL ? apiUrl('/api/createPayPalOrder') : ''),
++  paypalCaptureOrderEndpoint:import.meta.env.VITE_PAYPAL_CAPTURE_ORDER_ENDPOINT || (API_BASE_URL ? apiUrl('/api/capturePayPalOrder') : ''),
+   successUrl:import.meta.env.VITE_PAYMENT_SUCCESS_URL || `${window.location.origin}/payment-success`,
+   cancelUrl:import.meta.env.VITE_PAYMENT_CANCEL_URL || `${window.location.origin}/payment-cancel`,
+-  membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
++  membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || (API_BASE_URL ? apiUrl('/api/updateMembershipStatus') : '')
+ };
+ const ACCESS_PLANS=[
+   {id:'basic',name:'Club',kicker:'Founding Access',headline:'Orden operativo para validar y registrar sin improvisar.',cta:'Activar Club',tone:'base',valueNote:'Precio preferencial durante la etapa de expansión. Base sólida para trabajar con checklist, journal y evidencia.',features:['Dashboard operativo desbloqueado','Journal profesional para registrar evidencia','Checklist operativo antes de ejecutar','Base de setups','Workspace privado']},
+@@ -2482,6 +2505,16 @@ function PaymentCancelPage(){
+ }
+ 
+ function Empty({title,text,cta,onClick,icon:Icon=Sparkles}){return <div className="empty"><span className="emptyIcon"><Icon size={18}/></span><h3>{title}</h3><p>{text}</p>{cta&&<button className="ghost compact" onClick={onClick}>{cta}</button>}</div>}
++
++function PlanLockedPage({feature,setTab}){
++  const copy={
++    analytics:['Analytics Pro','Las métricas avanzadas, patrones y lectura de rendimiento forman parte del plan Pro. Tu acceso base sigue disponible para Dashboard, Journal, Checklist y Riesgo operativo.'],
++    results:['Resultados Pro','La publicación y revisión avanzada de resultados queda reservada para planes Pro o superiores.'],
++    brokers:['Integraciones Pro','Las integraciones y reportes conectados se habilitan en planes Pro o superiores.']
++  };
++  const [title,text]=copy[feature] || ['Módulo Pro','Este módulo requiere un plan superior.'];
++  return <main className="page"><Card title={title} sub="Acceso según plan activo"><Empty icon={Lock} title="Upgrade disponible" text={text} cta="Volver al Dashboard" onClick={()=>setTab('dashboard')}/></Card></main>;
++}
+ function EmojiMenu({onPick}){const [open,setOpen]=useState(false); return <div className="emojiMenu"><button type="button" className="emojiTrigger" onClick={()=>setOpen(!open)}>😊 Emojis</button>{open&&<div className="emojiDropdown">{quickEmojis.map(em=><button type="button" key={em} className="emojiBtn" onClick={()=>{onPick(em);setOpen(false)}}>{em}</button>)}</div>}</div>}
+ function TextareaWithEmoji({value,onChange,placeholder,className='input',rows}){const add=em=>onChange({target:{value:`${value||''}${em}`}}); return <div className="emojiField"><textarea className={className} rows={rows} placeholder={placeholder} value={value||''} onChange={onChange}/><EmojiMenu onPick={add}/></div>}
+ function InputWithEmoji({value,onChange,placeholder,className='input'}){const add=em=>onChange({target:{value:`${value||''}${em}`}}); return <div className="emojiField"><input className={className} placeholder={placeholder} value={value||''} onChange={onChange}/><EmojiMenu onPick={add}/></div>}
+@@ -2571,7 +2604,7 @@ function App(){const [fbUser,setFbUser]=useState(null),[profile,setProfile]=useS
+   if(!info.expired || profile.subscriptionStatus==='expired' || profile.accessStatus==='inactive') return;
+   if(!PAYMENT_CONFIG.membershipSyncEndpoint) return;
+   auth.currentUser?.getIdToken?.().then(token=>fetch(PAYMENT_CONFIG.membershipSyncEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({reason:'period_expired'})})).catch(e=>console.warn('membership expiration sync',e?.message));
+-},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:<BrokerSync data={data} profile={profile}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,ecosystem:<EcosystemGuidePage/>,emotional:<EmotionalJournalPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:<Analytics data={data}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:<Results data={data} profile={profile}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
++},[profile?.uid,profile?.currentPeriodEnd,profile?.subscriptionStatus,profile?.accessStatus]); const allowed=profile && isApproved(profile); const [data]=useLiveData(allowed?profile:null); usePresence(allowed?profile:null); const successRoutes=['/payment-success','/payment/approved','/checkout/success']; const cancelRoutes=['/payment-cancel','/payment-failed','/checkout/cancel']; const isPaymentSuccess=successRoutes.includes(publicPath); const isPaymentCancel=cancelRoutes.includes(publicPath); if(loading)return <div className="authPage"><div className="loginCard"><img className="logoImage loginLogo" src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><h1>Verificando acceso…</h1></div></div>; if(isPaymentCancel) return <><PaymentCancelPage/><ToastHost/></>; if(!fbUser||!profile){ if(isPaymentSuccess) return <><PaymentSuccessPage profile={null}/><ToastHost/></>; if(publicPath==='/login') return <><Login initialMode="login"/><ToastHost/></>; if(publicPath==='/register') return <><Login initialMode="register"/><ToastHost/></>; return <><PublicLanding/><ToastHost/></>;} if(isPaymentSuccess) return <><PaymentSuccessPage profile={profile}/><ToastHost/></>; if(!allowed)return <><AccessGate profile={profile}/><ToastHost/></>; const pages={dashboard:<Dashboard data={data} profile={profile} setTab={setTab}/>,journal:<Journal data={data} profile={profile}/>,brokers:canUsePlanFeature(profile,'brokers')?<BrokerSync data={data} profile={profile}/>:<PlanLockedPage feature="brokers" setTab={setTab}/>,risk:<RiskLab data={data} profile={profile}/>,checklist:<ChecklistPage data={data} profile={profile}/>,ecosystem:<EcosystemGuidePage/>,emotional:<EmotionalJournalPage data={data} profile={profile}/>,system:<SystemPage/>,reading:<ReadingPage data={data} profile={profile}/>,news:<NewsPage/>,analytics:canUsePlanFeature(profile,'analytics')?<Analytics data={data}/>:<PlanLockedPage feature="analytics" setTab={setTab}/>,academy:<Academy data={data} profile={profile}/>,community:<Community data={data} profile={profile}/>,ideas:<Ideas data={data} profile={profile}/>,results:canUsePlanFeature(profile,'results')?<Results data={data} profile={profile}/>:<PlanLockedPage feature="results" setTab={setTab}/>,announcements:<Announcements data={data} profile={profile}/>,chat:<ChatPage data={data} profile={profile}/>,online:<OnlinePage data={data} profile={profile}/>,coach:<CoachIA data={data} profile={profile}/>,notifications:<Notifications data={data} profile={profile} setTab={setTab}/>,settings:<SettingsPage data={data} profile={profile} setProfile={setProfile}/>,admin:<Admin data={data}/>}; return <div className="app"><Shell profile={profile} tab={tab} setTab={setTab} data={data} theme={theme} toggleTheme={toggleTheme}/><div className="main" onWheelCapture={desktopMainWheelHandler}><Topbar tab={tab} profile={profile} theme={theme} toggleTheme={toggleTheme}/><PullToRefresh><SectionBoundary key={tab}>{pages[tab]||pages.dashboard}</SectionBoundary></PullToRefresh></div><MobileNav profile={profile} tab={tab} setTab={setTab} data={data}/><CommandPalette open={cmdOpen} setOpen={setCmdOpen} setTab={setTab}/><ToastHost/></div>}
+ 
+ class ErrorBoundary extends React.Component {
+   constructor(props){

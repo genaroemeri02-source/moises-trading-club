@@ -706,10 +706,10 @@ const WHATSAPP_MENTORIA=import.meta.env.VITE_WHATSAPP_MENTORIA || '5493412133662
 const API_BASE_URL=String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 const apiUrl=(path)=>`${API_BASE_URL}${path.startsWith('/')?path:`/${path}`}`;
 const PAYMENT_CONFIG={
-  enabled:String(import.meta.env.VITE_PAYMENTS_ENABLED || (API_BASE_URL ? 'true' : 'false'))==='true',
+  enabled:String(import.meta.env.VITE_PAYMENTS_ENABLED || 'true')==='true',
   provider:import.meta.env.VITE_PAYMENT_PROVIDER || 'paypal',
   checkoutEndpoint:import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
-  paypalCreateOrderEndpoint:import.meta.env.VITE_PAYPAL_CREATE_ORDER_ENDPOINT || import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
+  paypalCreateOrderEndpoint:import.meta.env.VITE_PAYPAL_CREATE_ORDER_ENDPOINT || import.meta.env.VITE_CHECKOUT_ENDPOINT || apiUrl('/api/createPayPalOrder'),
   paypalCaptureOrderEndpoint:import.meta.env.VITE_PAYPAL_CAPTURE_ORDER_ENDPOINT || '',
   successUrl:import.meta.env.VITE_PAYMENT_SUCCESS_URL || `${window.location.origin}/payment-success`,
   cancelUrl:import.meta.env.VITE_PAYMENT_CANCEL_URL || `${window.location.origin}/payment-cancel`,
@@ -2470,12 +2470,18 @@ function AccessGate({profile}){
         email:profile?.email || auth.currentUser?.email || ''
       })});
       const payload=await res.json().catch(()=>({}));
-      if(!res.ok) throw new Error(payload?.error || 'checkout_failed');
+      if(!res.ok){
+        const detail={status:res.status,payload};
+        console.error('checkout_error',detail);
+        const err=new Error(payload?.message || payload?.error || 'checkout_failed');
+        err.details=detail;
+        throw err;
+      }
       if(payload.approvalUrl) window.location.href=payload.approvalUrl;
       else if(payload.checkoutUrl) window.location.href=payload.checkoutUrl;
-      else toast('No pudimos abrir el checkout. Intentá nuevamente.','error');
+      else {console.error('checkout_missing_url',payload); toast('No pudimos abrir el checkout. Intentá nuevamente.','error');}
     }catch(e){
-      console.warn(e);
+      console.error('startCheckout:error',e?.details || e);
       toast('No se pudo iniciar el pago. Intentá nuevamente o contactá soporte.','error');
     }finally{setBusy(null)}
   }
