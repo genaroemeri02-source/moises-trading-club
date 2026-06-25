@@ -709,7 +709,7 @@ const PAYMENT_CONFIG={
   enabled:String(import.meta.env.VITE_PAYMENTS_ENABLED || 'true')==='true',
   provider:import.meta.env.VITE_PAYMENT_PROVIDER || 'paypal',
   checkoutEndpoint:import.meta.env.VITE_CHECKOUT_ENDPOINT || '',
-  paypalCreateOrderEndpoint:import.meta.env.VITE_PAYPAL_CREATE_ORDER_ENDPOINT || import.meta.env.VITE_CHECKOUT_ENDPOINT || apiUrl('/api/createPayPalOrder'),
+  paypalCreateOrderEndpoint:import.meta.env.VITE_CREATE_PAYPAL_ORDER_URL || apiUrl('/api/createPayPalOrder'),
   paypalCaptureOrderEndpoint:import.meta.env.VITE_PAYPAL_CAPTURE_ORDER_ENDPOINT || '',
   successUrl:import.meta.env.VITE_PAYMENT_SUCCESS_URL || `${window.location.origin}/payment-success`,
   cancelUrl:import.meta.env.VITE_PAYMENT_CANCEL_URL || `${window.location.origin}/payment-cancel`,
@@ -2454,11 +2454,17 @@ function AccessGate({profile}){
       toast('Los pagos todavía no están activos. Contactá al administrador para activar tu acceso.','info');
       return;
     }
+    if(!auth.currentUser){
+      console.error('startCheckout:missing_user',{endpoint,planId:plan.id,billingCycle:cycle});
+      toast('Iniciá sesión para activar tu acceso.','error');
+      return;
+    }
     try{
       setBusy(plan.id);
       const token=await auth.currentUser?.getIdToken?.();
-      const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({
+      const checkoutPayload={
         planId:plan.id,
+        plan:plan.id,
         billingCycle:cycle,
         provider:PAYMENT_CONFIG.provider,
         amount:quote?.total,
@@ -2467,11 +2473,16 @@ function AccessGate({profile}){
         successUrl:PAYMENT_CONFIG.successUrl,
         cancelUrl:PAYMENT_CONFIG.cancelUrl,
         uid:profile?.uid,
+        userId:profile?.uid,
         email:profile?.email || auth.currentUser?.email || ''
+      };
+      console.info('startCheckout:request',{endpoint,payload:checkoutPayload});
+      const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({
+        ...checkoutPayload
       })});
       const payload=await res.json().catch(()=>({}));
       if(!res.ok){
-        const detail={status:res.status,payload};
+        const detail={endpoint,status:res.status,payload,requestPayload:checkoutPayload};
         console.error('checkout_error',detail);
         const err=new Error(payload?.message || payload?.error || 'checkout_failed');
         err.details=detail;
