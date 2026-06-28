@@ -4,20 +4,25 @@ const PLAN_CONFIG = {
   club: {
     aliases: ['club', 'basic'],
     label: 'Club',
-    env: 'PAYPAL_PLAN_ID_CLUB_MONTHLY',
     monthly: 14.99,
   },
   pro: {
     aliases: ['pro', 'premium'],
     label: 'Pro',
-    env: 'PAYPAL_PLAN_ID_PRO_MONTHLY',
     monthly: 24.99,
   },
-  mentoring: {
-    aliases: ['mentoring', 'mentorship', 'mentoria'],
-    label: 'Mentoring',
-    env: 'PAYPAL_PLAN_ID_MENTORING_MONTHLY',
-    monthly: null,
+};
+
+const PAYPAL_PLAN_ENV_KEYS = {
+  club: {
+    monthly: 'PAYPAL_PLAN_ID_CLUB_MONTHLY',
+    quarterly: 'PAYPAL_PLAN_ID_CLUB_QUARTERLY',
+    annual: 'PAYPAL_PLAN_ID_CLUB_ANNUAL',
+  },
+  pro: {
+    monthly: 'PAYPAL_PLAN_ID_PRO_MONTHLY',
+    quarterly: 'PAYPAL_PLAN_ID_PRO_QUARTERLY',
+    annual: 'PAYPAL_PLAN_ID_PRO_ANNUAL',
   },
 };
 
@@ -25,9 +30,6 @@ const REQUIRED_ENV_VARS = [
   'PAYPAL_CLIENT_ID',
   'PAYPAL_CLIENT_SECRET',
   'PAYPAL_MODE',
-  'PAYPAL_PLAN_ID_CLUB_MONTHLY',
-  'PAYPAL_PLAN_ID_PRO_MONTHLY',
-  'PAYPAL_PLAN_ID_MENTORING_MONTHLY',
   'APP_URL',
 ];
 
@@ -64,6 +66,10 @@ function normalizeBillingCycle(value) {
 function normalizePlan(value) {
   const raw = String(value || '').trim().toLowerCase();
   return Object.entries(PLAN_CONFIG).find(([, config]) => config.aliases.includes(raw));
+}
+
+function paypalPlanEnvKey(planKey, billingCycle) {
+  return PAYPAL_PLAN_ENV_KEYS[planKey]?.[billingCycle] || '';
 }
 
 function cycleQuote(plan, billingCycle) {
@@ -217,20 +223,27 @@ export default async function handler(req, res) {
     if (!planEntry) {
       return json(res, 400, {
         error: 'invalid_plan',
-        message: 'Plan must be one of: club/basic, pro/premium, mentoring/mentorship',
+        message: 'Plan must be one of: club/basic, pro/premium',
       });
     }
 
     const [planKey, plan] = planEntry;
-    const planId = requireEnv(plan.env);
+    const envKey = paypalPlanEnvKey(planKey, billingCycle);
+    if (!envKey) {
+      return json(res, 400, {
+        error: 'invalid_billing_cycle',
+        message: 'Billing cycle must be monthly, quarterly, or annual',
+      });
+    }
+    console.log("checkout payload", { planId: body.planId, plan: body.plan, billingCycle });
+    console.log("paypal env key", envKey);
+    const planId = requireEnv(envKey);
     const mode = requireEnv('PAYPAL_MODE');
     const appUrl = requireEnv('APP_URL').replace(/\/$/, '');
     const baseUrl = paypalBaseUrl(mode);
     const returnUrl = String(body.successUrl || `${appUrl}/payment-success`);
     const cancelUrl = String(body.cancelUrl || `${appUrl}/payment-cancel`);
 
-    console.log('createPayPalOrder plan:', planInput);
-    console.log('createPayPalOrder billingCycle:', billingCycle);
     console.log('createPayPalOrder PAYPAL_MODE:', mode);
     console.log('createPayPalOrder planId found:', Boolean(planId));
 
@@ -248,28 +261,12 @@ export default async function handler(req, res) {
       clientSecret: requireEnv('PAYPAL_CLIENT_SECRET'),
     });
 
-    const isMonthlySubscription = billingCycle === 'monthly';
-    const paypalPayload = isMonthlySubscription
-      ? await paypalRequest({
-          baseUrl,
-          token,
-          path: '/v1/billing/subscriptions',
-          body: buildSubscriptionPayload({ planId, email, userId, returnUrl, cancelUrl }),
-        })
-      : await paypalRequest({
-          baseUrl,
-          token,
-          path: '/v2/checkout/orders',
-          body: buildOrderPayload({
-            planKey,
-            plan,
-            billingCycle,
-            quote,
-            userId,
-            returnUrl,
-            cancelUrl,
-          }),
-        });
+    const paypalPayload = await paypalRequest({
+      baseUrl,
+      token,
+      path: '/v1/billing/subscriptions',
+      body: buildSubscriptionPayload({ planId, email, userId, returnUrl, cancelUrl }),
+    });
 
     const approvalUrl = paypalPayload.links?.find((link) => link.rel === 'approve')?.href;
     if (!approvalUrl) {

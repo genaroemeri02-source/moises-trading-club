@@ -720,6 +720,11 @@ const ACCESS_PLANS=[
   {id:'premium',name:'Pro',kicker:'M\u00e1s elegido',headline:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. La mejor relaci\u00f3n entre datos, riesgo y revisi\u00f3n.',features:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync','Mayor profundidad de m\u00e9tricas']},
   {id:'mentorship',name:'Mentor\u00eda',kicker:'1 a 1',headline:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',cta:'Aplicar a mentor\u00eda',tone:'mentor',valueNote:'Cupos limitados para traders que necesitan revisi\u00f3n directa y seguimiento.',features:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
 ];
+function checkoutPlanId(planId){
+  if(planId==='basic') return 'club';
+  if(planId==='premium') return 'pro';
+  return planId;
+}
 function calculatePlanPrice(planId,cycleId='monthly'){
   const pricing=PLAN_PRICING[planId];
   if(!pricing) return null;
@@ -2462,9 +2467,10 @@ function AccessGate({profile}){
     try{
       setBusy(plan.id);
       const token=await auth.currentUser?.getIdToken?.();
+      const paypalPlanId=checkoutPlanId(plan.id);
       const checkoutPayload={
-        planId:plan.id,
-        plan:plan.id,
+        planId:paypalPlanId,
+        plan:paypalPlanId,
         billingCycle:cycle,
         provider:PAYMENT_CONFIG.provider,
         amount:quote?.total,
@@ -2476,6 +2482,7 @@ function AccessGate({profile}){
         userId:profile?.uid,
         email:profile?.email || auth.currentUser?.email || ''
       };
+      console.log("checkout payload", { planId:checkoutPayload.planId, plan:checkoutPayload.plan, billingCycle:checkoutPayload.billingCycle });
       console.info('startCheckout:request',{endpoint,payload:checkoutPayload});
       const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({
         ...checkoutPayload
