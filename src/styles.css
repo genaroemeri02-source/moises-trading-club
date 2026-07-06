@@ -9886,6 +9886,264 @@ html[data-theme="dark"] body .app .monthCell.be :is(small,i){color:#60a5fa!impor
 html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthLegend .be{background:#3b82f6!important}
 html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be{background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.04))!important;border-color:rgba(59,130,246,.35)!important}
 html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be :is(small,i){color:#2563eb!important}
+/* v47.19c - Real EOF share overlay containment */
+.shareOverlay{position:fixed!important;inset:0!important;z-index:9999!important;display:grid!important;place-items:center!important;padding:24px!important;background:rgba(2,6,12,.76)!important;backdrop-filter:blur(18px)!important;overflow:hidden!important}
+.shareOverlay .shareModalCard{width:min(1280px,calc(100vw - 48px))!important;max-height:calc(100vh - 48px)!important;overflow:hidden!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;border-radius:28px!important;background:linear-gradient(180deg,rgba(15,23,42,.97),rgba(5,8,13,.985))!important;border:1px solid rgba(212,168,67,.20)!important;box-shadow:0 44px 130px rgba(0,0,0,.62),0 1px 0 rgba(255,255,255,.05) inset!important;padding:18px!important}
+.shareOverlay .shareModalBody{min-height:0!important;display:grid!important;grid-template-columns:320px minmax(0,1fr)!important;gap:22px!important;padding-top:18px!important}
+.shareOverlay .shareControls{min-width:0!important;max-height:calc(100vh - 150px)!important;overflow:auto!important;position:relative!important}
+.shareOverlay .storyPreviewFrame{min-width:0!important;min-height:0!important;height:calc(100vh - 150px)!important;overflow:auto!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;padding:18px!important}
+.shareOverlay .storyPreviewFrame img,.shareOverlay .storyPreviewSkeleton{width:auto!important;max-width:100%!important;height:auto!important;max-height:calc(100vh - 190px)!important;aspect-ratio:9/16!important;object-fit:contain!important}
+@media(max-width:860px){.shareOverlay{padding:12px!important;align-items:start!important;overflow:auto!important}.shareOverlay .shareModalCard{width:100%!important;max-height:none!important;overflow:visible!important;border-radius:22px!important}.shareOverlay .shareModalBody{grid-template-columns:1fr!important}.shareOverlay .shareControls{max-height:none!important}.shareOverlay .storyPreviewFrame{height:auto!important;max-height:none!important;padding:12px!important}.shareOverlay .storyPreviewFrame img,.shareOverlay .storyPreviewSkeleton{width:min(330px,100%)!important;max-height:none!important}}
+
+/* v47.23b - Effective EOF guard: chip centering + share overlay isolation */
+.app :is(.buy,.sell,.quality,.pill,.detailChips span,.bookCover .coverBadge,.brokerStatus,.monthLegend span,.resultPreview span){display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;vertical-align:middle!important;line-height:1!important}
+.app :is(.buy,.sell,.quality,.pill){min-height:26px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;letter-spacing:.01em!important}
+.app .quality{min-width:34px!important}
+.app .detailChips{display:flex!important;align-items:center!important;align-content:center!important;flex-wrap:wrap!important;gap:8px!important}
+.app .tradeDetailModal .detailChips span{min-height:31px!important;padding:7px 11px!important;border-radius:999px!important;font-size:13px!important;font-weight:750!important;line-height:1!important;letter-spacing:0!important}
+.app :is(.checks button,.chipSelect button,.filterPills button,.emotionalToggle,.lesson){display:inline-flex!important;align-items:center!important;justify-content:center!important;line-height:1.15!important}
+.app :is(.checks button,.chipSelect button,.filterPills button){min-height:36px!important}
+.app .modal{isolation:isolate!important;z-index:9000!important}
+body.share-modal-open{overflow:hidden!important}
+body.share-modal-open .app{isolation:isolate!important}
+body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){z-index:0!important;pointer-events:none!important}
+body.share-modal-open .shareOverlay{position:fixed!important;inset:0!important;z-index:2147483647!important;isolation:isolate!important;contain:layout style paint!important;opacity:1!important;background:rgba(2,6,12,.88)!important;backdrop-filter:none!important}
+body.share-modal-open .shareOverlay:before{content:""!important;position:absolute!important;inset:0!important;z-index:0!important;background:rgba(2,6,12,.66)!important;backdrop-filter:blur(22px)!important;pointer-events:none!important}
+body.share-modal-open .shareOverlay>.shareModalCard{position:relative!important;z-index:1!important}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay{background:rgba(15,23,42,.72)!important}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay:before{background:rgba(15,23,42,.50)!important;backdrop-filter:blur(24px) saturate(.82)!important}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){opacity:.12!important;filter:blur(1px) saturate(.55) brightness(.88)!important}
+html[data-theme="dark"] body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){opacity:.28!important;filter:saturate(.65) brightness(.70)!important}
+
+/* v47.23 - Final UI polish: chip centering + share overlay isolation */
+.app :is(.buy,.sell,.quality,.pill,.detailChips span,.bookCover .coverBadge,.brokerStatus,.monthLegend span,.resultPreview span){
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  vertical-align:middle!important;
+  line-height:1!important;
+}
+.app :is(.buy,.sell,.quality,.pill){
+  min-height:26px!important;
+  padding:6px 10px!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  letter-spacing:.01em!important;
+}
+.app .quality{min-width:34px!important}
+.app .detailChips{
+  display:flex!important;
+  align-items:center!important;
+  align-content:center!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+}
+.app .tradeDetailModal .detailChips span{
+  min-height:31px!important;
+  padding:7px 11px!important;
+  border-radius:999px!important;
+  font-size:13px!important;
+  font-weight:750!important;
+  line-height:1!important;
+  letter-spacing:0!important;
+}
+.app :is(.checks button,.chipSelect button,.filterPills button,.emotionalToggle,.lesson){
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1.15!important;
+}
+.app :is(.checks button,.chipSelect button,.filterPills button){min-height:36px!important}
+.app .modal{
+  isolation:isolate!important;
+  z-index:9000!important;
+}
+body.share-modal-open{
+  overflow:hidden!important;
+}
+body.share-modal-open .app{
+  isolation:isolate!important;
+}
+body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){
+  z-index:0!important;
+  pointer-events:none!important;
+}
+body.share-modal-open .shareOverlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483647!important;
+  isolation:isolate!important;
+  contain:layout style paint!important;
+  opacity:1!important;
+  background:rgba(2,6,12,.88)!important;
+  backdrop-filter:none!important;
+}
+body.share-modal-open .shareOverlay:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  background:rgba(2,6,12,.66)!important;
+  backdrop-filter:blur(22px)!important;
+  pointer-events:none!important;
+}
+body.share-modal-open .shareOverlay>.shareModalCard{
+  position:relative!important;
+  z-index:1!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay{
+  background:rgba(15,23,42,.72)!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay:before{
+  background:rgba(15,23,42,.50)!important;
+  backdrop-filter:blur(24px) saturate(.82)!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){
+  opacity:.12!important;
+  filter:blur(1px) saturate(.55) brightness(.88)!important;
+}
+html[data-theme="dark"] body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){
+  opacity:.28!important;
+  filter:saturate(.65) brightness(.70)!important;
+}
+/* v47.22 - Deploy final share overlay guard */
+.shareOverlay{z-index:2147483647!important;position:fixed!important;inset:0!important;isolation:isolate!important;contain:layout style paint!important;background:rgba(2,6,12,.82)!important}
+.shareOverlay:before{content:""!important;position:absolute!important;inset:0!important;background:rgba(2,6,12,.42)!important;backdrop-filter:blur(20px)!important;pointer-events:none!important}
+.shareOverlay>.shareModalCard{position:relative!important;z-index:1!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay{background:rgba(15,23,42,.48)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay:before{background:rgba(248,250,252,.50)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .storyPreviewFrame{background:radial-gradient(circle at 50% 0%,rgba(184,134,11,.13),transparent 34%),linear-gradient(180deg,#ffffff,#eef2f7)!important}
+/* v47.21 - Share review bugfix polish */
+.app .modal{z-index:9000!important}
+.shareOverlay{z-index:2147483000!important;isolation:isolate!important}
+.shareOverlay .shareControls{display:grid!important;gap:12px!important;align-content:start!important;padding:18px!important;border-radius:22px!important}
+.shareOverlay .shareControls b{display:block!important;color:#f8fafc!important;font-size:15px!important;font-weight:950!important}
+.shareOverlay .shareControls span{display:block!important;font-size:12px!important;line-height:1.45!important;color:#cbd5e1!important}
+.shareOverlay .shareControls label{display:flex!important;align-items:center!important;gap:10px!important;min-height:34px!important;font-size:13px!important;font-weight:850!important;color:#e2e8f0!important}
+.shareOverlay .shareControls input{width:17px!important;height:17px!important;accent-color:#d4a843!important;flex:0 0 auto!important}
+.shareOverlay .storyPreviewFrame{background:radial-gradient(circle at 50% 0%,rgba(212,168,67,.12),transparent 36%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.014))!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls b{color:#0f172a!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls span{color:#475569!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls label{color:#1f2937!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .storyPreviewFrame{background:radial-gradient(circle at 50% 0%,rgba(184,134,11,.10),transparent 34%),linear-gradient(180deg,#ffffff,#f1f5f9)!important;border-color:rgba(15,23,42,.10)!important}
+/* v47.20 - Portal share modal final UX */
+.shareOverlay .modalActions{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important}
+.shareOverlay .modalActions button{min-height:38px!important;border-radius:12px!important;border:1px solid rgba(255,255,255,.10)!important;background:rgba(255,255,255,.045)!important;color:#e5e7eb!important;font-weight:900!important;padding:8px 11px!important}
+.shareOverlay .modalActions .exportModalButton{border-color:rgba(212,175,55,.36)!important;background:rgba(212,175,55,.10)!important;color:#fff7db!important}
+.shareOverlay .shareControls label,.shareOverlay .shareControls span,.shareOverlay .shareControls small{color:#dbe4f0!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay{background:rgba(15,23,42,.32)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareModalCard{background:linear-gradient(180deg,#ffffff,#f8fafc)!important;border-color:rgba(15,23,42,.12)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls{background:#ffffff!important;border-color:rgba(15,23,42,.10)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls label,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareControls small{color:#334155!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .modalActions button{background:#ffffff!important;border-color:rgba(15,23,42,.12)!important;color:#334155!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .modalActions .exportModalButton{background:#fff8eb!important;border-color:rgba(184,134,11,.28)!important;color:#4b3410!important}
+
+/* v47.19b - EOF share overlay pin */
+.shareOverlay{position:fixed!important;inset:0!important;z-index:9999!important;display:grid!important;place-items:center!important;padding:24px!important;background:rgba(2,6,12,.76)!important;backdrop-filter:blur(18px)!important;overflow:hidden!important}
+.shareOverlay .shareModalCard{width:min(1280px,calc(100vw - 48px))!important;max-height:calc(100vh - 48px)!important;overflow:hidden!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;border-radius:28px!important;background:linear-gradient(180deg,rgba(15,23,42,.97),rgba(5,8,13,.985))!important;border:1px solid rgba(212,168,67,.20)!important;box-shadow:0 44px 130px rgba(0,0,0,.62),0 1px 0 rgba(255,255,255,.05) inset!important;padding:18px!important}
+.shareOverlay .shareModalBody{min-height:0!important;display:grid!important;grid-template-columns:320px minmax(0,1fr)!important;gap:22px!important;padding-top:18px!important}
+.shareOverlay .storyPreviewFrame{min-width:0!important;min-height:0!important;height:calc(100vh - 150px)!important;overflow:auto!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;padding:18px!important}
+.shareOverlay .storyPreviewFrame img,.shareOverlay .storyPreviewSkeleton{width:auto!important;max-width:100%!important;height:auto!important;max-height:calc(100vh - 190px)!important;aspect-ratio:9/16!important;object-fit:contain!important}
+@media(max-width:860px){.shareOverlay{padding:12px!important;align-items:start!important;overflow:auto!important}.shareOverlay .shareModalCard{width:100%!important;max-height:none!important;overflow:visible!important;border-radius:22px!important}.shareOverlay .shareModalBody{grid-template-columns:1fr!important}.shareOverlay .storyPreviewFrame{height:auto!important;max-height:none!important;padding:12px!important}.shareOverlay .storyPreviewFrame img,.shareOverlay .storyPreviewSkeleton{width:min(330px,100%)!important;max-height:none!important}}
+
+/* v47.19 - Share poster modal containment */
+.shareOverlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:24px!important;
+  background:rgba(2,6,12,.76)!important;
+  backdrop-filter:blur(18px)!important;
+  overflow:hidden!important;
+}
+.shareOverlay .shareModalCard{
+  width:min(1280px,calc(100vw - 48px))!important;
+  max-height:calc(100vh - 48px)!important;
+  overflow:hidden!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr)!important;
+  border-radius:28px!important;
+  background:linear-gradient(180deg,rgba(15,23,42,.97),rgba(5,8,13,.985))!important;
+  border:1px solid rgba(212,168,67,.20)!important;
+  box-shadow:0 44px 130px rgba(0,0,0,.62),0 1px 0 rgba(255,255,255,.05) inset!important;
+  padding:18px!important;
+}
+.shareModalHead{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:16px!important;
+  padding:4px 4px 16px!important;
+  border-bottom:1px solid rgba(255,255,255,.07)!important;
+}
+.shareModalHead h3{margin:0!important;color:#f8fafc!important;font-size:18px!important}
+.shareModalHead p{margin:4px 0 0!important;color:#98a6b9!important;font-size:12px!important}
+.shareOverlay .shareModalBody{
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:320px minmax(0,1fr)!important;
+  gap:22px!important;
+  padding-top:18px!important;
+}
+.shareOverlay .shareControls{
+  min-width:0!important;
+  max-height:calc(100vh - 150px)!important;
+  overflow:auto!important;
+  position:relative!important;
+}
+.shareOverlay .storyPreviewFrame{
+  min-width:0!important;
+  min-height:0!important;
+  height:calc(100vh - 150px)!important;
+  overflow:auto!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  padding:18px!important;
+}
+.shareOverlay .storyPreviewFrame img,
+.shareOverlay .storyPreviewSkeleton{
+  width:auto!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:calc(100vh - 190px)!important;
+  aspect-ratio:9/16!important;
+  object-fit:contain!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareOverlay .shareModalCard{
+  background:linear-gradient(180deg,#ffffff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.10)!important;
+  box-shadow:0 32px 90px rgba(15,23,42,.18)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareModalHead h3{color:#0f172a!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .shareModalHead p{color:#64748b!important}
+@media(max-width:860px){
+  .shareOverlay{padding:12px!important;align-items:start!important;overflow:auto!important}
+  .shareOverlay .shareModalCard{
+    width:100%!important;
+    max-height:none!important;
+    overflow:visible!important;
+    border-radius:22px!important;
+  }
+  .shareModalHead{display:grid!important}
+  .shareOverlay .shareModalBody{grid-template-columns:1fr!important}
+  .shareOverlay .shareControls{max-height:none!important}
+  .shareOverlay .storyPreviewFrame{
+    height:auto!important;
+    max-height:none!important;
+    padding:12px!important;
+  }
+  .shareOverlay .storyPreviewFrame img,
+  .shareOverlay .storyPreviewSkeleton{
+    width:min(330px,100%)!important;
+    max-height:none!important;
+  }
+}
 
 /* v47.18b - Final share preview polish */
 .app .shareModalCard{
@@ -12957,3 +13215,265 @@ html[data-theme="dark"] body .app .monthCell.be :is(small,i){color:#60a5fa!impor
 html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthLegend .be{background:#3b82f6!important}
 html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be{background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.04))!important;border-color:rgba(59,130,246,.35)!important}
 html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be :is(small,i){color:#2563eb!important}
+/* v47.19d - Absolute EOF share overlay containment */
+.shareOverlay{position:fixed!important;inset:0!important;z-index:9999!important;display:grid!important;place-items:center!important;padding:24px!important;background:rgba(2,6,12,.76)!important;backdrop-filter:blur(18px)!important;overflow:hidden!important}
+.shareOverlay .shareModalCard{width:min(1280px,calc(100vw - 48px))!important;max-height:calc(100vh - 48px)!important;overflow:hidden!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;border-radius:28px!important;background:linear-gradient(180deg,rgba(15,23,42,.97),rgba(5,8,13,.985))!important;border:1px solid rgba(212,168,67,.20)!important;box-shadow:0 44px 130px rgba(0,0,0,.62),0 1px 0 rgba(255,255,255,.05) inset!important;padding:18px!important}
+.shareOverlay .shareModalBody{min-height:0!important;display:grid!important;grid-template-columns:320px minmax(0,1fr)!important;gap:22px!important;padding-top:18px!important}
+.shareOverlay .shareControls{min-width:0!important;max-height:calc(100vh - 150px)!important;overflow:auto!important;position:relative!important}
+.shareOverlay .storyPreviewFrame{min-width:0!important;min-height:0!important;height:calc(100vh - 150px)!important;overflow:auto!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;padding:18px!important}
+.shareOverlay .storyPreviewFrame img,.shareOverlay .storyPreviewSkeleton{width:auto!important;max-width:100%!important;height:auto!important;max-height:calc(100vh - 190px)!important;aspect-ratio:9/16!important;object-fit:contain!important}
+@media(max-width:860px){.shareOverlay{padding:12px!important;align-items:start!important;overflow:auto!important}.shareOverlay .shareModalCard{width:100%!important;max-height:none!important;overflow:visible!important;border-radius:22px!important}.shareOverlay .shareModalBody{grid-template-columns:1fr!important}.shareOverlay .shareControls{max-height:none!important}.shareOverlay .storyPreviewFrame{height:auto!important;max-height:none!important;padding:12px!important}.shareOverlay .storyPreviewFrame img,.shareOverlay .storyPreviewSkeleton{width:min(330px,100%)!important;max-height:none!important}}
+/* v47.23b - Effective EOF guard: chip centering + share overlay isolation */
+.app :is(.buy,.sell,.quality,.pill,.detailChips span,.bookCover .coverBadge,.brokerStatus,.monthLegend span,.resultPreview span){display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;vertical-align:middle!important;line-height:1!important}
+.app :is(.buy,.sell,.quality,.pill){min-height:26px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;letter-spacing:.01em!important}
+.app .quality{min-width:34px!important}
+.app .detailChips{display:flex!important;align-items:center!important;align-content:center!important;flex-wrap:wrap!important;gap:8px!important}
+.app .tradeDetailModal .detailChips span{min-height:31px!important;padding:7px 11px!important;border-radius:999px!important;font-size:13px!important;font-weight:750!important;line-height:1!important;letter-spacing:0!important}
+.app :is(.checks button,.chipSelect button,.filterPills button,.emotionalToggle,.lesson){display:inline-flex!important;align-items:center!important;justify-content:center!important;line-height:1.15!important}
+.app :is(.checks button,.chipSelect button,.filterPills button){min-height:36px!important}
+.app .modal{isolation:isolate!important;z-index:9000!important}
+body.share-modal-open{overflow:hidden!important}
+body.share-modal-open .app{isolation:isolate!important}
+body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){z-index:0!important;pointer-events:none!important}
+body.share-modal-open .shareOverlay{position:fixed!important;inset:0!important;z-index:2147483647!important;isolation:isolate!important;contain:layout style paint!important;opacity:1!important;background:rgba(2,6,12,.88)!important;backdrop-filter:none!important}
+body.share-modal-open .shareOverlay:before{content:""!important;position:absolute!important;inset:0!important;z-index:0!important;background:rgba(2,6,12,.66)!important;backdrop-filter:blur(22px)!important;pointer-events:none!important}
+body.share-modal-open .shareOverlay>.shareModalCard{position:relative!important;z-index:1!important}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay{background:rgba(15,23,42,.72)!important}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay:before{background:rgba(15,23,42,.50)!important;backdrop-filter:blur(24px) saturate(.82)!important}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){opacity:.12!important;filter:blur(1px) saturate(.55) brightness(.88)!important}
+html[data-theme="dark"] body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){opacity:.28!important;filter:saturate(.65) brightness(.70)!important}
+/* v47.24 - Final deploy guard: trade detail portal overlay */
+body.trade-detail-modal-open{overflow:hidden!important}
+body.trade-detail-modal-open .app{isolation:isolate!important}
+body.trade-detail-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){z-index:0!important;pointer-events:none!important}
+.tradeDetailOverlay{position:fixed!important;inset:0!important;z-index:2147483000!important;display:grid!important;place-items:center!important;padding:20px!important;isolation:isolate!important;background:rgba(2,6,12,.76)!important;backdrop-filter:blur(18px)!important;overflow:hidden!important}
+.tradeDetailOverlay:before{content:""!important;position:absolute!important;inset:0!important;z-index:0!important;background:rgba(2,6,12,.30)!important;pointer-events:none!important}
+.tradeDetailOverlay>.tradeDetailModal{position:relative!important;z-index:1!important}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .tradeDetailOverlay{background:rgba(15,23,42,.58)!important;backdrop-filter:blur(20px) saturate(.85)!important}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .tradeDetailOverlay:before{background:rgba(248,250,252,.24)!important}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){opacity:.10!important;filter:blur(1px) saturate(.55) brightness(.88)!important}
+html[data-theme="dark"] body.trade-detail-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){opacity:.24!important;filter:saturate(.65) brightness(.70)!important}
+body.share-modal-open .shareOverlay{z-index:2147483647!important}
+/* v47.25 - Premium translucent overlay tuning */
+body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab),
+body.trade-detail-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){
+  z-index:0!important;
+  opacity:1!important;
+  filter:none!important;
+  pointer-events:none!important;
+}
+body.share-modal-open .shareOverlay{
+  z-index:2147483647!important;
+  background:rgba(2,6,23,.64)!important;
+  backdrop-filter:blur(12px) saturate(.88)!important;
+}
+body.share-modal-open .shareOverlay:before{
+  background:radial-gradient(circle at 78% 18%,rgba(212,168,67,.08),transparent 34%),rgba(2,6,23,.08)!important;
+  backdrop-filter:none!important;
+}
+.tradeDetailOverlay{
+  z-index:2147483000!important;
+  background:rgba(2,6,23,.62)!important;
+  backdrop-filter:blur(12px) saturate(.88)!important;
+}
+.tradeDetailOverlay:before{
+  background:radial-gradient(circle at 78% 18%,rgba(212,168,67,.07),transparent 34%),rgba(2,6,23,.06)!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay{
+  background:rgba(15,23,42,.44)!important;
+  backdrop-filter:blur(11px) saturate(.88)!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay:before{
+  background:radial-gradient(circle at 78% 18%,rgba(184,134,11,.09),transparent 34%),rgba(248,250,252,.05)!important;
+  backdrop-filter:none!important;
+}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .tradeDetailOverlay{
+  background:rgba(15,23,42,.44)!important;
+  backdrop-filter:blur(11px) saturate(.88)!important;
+}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .tradeDetailOverlay:before{
+  background:radial-gradient(circle at 78% 18%,rgba(184,134,11,.08),transparent 34%),rgba(248,250,252,.05)!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab),
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){
+  opacity:1!important;
+  filter:none!important;
+}
+html[data-theme="dark"] body.share-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab),
+html[data-theme="dark"] body.trade-detail-modal-open .app :is(.side,.top,.mobileNav,.mobileMenu,.mobileNewTradeFab){
+  opacity:1!important;
+  filter:none!important;
+}
+/* v47.26 - Trade detail header in normal flow */
+.tradeDetailOverlay>.tradeDetailModal{
+  display:flex!important;
+  flex-direction:column!important;
+  width:min(1188px,calc(100vw - 48px))!important;
+  max-height:calc(100dvh - 48px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:0 28px 28px!important;
+  scroll-padding-top:0!important;
+  gap:16px!important;
+}
+.tradeDetailModal>.modalHead{
+  position:relative!important;
+  top:auto!important;
+  z-index:2!important;
+  flex:0 0 auto!important;
+  margin:0 -28px!important;
+  padding:22px 28px 18px!important;
+  transform:none!important;
+  backdrop-filter:none!important;
+  background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(15,23,42,.94))!important;
+  border-bottom:1px solid rgba(212,168,67,.14)!important;
+}
+.tradeDetailModal>.detailKpis{
+  flex:0 0 auto!important;
+  margin-top:0!important;
+  margin-bottom:0!important;
+  transform:none!important;
+  position:relative!important;
+  z-index:1!important;
+}
+.tradeDetailModal>.linkedValidationCard,
+.tradeDetailModal>.mentorReviewStatusCard,
+.tradeDetailModal>.detailGrid,
+.tradeDetailModal>.emotionPanel{
+  flex:0 0 auto!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .tradeDetailModal>.modalHead{
+  background:linear-gradient(180deg,#ffffff,#f8fafc)!important;
+  border-bottom:1px solid rgba(15,23,42,.10)!important;
+}
+@media(max-width:860px){
+  .tradeDetailOverlay>.tradeDetailModal{
+    width:100%!important;
+    max-height:calc(100dvh - 24px)!important;
+    padding:0 16px max(20px,env(safe-area-inset-bottom))!important;
+    gap:14px!important;
+  }
+  .tradeDetailModal>.modalHead{
+    margin:0 -16px!important;
+    padding:18px 16px 16px!important;
+  }
+}
+/* v47.27 - Trade detail header surface refinement */
+.tradeDetailModal>.modalHead{
+  background:rgba(11,16,24,.78)!important;
+  backdrop-filter:blur(10px) saturate(.92)!important;
+  border-bottom:1px solid rgba(212,168,67,.10)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.035) inset!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .tradeDetailModal>.modalHead{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.92))!important;
+  backdrop-filter:blur(8px) saturate(.96)!important;
+  border-bottom:1px solid rgba(15,23,42,.08)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.80) inset!important;
+}
+/* v47.28 - Final calendar parity, invisible modal scrollbars, softer overlay blur */
+.app .monthCalendar{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:12px!important;
+}
+.app .monthHead{
+  min-height:38px!important;
+  padding:0!important;
+}
+.app .monthHead b{
+  font-size:14px!important;
+  line-height:1.2!important;
+}
+.app .monthHead small{
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.app .weekDays,
+.app .monthGrid{
+  display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+.app .monthCell{
+  min-height:64px!important;
+  height:64px!important;
+  padding:8px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+  line-height:1.15!important;
+  transform:none!important;
+  zoom:1!important;
+}
+.app .monthCell b{
+  font-size:13px!important;
+  line-height:1!important;
+}
+.app .monthCell i{
+  font-size:10px!important;
+  line-height:1.2!important;
+  padding:1px 6px!important;
+}
+.app .monthCell small{
+  font-size:11px!important;
+  line-height:1.15!important;
+}
+body.share-modal-open .shareOverlay{
+  backdrop-filter:blur(6px) saturate(.88)!important;
+}
+.tradeDetailOverlay{
+  backdrop-filter:blur(6px) saturate(.88)!important;
+}
+html[data-theme="light"] body.share-modal-open:not(:has(.paywallFunnel)) .shareOverlay,
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) .tradeDetailOverlay{
+  backdrop-filter:blur(5.5px) saturate(.88)!important;
+}
+.tradeDetailOverlay,
+.tradeDetailOverlay>.tradeDetailModal,
+.shareOverlay,
+.shareOverlay .shareModalCard,
+.shareOverlay .shareModalBody,
+.shareOverlay .shareControls,
+.shareOverlay .storyPreviewFrame{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+.tradeDetailOverlay::-webkit-scrollbar,
+.tradeDetailOverlay>.tradeDetailModal::-webkit-scrollbar,
+.shareOverlay::-webkit-scrollbar,
+.shareOverlay .shareModalCard::-webkit-scrollbar,
+.shareOverlay .shareModalBody::-webkit-scrollbar,
+.shareOverlay .shareControls::-webkit-scrollbar,
+.shareOverlay .storyPreviewFrame::-webkit-scrollbar{
+  width:0!important;
+  height:0!important;
+  display:none!important;
+}
+@media(max-width:900px){
+  .app .weekDays,
+  .app .monthGrid{
+    gap:4px!important;
+  }
+  .app .monthCell{
+    min-height:54px!important;
+    height:54px!important;
+    padding:6px!important;
+  }
+  .app .monthCell b{
+    font-size:12px!important;
+  }
+  .app .monthCell small{
+    font-size:10px!important;
+  }
+}
+@media(max-width:640px){
+  .app .monthCell{
+    min-height:48px!important;
+    height:48px!important;
+    padding:5px!important;
+  }
+  .app .weekDays,
+  .app .monthGrid{
+    gap:4px!important;
+  }
+}
