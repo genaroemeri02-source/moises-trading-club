@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, where, orderBy, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Home, BookOpen, BarChart3, LineChart, Users, Lightbulb, Trophy, Shield, Bell, Settings, Plus, Trash2, Download, Upload, Search, LogOut, CheckCircle2, Lock, PlayCircle, FileText, Heart, MessageCircle, Bookmark, Menu, X, Megaphone, Edit3, Sparkles, Crown, Newspaper, ExternalLink, Camera, Image as ImageIcon, Copy, ChevronDown, ChevronRight, SlidersHorizontal, CalendarDays, Clock3, Flame, Medal, Activity, TrendingUp, Target, XCircle, AlertTriangle, Info, Rocket } from 'lucide-react';
+import { Home, BookOpen, BarChart3, LineChart, Users, Lightbulb, Trophy, Shield, Bell, Settings, Plus, Trash2, Download, Upload, Search, LogOut, CheckCircle2, Lock, PlayCircle, FileText, Heart, MessageCircle, Bookmark, Menu, X, Megaphone, Edit3, Sparkles, Crown, Newspaper, ExternalLink, Camera, Image as ImageIcon, Copy, ChevronDown, ChevronRight, SlidersHorizontal, CalendarDays, Clock3, Flame, Medal, Activity, TrendingUp, Target, XCircle, AlertTriangle, Info, Rocket, Share2 } from 'lucide-react';
 import './styles.css';
 
 const firebaseConfig = {
@@ -453,7 +453,494 @@ function insights(s){
 }
 function InsightGrid({items}){return <div className="insightGrid">{items.map((x,i)=><div className={`insightPro ${x.tone||'neutral'}`} key={i}><div><span>{x.label}</span><strong>{x.value}</strong></div><p>{x.text}</p></div>)}</div>}
 function TraderStats({s}){const rows=[['Trades',formatMetricCard(s.count)],['Ganados / Perdidos',`${formatMetricCard(s.wins)}W / ${formatMetricCard(s.losses)}L`],['Sesgo más rentable',s.count?`${s.bestBias.name} · ${formatMoneyClean(s.bestBias.value)}`:'—'],['Ganancia bruta',formatMoneyClean(s.grossProfit)],['Pérdida bruta',formatMoneyClean(s.grossLoss)],['Avg win',formatMoneyClean(s.avgWin)],['Avg loss',formatMoneyClean(s.avgLoss)],['Payoff ratio',s.payoffRatio?s.payoffRatio.toFixed(2):'0.00'],['Recovery factor',s.recovery?s.recovery.toFixed(2):'0.00'],['Media R',`${s.meanR.toFixed(2)}R`],['Volatilidad R',`${s.stdR.toFixed(2)}R`]];return <div className="statMatrix">{rows.map(([a,b])=><div key={a}><span>{a}</span><b>{b}</b></div>)}</div>}
-function csvExport(rows){const headers=['date','asset','session','side','tradeSystem','pattern','confluencesUsed','otherSystem','setup','entry','sl','tp','exit','riskMoney','riskPct','resultMoney','resultPct','resultR','quality','followedPlan','error','lesson','captureLink','captureUrl','captureFileName','emotionBefore','emotionDuring','emotionAfter','privateJournal','tags']; const body=[headers.join(','),...rows.map(r=>headers.map(h=>`"${String(h==='setup'?normalizeTradeSetup(r):(r[h]??'')).replaceAll('"','""')}"`).join(','))].join('\n'); const blob=new Blob([body],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='moises-trades.csv'; a.click();}
+function exportSafeDate(value){
+  try{
+    if(!value)return '';
+    if(typeof value==='string')return value;
+    if(value?.toDate)return value.toDate().toISOString();
+    if(value instanceof Date)return value.toISOString();
+    if(typeof value==='number')return new Date(value).toISOString();
+    return String(value);
+  }catch{return String(value||'')}
+}
+function exportText(value){
+  if(value==null)return '';
+  if(Array.isArray(value))return value.map(exportText).filter(Boolean).join('|');
+  if(typeof value==='object')return JSON.stringify(value);
+  return String(value);
+}
+function normalizeTradeForExport(trade={}){
+  const date=String(trade.tradingDay||trade.date||safeDate(trade.createdAt)||today()).slice(0,10);
+  return {
+    id: trade.id||'',
+    date,
+    tradingDay: trade.tradingDay||date,
+    createdAt: exportSafeDate(trade.createdAt),
+    updatedAt: exportSafeDate(trade.updatedAt),
+    symbol: trade.asset||trade.symbol||'',
+    account: accountName(trade),
+    session: trade.session||'',
+    direction: trade.side||trade.direction||'',
+    entry: trade.entry??'',
+    stopLoss: trade.sl??trade.stopLoss??'',
+    takeProfit: trade.tp??trade.takeProfit??'',
+    exit: trade.exit??'',
+    result: trade.result||'',
+    resultR: toNumberSafe(trade.resultR),
+    resultPct: toNumberSafe(trade.resultPct),
+    profitLossMoney: toNumberSafe(trade.resultMoney),
+    riskMoney: toNumberSafe(trade.riskMoney),
+    riskPct: toNumberSafe(trade.riskPct),
+    system: trade.tradeSystem||trade.system||'',
+    setup: normalizeTradeSetup(trade),
+    pattern: trade.pattern||trade.checklistPattern||'',
+    quality: trade.quality||'',
+    checklist: Array.isArray(trade.checklist)?trade.checklist:[],
+    confluences: Array.isArray(trade.confluencesUsed)?trade.confluencesUsed:[],
+    checklistValidation: {
+      checklistId: trade.checklistId||'',
+      createdFromChecklist: trade.createdFromChecklist===true,
+      finalGreen: trade.checklistFinalGreen===true,
+      score: trade.checklistScore??'',
+      aPlus: trade.checklistAPlus===true,
+      operationalState: trade.checklistOperationalState||'',
+      executedWithoutFullChecklist: trade.executedWithoutFullChecklist===true
+    },
+    behavior: {
+      followedPlan: trade.followedPlan===true,
+      score: Number(trade.behaviorScore||behaviorScoreFromTrade(trade)),
+      scoreLabel: trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(trade)),
+      emotionBefore: trade.emotionBefore||'',
+      emotionDuring: trade.emotionDuring||'',
+      emotionAfter: trade.emotionAfter||'',
+      executionBehaviors: Array.isArray(trade.executionBehaviors)?trade.executionBehaviors:[],
+      postTradeBehavior: trade.postTradeBehavior||'',
+      respetoProceso: trade.respetoProceso||'',
+      estadoMental: trade.estadoMental||'',
+      motivoOperacion: trade.motivoOperacion||'',
+      notasComportamiento: trade.notasComportamiento||''
+    },
+    contextQuality: {
+      calidadTesis: trade.calidadTesis??'',
+      calidadEjecucion: trade.calidadEjecucion??'',
+      calidadComportamiento: trade.calidadComportamiento??'',
+      calidadRevision: trade.calidadRevision??'',
+      indiceCalidadContextual: trade.indiceCalidadContextual??'',
+      alineacionMacro: trade.alineacionMacro||'',
+      alineacionHTF: trade.alineacionHTF||'',
+      alineacionIntra: trade.alineacionIntra||'',
+      liquidezClara: trade.liquidezClara||'',
+      dxyConfirma: trade.dxyConfirma||'',
+      zonaConFuncion: trade.zonaConFuncion||'',
+      notasContexto: trade.notasContexto||''
+    },
+    notes: trade.lesson||trade.notes||'',
+    privateJournal: trade.privateJournal||'',
+    screenshots: [trade.captureLink,trade.captureUrl,trade.captureFileName].filter(Boolean),
+    captureLink: trade.captureLink||'',
+    captureUrl: trade.captureUrl||'',
+    captureFileName: trade.captureFileName||'',
+    tags: Array.isArray(trade.tags)?trade.tags:[],
+    status: trade.status||trade.mentorReviewStatus||'saved',
+    mentorReview: {
+      requested: trade.mentorReviewRequested===true,
+      status: trade.mentorReviewStatus||'',
+      focus: trade.mentorReviewFocus||'',
+      note: trade.mentorReviewNote||'',
+      response: trade.mentorReviewResponse||''
+    }
+  };
+}
+function flattenTradeForCsv(trade){
+  const t=normalizeTradeForExport(trade);
+  return {
+    id:t.id,date:t.date,tradingDay:t.tradingDay,symbol:t.symbol,account:t.account,session:t.session,direction:t.direction,
+    entry:t.entry,stopLoss:t.stopLoss,takeProfit:t.takeProfit,exit:t.exit,result:t.result,resultR:t.resultR,resultPct:t.resultPct,
+    profitLossMoney:t.profitLossMoney,riskMoney:t.riskMoney,riskPct:t.riskPct,system:t.system,setup:t.setup,pattern:t.pattern,quality:t.quality,
+    checklist:exportText(t.checklist),confluences:exportText(t.confluences),checklistFinalGreen:t.checklistValidation.finalGreen,checklistScore:t.checklistValidation.score,
+    followedPlan:t.behavior.followedPlan,behaviorScore:t.behavior.score,behaviorScoreLabel:t.behavior.scoreLabel,emotionBefore:t.behavior.emotionBefore,
+    emotionDuring:t.behavior.emotionDuring,emotionAfter:t.behavior.emotionAfter,executionBehaviors:exportText(t.behavior.executionBehaviors),
+    postTradeBehavior:t.behavior.postTradeBehavior,respetoProceso:t.behavior.respetoProceso,estadoMental:t.behavior.estadoMental,motivoOperacion:t.behavior.motivoOperacion,
+    notasComportamiento:t.behavior.notasComportamiento,calidadTesis:t.contextQuality.calidadTesis,calidadEjecucion:t.contextQuality.calidadEjecucion,
+    calidadComportamiento:t.contextQuality.calidadComportamiento,calidadRevision:t.contextQuality.calidadRevision,indiceCalidadContextual:t.contextQuality.indiceCalidadContextual,
+    alineacionMacro:t.contextQuality.alineacionMacro,alineacionHTF:t.contextQuality.alineacionHTF,alineacionIntra:t.contextQuality.alineacionIntra,
+    liquidezClara:t.contextQuality.liquidezClara,dxyConfirma:t.contextQuality.dxyConfirma,zonaConFuncion:t.contextQuality.zonaConFuncion,notasContexto:t.contextQuality.notasContexto,
+    notes:t.notes,privateJournal:t.privateJournal,screenshots:exportText(t.screenshots),captureLink:t.captureLink,captureUrl:t.captureUrl,captureFileName:t.captureFileName,
+    tags:exportText(t.tags),status:t.status,mentorReviewRequested:t.mentorReview.requested,mentorReviewStatus:t.mentorReview.status,mentorReviewFocus:t.mentorReview.focus,
+    mentorReviewNote:t.mentorReview.note,mentorReviewResponse:t.mentorReview.response,createdAt:t.createdAt,updatedAt:t.updatedAt
+  };
+}
+function downloadBlob(content,filename,type){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function exportToJson(data,filename){downloadBlob(JSON.stringify(data,null,2),filename,'application/json;charset=utf-8')}
+function escapeCsvCell(value){return `"${exportText(value).replaceAll('"','""').replace(/\r?\n/g,'\n')}"`}
+function exportToCsv(rows,filename){
+  const safeRows=rows||[];
+  const headers=Object.keys(safeRows[0]||flattenTradeForCsv({}));
+  const body=[headers.join(','),...safeRows.map(row=>headers.map(h=>escapeCsvCell(row[h])).join(','))].join('\n');
+  downloadBlob(`\uFEFF${body}`,filename,'text/csv;charset=utf-8');
+}
+function sanitizeFilenamePart(value){return String(value||'trade').trim().replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,48)||'trade'}
+function buildTradeExportFilename(trade,extension){
+  const symbol=sanitizeFilenamePart(trade.asset||trade.symbol||'trade').toUpperCase();
+  const date=sanitizeFilenamePart(String(trade.tradingDay||trade.date||safeDate(trade.createdAt)||today()).slice(0,10));
+  return `mtc-trade-${symbol}-${date}.${extension}`;
+}
+function buildTradesExportFilename(extension){return `mtc-trades-export-${today()}.${extension}`}
+function exportSingleTrade(trade,format){
+  try{
+    if(format==='json')exportToJson({exportMeta:{app:'MTC Analytics',exportedAt:new Date().toISOString(),version:'1.0',scope:'single_trade'},trade:normalizeTradeForExport(trade)},buildTradeExportFilename(trade,'json'));
+    else exportToCsv([flattenTradeForCsv(trade)],buildTradeExportFilename(trade,'csv'));
+    toast(`Trade exportado en ${format.toUpperCase()}`);
+  }catch(e){console.error('trade_export_failed',e?.message||e); toast('No se pudo exportar el trade','error')}
+}
+function exportTradesCollection(trades,format,scope='all'){
+  try{
+    const rows=trades||[];
+    if(!rows.length){toast('No hay trades para exportar','error'); return;}
+    if(format==='json')exportToJson({exportMeta:{app:'MTC Analytics',exportedAt:new Date().toISOString(),version:'1.0',totalTrades:rows.length,scope},trades:rows.map(normalizeTradeForExport)},buildTradesExportFilename('json'));
+    else exportToCsv(rows.map(flattenTradeForCsv),buildTradesExportFilename('csv'));
+    toast(`${rows.length} trade${rows.length===1?'':'s'} exportado${rows.length===1?'':'s'} en ${format.toUpperCase()}`);
+  }catch(e){console.error('trades_export_failed',e?.message||e); toast('No se pudieron exportar los trades','error')}
+}
+
+function toCanvasBlob(canvas){return new Promise(resolve=>canvas.toBlob(resolve,'image/png',1))}
+function downloadGeneratedBlob(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function buildTradeShareFilename(trade){
+  const symbol=sanitizeFilenamePart(trade.asset||trade.symbol||'trade').toUpperCase();
+  const date=sanitizeFilenamePart(String(trade.tradingDay||trade.date||safeDate(trade.createdAt)||today()).slice(0,10));
+  return `mtc-trade-story-${symbol}-${date}.png`;
+}
+function buildDailyShareFilename(date){return `mtc-daily-review-${sanitizeFilenamePart(String(date||today()).slice(0,10))}.png`}
+function formatCurrencySafe(value){return Number.isFinite(Number(value))?money(Number(value)):'N/A'}
+function formatRShare(value){
+  const n=Number(value||0);
+  if(!Number.isFinite(n))return 'N/A';
+  return `${n>0?'+':''}${n.toFixed(2)}R`;
+}
+function formatPercentageSafe(value){
+  const n=Number(value||0);
+  if(!Number.isFinite(n))return 'N/A';
+  return `${n.toFixed(0)}%`;
+}
+function compactShareText(value,max=92){
+  const text=String(value||'').replace(/\s+/g,' ').trim();
+  return text.length>max?`${text.slice(0,max-1).trim()}...`:text;
+}
+function getTradeResultLabel(trade){
+  const r=Number(trade.resultR||0), pl=Number(trade.resultMoney||0);
+  if(r>0)return `+${r.toFixed(2)}R`;
+  if(r<0)return `${r.toFixed(2)}R`;
+  if(pl>0)return 'Profit';
+  if(pl<0)return 'Stop Loss';
+  return 'BE';
+}
+function getTradeDirectionLabel(trade){
+  const side=String(trade.side||trade.direction||'').toUpperCase();
+  return side==='SELL'||side==='SHORT'?'SHORT':'LONG';
+}
+function formatTradeDateForShare(value){return formatDateLabel(String(value||today()).slice(0,10))}
+function normalizeTradeForShare(trade={},privacy={}){
+  const t=normalizeTradeForExport(trade);
+  const behaviorScore=Number(trade.behaviorScore||behaviorScoreFromTrade(trade)||0);
+  return {
+    symbol:t.symbol||trade.asset||'Trade',
+    direction:getTradeDirectionLabel(trade),
+    date:String(t.tradingDay||t.date||trade.date||today()).slice(0,10),
+    session:t.session||'',
+    setup:t.setup||t.pattern||normalizeTradeSetup(trade)||'',
+    result:getTradeResultLabel(trade),
+    resultR:Number(trade.resultR||0),
+    profitLossMoney:privacy.hideMoney?null:Number(trade.resultMoney||0),
+    riskMoney:privacy.hideMoney?null:Number(trade.riskMoney||0),
+    riskPct:trade.riskPct??'',
+    entry:privacy.hidePrices?null:trade.entry,
+    stopLoss:privacy.hidePrices?null:trade.sl,
+    takeProfit:privacy.hidePrices?null:trade.tp,
+    exit:privacy.hidePrices?null:trade.exit,
+    rr:trade.rr||trade.plannedRR||trade.rrPlanned||'',
+    quality:trade.quality||'',
+    behaviorScore,
+    behaviorLabel:trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScore),
+    followedPlan:trade.followedPlan,
+    checklistScore:trade.checklistScore||trade.checklistValidation?.score||'',
+    checklistGreen:trade.checklistFinalGreen===true||trade.checklistValidation?.finalGreen===true,
+    note:privacy.hideNote?'':(trade.lesson||trade.notes||trade.privateJournal||''),
+    tags:Array.isArray(trade.tags)?trade.tags:[],
+    footer:'Process over outcome.'
+  };
+}
+function getTradesForDate(trades=[],date){return (trades||[]).filter(t=>String(t.tradingDay||t.date||'').slice(0,10)===String(date||today()).slice(0,10))}
+function calculateDailyTradeStats(trades=[]){
+  const rows=trades||[];
+  const rValues=rows.map(t=>Number(t.resultR||0)).filter(Number.isFinite);
+  const moneyValues=rows.map(t=>Number(t.resultMoney||0)).filter(Number.isFinite);
+  const wins=rows.filter(t=>Number(t.resultMoney||0)>0||Number(t.resultR||0)>0).length;
+  const losses=rows.filter(t=>Number(t.resultMoney||0)<0||Number(t.resultR||0)<0).length;
+  const breakevens=Math.max(0,rows.length-wins-losses);
+  const netR=rValues.reduce((a,b)=>a+b,0);
+  const netPL=moneyValues.reduce((a,b)=>a+b,0);
+  const riskValues=rows.map(t=>Number(t.riskMoney||0)).filter(n=>Number.isFinite(n)&&n>0);
+  const behaviorScores=rows.map(t=>Number(t.behaviorScore||behaviorScoreFromTrade(t)||0)).filter(n=>Number.isFinite(n)&&n>0);
+  const checklistScores=rows.map(t=>Number(t.checklistScore||0)).filter(n=>Number.isFinite(n)&&n>0);
+  const mostCommon=(values)=>{const map={}; values.filter(Boolean).forEach(v=>{map[v]=(map[v]||0)+1}); return Object.entries(map).sort((a,b)=>b[1]-a[1])[0]?.[0]||''};
+  return {
+    totalTrades:rows.length,
+    netR,netPL,wins,losses,breakevens,
+    winRate:rows.length?(wins/rows.length)*100:0,
+    bestR:rValues.length?Math.max(...rValues):0,
+    worstR:rValues.length?Math.min(...rValues):0,
+    avgR:rValues.length?netR/rValues.length:0,
+    avgRisk:riskValues.length?riskValues.reduce((a,b)=>a+b,0)/riskValues.length:0,
+    maxRisk:riskValues.length?Math.max(...riskValues):0,
+    behaviorScore:behaviorScores.length?behaviorScores.reduce((a,b)=>a+b,0)/behaviorScores.length:0,
+    planComplianceRate:rows.length?(rows.filter(t=>t.followedPlan===true).length/rows.length)*100:0,
+    checklistAverage:checklistScores.length?checklistScores.reduce((a,b)=>a+b,0)/checklistScores.length:0,
+    topSetup:mostCommon(rows.map(t=>normalizeTradeSetup(t)||t.setup||t.pattern)),
+    mainSession:mostCommon(rows.map(t=>t.session))
+  };
+}
+function normalizeDailyStatsForShare(trades=[],date,plan={},privacy={}){
+  const stats=calculateDailyTradeStats(trades);
+  return {
+    date:String(date||today()).slice(0,10),
+    ...stats,
+    netPL:privacy.hideMoney?null:stats.netPL,
+    avgRisk:privacy.hideMoney?null:stats.avgRisk,
+    maxRisk:privacy.hideMoney?null:stats.maxRisk,
+    note:plan?.notes||plan?.reflection||'',
+    dayBias:plan?.bias||'',
+    emotion:plan?.emotion||'',
+    footer:'La cuenta puede cerrar en rojo y la conducta en verde.'
+  };
+}
+function canUseNativeShare(file){return !!(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]})))}
+async function shareImageFile(blob,filename,title='MTC Analytics'){
+  const file=new File([blob],filename,{type:'image/png'});
+  if(canUseNativeShare(file)){
+    await navigator.share({files:[file],title,text:'MTC Analytics review'});
+    return true;
+  }
+  return false;
+}
+function drawRoundedRect(ctx,x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}
+}
+function drawWrappedText(ctx,text,x,y,maxWidth,lineHeight,maxLines=3){
+  const words=String(text||'').split(/\s+/).filter(Boolean);
+  let line='',lines=[];
+  words.forEach(word=>{
+    const test=line?`${line} ${word}`:word;
+    if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}
+    else line=test;
+  });
+  if(line)lines.push(line);
+  if(lines.length>maxLines)lines=[...lines.slice(0,maxLines-1),`${lines.slice(maxLines-1).join(' ').slice(0,50)}...`];
+  lines.forEach((ln,i)=>ctx.fillText(ln,x,y+(i*lineHeight)));
+  return y+(lines.length*lineHeight);
+}
+const BRAND_LOGO_HORIZONTAL='/brand/mtc-analytics-logo-horizontal.png';
+const BRAND_ICON='/brand/mtc-analytics-icon.png';
+const storyAssetCache={};
+function loadStoryImage(src){
+  if(storyAssetCache[src])return storyAssetCache[src];
+  storyAssetCache[src]=new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>resolve(null);
+    img.src=src;
+  });
+  return storyAssetCache[src];
+}
+function drawSoftEllipse(ctx,x,y,rx,ry,color,rotation=0){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(rotation);
+  ctx.scale(rx,ry);
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.arc(0,0,1,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+function drawStoryGrid(ctx){
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.035)';
+  ctx.lineWidth=1;
+  for(let x=80;x<1080;x+=120){ctx.beginPath();ctx.moveTo(x,210);ctx.lineTo(x,1700);ctx.stroke();}
+  for(let y=250;y<1720;y+=120){ctx.beginPath();ctx.moveTo(70,y);ctx.lineTo(1010,y);ctx.stroke();}
+  ctx.restore();
+}
+function drawLogoImage(ctx,img,x,y,w){
+  if(!img)return false;
+  const ratio=img.height/img.width;
+  ctx.drawImage(img,x,y,w,w*ratio);
+  return true;
+}
+function drawMiniCard(ctx,x,y,w,h,label,value,accent='rgba(245,201,91,.86)'){
+  const g=ctx.createLinearGradient(x,y,x+w,y+h);
+  g.addColorStop(0,'rgba(255,255,255,.080)');
+  g.addColorStop(1,'rgba(255,255,255,.030)');
+  drawRoundedRect(ctx,x,y,w,h,26,g,'rgba(255,255,255,.105)');
+  ctx.fillStyle=accent;
+  ctx.globalAlpha=.72;
+  ctx.fillRect(x+24,y+22,34,3);
+  ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(203,213,225,.78)';
+  ctx.font='900 21px Manrope, Inter, Arial';
+  ctx.fillText(label,x+24,y+54);
+  ctx.fillStyle='#f8fafc';
+  ctx.font='900 38px Manrope, Inter, Arial';
+  drawWrappedText(ctx,String(value),x+24,y+105,w-48,40,1);
+}
+function drawSectionCard(ctx,x,y,w,h,kicker,title,body){
+  drawRoundedRect(ctx,x,y,w,h,30,'rgba(255,255,255,.045)','rgba(212,168,67,.145)');
+  ctx.fillStyle='rgba(245,201,91,.82)';
+  ctx.font='900 22px Manrope, Inter, Arial';
+  ctx.fillText(kicker,x+32,y+48);
+  if(title){
+    ctx.fillStyle='#f8fafc';
+    ctx.font='900 30px Manrope, Inter, Arial';
+    drawWrappedText(ctx,title,x+32,y+92,w-64,36,2);
+  }
+  if(body){
+    ctx.fillStyle='rgba(219,228,240,.88)';
+    ctx.font='700 28px Manrope, Inter, Arial';
+    drawWrappedText(ctx,body,x+32,y+(title?164:92),w-64,36,title?3:4);
+  }
+}
+async function drawStoryBase(ctx,title,date){
+  const [logo,icon]=await Promise.all([loadStoryImage(BRAND_LOGO_HORIZONTAL),loadStoryImage(BRAND_ICON)]);
+  const grad=ctx.createLinearGradient(0,0,1080,1920);
+  grad.addColorStop(0,'#061018');
+  grad.addColorStop(.46,'#101827');
+  grad.addColorStop(1,'#050608');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,1080,1920);
+  drawSoftEllipse(ctx,855,125,380,260,'rgba(212,168,67,.135)',-.32);
+  drawSoftEllipse(ctx,165,1555,430,520,'rgba(22,34,55,.64)',.18);
+  drawSoftEllipse(ctx,960,1420,250,500,'rgba(59,130,246,.065)',.38);
+  drawStoryGrid(ctx);
+  if(icon){
+    ctx.save();
+    ctx.globalAlpha=.035;
+    ctx.translate(682,600);
+    ctx.rotate(-.10);
+    ctx.drawImage(icon,0,0,560,560);
+    ctx.restore();
+  }
+  drawRoundedRect(ctx,52,52,976,1816,54,'rgba(255,255,255,.018)','rgba(255,255,255,.075)');
+  drawRoundedRect(ctx,72,72,936,1776,44,'rgba(5,8,13,.12)','rgba(212,168,67,.12)');
+  if(!drawLogoImage(ctx,logo,92,92,238)){
+    ctx.fillStyle='#d4a843'; ctx.font='900 32px Manrope, Inter, Arial'; ctx.fillText('MTC Analytics',92,122);
+  }
+  ctx.fillStyle='rgba(226,232,240,.72)';
+  ctx.font='800 22px Manrope, Inter, Arial';
+  ctx.fillText(title,94,170);
+  ctx.textAlign='right';
+  ctx.fillStyle='rgba(226,232,240,.78)';
+  ctx.font='800 24px Manrope, Inter, Arial';
+  ctx.fillText(formatTradeDateForShare(date),986,118);
+  ctx.fillStyle='rgba(245,201,91,.72)';
+  ctx.font='900 17px Manrope, Inter, Arial';
+  ctx.fillText('PROCESS SYSTEM',986,153);
+  ctx.textAlign='left';
+}
+async function renderTradeStoryPng(trade,privacy={}){
+  const t=normalizeTradeForShare(trade,privacy);
+  const canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1920;
+  const ctx=canvas.getContext('2d');
+  await drawStoryBase(ctx,'Trade Review',t.date);
+  const shell=ctx.createLinearGradient(84,236,996,1502);
+  shell.addColorStop(0,'rgba(17,24,39,.88)');
+  shell.addColorStop(1,'rgba(5,8,13,.76)');
+  drawRoundedRect(ctx,84,250,912,1228,48,shell,'rgba(212,168,67,.25)');
+  ctx.fillStyle='rgba(245,201,91,.82)';
+  ctx.font='900 20px Manrope, Inter, Arial';
+  ctx.fillText('EXECUTION REVIEW',126,330);
+  ctx.fillStyle='#f8fafc'; ctx.font='900 94px Manrope, Inter, Arial'; ctx.fillText(t.symbol,126,430);
+  const dirColor=t.direction==='LONG'?'#86efac':'#fda4af';
+  drawRoundedRect(ctx,132,472,190,62,22,t.direction==='LONG'?'rgba(34,197,94,.13)':'rgba(244,63,94,.13)',t.direction==='LONG'?'rgba(34,197,94,.36)':'rgba(244,63,94,.36)');
+  ctx.fillStyle=dirColor; ctx.font='900 28px Manrope, Inter, Arial'; ctx.fillText(t.direction,170,513);
+  ctx.fillStyle=t.resultR>0?'#86efac':t.resultR<0?'#fda4af':'#93c5fd'; ctx.font='900 110px Manrope, Inter, Arial'; ctx.textAlign='right'; ctx.fillText(t.result,942,514); ctx.textAlign='left';
+  ctx.fillStyle='rgba(226,232,240,.80)'; ctx.font='700 27px Manrope, Inter, Arial'; drawWrappedText(ctx,[t.session,t.setup].filter(Boolean).join(' · '),126,594,820,36,2);
+  const metrics=[
+    ['P/L',t.profitLossMoney==null?'Privado':formatCurrencySafe(t.profitLossMoney)],
+    ['Riesgo',t.riskMoney==null?(t.riskPct?`${t.riskPct}%`:'Privado'):formatCurrencySafe(t.riskMoney)],
+    ['Calidad',t.quality||'N/A'],
+    ['Conducta',`${Math.round(t.behaviorScore||0)}/100`]
+  ];
+  metrics.forEach((m,i)=>drawMiniCard(ctx,126+(i%2)*415,705+Math.floor(i/2)*158,365,126,m[0],m[1],i===0?(t.resultR>=0?'#86efac':'#fda4af'):'rgba(245,201,91,.86)'));
+  if(!privacy.hidePrices){
+    const priceLine=`Entry ${t.entry||'N/A'} · SL ${t.stopLoss||'N/A'} · TP ${t.takeProfit||'N/A'}${t.exit?` · Exit ${t.exit}`:''}`;
+    drawSectionCard(ctx,126,1050,828,150,'PRICE MAP','',priceLine);
+  }
+  const processY=privacy.hidePrices?1050:1230;
+  drawSectionCard(ctx,126,processY,828,150,'PROCESS',t.checklistScore?`Checklist ${t.checklistScore}/100`:t.behaviorLabel,t.checklistScore?(t.checklistGreen?'Luz verde operativa':'Revisar proceso'):t.behaviorLabel);
+  if(t.note){
+    drawSectionCard(ctx,126,processY+180,828,190,'TRADE NOTE','',compactShareText(t.note,150));
+  }
+  ctx.fillStyle='rgba(245,201,91,.82)'; ctx.font='900 30px Manrope, Inter, Arial'; ctx.fillText(t.footer,126,1632);
+  ctx.fillStyle='rgba(203,213,225,.72)'; ctx.font='700 24px Manrope, Inter, Arial'; ctx.fillText('Contexto, ejecucion, riesgo, conducta y revision.',126,1674);
+  ctx.fillStyle='rgba(148,163,184,.62)'; ctx.font='700 19px Manrope, Inter, Arial'; ctx.fillText('MTC Analytics trading performance platform',126,1770);
+  return toCanvasBlob(canvas);
+}
+async function renderDailyStoryPng(stats){
+  const canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1920;
+  const ctx=canvas.getContext('2d');
+  await drawStoryBase(ctx,'Daily Review',stats.date);
+  const shell=ctx.createLinearGradient(84,236,996,1502);
+  shell.addColorStop(0,'rgba(17,24,39,.88)');
+  shell.addColorStop(1,'rgba(5,8,13,.76)');
+  drawRoundedRect(ctx,84,250,912,1228,48,shell,'rgba(212,168,67,.25)');
+  ctx.fillStyle='rgba(245,201,91,.82)'; ctx.font='900 20px Manrope, Inter, Arial'; ctx.fillText('DAILY OPERATING REVIEW',126,330);
+  ctx.fillStyle='#f8fafc'; ctx.font='900 72px Manrope, Inter, Arial'; ctx.fillText('Resumen del dia',126,420);
+  ctx.fillStyle=stats.netR>0?'#86efac':stats.netR<0?'#fda4af':'#93c5fd'; ctx.font='900 112px Manrope, Inter, Arial'; ctx.fillText(formatRShare(stats.netR),126,555);
+  ctx.textAlign='right'; ctx.fillStyle=Number(stats.netPL)>0?'#86efac':Number(stats.netPL)<0?'#fda4af':'#cbd5e1'; ctx.font='900 56px Manrope, Inter, Arial'; ctx.fillText(stats.netPL==null?'P/L privado':formatCurrencySafe(stats.netPL),942,535); ctx.textAlign='left';
+  const rows=[
+    ['Trades',stats.totalTrades],
+    ['Win rate',formatPercentageSafe(stats.winRate)],
+    ['W / L / BE',`${stats.wins}/${stats.losses}/${stats.breakevens}`],
+    ['Promedio R',formatRShare(stats.avgR)],
+    ['Mejor trade',formatRShare(stats.bestR)],
+    ['Peor trade',formatRShare(stats.worstR)]
+  ];
+  rows.forEach((m,i)=>drawMiniCard(ctx,126+(i%2)*415,665+Math.floor(i/2)*148,365,116,m[0],m[1],i===1?'#93c5fd':'rgba(245,201,91,.86)'));
+  const processY=1140;
+  drawSectionCard(ctx,126,processY,828,230,'PROCESS CONTEXT','',
+    [stats.topSetup&&`Setup: ${stats.topSetup}`,stats.mainSession&&`Sesion: ${stats.mainSession}`,stats.behaviorScore?`Conducta promedio: ${Math.round(stats.behaviorScore)}/100`:'',stats.dayBias&&`Sesgo: ${stats.dayBias}`].filter(Boolean).join(' · ')||'Sin datos de proceso cargados.'
+  );
+  if(stats.note){drawSectionCard(ctx,126,1400,828,140,'DAY NOTE','',compactShareText(stats.note,120));}
+  ctx.fillStyle='rgba(245,201,91,.82)'; ctx.font='900 28px Manrope, Inter, Arial'; drawWrappedText(ctx,stats.footer,126,1628,828,36,2);
+  ctx.fillStyle='rgba(203,213,225,.72)'; ctx.font='700 24px Manrope, Inter, Arial'; ctx.fillText('No improvisar. Operar con criterio.',126,1720);
+  ctx.fillStyle='rgba(148,163,184,.62)'; ctx.font='700 19px Manrope, Inter, Arial'; ctx.fillText('MTC Analytics trading performance platform',126,1770);
+  return toCanvasBlob(canvas);
+}
 
 function sanitizeFirestoreValue(value){
   if(value === undefined) return undefined;
@@ -1253,9 +1740,69 @@ function Dashboard({data,profile,setTab}){
 }
 function ResetTicker(){const [now,setNow]=useState(new Date()); useEffect(()=>{const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id)},[]); return <>{resetCountdown(now)}</>}
 
+function SharePreviewModal({title,filename,renderBlob,onClose,children}){
+  const [blob,setBlob]=useState(null),[url,setUrl]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  useEffect(()=>{
+    let alive=true,objectUrl='';
+    async function run(){
+      setBusy(true); setError('');
+      try{
+        const nextBlob=await renderBlob();
+        if(!nextBlob)throw new Error('No se pudo generar la imagen.');
+        objectUrl=URL.createObjectURL(nextBlob);
+        if(alive){setBlob(nextBlob); setUrl(objectUrl);}
+        else URL.revokeObjectURL(objectUrl);
+      }catch(e){if(alive)setError(e?.message||'No se pudo generar la imagen.');}
+      finally{if(alive)setBusy(false);}
+    }
+    run();
+    return()=>{alive=false; if(objectUrl)URL.revokeObjectURL(objectUrl);};
+  },[renderBlob]);
+  async function share(){
+    if(!blob)return;
+    try{
+      const shared=await shareImageFile(blob,filename,title);
+      if(shared)toast('Share sheet abierto');
+      else {downloadGeneratedBlob(blob,filename); toast('Tu navegador no soporta compartir archivos. Descargué el PNG.');}
+    }catch(e){
+      if(e?.name==='AbortError')return;
+      console.warn('share_image_failed',e?.message||e);
+      downloadGeneratedBlob(blob,filename);
+      toast('No se pudo compartir. Descargué el PNG.','error');
+    }
+  }
+  return <div className="modal shareModal"><div className="modalCard shareModalCard"><div className="modalHead"><div><h3>{title}</h3><p>Preview vertical 9:16 · PNG 1080x1920</p></div><div className="modalActions"><button className="ghost compact" disabled={!blob||busy} onClick={()=>downloadGeneratedBlob(blob,filename)}><Download size={15}/>Descargar PNG</button><button className="exportModalButton compact" disabled={!blob||busy} onClick={share}><Share2 size={15}/>Compartir</button><button onClick={onClose}><X size={20}/></button></div></div><div className="shareModalBody"><aside className="shareControls">{children}{error&&<p className="shareError">{error}</p>}{busy&&<p className="shareHint">Generando imagen premium...</p>}</aside><div className="storyPreviewFrame">{url?<img src={url} alt={title}/>:<div className="storyPreviewSkeleton">Generando preview...</div>}</div></div></div></div>
+}
+function TradeShareModal({trade,onClose}){
+  const [privacy,setPrivacy]=useState({hideMoney:false,hidePrices:false,hideNote:false});
+  const renderBlob=useMemo(()=>()=>renderTradeStoryPng(trade,privacy),[trade,privacy]);
+  const filename=buildTradeShareFilename(trade);
+  const toggle=k=>setPrivacy(prev=>({...prev,[k]:!prev[k]}));
+  return <SharePreviewModal title="Compartir trade" filename={filename} renderBlob={renderBlob} onClose={onClose}>
+    <b>Privacidad</b>
+    <label><input type="checkbox" checked={privacy.hideMoney} onChange={()=>toggle('hideMoney')}/>Ocultar P/L monetario</label>
+    <label><input type="checkbox" checked={privacy.hidePrices} onChange={()=>toggle('hidePrices')}/>Ocultar precios</label>
+    <label><input type="checkbox" checked={privacy.hideNote} onChange={()=>toggle('hideNote')}/>Ocultar nota</label>
+    <small>Listo para Stories. En mobile se usa Web Share API si el navegador lo permite.</small>
+  </SharePreviewModal>
+}
+function DailyReviewShareModal({trades,date,plan,onClose}){
+  const [privacy,setPrivacy]=useState({hideMoney:false});
+  const stats=useMemo(()=>normalizeDailyStatsForShare(trades,date,plan,privacy),[trades,date,plan,privacy]);
+  const renderBlob=useMemo(()=>()=>renderDailyStoryPng(stats),[stats]);
+  const filename=buildDailyShareFilename(date);
+  return <SharePreviewModal title="Compartir resumen del día" filename={filename} renderBlob={renderBlob} onClose={onClose}>
+    <b>Resumen diario</b>
+    <span>{stats.totalTrades} trade{stats.totalTrades===1?'':'s'} · {formatRShare(stats.netR)} · {formatPercentageSafe(stats.winRate)} WR</span>
+    <label><input type="checkbox" checked={privacy.hideMoney} onChange={()=>setPrivacy(prev=>({...prev,hideMoney:!prev.hideMoney}))}/>Ocultar P/L monetario</label>
+    <small>Usa los trades de la jornada seleccionada en el Journal.</small>
+  </SharePreviewModal>
+}
+
 
 function Journal({data,profile}){
   const [form,setForm]=useState(null),[search,setSearch]=useState(''),[selectedTrade,setSelectedTrade]=useState(null),[checklistFilter,setChecklistFilter]=useState('Todos');
+  const [shareTrade,setShareTrade]=useState(null),[shareDay,setShareDay]=useState(false);
   const [selectedDate,setSelectedDate]=useState(tradingDayKey());
   const [riskSettings,setRiskSettings]=useState(getRiskSettings());
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
@@ -1297,14 +1844,18 @@ function Journal({data,profile}){
     const d=localStorage.getItem('mtc-open-journal-date');
     if(d){setSelectedDate(d.slice(0,10)); localStorage.removeItem('mtc-open-journal-date');}
   },[]);
+  const exportDisabled=!filtered.length;
+  const filteredExportDisabled=!list.length;
   return <main className="page journalPage">
     {!form&&<button className="mobileNewTradeFab" onClick={openNewTrade}><Plus size={18}/>Nuevo trade</button>}
     {guard.blocked&&<div className="riskAlert"><Shield size={20}/><div><b>Modo reflexión activo</b><p>{guard.reasons.join(' · ')}. Este bloqueo se calcula por jornada operativa New York y se reinicia al rollover 17:00 NY. Ajustá límites en Riesgo si corresponde.</p></div></div>}
     {form&&<TradeForm form={form} setForm={setForm} profile={profile} data={data}/>}
-    <Card title="Acciones rápidas"><div className="row"><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><button className="primary" onClick={openNewTrade}><Plus/>Nuevo trade</button><button className="ghost" onClick={()=>csvExport(filtered)}><Download/>Exportar CSV</button><label className="ghost file"><Upload/>Importar CSV<input type="file" accept=".csv" onChange={importCsv}/></label><select className="input small" value={checklistFilter} onChange={e=>setChecklistFilter(e.target.value)}>{["Todos","Con checklist","Sin checklist","Con luz verde","Sin luz verde","Setups A+","Ejecutados sin checklist completo"].map(x=><option key={x}>{x}</option>)}</select><div className="search"><Search size={16}/><input placeholder="Buscar por activo, setup, patrón o nota" value={search} onChange={e=>setSearch(e.target.value)}/></div></div></Card>
-    <div className="grid2 journalControlGrid"><DailyPlanPanel profile={profile} data={scopedData} dayKey={selectedDate}/><Card title="Calendario mensual de jornadas" sub="Verde = día positivo, rojo = día negativo, gris = sin trades. Click para abrir una jornada."><MonthCalendar trades={filtered} selectedDate={selectedDate} onSelect={setSelectedDate}/>{dayPlan&&<div className="dayPlanSummary"><b>Plan guardado</b><p>{dayPlan.bias||'Sin sesgo'} · {dayPlan.maxRisk||'Sin riesgo definido'}</p></div>}</Card></div>
-    <div className="table">{list.map(t=><TradeRow key={t.id} t={t} onOpen={()=>setSelectedTrade(t)} onDelete={()=>del(t)}/>) }{!list.length&&<Empty title="Sin trades en esta jornada" text="Elegí otra fecha o registrá una nueva operación para este día." cta="Nuevo trade" icon={Plus} onClick={openNewTrade}/>}</div>
+    <Card title="Acciones rápidas"><div className="row journalQuickActions"><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><button className="primary" onClick={openNewTrade}><Plus/>Nuevo trade</button><div className="exportGroup"><button className="ghost compact" disabled={exportDisabled} onClick={()=>exportTradesCollection(filtered,'json','all')}><Download size={15}/>Exportar todos JSON</button><button className="ghost compact" disabled={exportDisabled} onClick={()=>exportTradesCollection(filtered,'csv','all')}><Download size={15}/>Exportar todos CSV</button><button className="ghost compact" disabled={filteredExportDisabled} onClick={()=>exportTradesCollection(list,'json','filtered')}><Download size={15}/>Exportar filtrados JSON</button><button className="ghost compact" disabled={filteredExportDisabled} onClick={()=>exportTradesCollection(list,'csv','filtered')}><Download size={15}/>Exportar filtrados CSV</button></div><button className="ghost compact shareReviewButton" disabled={!list.length} onClick={()=>setShareDay(true)}><Share2 size={15}/>Compartir resumen del día</button><label className="ghost file"><Upload/>Importar CSV<input type="file" accept=".csv" onChange={importCsv}/></label><select className="input small" value={checklistFilter} onChange={e=>setChecklistFilter(e.target.value)}>{["Todos","Con checklist","Sin checklist","Con luz verde","Sin luz verde","Setups A+","Ejecutados sin checklist completo"].map(x=><option key={x}>{x}</option>)}</select><div className="search"><Search size={16}/><input placeholder="Buscar por activo, setup, patrón o nota" value={search} onChange={e=>setSearch(e.target.value)}/></div></div></Card>
+    <div className="grid2 journalControlGrid"><DailyPlanPanel profile={profile} data={scopedData} dayKey={selectedDate}/><Card title="Calendario mensual de jornadas" sub="Profit, Stop Loss y Breakeven por resultado neto de cada jornada. Click para abrir una jornada."><MonthCalendar trades={filtered} selectedDate={selectedDate} onSelect={setSelectedDate}/>{dayPlan&&<div className="dayPlanSummary"><b>Plan guardado</b><p>{dayPlan.bias||'Sin sesgo'} · {dayPlan.maxRisk||'Sin riesgo definido'}</p></div>}</Card></div>
+    <div className="table">{list.map(t=><TradeRow key={t.id} t={t} onOpen={()=>setSelectedTrade(t)} onDelete={()=>del(t)} onExport={exportSingleTrade} onShare={()=>setShareTrade(t)}/>) }{!list.length&&<Empty title="Sin trades en esta jornada" text="Elegí otra fecha o registrá una nueva operación para este día." cta="Nuevo trade" icon={Plus} onClick={openNewTrade}/>}</div>
     {selectedTrade&&<TradeDetailModal trade={selectedTrade} data={data} onClose={()=>setSelectedTrade(null)} onEdit={()=>{setForm({...selectedTrade});setSelectedTrade(null)}} onDelete={async()=>{await deleteTradeSafely(selectedTrade); setSelectedTrade(null);}}/>}  
+    {shareTrade&&<TradeShareModal trade={shareTrade} onClose={()=>setShareTrade(null)}/>}
+    {shareDay&&<DailyReviewShareModal trades={list} date={selectedDate} plan={dayPlan} onClose={()=>setShareDay(false)}/>}
   </main>
 }
 function MonthCalendar({trades=[],selectedDate,onSelect}){
@@ -1316,29 +1867,35 @@ function MonthCalendar({trades=[],selectedDate,onSelect}){
   const total=monthStats.reduce((a,b)=>a+b.total,0);
   const prev=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()-1); setKey(d.toISOString().slice(0,7));}
   const next=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()+1); setKey(d.toISOString().slice(0,7));}
-  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatMoneyCompactCard(st.total):''; return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${st.count} trade${st.count>1?'s':''}`:d}><b>{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small>{amount}</small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>positivo</span><span><i className="loss"/>negativo</span><span><i className="be"/>breakeven</span></div></div>
+  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatMoneyCompactCard(st.total):''; return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${st.count} trade${st.count>1?'s':''}`:d}><b>{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small>{amount}</small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div></div>
 }
-function TradeRow({t,onOpen,onDelete}){
+function TradeRow({t,onOpen,onDelete,onExport,onShare}){
   const value=Number(t.resultMoney||0), pctVal=Number(t.resultPct||0), rVal=Number(t.resultR||0);
   return <div className="trade tradePro clickableTrade" onClick={onOpen} role="button" tabIndex={0} onKeyDown={e=>e.key==='Enter'&&onOpen()}>
     <div><b>{t.asset}</b><p>{accountName(t)} · {t.date} · {t.session} · {t.tradeSystem||'Sistema'} · {t.pattern||normalizeTradeSetup(t)||t.otherSystem}{t.confluencesUsed?.length?` · ${t.confluencesUsed.length} confluencias`:''}</p></div>
     <span className={t.side==='BUY'?'buy':'sell'}>{t.side}</span>
     <div className={value>0?'tradeResult pos':value<0?'tradeResult neg':'tradeResult'}><strong>{value>0?'+':''}{money(value)}</strong><small>{pctVal>0?'+':''}{pct(pctVal)} · {rVal>0?'+':''}{rVal.toFixed(2)}R</small></div>
     <span className="quality">{t.quality}</span>
-    <button className="icon" onClick={e=>{e.stopPropagation(); onDelete();}} title="Borrar trade"><Trash2 size={16}/></button>
+    <div className="tradeExportActions" onClick={e=>e.stopPropagation()}>
+      <button className="ghost compact shareReviewButton" onClick={onShare} title="Compartir review"><Share2 size={14}/>Review</button>
+      <button className="ghost compact" onClick={()=>onExport(t,'json')} title="Exportar JSON"><Download size={14}/>JSON</button>
+      <button className="ghost compact" onClick={()=>onExport(t,'csv')} title="Exportar CSV"><Download size={14}/>CSV</button>
+      <button className="tradeDeleteButton" onClick={onDelete} title="Borrar trade" aria-label="Borrar trade"><Trash2 size={16}/></button>
+    </div>
   </div>
 }
 function DetailBlock({title,children}){return <div className="detailBlock"><span>{title}</span><div>{children||<em>Sin datos</em>}</div></div>}
 function TradeDetailModal({trade,onClose,onEdit,onDelete,data}){
+  const [shareOpen,setShareOpen]=useState(false);
   const value=Number(trade.resultMoney||0), pctVal=Number(trade.resultPct||0), rVal=Number(trade.resultR||0);
   const linkedChecklist=trade.checklistId?(data?.checklists||[]).find(c=>c.id===trade.checklistId):null;
-  return <div className="modal"><div className="modalCard tradeDetailModal"><div className="modalHead"><div><h3>{trade.asset} · {trade.side}</h3><p>{trade.date} · {trade.session} · {trade.tradeSystem||'Sistema de Moisés'}</p></div><div className="modalActions"><button className="ghost compact" onClick={onEdit}><Edit3 size={15}/>Editar</button>{onDelete&&<button className="ghost danger compact" onClick={onDelete}><Trash2 size={15}/>Eliminar</button>}<button onClick={onClose}><X size={20}/></button></div></div>
+  return <><div className="modal"><div className="modalCard tradeDetailModal"><div className="modalHead"><div><h3>{trade.asset} · {trade.side}</h3><p>{trade.date} · {trade.session} · {trade.tradeSystem||'Sistema de Moisés'}</p></div><div className="modalActions"><button className="exportModalButton compact" onClick={()=>exportSingleTrade(trade,'json')}><Download size={15}/>Exportar JSON</button><button className="exportModalButton compact" onClick={()=>exportSingleTrade(trade,'csv')}><Download size={15}/>Exportar CSV</button><button className="exportModalButton compact" onClick={()=>setShareOpen(true)}><Share2 size={15}/>Compartir review</button><button className="ghost compact" onClick={onEdit}><Edit3 size={15}/>Editar</button>{onDelete&&<button className="ghost danger compact" onClick={onDelete}><Trash2 size={15}/>Eliminar</button>}<button onClick={onClose}><X size={20}/></button></div></div>
     <div className="detailKpis"><div className={value>0?'pos':value<0?'neg':''}><span>P/L $</span><b>{value>0?'+':''}{money(value)}</b></div><div className={pctVal>0?'pos':pctVal<0?'neg':''}><span>P/L %</span><b>{pctVal>0?'+':''}{pct(pctVal)}</b></div><div className={rVal>0?'pos':rVal<0?'neg':''}><span>Resultado R</span><b>{rVal>0?'+':''}{rVal.toFixed(2)}R</b></div><div><span>Calidad</span><b>{trade.quality||'—'}</b></div></div>
     {trade.createdFromChecklist||trade.checklistId?<div className={`linkedValidationCard ${trade.checklistFinalGreen?'ok':'warn'}`}><div><span>Validación vinculada</span><b>{trade.checklistFinalGreen?'Luz verde':'Luz roja / incompleta'} · Score {trade.checklistScore||0}/100</b><small>{trade.checklistAPlus?'Setup A+':trade.executedWithoutFullChecklist?'Ejecutado sin checklist completo':'Checklist vinculado'}</small></div><div className="detailChips"><span>{trade.checklistOperationalState||'Estado no registrado'}</span>{trade.checklistPattern&&<span>{trade.checklistPattern}</span>}{trade.checklistZoneM15&&<span>{trade.checklistZoneM15}</span>}{trade.checklistLiquidity&&<span>{trade.checklistLiquidity}</span>}</div>{trade.executedWithoutFullChecklist&&<p className="warnText">Este trade fue ejecutado sin checklist completo.</p>}<button className="ghost compact" onClick={()=>{localStorage.setItem('mtc-open-checklist',trade.checklistId||''); window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}));}}>Ver checklist original</button></div>:null}
     {trade.mentorReviewRequested&&<div className={`mentorReviewStatusCard ${trade.mentorReviewStatus||'pending'}`}><span>Revisión del mentor</span><b>{mentorStatusLabel(trade.mentorReviewStatus||'pending')}</b><small>Foco: {trade.mentorReviewFocus||'general'}{trade.mentorReviewRequestedAt?` · solicitado ${String(trade.mentorReviewRequestedAt).slice(0,10)}`:''}</small>{trade.mentorReviewNote&&<p><b>Pregunta del trader:</b> {trade.mentorReviewNote}</p>}{trade.mentorReviewResponse&&<p><b>Devolución:</b> {trade.mentorReviewResponse}</p>}</div>}
     <div className="detailGrid"><DetailBlock title="Patrón de Moisés"><p>{trade.pattern||trade.otherSystem||'—'}</p></DetailBlock><DetailBlock title="Setup / contexto"><p>{normalizeTradeSetup(trade)}</p></DetailBlock><DetailBlock title="Precios"><p>{`Entry: ${trade.entry||'—'} · SL: ${trade.sl||'—'} · TP: ${trade.tp||'—'} · Exit: ${trade.exit||'—'} · Riesgo: ${trade.riskMoney?money(trade.riskMoney):'—'}`}</p></DetailBlock><DetailBlock title="Confluencias usadas"><div className="detailChips">{(trade.confluencesUsed||[]).length?trade.confluencesUsed.map(x=><span key={x}>{x}</span>):<em>Sin confluencias registradas</em>}</div></DetailBlock><DetailBlock title="Checklist operativo"><div className="detailChips">{(trade.checklist||[]).length?trade.checklist.map(x=><span key={x}>{x}</span>):<em>Sin checklist marcado</em>}</div></DetailBlock><DetailBlock title="Comportamiento"><p><b>{Number(trade.behaviorScore||behaviorScoreFromTrade(trade))}/100</b> · {trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(trade))}<br/>Antes: {trade.emotionBefore||'—'}<br/>Durante: {(trade.executionBehaviors||[]).join(', ')||'—'}<br/>Después: {trade.postTradeBehavior||trade.emotionAfter||'—'}</p></DetailBlock><TraderBehaviorReviewDetail trade={trade}/><DetailBlock title="Notas / lección"><p>{trade.lesson||'—'}</p></DetailBlock><DetailBlock title="Captura"><p>{trade.captureUrl?<a href={trade.captureUrl} target="_blank" rel="noreferrer">Abrir imagen subida</a>:trade.captureLink?<a href={trade.captureLink} target="_blank" rel="noreferrer">Abrir captura</a>:(trade.captureFileName||'—')}</p></DetailBlock></div>
     <div className="emotionPanel"><h3>Journal emocional privado</h3><div className="detailGrid"><DetailBlock title="Antes del trade"><p>{trade.emotionBefore||'—'}</p></DetailBlock><DetailBlock title="Durante el trade"><p>{trade.emotionDuring||'—'}</p></DetailBlock><DetailBlock title="Después del trade"><p>{trade.emotionAfter||'—'}</p></DetailBlock><DetailBlock title="Registro libre"><p>{trade.privateJournal||'—'}</p></DetailBlock></div></div>
-  </div></div>
+  </div></div>{shareOpen&&<TradeShareModal trade={trade} onClose={()=>setShareOpen(false)}/>}</>
 }
 function DailyPlanPanel({profile,data,dayKey}){
   const existing=(data.dailyPlans||[]).find(p=>p.dayKey===dayKey&&p.userId===profile.uid)||{};

@@ -22,6 +22,23 @@
   --shadow:0 18px 60px rgba(0,0,0,.35);
 }
 
+/* Trade export controls */
+.journalQuickActions{flex-wrap:wrap}
+.exportGroup,.tradeExportActions{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.exportGroup{padding:6px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);border-radius:16px}
+.tradeExportActions .ghost.compact{min-height:34px;padding:7px 9px!important}
+.tradeDeleteButton{display:inline-grid!important;place-items:center!important;width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important;padding:0!important;border-radius:12px!important;border:1px solid rgba(244,63,94,.28)!important;background:rgba(244,63,94,.07)!important;color:#fecdd3!important;box-shadow:none!important;flex:0 0 36px!important}
+.tradeDeleteButton:hover{border-color:rgba(244,63,94,.45)!important;background:rgba(244,63,94,.12)!important;color:#fff!important}
+.modalActions .exportModalButton{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-height:38px!important;padding:8px 11px!important;border:1px solid rgba(191,145,42,.35)!important;border-radius:12px!important;background:#fffaf0!important;color:#1f2937!important;font-size:12px!important;font-weight:900!important;box-shadow:0 8px 18px rgba(15,23,42,.06)!important}
+.modalActions .exportModalButton svg{color:#b8860b!important}
+.modalActions .exportModalButton:hover{border-color:rgba(191,145,42,.52)!important;background:#fff7e6!important;color:#111827!important}
+html[data-theme="dark"] .modalActions .exportModalButton{border-color:rgba(212,175,55,.35)!important;background:rgba(15,23,42,.72)!important;color:#e5e7eb!important;box-shadow:0 10px 24px rgba(0,0,0,.24)!important}
+html[data-theme="dark"] .modalActions .exportModalButton svg{color:#d4af37!important}
+html[data-theme="dark"] .modalActions .exportModalButton:hover{border-color:rgba(212,175,55,.55)!important;background:rgba(212,175,55,.10)!important;color:#fff7db!important}
+button:disabled,.ghost:disabled,.primary:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+button:disabled:hover,.ghost:disabled:hover,.primary:disabled:hover{color:var(--muted);border-color:var(--line2);background:transparent}
+@media(max-width:1050px){.tradeExportActions{width:auto;justify-content:flex-start}.exportGroup{width:100%}.exportGroup .ghost{flex:1 1 135px}}
+
 /* ── TEMA CLARO ─────────────────────────────────────────────── */
 :root[data-theme="light"] {
   --bg: #f0f2f5;
@@ -9830,6 +9847,559 @@ html{scroll-padding-top:96px;}
   }
 }
 
+/* v47.17b - EOF authenticated text order pin */
+html[data-theme="dark"] body .app{--mtc-text-primary:#f8fafc;--mtc-text-body:#dbe4f0;--mtc-text-readable:#d6deea;--mtc-text-secondary:#cbd5e1;--mtc-text-tertiary:#98a6b9;--mtc-text-label:#c3cede;--mtc-text-accent-label:rgba(245,201,91,.84);--mtc-text-placeholder:#64748b;color:var(--mtc-text-body)}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app{--mtc-text-primary:#0f172a;--mtc-text-body:#1f2937;--mtc-text-readable:#263447;--mtc-text-secondary:#475569;--mtc-text-tertiary:#64748b;--mtc-text-label:#475569;--mtc-text-accent-label:rgba(146,100,20,.88);--mtc-text-placeholder:#94a3b8;color:var(--mtc-text-body)}
+html[data-theme="dark"] body .app :is(.top h1,.top h2,.card h3,.heroSystem h2,.riskHero h2,.modalHead h3,.trade b,.checkItem b,.metric b,.metricPremium b,.controlStats b,.pulseGrid b,.statMatrix b,.insightPro strong,.onboardingProgress b,.processSummaryGrid b),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.top h1,.top h2,.card h3,.heroSystem h2,.riskHero h2,.modalHead h3,.trade b,.checkItem b,.metric b,.metricPremium b,.controlStats b,.pulseGrid b,.statMatrix b,.insightPro strong,.onboardingProgress b,.processSummaryGrid b){color:var(--mtc-text-primary)!important}
+html[data-theme="dark"] body .app :is(.top p,.cardHead p,.muted,.heroSystem p,.riskHero p,.tradeGuide p,.behaviorJournal p,.emotionalJournal p,.mentorReviewRequest p,.mentorReviewStatusCard p,.checkResult p,.empty p,.sampleNotice p,.ecosystemStageCard p,.nextActionBody p,.premiumEmptyAction p,.processSummaryCard p,.structuredOnboardingCard p,.insightPro p),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.top p,.cardHead p,.muted,.heroSystem p,.riskHero p,.tradeGuide p,.behaviorJournal p,.emotionalJournal p,.mentorReviewRequest p,.mentorReviewStatusCard p,.checkResult p,.empty p,.sampleNotice p,.ecosystemStageCard p,.nextActionBody p,.premiumEmptyAction p,.processSummaryCard p,.structuredOnboardingCard p){color:var(--mtc-text-secondary)!important;line-height:1.55!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.card p,.post>p,.idea p,.detailBlock p,.detailBlock div,.behaviorReviewDetail p,.answerList span,.ruleBox p,.ruleMini span,.patternCard p,.readingProtocol p,.readCard p,.comingSoonItem p,.brokerFlow p,.brokerSecurityNote p,.coachAnswer p,.libraryInfo span,.academyLesson span,.mandamiento span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.card p,.post>p,.idea p,.detailBlock p,.detailBlock div,.behaviorReviewDetail p,.answerList span,.ruleBox p,.ruleMini span,.patternCard p,.readingProtocol p,.readCard p,.comingSoonItem p,.brokerFlow p,.brokerSecurityNote p,.coachAnswer p,.libraryInfo span,.academyLesson span,.mandamiento span){color:var(--mtc-text-readable)!important;line-height:1.58!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.metric small,.metricPremium small,.tradeResult small,.controlStats span,.pulseGrid small,.checklistDash small,.memberList small,.postTop p,.notif p,.rank small,.adminRow p,.checkItem small,.onlineRow small,.linkedValidationCard small,.linkedTradeCard small,.dayPlanSummary p,.monthHead small,.monthLegend,.microInsight,.onboardingSteps button small),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.metric small,.metricPremium small,.tradeResult small,.controlStats span,.pulseGrid small,.checklistDash small,.memberList small,.postTop p,.notif p,.rank small,.adminRow p,.checkItem small,.onlineRow small,.linkedValidationCard small,.linkedTradeCard small,.dayPlanSummary p,.monthHead small,.monthLegend,.microInsight,.onboardingSteps button small){color:var(--mtc-text-tertiary)!important;line-height:1.45!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.field>span,.metric span,.metricPremiumTop span,.detailBlock>span,.detailKpis span,.behaviorReviewSubhead h4,.navGroup small,.bookCover .coverBadge,.brokerMetaGrid b,.emotionalField span,.emotionalScale>span,.processSummaryGrid span,.onboardingProgress span,.insightPro span,.statMatrix span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.field>span,.metric span,.metricPremiumTop span,.detailBlock>span,.detailKpis span,.behaviorReviewSubhead h4,.navGroup small,.bookCover .coverBadge,.brokerMetaGrid b,.emotionalField span,.emotionalScale>span,.processSummaryGrid span,.onboardingProgress span,.insightPro span,.statMatrix span){color:var(--mtc-text-label)!important;font-weight:800!important}
+html[data-theme="dark"] body .app :is(.tradeDetailModal .detailBlock>span,.tradeDetailModal .detailKpis span,.resultPreview span,.linkedValidationCard>div>span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.tradeDetailModal .detailBlock>span,.tradeDetailModal .detailKpis span,.resultPreview span,.linkedValidationCard>div>span){color:var(--mtc-text-accent-label)!important}
+html[data-theme="dark"] body .app :is(.side nav button,.mobileNav button),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.side nav button,.mobileNav button){color:var(--mtc-text-secondary)!important;font-weight:800!important}
+html[data-theme="dark"] body .app :is(.side nav button:hover,.mobileNav button:hover),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.side nav button:hover,.mobileNav button:hover){color:var(--mtc-text-primary)!important}
+html[data-theme="dark"] body .app :is(.side nav button.active,.mobileNav button.active),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.side nav button.active,.mobileNav button.active){color:var(--gold2)!important}
+html[data-theme="dark"] body .app :is(.brand b,.user b,.me b),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.brand b,.user b,.me b){color:var(--mtc-text-primary)!important}
+html[data-theme="dark"] body .app :is(.brand span,.user span,.me span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.brand span,.user span,.me span){color:var(--mtc-text-tertiary)!important}
+html[data-theme="dark"] body .app :is(.input,select,textarea,.search input),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.input,select,textarea,.search input){color:var(--mtc-text-body)!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.input::placeholder,textarea::placeholder,.search input::placeholder),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.input::placeholder,textarea::placeholder,.search input::placeholder){color:var(--mtc-text-placeholder)!important}
+html[data-theme="dark"] body .app :is(.checks button,.chipSelect button,.emotionalToggle,.filterPills button,.lesson),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.checks button,.chipSelect button,.emotionalToggle,.filterPills button,.lesson){color:var(--mtc-text-secondary)!important;font-weight:700!important}
+html[data-theme="dark"] body .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active){color:var(--gold2)!important}
+html[data-theme="dark"] body .app .monthLegend .be{background:#60a5fa!important}
+html[data-theme="dark"] body .app .monthCell.be{background:linear-gradient(180deg,rgba(96,165,250,.12),rgba(96,165,250,.045))!important;border-color:rgba(96,165,250,.35)!important}
+html[data-theme="dark"] body .app .monthCell.be :is(small,i){color:#60a5fa!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthLegend .be{background:#3b82f6!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be{background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.04))!important;border-color:rgba(59,130,246,.35)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be :is(small,i){color:#2563eb!important}
+
+/* v47.18b - Final share preview polish */
+.app .shareModalCard{
+  width:min(1180px,calc(100vw - 32px))!important;
+  background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(5,8,13,.97))!important;
+  border-color:rgba(212,168,67,.20)!important;
+  box-shadow:0 34px 110px rgba(0,0,0,.52),0 1px 0 rgba(255,255,255,.05) inset!important;
+}
+.app .shareModalBody{
+  grid-template-columns:300px minmax(0,1fr)!important;
+  gap:24px!important;
+}
+.app .shareControls{
+  position:sticky;
+  top:0;
+  border-radius:22px!important;
+  padding:18px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.028))!important;
+  border-color:rgba(212,168,67,.18)!important;
+}
+.app .storyPreviewFrame{
+  min-height:680px!important;
+  border-radius:28px!important;
+  background:radial-gradient(circle at 50% 0%,rgba(212,168,67,.16),transparent 38%),linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;
+  border-color:rgba(212,168,67,.18)!important;
+}
+.app .storyPreviewFrame img,
+.app .storyPreviewSkeleton{
+  width:min(390px,100%)!important;
+  border-radius:22px!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .shareModalCard{
+  background:linear-gradient(180deg,#ffffff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.10)!important;
+  box-shadow:0 28px 80px rgba(15,23,42,.16)!important;
+}
+@media(max-width:860px){
+  .app .shareModalBody{grid-template-columns:1fr!important}
+  .app .shareControls{position:static}
+  .app .storyPreviewFrame{min-height:auto!important}
+  .app .storyPreviewFrame img,
+  .app .storyPreviewSkeleton{width:min(315px,100%)!important}
+}
+
+/* v47.18 - Trade and daily review story sharing */
+.app .shareReviewButton{
+  border-color:rgba(212,168,67,.25)!important;
+  background:rgba(212,168,67,.07)!important;
+  color:#f5c95b!important;
+}
+.app .shareReviewButton:hover{
+  border-color:rgba(212,168,67,.45)!important;
+  background:rgba(212,168,67,.12)!important;
+  color:#fff4c7!important;
+}
+.shareModal{z-index:60}
+.shareModalCard{
+  width:min(1120px,100%)!important;
+  max-height:94vh!important;
+}
+.shareModalBody{
+  display:grid;
+  grid-template-columns:minmax(230px,300px) minmax(0,1fr);
+  gap:20px;
+  align-items:start;
+}
+.shareControls{
+  display:grid;
+  gap:12px;
+  align-content:start;
+  border:1px solid rgba(212,168,67,.18);
+  background:rgba(255,255,255,.035);
+  border-radius:18px;
+  padding:16px;
+}
+.shareControls b{
+  color:var(--mtc-text-primary,#f8fafc);
+  font-size:14px;
+}
+.shareControls label{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:var(--mtc-text-readable,#dbe4f0);
+  font-size:13px;
+  font-weight:800;
+}
+.shareControls input{
+  width:17px;
+  height:17px;
+  accent-color:#d4a843;
+}
+.shareControls span,
+.shareControls small,
+.shareHint{
+  color:var(--mtc-text-secondary,#cbd5e1);
+  line-height:1.45;
+  font-size:12px;
+}
+.shareError{
+  color:#fecdd3;
+  border:1px solid rgba(244,63,94,.25);
+  background:rgba(244,63,94,.08);
+  border-radius:12px;
+  padding:10px;
+  margin:0;
+  font-size:12px;
+}
+.storyPreviewFrame{
+  display:grid;
+  place-items:center;
+  min-height:560px;
+  border:1px solid rgba(212,168,67,.18);
+  background:radial-gradient(circle at top,rgba(212,168,67,.12),transparent 42%),rgba(0,0,0,.22);
+  border-radius:22px;
+  padding:18px;
+  overflow:auto;
+}
+.storyPreviewFrame img{
+  display:block;
+  width:min(315px,100%);
+  aspect-ratio:9/16;
+  object-fit:contain;
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.42),0 0 0 1px rgba(212,168,67,.22);
+}
+.storyPreviewSkeleton{
+  width:min(315px,100%);
+  aspect-ratio:9/16;
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  border:1px dashed rgba(212,168,67,.25);
+  color:var(--mtc-text-secondary,#cbd5e1);
+  background:rgba(255,255,255,.035);
+  font-weight:800;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .shareReviewButton{
+  background:#fff8eb!important;
+  border-color:rgba(184,134,11,.25)!important;
+  color:#7c5a10!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .shareReviewButton:hover{
+  background:#fff3d6!important;
+  border-color:rgba(184,134,11,.42)!important;
+  color:#4b3410!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .shareControls,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .storyPreviewFrame{
+  background:#ffffff!important;
+  border-color:rgba(15,23,42,.10)!important;
+  box-shadow:0 14px 36px rgba(15,23,42,.07)!important;
+}
+@media(max-width:860px){
+  .shareModalCard{padding:16px!important}
+  .shareModalBody{grid-template-columns:1fr}
+  .storyPreviewFrame{min-height:auto;padding:12px}
+  .storyPreviewFrame img,.storyPreviewSkeleton{width:min(280px,100%)}
+}
+
+/* v47.17 - Final authenticated app text cascade fix */
+html[data-theme="dark"] body .app{
+  --mtc-text-primary:#f8fafc;
+  --mtc-text-body:#dbe4f0;
+  --mtc-text-readable:#d6deea;
+  --mtc-text-secondary:#cbd5e1;
+  --mtc-text-tertiary:#98a6b9;
+  --mtc-text-label:#c3cede;
+  --mtc-text-accent-label:rgba(245,201,91,.84);
+  --mtc-text-placeholder:#64748b;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app{
+  --mtc-text-primary:#0f172a;
+  --mtc-text-body:#1f2937;
+  --mtc-text-readable:#263447;
+  --mtc-text-secondary:#475569;
+  --mtc-text-tertiary:#64748b;
+  --mtc-text-label:#475569;
+  --mtc-text-accent-label:rgba(146,100,20,.88);
+  --mtc-text-placeholder:#94a3b8;
+}
+html[data-theme="dark"] body .app,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app{
+  color:var(--mtc-text-body);
+}
+html[data-theme="dark"] body .app .top h1,
+html[data-theme="dark"] body .app .top h2,
+html[data-theme="dark"] body .app .card h3,
+html[data-theme="dark"] body .app .heroSystem h2,
+html[data-theme="dark"] body .app .riskHero h2,
+html[data-theme="dark"] body .app .modalHead h3,
+html[data-theme="dark"] body .app .trade b,
+html[data-theme="dark"] body .app .checkItem b,
+html[data-theme="dark"] body .app .metric b,
+html[data-theme="dark"] body .app .metricPremium b,
+html[data-theme="dark"] body .app .controlStats b,
+html[data-theme="dark"] body .app .pulseGrid b,
+html[data-theme="dark"] body .app .statMatrix b,
+html[data-theme="dark"] body .app .insightPro strong,
+html[data-theme="dark"] body .app .onboardingProgress b,
+html[data-theme="dark"] body .app .processSummaryGrid b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .top h1,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .top h2,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .card h3,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .heroSystem h2,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .riskHero h2,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .modalHead h3,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .trade b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .checkItem b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .metric b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .metricPremium b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .controlStats b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .pulseGrid b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .statMatrix b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .insightPro strong,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .onboardingProgress b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .processSummaryGrid b{
+  color:var(--mtc-text-primary)!important;
+}
+html[data-theme="dark"] body .app .top p,
+html[data-theme="dark"] body .app .cardHead p,
+html[data-theme="dark"] body .app .muted,
+html[data-theme="dark"] body .app .heroSystem p,
+html[data-theme="dark"] body .app .riskHero p,
+html[data-theme="dark"] body .app .tradeGuide p,
+html[data-theme="dark"] body .app .behaviorJournal p,
+html[data-theme="dark"] body .app .emotionalJournal p,
+html[data-theme="dark"] body .app .mentorReviewRequest p,
+html[data-theme="dark"] body .app .mentorReviewStatusCard p,
+html[data-theme="dark"] body .app .checkResult p,
+html[data-theme="dark"] body .app .empty p,
+html[data-theme="dark"] body .app .sampleNotice p,
+html[data-theme="dark"] body .app .ecosystemStageCard p,
+html[data-theme="dark"] body .app .nextActionBody p,
+html[data-theme="dark"] body .app .premiumEmptyAction p,
+html[data-theme="dark"] body .app .processSummaryCard p,
+html[data-theme="dark"] body .app .structuredOnboardingCard p,
+html[data-theme="dark"] body .app .insightPro p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .top p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .cardHead p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .muted,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .heroSystem p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .riskHero p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradeGuide p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .behaviorJournal p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .emotionalJournal p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mentorReviewRequest p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mentorReviewStatusCard p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .checkResult p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .empty p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .sampleNotice p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .ecosystemStageCard p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .nextActionBody p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .premiumEmptyAction p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .processSummaryCard p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .structuredOnboardingCard p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .insightPro p{
+  color:var(--mtc-text-secondary)!important;
+  line-height:1.55!important;
+  font-weight:500!important;
+}
+html[data-theme="dark"] body .app .card p,
+html[data-theme="dark"] body .app .post>p,
+html[data-theme="dark"] body .app .idea p,
+html[data-theme="dark"] body .app .detailBlock p,
+html[data-theme="dark"] body .app .detailBlock div,
+html[data-theme="dark"] body .app .behaviorReviewDetail p,
+html[data-theme="dark"] body .app .answerList span,
+html[data-theme="dark"] body .app .ruleBox p,
+html[data-theme="dark"] body .app .ruleMini span,
+html[data-theme="dark"] body .app .patternCard p,
+html[data-theme="dark"] body .app .readingProtocol p,
+html[data-theme="dark"] body .app .readCard p,
+html[data-theme="dark"] body .app .comingSoonItem p,
+html[data-theme="dark"] body .app .brokerFlow p,
+html[data-theme="dark"] body .app .brokerSecurityNote p,
+html[data-theme="dark"] body .app .coachAnswer p,
+html[data-theme="dark"] body .app .libraryInfo span,
+html[data-theme="dark"] body .app .academyLesson span,
+html[data-theme="dark"] body .app .mandamiento span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .card p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .post>p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .idea p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .detailBlock p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .detailBlock div,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .behaviorReviewDetail p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .answerList span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .ruleBox p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .ruleMini span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .patternCard p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .readingProtocol p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .readCard p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .comingSoonItem p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .brokerFlow p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .brokerSecurityNote p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .coachAnswer p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .libraryInfo span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .academyLesson span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mandamiento span{
+  color:var(--mtc-text-readable)!important;
+  line-height:1.58!important;
+  font-weight:500!important;
+}
+html[data-theme="dark"] body .app .metric small,
+html[data-theme="dark"] body .app .metricPremium small,
+html[data-theme="dark"] body .app .tradeResult small,
+html[data-theme="dark"] body .app .controlStats span,
+html[data-theme="dark"] body .app .pulseGrid small,
+html[data-theme="dark"] body .app .checklistDash small,
+html[data-theme="dark"] body .app .memberList small,
+html[data-theme="dark"] body .app .postTop p,
+html[data-theme="dark"] body .app .notif p,
+html[data-theme="dark"] body .app .rank small,
+html[data-theme="dark"] body .app .adminRow p,
+html[data-theme="dark"] body .app .checkItem small,
+html[data-theme="dark"] body .app .onlineRow small,
+html[data-theme="dark"] body .app .linkedValidationCard small,
+html[data-theme="dark"] body .app .linkedTradeCard small,
+html[data-theme="dark"] body .app .dayPlanSummary p,
+html[data-theme="dark"] body .app .monthHead small,
+html[data-theme="dark"] body .app .monthLegend,
+html[data-theme="dark"] body .app .microInsight,
+html[data-theme="dark"] body .app .onboardingSteps button small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .metric small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .metricPremium small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradeResult small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .controlStats span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .pulseGrid small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .checklistDash small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .memberList small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .postTop p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .notif p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .rank small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .adminRow p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .checkItem small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .onlineRow small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .linkedValidationCard small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .linkedTradeCard small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .dayPlanSummary p,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthHead small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthLegend,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .microInsight,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .onboardingSteps button small{
+  color:var(--mtc-text-tertiary)!important;
+  line-height:1.45!important;
+  font-weight:500!important;
+}
+html[data-theme="dark"] body .app .field>span,
+html[data-theme="dark"] body .app .metric span,
+html[data-theme="dark"] body .app .metricPremiumTop span,
+html[data-theme="dark"] body .app .detailBlock>span,
+html[data-theme="dark"] body .app .detailKpis span,
+html[data-theme="dark"] body .app .behaviorReviewSubhead h4,
+html[data-theme="dark"] body .app .navGroup small,
+html[data-theme="dark"] body .app .bookCover .coverBadge,
+html[data-theme="dark"] body .app .brokerMetaGrid b,
+html[data-theme="dark"] body .app .emotionalField span,
+html[data-theme="dark"] body .app .emotionalScale>span,
+html[data-theme="dark"] body .app .processSummaryGrid span,
+html[data-theme="dark"] body .app .onboardingProgress span,
+html[data-theme="dark"] body .app .insightPro span,
+html[data-theme="dark"] body .app .statMatrix span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .field>span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .metric span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .metricPremiumTop span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .detailBlock>span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .detailKpis span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .behaviorReviewSubhead h4,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .navGroup small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .bookCover .coverBadge,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .brokerMetaGrid b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .emotionalField span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .emotionalScale>span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .processSummaryGrid span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .onboardingProgress span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .insightPro span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .statMatrix span{
+  color:var(--mtc-text-label)!important;
+  font-weight:800!important;
+}
+html[data-theme="dark"] body .app .tradeDetailModal .detailBlock>span,
+html[data-theme="dark"] body .app .tradeDetailModal .detailKpis span,
+html[data-theme="dark"] body .app .resultPreview span,
+html[data-theme="dark"] body .app .linkedValidationCard>div>span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradeDetailModal .detailBlock>span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradeDetailModal .detailKpis span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .resultPreview span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .linkedValidationCard>div>span{
+  color:var(--mtc-text-accent-label)!important;
+}
+html[data-theme="dark"] body .app .side nav button,
+html[data-theme="dark"] body .app .mobileNav button,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .side nav button,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mobileNav button{
+  color:var(--mtc-text-secondary)!important;
+  font-weight:800!important;
+}
+html[data-theme="dark"] body .app .side nav button:hover,
+html[data-theme="dark"] body .app .mobileNav button:hover,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .side nav button:hover,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mobileNav button:hover{
+  color:var(--mtc-text-primary)!important;
+}
+html[data-theme="dark"] body .app .side nav button.active,
+html[data-theme="dark"] body .app .mobileNav button.active,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .side nav button.active,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mobileNav button.active{
+  color:var(--gold2)!important;
+}
+html[data-theme="dark"] body .app .brand b,
+html[data-theme="dark"] body .app .user b,
+html[data-theme="dark"] body .app .me b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .brand b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .user b,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .me b{
+  color:var(--mtc-text-primary)!important;
+}
+html[data-theme="dark"] body .app .brand span,
+html[data-theme="dark"] body .app .user span,
+html[data-theme="dark"] body .app .me span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .brand span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .user span,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .me span{
+  color:var(--mtc-text-tertiary)!important;
+}
+html[data-theme="dark"] body .app .input,
+html[data-theme="dark"] body .app select,
+html[data-theme="dark"] body .app textarea,
+html[data-theme="dark"] body .app .search input,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .input,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app select,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app textarea,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .search input{
+  color:var(--mtc-text-body)!important;
+  font-weight:500!important;
+}
+html[data-theme="dark"] body .app .input::placeholder,
+html[data-theme="dark"] body .app textarea::placeholder,
+html[data-theme="dark"] body .app .search input::placeholder,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .input::placeholder,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app textarea::placeholder,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .search input::placeholder{
+  color:var(--mtc-text-placeholder)!important;
+}
+html[data-theme="dark"] body .app .checks button,
+html[data-theme="dark"] body .app .chipSelect button,
+html[data-theme="dark"] body .app .emotionalToggle,
+html[data-theme="dark"] body .app .filterPills button,
+html[data-theme="dark"] body .app .lesson,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .checks button,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .chipSelect button,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .emotionalToggle,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .filterPills button,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .lesson{
+  color:var(--mtc-text-secondary)!important;
+  font-weight:700!important;
+}
+html[data-theme="dark"] body .app .checks button.on,
+html[data-theme="dark"] body .app .chipSelect button.on,
+html[data-theme="dark"] body .app .filterPills button.active,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .checks button.on,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .chipSelect button.on,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .filterPills button.active{
+  color:var(--gold2)!important;
+}
+html[data-theme="dark"] body .app .monthLegend .be{
+  background:#60a5fa!important;
+}
+html[data-theme="dark"] body .app .monthCell.be{
+  background:linear-gradient(180deg,rgba(96,165,250,.12),rgba(96,165,250,.045))!important;
+  border-color:rgba(96,165,250,.35)!important;
+}
+html[data-theme="dark"] body .app .monthCell.be small,
+html[data-theme="dark"] body .app .monthCell.be i{
+  color:#60a5fa!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthLegend .be{
+  background:#3b82f6!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be{
+  background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.04))!important;
+  border-color:rgba(59,130,246,.35)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be small,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be i{
+  color:#2563eb!important;
+}
+
+/* Journal final UX pass: calendar states and text hierarchy (final priority) */
+.monthLegend .be{background:#60a5fa!important}
+.monthCell.be{background:linear-gradient(180deg,rgba(96,165,250,.12),rgba(96,165,250,.04))!important;border-color:rgba(96,165,250,.35)!important}
+.monthCell.be small{color:#93c5fd!important}
+.monthCell.be i{border-color:rgba(96,165,250,.25)!important;color:#bfdbfe!important;background:rgba(96,165,250,.10)!important}
+.journalPage .cardHead p,.journalPage .muted,.monthHead small,.monthLegend,.dayPlanSummary p{color:#cbd5e1!important;line-height:1.55!important}
+.journalPage .trade p{color:#cbd5e1!important;line-height:1.45!important}
+.journalPage .tradeResult small{color:#b6c2d2!important}
+.tradeDetailModal .modalHead p{color:#cbd5e1!important;line-height:1.4!important}
+.tradeDetailModal .detailBlock>span,.tradeDetailModal .detailKpis span{color:rgba(245,201,91,.76)!important;letter-spacing:.10em!important}
+.tradeDetailModal .detailBlock p,.tradeDetailModal .detailBlock div,.tradeDetailModal .behaviorReviewDetail p,.tradeDetailModal .emotionPanel p,.tradeDetailModal .mentorReviewStatusCard p{color:#dbe4f0!important;line-height:1.52!important}
+.tradeDetailModal .detailBlock b,.tradeDetailModal .behaviorReviewDetail b{color:#f8fafc!important}
+.tradeDetailModal .detailChips span{color:#dbe4f0!important}
+html[data-theme="light"] .monthLegend .be{background:#3b82f6!important}
+html[data-theme="light"] .monthCell.be{background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.04))!important;border-color:rgba(59,130,246,.35)!important}
+html[data-theme="light"] .monthCell.be small{color:#2563eb!important}
+html[data-theme="light"] .monthCell.be i{border-color:rgba(59,130,246,.22)!important;color:#2563eb!important;background:rgba(59,130,246,.08)!important}
+html[data-theme="light"] .journalPage .cardHead p,html[data-theme="light"] .journalPage .muted,html[data-theme="light"] .monthHead small,html[data-theme="light"] .monthLegend,html[data-theme="light"] .dayPlanSummary p{color:#475569!important}
+html[data-theme="light"] .journalPage .trade p{color:#475569!important}
+html[data-theme="light"] .journalPage .tradeResult small{color:#475569!important}
+html[data-theme="light"] .tradeDetailModal .modalHead p{color:#475569!important}
+html[data-theme="light"] .tradeDetailModal .detailBlock>span,html[data-theme="light"] .tradeDetailModal .detailKpis span{color:rgba(146,100,20,.82)!important}
+html[data-theme="light"] .tradeDetailModal .detailBlock p,html[data-theme="light"] .tradeDetailModal .detailBlock div,html[data-theme="light"] .tradeDetailModal .behaviorReviewDetail p,html[data-theme="light"] .tradeDetailModal .emotionPanel p,html[data-theme="light"] .tradeDetailModal .mentorReviewStatusCard p{color:#334155!important;line-height:1.52!important}
+html[data-theme="light"] .tradeDetailModal .detailBlock b,html[data-theme="light"] .tradeDetailModal .behaviorReviewDetail b{color:#0f172a!important}
+html[data-theme="light"] .tradeDetailModal .detailChips span{color:#334155!important}
+
 /* Final landing conversion section: premium narrative, not a gallery */
 .finalCommercialSurface .finalConversionSection{
   width:min(1400px,100%)!important;
@@ -10992,6 +11562,45 @@ html[data-theme="light"] .sampleNotice b{color:#1c160d!important}
 html[data-theme="light"] .sampleNotice p{color:#69707b!important}
 .emptyIcon{width:36px;height:36px;border-radius:12px;display:inline-grid;place-items:center;margin-bottom:10px;color:var(--gold2);background:rgba(212,168,67,.10);border:1px solid rgba(212,168,67,.22)}
 .empty .ghost.compact{margin-top:12px}
+
+/* v47.16 — App-wide professional text scale (authenticated app only) */
+.app{
+  --mtc-text-primary:#f8fafc;
+  --mtc-text-body:#d6deea;
+  --mtc-text-readable:#cbd5e1;
+  --mtc-text-secondary:#aebacc;
+  --mtc-text-tertiary:#8f9caf;
+  --mtc-text-label:#a8b3c4;
+  --mtc-text-accent-label:rgba(245,201,91,.78);
+  --mtc-text-placeholder:#64748b;
+}
+html[data-theme="light"] .app{
+  --mtc-text-primary:#0f172a;
+  --mtc-text-body:#1f2937;
+  --mtc-text-readable:#334155;
+  --mtc-text-secondary:#475569;
+  --mtc-text-tertiary:#64748b;
+  --mtc-text-label:#475569;
+  --mtc-text-accent-label:rgba(146,100,20,.82);
+  --mtc-text-placeholder:#94a3b8;
+}
+.app .top h1,.app .top h2,.app .card h3,.app .heroSystem h2,.app .riskHero h2,.app .modalHead h3,.app .trade b,.app .checkItem b,.app .metric b,.app .metricPremium b,.app .statMatrix b,.app .insightPro strong{color:var(--mtc-text-primary)!important}
+.app .top p,.app .cardHead p,.app .muted,.app .heroSystem p,.app .riskHero p,.app .tradeGuide p,.app .behaviorJournal p,.app .emotionalJournal p,.app .mentorReviewRequest p,.app .mentorReviewStatusCard p,.app .checkResult p,.app .empty p,.app .sampleNotice p,.app .ecosystemStageCard p,.app .nextActionBody p,.app .premiumEmptyAction p,.app .processSummaryCard p,.app .structuredOnboardingCard p{color:var(--mtc-text-secondary)!important;line-height:1.55!important;font-weight:500!important}
+.app .card p,.app .post>p,.app .idea p,.app .detailBlock p,.app .detailBlock div,.app .behaviorReviewDetail p,.app .answerList span,.app .ruleBox p,.app .ruleMini span,.app .patternCard p,.app .readingProtocol p,.app .readCard p,.app .comingSoonItem p,.app .brokerFlow p,.app .brokerSecurityNote p,.app .coachAnswer p,.app .libraryInfo span,.app .academyLesson span{color:var(--mtc-text-readable)!important;line-height:1.55!important;font-weight:500!important}
+.app .metric small,.app .metricPremium small,.app .tradeResult small,.app .controlStats span,.app .pulseGrid small,.app .checklistDash small,.app .memberList small,.app .postTop p,.app .notif p,.app .rank small,.app .adminRow p,.app .checkItem small,.app .onlineRow small,.app .linkedValidationCard small,.app .linkedTradeCard small,.app .dayPlanSummary p,.app .monthHead small,.app .monthLegend,.app .microInsight{color:var(--mtc-text-tertiary)!important;line-height:1.45!important}
+.app .field>span,.app .metric span,.app .metricPremiumTop span,.app .resultPreview span,.app .detailBlock>span,.app .detailKpis span,.app .behaviorReviewSubhead h4,.app .navGroup small,.app .bookCover .coverBadge,.app .brokerMetaGrid b,.app .emotionalField span,.app .emotionalScale>span,.app .processSummaryGrid span,.app .onboardingProgress span{color:var(--mtc-text-label)!important}
+.app .tradeDetailModal .detailBlock>span,.app .tradeDetailModal .detailKpis span,.app .resultPreview span,.app .linkedValidationCard>div>span{color:var(--mtc-text-accent-label)!important}
+.app .field small,.app .formNote span,.app .settingsHint,.app .hint,.app .fileName,.app .bookPreview span,.app .libraryInfo small,.app .academyLesson small,.app .brokerHeroPanel small,.app .brokerLogin span{color:var(--mtc-text-tertiary)!important;line-height:1.4!important}
+.app .side nav button,.app .mobileNav button{color:var(--mtc-text-secondary)!important}
+.app .side nav button:hover,.app .mobileNav button:hover{color:var(--mtc-text-primary)!important}
+.app .side nav button.active,.app .mobileNav button.active{color:var(--gold2)!important}
+.app .user b,.app .me b,.app .brand b{color:var(--mtc-text-primary)!important}
+.app .user span,.app .me span,.app .brand span{color:var(--mtc-text-tertiary)!important}
+.app .input,.app select,.app textarea,.app .search input{color:var(--mtc-text-body)!important}
+.app .input::placeholder,.app textarea::placeholder,.app .search input::placeholder{color:var(--mtc-text-placeholder)!important}
+.app .checks button,.app .chipSelect button,.app .emotionalToggle,.app .filterPills button,.app .actions button,.app .lesson{color:var(--mtc-text-secondary)!important}
+.app .checks button.on,.app .chipSelect button.on,.app .filterPills button.active{color:var(--gold2)!important}
+html[data-theme="light"] .app .card p,html[data-theme="light"] .app .post>p,html[data-theme="light"] .app .idea p,html[data-theme="light"] .app .detailBlock p,html[data-theme="light"] .app .detailBlock div,html[data-theme="light"] .app .behaviorReviewDetail p,html[data-theme="light"] .app .answerList span,html[data-theme="light"] .app .ruleBox p,html[data-theme="light"] .app .ruleMini span,html[data-theme="light"] .app .patternCard p,html[data-theme="light"] .app .readingProtocol p,html[data-theme="light"] .app .readCard p{font-weight:500}
 
 /* Final commercial polish: real image demos */
 .finalCommercialSurface.publicLanding{
@@ -12309,3 +12918,42 @@ body:has(#root > .finalPaywallSurface){
     overflow-x:auto!important;
   }
 }
+/* v47.17c - Real EOF authenticated text cascade */
+html[data-theme="dark"] body .app{--mtc-text-primary:#f8fafc;--mtc-text-body:#dbe4f0;--mtc-text-readable:#d6deea;--mtc-text-secondary:#cbd5e1;--mtc-text-tertiary:#98a6b9;--mtc-text-label:#c3cede;--mtc-text-accent-label:rgba(245,201,91,.84);--mtc-text-placeholder:#64748b;color:var(--mtc-text-body)}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app{--mtc-text-primary:#0f172a;--mtc-text-body:#1f2937;--mtc-text-readable:#263447;--mtc-text-secondary:#475569;--mtc-text-tertiary:#64748b;--mtc-text-label:#475569;--mtc-text-accent-label:rgba(146,100,20,.88);--mtc-text-placeholder:#94a3b8;color:var(--mtc-text-body)}
+html[data-theme="dark"] body .app :is(.top h1,.top h2,.card h3,.heroSystem h2,.riskHero h2,.modalHead h3,.trade b,.checkItem b,.metric b,.metricPremium b,.controlStats b,.pulseGrid b,.statMatrix b,.insightPro strong,.onboardingProgress b,.processSummaryGrid b),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.top h1,.top h2,.card h3,.heroSystem h2,.riskHero h2,.modalHead h3,.trade b,.checkItem b,.metric b,.metricPremium b,.controlStats b,.pulseGrid b,.statMatrix b,.insightPro strong,.onboardingProgress b,.processSummaryGrid b){color:var(--mtc-text-primary)!important}
+html[data-theme="dark"] body .app :is(.top p,.cardHead p,.muted,.heroSystem p,.riskHero p,.tradeGuide p,.behaviorJournal p,.emotionalJournal p,.mentorReviewRequest p,.mentorReviewStatusCard p,.checkResult p,.empty p,.sampleNotice p,.ecosystemStageCard p,.nextActionBody p,.premiumEmptyAction p,.processSummaryCard p,.structuredOnboardingCard p,.insightPro p),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.top p,.cardHead p,.muted,.heroSystem p,.riskHero p,.tradeGuide p,.behaviorJournal p,.emotionalJournal p,.mentorReviewRequest p,.mentorReviewStatusCard p,.checkResult p,.empty p,.sampleNotice p,.ecosystemStageCard p,.nextActionBody p,.premiumEmptyAction p,.processSummaryCard p,.structuredOnboardingCard p,.insightPro p){color:var(--mtc-text-secondary)!important;line-height:1.55!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.card p,.post>p,.idea p,.detailBlock p,.detailBlock div,.behaviorReviewDetail p,.answerList span,.ruleBox p,.ruleMini span,.patternCard p,.readingProtocol p,.readCard p,.comingSoonItem p,.brokerFlow p,.brokerSecurityNote p,.coachAnswer p,.libraryInfo span,.academyLesson span,.mandamiento span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.card p,.post>p,.idea p,.detailBlock p,.detailBlock div,.behaviorReviewDetail p,.answerList span,.ruleBox p,.ruleMini span,.patternCard p,.readingProtocol p,.readCard p,.comingSoonItem p,.brokerFlow p,.brokerSecurityNote p,.coachAnswer p,.libraryInfo span,.academyLesson span,.mandamiento span){color:var(--mtc-text-readable)!important;line-height:1.58!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.metric small,.metricPremium small,.tradeResult small,.controlStats span,.pulseGrid small,.checklistDash small,.memberList small,.postTop p,.notif p,.rank small,.adminRow p,.checkItem small,.onlineRow small,.linkedValidationCard small,.linkedTradeCard small,.dayPlanSummary p,.monthHead small,.monthLegend,.microInsight,.onboardingSteps button small),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.metric small,.metricPremium small,.tradeResult small,.controlStats span,.pulseGrid small,.checklistDash small,.memberList small,.postTop p,.notif p,.rank small,.adminRow p,.checkItem small,.onlineRow small,.linkedValidationCard small,.linkedTradeCard small,.dayPlanSummary p,.monthHead small,.monthLegend,.microInsight,.onboardingSteps button small){color:var(--mtc-text-tertiary)!important;line-height:1.45!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.field>span,.metric span,.metricPremiumTop span,.detailBlock>span,.detailKpis span,.behaviorReviewSubhead h4,.navGroup small,.bookCover .coverBadge,.brokerMetaGrid b,.emotionalField span,.emotionalScale>span,.processSummaryGrid span,.onboardingProgress span,.insightPro span,.statMatrix span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.field>span,.metric span,.metricPremiumTop span,.detailBlock>span,.detailKpis span,.behaviorReviewSubhead h4,.navGroup small,.bookCover .coverBadge,.brokerMetaGrid b,.emotionalField span,.emotionalScale>span,.processSummaryGrid span,.onboardingProgress span,.insightPro span,.statMatrix span){color:var(--mtc-text-label)!important;font-weight:800!important}
+html[data-theme="dark"] body .app :is(.tradeDetailModal .detailBlock>span,.tradeDetailModal .detailKpis span,.resultPreview span,.linkedValidationCard>div>span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.tradeDetailModal .detailBlock>span,.tradeDetailModal .detailKpis span,.resultPreview span,.linkedValidationCard>div>span){color:var(--mtc-text-accent-label)!important}
+html[data-theme="dark"] body .app :is(.side nav button,.mobileNav button),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.side nav button,.mobileNav button){color:var(--mtc-text-secondary)!important;font-weight:800!important}
+html[data-theme="dark"] body .app :is(.side nav button:hover,.mobileNav button:hover),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.side nav button:hover,.mobileNav button:hover){color:var(--mtc-text-primary)!important}
+html[data-theme="dark"] body .app :is(.side nav button.active,.mobileNav button.active),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.side nav button.active,.mobileNav button.active){color:var(--gold2)!important}
+html[data-theme="dark"] body .app :is(.brand b,.user b,.me b),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.brand b,.user b,.me b){color:var(--mtc-text-primary)!important}
+html[data-theme="dark"] body .app :is(.brand span,.user span,.me span),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.brand span,.user span,.me span){color:var(--mtc-text-tertiary)!important}
+html[data-theme="dark"] body .app :is(.input,select,textarea,.search input),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.input,select,textarea,.search input){color:var(--mtc-text-body)!important;font-weight:500!important}
+html[data-theme="dark"] body .app :is(.input::placeholder,textarea::placeholder,.search input::placeholder),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.input::placeholder,textarea::placeholder,.search input::placeholder){color:var(--mtc-text-placeholder)!important}
+html[data-theme="dark"] body .app :is(.checks button,.chipSelect button,.emotionalToggle,.filterPills button,.lesson),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.checks button,.chipSelect button,.emotionalToggle,.filterPills button,.lesson){color:var(--mtc-text-secondary)!important;font-weight:700!important}
+html[data-theme="dark"] body .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active){color:var(--gold2)!important}
+html[data-theme="dark"] body .app .monthLegend .be{background:#60a5fa!important}
+html[data-theme="dark"] body .app .monthCell.be{background:linear-gradient(180deg,rgba(96,165,250,.12),rgba(96,165,250,.045))!important;border-color:rgba(96,165,250,.35)!important}
+html[data-theme="dark"] body .app .monthCell.be :is(small,i){color:#60a5fa!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthLegend .be{background:#3b82f6!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be{background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.04))!important;border-color:rgba(59,130,246,.35)!important}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be :is(small,i){color:#2563eb!important}
