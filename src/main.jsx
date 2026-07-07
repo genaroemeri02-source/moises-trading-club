@@ -9,6 +9,34 @@ import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tool
 import { createChart, AreaSeries, CrosshairMode, LineType } from 'lightweight-charts';
 import { Home, BookOpen, BarChart3, LineChart, Users, Lightbulb, Trophy, Shield, Bell, Settings, Plus, Trash2, Download, Upload, Search, LogOut, CheckCircle2, Lock, PlayCircle, FileText, Heart, MessageCircle, Bookmark, Menu, X, Megaphone, Edit3, Sparkles, Crown, Newspaper, ExternalLink, Camera, Image as ImageIcon, Copy, ChevronDown, ChevronRight, SlidersHorizontal, CalendarDays, Clock3, Flame, Medal, Activity, TrendingUp, Target, XCircle, AlertTriangle, Info, Rocket, Share2 } from 'lucide-react';
 import './styles.css';
+import {
+  money,
+  formatMoneyCompactCard, formatMoneyClean, formatPercentCard, formatMetricCard, formatR,
+  formatCalendarMoney, formatCalendarR, formatCalendarPct, pct,
+  formatCurrencySafe, formatRShare, formatPercentageSafe, formatRiskPctLabel
+} from './lib/formatUtils.js';
+import {
+  today, nyParts, nyISO, tradingDayKey, formatDateLabel,
+  normalizeDateKey, getTradeOperationalDateKey, monthKey, daysInMonth,
+  resetCountdown, weekStartISO, safeDate
+} from './lib/dateUtils.js';
+import {
+  toNumberSafe, normalizeNumInput, parseLimitMoney,
+  safeArray, normalizeTradeArrayFields,
+  normalizeImportedTradeRow, parseCsv,
+  normalizeTradeSetup, tradeDayKey, isClosedEvaluableTrade, accountName
+} from './lib/tradeUtils.js';
+import {
+  behaviorScoreFromTrade, behaviorScoreLabel,
+  calendarDayR, calendarDayPct, calendarToneFromTotal,
+  groupTradesByDay, buildTradingCalendarWeeks, calc, insights,
+  getTradesForDate, calculateDailyTradeStats
+} from './lib/analyticsUtils.js';
+import {
+  normalizeTradeForExport, flattenTradeForCsv,
+  exportToJson, exportToCsv,
+  sanitizeFilenamePart, buildTradeExportFilename, buildTradesExportFilename
+} from './lib/importExportUtils.js';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -24,52 +52,6 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const ADMIN_EMAILS = String(import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
 
-const money=n=>`$${Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-const compactNumber=(value,max=0)=>Number(value||0).toLocaleString('en-US',{maximumFractionDigits:max,minimumFractionDigits:0});
-function formatCompactNumber(value,max=1){
-  const n=Number(value||0),abs=Math.abs(n),sign=n<0?'-':'';
-  const clean=v=>Number(v.toFixed(max)).toLocaleString('en-US',{maximumFractionDigits:max});
-  if(abs>=1000000)return `${sign}${clean(abs/1000000)}M`;
-  if(abs>=1000)return `${sign}${clean(abs/1000)}k`;
-  return `${sign}${abs.toLocaleString('en-US',{maximumFractionDigits:0})}`;
-}
-const compactSigned=(value,max=0)=>`${Number(value||0)>0?'+':Number(value||0)<0?'-':''}${formatCompactNumber(Math.abs(Number(value||0)),max)}`;
-const formatMoneyCompactCard=value=>`${Number(value||0)>=0?'+':''}$${formatCompactNumber(Math.abs(Number(value||0)),1)}`;
-const formatMoneyClean=value=>`${Number(value||0)<0?'-':''}$${formatCompactNumber(Math.abs(Number(value||0)),1)}`;
-const formatPercentCard=value=>`${compactNumber(Number(value||0),0)}%`;
-const formatMetricCard=(value,max=0)=>formatCompactNumber(value,max);
-const formatR=value=>`${Number(value||0).toLocaleString('en-US',{minimumFractionDigits:Math.abs(Number(value||0))<10?2:1,maximumFractionDigits:2})}R`;
-const formatCalendarMoney=value=>{
-  const n=Number(value||0);
-  if(n===0) return 'BE';
-  return `${n>0?'+':'-'}$${formatCompactNumber(Math.abs(n),1)}`;
-};
-const formatCalendarR=value=>{
-  const n=Number(value||0);
-  return `${n>0?'+':''}${n.toFixed(2)}R`;
-};
-const calendarDayR=dayStats=>(dayStats?.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultR),0);
-const formatCalendarPct=value=>{
-  const n=Number(value||0);
-  return `${n>0?'+':''}${n.toFixed(1)}%`;
-};
-const calendarDayPct=dayStats=>(dayStats?.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultPct),0);
-const calendarToneFromTotal=value=>Number(value||0)>0?'win':Number(value||0)<0?'loss':'be';
-function normalizeNumInput(v){
-  const raw=String(v ?? '').replace(',', '.').trim();
-  if(raw==='' || raw==='-' || /^-?\d*(\.\d*)?$/.test(raw)) return raw;
-  return null;
-}
-function toNumberSafe(v){
-  if(v==='' || v==='-' || v==null) return 0;
-  const n=Number(String(v).replace(',', '.'));
-  return Number.isFinite(n)?n:0;
-}
-function parseLimitMoney(v){
-  const raw=String(v||'').replace(/[^0-9,.-]/g,'').replace(',', '.');
-  const n=Number(raw);
-  return Number.isFinite(n)?Math.abs(n):0;
-}
 function numericTradePayload(form){
   const numeric=['riskPct','entry','sl','tp','exit','riskMoney','resultMoney','resultPct','resultR'];
   const out=normalizeTradeArrayFields({...form});
@@ -82,130 +64,8 @@ function numericTradePayload(form){
   out.behaviorScoreLabel=behaviorScoreLabel(out.behaviorScore);
   return out;
 }
-const pct=n=>`${Number(n||0).toFixed(2)}%`;
-const today=()=>new Date().toISOString().slice(0,10);
-const dateAddDays=(iso,days)=>{const d=new Date(`${iso}T12:00:00`); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10)};
-function nyParts(d=new Date()){
-  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(d).reduce((a,p)=>{a[p.type]=p.value;return a;},{});
-  let hour=Number(parts.hour); if(hour===24) hour=0;
-  return {year:parts.year,month:parts.month,day:parts.day,hour,minute:Number(parts.minute),second:Number(parts.second)};
-}
-const nyISO=(d=new Date())=>{const p=nyParts(d); return `${p.year}-${p.month}-${p.day}`};
-const tradingDayKey=(d=new Date())=>{const p=nyParts(d); const iso=`${p.year}-${p.month}-${p.day}`; return p.hour>=17?dateAddDays(iso,1):iso};
-const formatDateLabel=iso=>{try{return new Date(`${iso}T12:00:00`).toLocaleDateString('es-AR',{weekday:'short',day:'2-digit',month:'short'})}catch{return iso}};
-function normalizeDateKey(value){
-  if(value==null||value==='')return null;
-  if(value instanceof Date){
-    const ms=value.getTime();
-    return Number.isFinite(ms)?new Date(ms).toISOString().slice(0,10):null;
-  }
-  if(typeof value==='object'){
-    if(typeof value.toDate==='function')return normalizeDateKey(value.toDate());
-    if(Number.isFinite(Number(value.seconds)))return normalizeDateKey(Number(value.seconds));
-    if(Number.isFinite(Number(value._seconds)))return normalizeDateKey(Number(value._seconds));
-  }
-  if(typeof value==='number'||/^\d+$/.test(String(value).trim())){
-    const n=Number(value);
-    if(!Number.isFinite(n)||n<=0)return null;
-    return new Date(n>9999999999?n:n*1000).toISOString().slice(0,10);
-  }
-  const raw=String(value).trim();
-  let m=raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if(m){
-    const y=Number(m[1]),mo=Number(m[2]),d=Number(m[3]);
-    if(mo<1||mo>12||d<1||d>31)return null;
-    return `${m[1]}-${m[2]}-${m[3]}`;
-  }
-  m=raw.match(/^(\d{2})[-/](\d{2})$/);
-  if(m){
-    const year=String(monthKey()).slice(0,4);
-    const mo=Number(m[1]),d=Number(m[2]);
-    if(mo<1||mo>12||d<1||d>31)return null;
-    return `${year}-${m[1]}-${m[2]}`;
-  }
-  const parsed=Date.parse(raw);
-  return Number.isFinite(parsed)?new Date(parsed).toISOString().slice(0,10):null;
-}
-function getTradeOperationalDateKey(trade={}){
-  const explicit=[trade.date,trade.tradeDate,trade.entryDate,trade.closeDate,trade.sessionDate,trade.tradingDate,trade.operationalDate,trade.dayKey,trade.tradingDay];
-  for(const value of explicit){
-    const date=normalizeDateKey(value);
-    if(date)return date;
-  }
-  const fallback=[trade.closedAt,trade.executedAt,trade.timestamp,trade.createdAt,trade.updatedAt];
-  for(const value of fallback){
-    const date=normalizeDateKey(value);
-    if(date)return date;
-  }
-  return null;
-}
-
-function daysInMonth(key){
-  const [year,month]=String(key||monthKey()).split('-').map(Number);
-  if(!year||!month) return [];
-  const first=new Date(year,month-1,1);
-  const total=new Date(year,month,0).getDate();
-  const mondayOffset=(first.getDay()+6)%7;
-  const cells=Array.from({length:mondayOffset},()=>null);
-  for(let day=1; day<=total; day++) cells.push(`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`);
-  while(cells.length%7!==0) cells.push(null);
-  return cells;
-}
-
-const monthKey=(d=new Date())=>nyISO(d).slice(0,7);
-function resetCountdown(now=new Date()){
-  // Cuenta regresiva estrictamente basada en la hora de New York (ET), no en la hora local del dispositivo.
-  const p=nyParts(now);
-  const nowSeconds=p.hour*3600+p.minute*60+p.second;
-  const resetSeconds=17*3600; // 17:00 ET / cierre operativo NY
-  let remaining=resetSeconds-nowSeconds;
-  if(remaining<=0) remaining+=24*3600;
-  const h=String(Math.floor(remaining/3600)).padStart(2,'0');
-  const m=String(Math.floor((remaining%3600)/60)).padStart(2,'0');
-  const sec=String(remaining%60).padStart(2,'0');
-  return `${h}:${m}:${sec}`;
-}
-function groupTradesByDay(trades=[]){
-  return trades.reduce((acc,t)=>{
-    const date=getTradeOperationalDateKey(t);
-    if(!date)return acc;
-    if(!acc[date]) acc[date]={date,total:0,count:0,wins:0,losses:0,trades:[]};
-    const v=toNumberSafe(t.resultMoney);
-    acc[date].total+=v;
-    acc[date].count+=1;
-    if(v>0) acc[date].wins+=1;
-    if(v<0) acc[date].losses+=1;
-    acc[date].trades.push(t);
-    return acc;
-  },{});
-}
-function buildTradingCalendarWeeks(key,stats={}){
-  const rows=[];
-  const cells=daysInMonth(key);
-  for(let i=0;i<cells.length;i+=7){
-    const weekdays=cells.slice(i,i+5);
-    const weekStats=weekdays.reduce((acc,date)=>{
-      const st=date?stats[date]:null;
-      if(!st) return acc;
-      const r=calendarDayR(st), pctValue=calendarDayPct(st);
-      acc.total+=st.total;
-      acc.r+=r;
-      acc.pct+=pctValue;
-      acc.pctCount+=(st.trades||[]).filter(t=>String(t.resultPct??'').trim()!=='').length;
-      acc.count+=st.count;
-      acc.wins+=st.total>0?1:0;
-      acc.losses+=st.total<0?1:0;
-      acc.breakevens+=st.total===0?1:0;
-      acc.trades.push(...(st.trades||[]));
-      return acc;
-    },{total:0,r:0,pct:0,pctCount:0,count:0,wins:0,losses:0,breakevens:0,trades:[]});
-    rows.push({index:rows.length+1,days:weekdays,summary:weekStats});
-  }
-  return rows;
-}
 const uid=()=>crypto.randomUUID?.()||String(Date.now()+Math.random());
 async function copyText(text,label='Copiado'){try{await navigator.clipboard.writeText(String(text||'')); toast(label);}catch(e){toast('No se pudo copiar');}}
-const qualityScore={ 'A+':100, A:85, B:65, C:35, Impulsivo:10 };
 const checklistBase=['Contexto claro','Sesión válida','Tomó liquidez','Confirmación estructural','RR válido','Sigo el plan','Neutralidad emocional','Entrada A/A+'];
 const emotionBeforeOptions=['Calmo','Ansioso','Apurado','Eufórico','Frustrado','Neutral'];
 const executionBehaviorOptions=['Seguí el plan','Dudé antes de entrar','Entré tarde','Me anticipé','Moví el stop','Cerré antes de tiempo','Sobreoperé','Respeté el riesgo','Operé por impulso'];
@@ -224,25 +84,6 @@ const siParcialNoOptions=['Sí','Parcial','No'];
 const dxyConfirmaOptions=['Sí','Parcial','No','No aplica'];
 const negativeBehaviorOptions=['Dudé antes de entrar','Entré tarde','Me anticipé','Moví el stop','Cerré antes de tiempo','Sobreoperé','Operé por impulso','Rompí reglas'];
 const positiveBehaviorOptions=['Seguí el plan','Respeté el riesgo','Buena ejecución','Aprendizaje claro','Ejecución disciplinada'];
-function behaviorScoreFromTrade(t={}){
-  let score=70;
-  const b=safeArray(t.executionBehaviors);
-  if(t.followedPlan===true || b.includes('Seguí el plan')) score+=15;
-  if(b.includes('Respeté el riesgo')) score+=10;
-  if(t.postTradeBehavior==='Buena ejecución') score+=10;
-  if(t.postTradeBehavior==='Aprendizaje claro') score+=5;
-  if(b.includes('Dudé antes de entrar')) score-=5;
-  if(b.includes('Entré tarde')) score-=12;
-  if(b.includes('Me anticipé')) score-=18;
-  if(b.includes('Moví el stop')) score-=22;
-  if(b.includes('Cerré antes de tiempo')) score-=12;
-  if(b.includes('Sobreoperé')) score-=25;
-  if(b.includes('Operé por impulso')) score-=30;
-  if(t.postTradeBehavior==='Rompí reglas') score-=25;
-  if(t.emotionBefore==='Ansioso'||t.emotionBefore==='Apurado'||t.emotionBefore==='Frustrado'||t.emotionBefore==='Eufórico') score-=5;
-  return Math.max(0,Math.min(100,Math.round(score)));
-}
-function behaviorScoreLabel(score){return score>=90?'Ejecución disciplinada':score>=70?'Buena ejecución':score>=50?'Ejecución irregular':'Operación impulsiva'}
 const moisesPatterns=['Método Estructural: ChoCH en M1','Método Volumen × Desplazamiento','Envolvente','Estrella de la Mañana / Noche','Hombro Cabeza Hombro','HCH Invertido','Secuencia de 3 Velas'];
 const moisesConfluences=['7 Mandamientos validados','Liquidity Sweep','ChoCH','OB de confirmación','FVG institucional / Vacío','Vacío + EMA','Subasta completada','Toma de liquidez interna','Sesión válida','RR mínimo 1:2','Confirmación estructural','Volumen institucional','Desplazamiento 50%+','Retest limpio','Distancia M15→M1 válida'];
 const avatarOptions=[
@@ -317,7 +158,6 @@ const instrumentPresets={
 function getRiskSettings(){try{return {...riskDefaults,...JSON.parse(localStorage.getItem('mtc-risk-settings')||'{}')}}catch{return riskDefaults}}
 function saveRiskSettings(v){localStorage.setItem('mtc-risk-settings',JSON.stringify(v)); window.dispatchEvent(new Event('mtc-risk-settings-updated'));}
 
-function accountName(t){return String(t?.account||t?.accountName||t?.challenge||'Cuenta principal').trim()||'Cuenta principal'}
 function normalizedAccounts(settings={}){
   const list=Array.isArray(settings.accounts)?settings.accounts:[];
   const base=list.length?list:[{id:'main',name:'Cuenta principal',capital:Number(settings.initialBalance||10000),type:'Personal',currency:'USD'}];
@@ -396,7 +236,6 @@ function AccountManager({settings,onChange}){
   const add=()=>{const next=[...accounts,{id:uid(),name:`Cuenta ${accounts.length+1}`,capital:10000,type:'Challenge',currency:'USD'}]; onChange({...settings,accounts:next,initialBalance:totalCapital(next)});};
   const del=i=>{const next=accounts.filter((_,idx)=>idx!==i); onChange({...settings,accounts:next,initialBalance:totalCapital(next)});};
   return <div className="accountManager"><div className="accountManagerHead"><div><b>Cuentas / challenges</b><small>Configura el capital de cada cuenta para que Dashboard y Analytics calculen métricas correctas.</small></div><button type="button" className="primary compact" onClick={add}><Plus size={14}/>Agregar cuenta</button></div>{accounts.map((a,i)=><div className="accountEditRow" key={a.id||i}><input className="input" value={a.name||''} onChange={e=>upd(i,{name:e.target.value})} placeholder="Nombre de cuenta"/><input className="input" type="number" value={a.capital??''} onChange={e=>upd(i,{capital:Number(e.target.value)})} placeholder="Capital"/><select className="input" value={a.type||'Personal'} onChange={e=>upd(i,{type:e.target.value})}><option>Personal</option><option>Challenge</option><option>Fondeada</option><option>Demo</option></select><button type="button" className="ghost danger compact" onClick={()=>del(i)}><Trash2 size={14}/></button></div>)}</div>}
-function weekStartISO(){const base=tradingDayKey(); const d=new Date(`${base}T12:00:00`); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d.toISOString().slice(0,10)}
 function evaluateRiskGuard(trades=[],settings=getRiskSettings(),initial=10000,dailyPlan=null){
   const todayStr=tradingDayKey(), weekStart=weekStartISO();
   const todayTrades=trades.filter(t=>getTradeOperationalDateKey(t)===todayStr);
@@ -418,274 +257,8 @@ function evaluateRiskGuard(trades=[],settings=getRiskSettings(),initial=10000,da
 }
 
 
-function realizedRValue(t={}){
-  const moneyVal=toNumberSafe(t.resultMoney);
-  const riskVal=Math.abs(toNumberSafe(t.riskMoney));
-  const rawR=Number(String(t.resultR ?? '').replace(',', '.'));
-  let r=0;
-
-  // Fuente principal: P/L dividido por riesgo monetario real.
-  // Esto evita que un campo resultR viejo/mal tipeado rompa el dashboard.
-  if(riskVal>0 && Number.isFinite(moneyVal)){
-    r=moneyVal/riskVal;
-  }else if(Number.isFinite(rawR)){
-    r=rawR;
-  }
-
-  if(!Number.isFinite(r)) r=0;
-
-  // La dirección del R realizado tiene que coincidir con el P/L real.
-  // Un trade positivo no puede aportar R negativo, y viceversa.
-  if(moneyVal>0 && r<0) r=Math.abs(r);
-  if(moneyVal<0 && r>0) r=-Math.abs(r);
-  if(moneyVal===0) r=0;
-
-  // Defensa ante datos corruptos/importados: no dejamos que un outlier destruya el promedio.
-  if(Math.abs(r)>25) return 0;
-  return r;
-}
-
-function normalizeTradeSetup(trade){
-  const raw=String(trade?.setup || trade?.tradeSystem || trade?.system || trade?.strategy || '').trim();
-  if(
-    trade?.createdFromChecklist===true ||
-    raw.includes('LUZ VERDE') ||
-    raw.includes('LUZ ROJA') ||
-    raw.includes('PODÉS EJECUTAR') ||
-    raw.includes('NO DEBÉS EJECUTAR') ||
-    raw.includes('Checklist de Moisés') ||
-    raw.includes('Creado desde Checklist')
-  ){
-    return 'Sistema de Moisés';
-  }
-  if(raw==='Sistema de Moisés' || raw==='Otro') return raw;
-  return raw || 'Otro';
-}
-function tradeDayKey(t={}){
-  return getTradeOperationalDateKey(t)||'';
-}
-function isClosedEvaluableTrade(t={}){
-  const result=String(t.result||t.status||'').trim().toLowerCase();
-  if(['invalidada','no ejecutada','cancelada','pending','pendiente'].includes(result)) return false;
-  return String(t.resultMoney??'').trim()!=='' || String(t.resultR??'').trim()!=='' || String(t.resultPct??'').trim()!=='';
-}
-function normalizedText(value=''){
-  return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-}
-function tradeFollowedPlan(t={}){
-  const raw=normalizedText(t.followedPlan);
-  if(t.followedPlan===true || ['si','sí','yes','true','cumplido','seguido'].includes(raw)) return true;
-  const behaviors=[...safeArray(t.executionBehaviors),t.postTradeBehavior].map(normalizedText);
-  return behaviors.some(x=>x.includes('segui el plan') || x.includes('ejecucion disciplinada'));
-}
-function calc(trades,initial=10000){
-  const closed=(trades||[]).filter(isClosedEvaluableTrade);
-  const resultValue=t=>toNumberSafe(t.resultMoney);
-  const results=closed.map(resultValue);
-  const rVals=closed.map(realizedRValue);
-  const total=results.reduce((a,b)=>a+b,0);
-  const wins=closed.filter(t=>resultValue(t)>0);
-  const losses=closed.filter(t=>resultValue(t)<0);
-  const winLossCount=wins.length+losses.length;
-  const grossProfit=wins.reduce((sum,t)=>sum+resultValue(t),0);
-  const grossLoss=Math.abs(losses.reduce((sum,t)=>sum+resultValue(t),0));
-  const avgWin=wins.length?grossProfit/wins.length:0;
-  const avgLoss=losses.length?grossLoss/losses.length:0;
-  const profitFactor=grossLoss?grossProfit/grossLoss:(grossProfit?grossProfit:0);
-  const payoffRatio=avgLoss?avgWin/avgLoss:0;
-  const expectancy=closed.length?total/closed.length:0;
-  const validRVals=rVals.filter(x=>Number.isFinite(x) && x!==0);
-  const meanR=validRVals.length?validRVals.reduce((a,b)=>a+b,0)/validRVals.length:0;
-  const varianceR=validRVals.length?validRVals.reduce((s,x)=>s+Math.pow(x-meanR,2),0)/validRVals.length:0;
-  const stdR=Math.sqrt(varianceR);
-  const sharpeLike=stdR?meanR/stdR*Math.sqrt(Math.min(252,Math.max(1,closed.length))):0;
-  let eq=initial, peak=initial, maxDD=0, ddMoney=0;
-  const curve=[{name:'Inicio',equity:initial}];
-  [...closed].sort((a,b)=>String(tradeDayKey(a)).localeCompare(String(tradeDayKey(b))) || String(a.createdAt?.seconds||a.id||'').localeCompare(String(b.createdAt?.seconds||b.id||''))).forEach((t,i)=>{eq+=resultValue(t); peak=Math.max(peak,eq); const dd=peak-eq; ddMoney=Math.max(ddMoney,dd); maxDD=Math.max(maxDD,peak?dd/peak*100:0); curve.push({name:tradeDayKey(t)||`T${i+1}`,equity:Math.round(eq),pnl:resultValue(t)});});
-  const dayRows=Object.values(groupTradesByDay(closed)).sort((a,b)=>a.date.localeCompare(b.date));
-  const bestDay=dayRows.length?[...dayRows].sort((a,b)=>b.total-a.total)[0]:null;
-  const worstDay=dayRows.length?[...dayRows].sort((a,b)=>a.total-b.total)[0]:null;
-  const by=k=>Object.values(closed.reduce((a,t)=>{const n=t[k]||'N/A'; a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=resultValue(t); a[n].count++; return a;},{}));
-  const byBias=Object.values(closed.reduce((a,t)=>{const n=t.bias||t.side||'N/A'; a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=resultValue(t); a[n].count++; return a;},{})).sort((a,b)=>b.value-a.value);
-  const bestBias=byBias[0]||{name:'—',value:0,count:0};
-  const avgR=validRVals.length?validRVals.reduce((s,x)=>s+x,0)/validRVals.length:0;
-  const plan=closed.filter(tradeFollowedPlan);
-  const recovery=ddMoney?total/ddMoney:0;
-  const impulseWords=['Operé por impulso','Sobreoperé','Me anticipé','Moví el stop'];
-  const impulseTrades=closed.filter(t=>safeArray(t.executionBehaviors).some(x=>impulseWords.includes(x)) || t.quality==='Impulsivo');
-  const lateEntries=closed.filter(t=>safeArray(t.executionBehaviors).includes('Entré tarde'));
-  const movedSL=closed.filter(t=>safeArray(t.executionBehaviors).includes('Moví el stop'));
-  const planFollowed=closed.filter(tradeFollowedPlan);
-  const negativeBehaviorOptions=['Dudé antes de entrar','Entré tarde','Me anticipé','Moví el stop','Cerré antes de tiempo','Sobreoperé','Operé por impulso','Rompí reglas'];
-  const freq=(arr)=>{const items=(arr||[]).filter(Boolean); if(!items.length)return null; return Object.values(items.reduce((a,x)=>{a[x]=a[x]||{name:x,count:0}; a[x].count++; return a;},{})).sort((a,b)=>b.count-a.count)[0]?.name||null;};
-  const allBehaviors=closed.flatMap(t=>safeArray(t.executionBehaviors));
-  const repeatedErrors=closed.flatMap(t=>{const behaviors=safeArray(t.executionBehaviors); const negativeExecution=behaviors.filter(x=>negativeBehaviorOptions.includes(x)); const post=negativeBehaviorOptions.includes(t.postTradeBehavior)?[t.postTradeBehavior]:[]; return [...negativeExecution,...post];});
-  const lossEmotions=closed.filter(t=>resultValue(t)<0).map(t=>t.emotionBefore).filter(Boolean);
-  const goodLosses=closed.filter(t=>resultValue(t)<0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))>=70);
-  const badWins=closed.filter(t=>resultValue(t)>0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))<70);
-  const behaviorAvg=closed.length?closed.reduce((sum,t)=>sum+Number(t.behaviorScore||behaviorScoreFromTrade(t)),0)/closed.length:0;
-  return {initial,equity:initial+total,total,profitPct:initial?total/initial*100:0,count:closed.length,wins:wins.length,losses:losses.length,breakeven:closed.length-winLossCount,winrate:winLossCount?wins.length/winLossCount*100:0,avgR,expectancy,maxDD,ddMoney,best:Math.max(0,...results),worst:Math.min(0,...results),bestDay,worstDay,curve,byAsset:by('asset'),bySession:by('session'),bySetup:Object.values(closed.reduce((a,t)=>{const n=normalizeTradeSetup(t); a[n]=a[n]||{name:n,value:0,count:0}; a[n].value+=resultValue(t); a[n].count++; return a;},{})).sort((a,b)=>b.value-a.value),byBias,bestBias,byQuality:by('quality'),discipline:closed.length?planFollowed.length/closed.length*100:0,qualityAvg:closed.length?closed.reduce((s,t)=>s+(qualityScore[t.quality]||0),0)/closed.length:0,planWinrate:plan.length?plan.filter(t=>resultValue(t)>0).length/plan.length*100:0,grossProfit,grossLoss,avgWin,avgLoss,profitFactor,payoffRatio,sharpeLike,recovery,meanR,stdR,behaviorAvg,planFollowedPct:closed.length?planFollowed.length/closed.length*100:0,impulseTrades:impulseTrades.length,errorMostRepeated:freq(repeatedErrors)||'Sin error dominante',emotionBeforeLoss:freq(lossEmotions),lateEntries:lateEntries.length,movedSL:movedSL.length,goodLosses:goodLosses.length,badWins:badWins.length};
-}
-function insights(s){
-  const cards=[];
-  const score=s.count?Math.round(Math.min(100,Math.max(0,(s.profitFactor>=1?25:8)+(s.discipline*.28)+(s.winrate*.18)+(Math.max(0,Math.min(2,s.avgR))*16)+(s.qualityAvg*.13)))):0;
-  cards.push({label:'Score operativo',value:s.count?`${score}/100`:'Sin datos',tone:score>=75?'good':score>=55?'warn':'neutral',text:s.count?'Combina disciplina, calidad, R promedio, winrate y factor de beneficio.':'Carga trades para activar el score.'});
-  cards.push({label:'Factor de beneficio',value:s.count?(s.profitFactor? s.profitFactor.toFixed(2):'0.00'):'—',tone:s.profitFactor>=1.5?'good':s.profitFactor>=1?'warn':'bad',text:'Mide cuánto ganas por cada $1 perdido. >1.30 empieza a ser saludable.'});
-  cards.push({label:'Sharpe operativo',value:s.count?s.sharpeLike.toFixed(2):'—',tone:s.sharpeLike>1?'good':s.sharpeLike>0?'warn':'bad',text:'Relación entre retorno promedio en R y volatilidad de tus resultados.'});
-  cards.push({label:'Expectativa',value:s.count?formatMoneyClean(s.expectancy):'—',tone:s.expectancy>0?'good':s.expectancy<0?'bad':'neutral',text:'Promedio real que entrega cada trade registrado.'});
-  if(s.bySession.length){const b=[...s.bySession].sort((a,b)=>b.value-a.value)[0]; cards.push({label:'Mejor sesión',value:b.name,tone:b.value>=0?'good':'bad',text:`Resultado acumulado: ${formatMoneyClean(b.value)} en ${formatMetricCard(b.count)} trade(s).`});}
-  if(s.byBias?.length){const b=s.byBias[0]; cards.push({label:'Sesgo más rentable',value:b.name,tone:b.value>=0?'good':'warn',text:`Ese sesgo generó ${formatMoneyClean(b.value)} en ${formatMetricCard(b.count)} trade(s). Úsalo para detectar dónde está tu ventaja.`});}
-  if(s.bySetup.length){const b=s.bySetup[0]; cards.push({label:'Setup dominante',value:b.name,tone:b.value>=0?'good':'warn',text:`Resultado acumulado: ${formatMoneyClean(b.value)}. Evita dispersarte fuera de tu edge.`});}
-  cards.push({label:'Drawdown máximo',value:pct(s.maxDD),tone:s.maxDD<=5?'good':s.maxDD<=10?'warn':'bad',text:`Caída máxima estimada: ${formatMoneyClean(s.ddMoney)} desde el pico de equity.`});
-  cards.push({label:'Disciplina',value:pct(s.discipline),tone:s.discipline>=80?'good':s.discipline>=60?'warn':'bad',text:'Porcentaje de trades donde marcaste que seguiste el plan.'});
-  return cards;
-}
 function InsightGrid({items}){return <div className="insightGrid">{items.map((x,i)=><div className={`insightPro ${x.tone||'neutral'}`} key={i}><div><span>{x.label}</span><strong>{x.value}</strong></div><p>{x.text}</p></div>)}</div>}
 function TraderStats({s}){const rows=[['Trades',formatMetricCard(s.count)],['Ganados / Perdidos',`${formatMetricCard(s.wins)}W / ${formatMetricCard(s.losses)}L`],['Sesgo más rentable',s.count?`${s.bestBias.name} · ${formatMoneyClean(s.bestBias.value)}`:'—'],['Ganancia bruta',formatMoneyClean(s.grossProfit)],['Pérdida bruta',formatMoneyClean(s.grossLoss)],['Ganancia prom.',formatMoneyClean(s.avgWin)],['Pérdida prom.',formatMoneyClean(s.avgLoss)],['Ratio G/P',s.payoffRatio?s.payoffRatio.toFixed(2):'0.00'],['Factor de recuperación',s.recovery?s.recovery.toFixed(2):'0.00'],['Media R',`${s.meanR.toFixed(2)}R`],['Volatilidad R',`${s.stdR.toFixed(2)}R`]];return <div className="statMatrix">{rows.map(([a,b])=><div key={a}><span>{a}</span><b>{b}</b></div>)}</div>}
-function exportSafeDate(value){
-  try{
-    if(!value)return '';
-    if(typeof value==='string')return value;
-    if(value?.toDate)return value.toDate().toISOString();
-    if(value instanceof Date)return value.toISOString();
-    if(typeof value==='number')return new Date(value).toISOString();
-    return String(value);
-  }catch{return String(value||'')}
-}
-function exportText(value){
-  if(value==null)return '';
-  if(Array.isArray(value))return value.map(exportText).filter(Boolean).join('|');
-  if(typeof value==='object')return JSON.stringify(value);
-  return String(value);
-}
-function normalizeTradeForExport(trade={}){
-  const t=normalizeTradeArrayFields(trade);
-  const date=String(t.tradingDay||t.date||safeDate(t.createdAt)||today()).slice(0,10);
-  return {
-    id: t.id||'',
-    date,
-    tradingDay: t.tradingDay||date,
-    createdAt: exportSafeDate(t.createdAt),
-    updatedAt: exportSafeDate(t.updatedAt),
-    symbol: t.asset||t.symbol||'',
-    account: accountName(t),
-    session: t.session||'',
-    direction: t.side||t.direction||'',
-    entry: t.entry??'',
-    stopLoss: t.sl??t.stopLoss??'',
-    takeProfit: t.tp??t.takeProfit??'',
-    exit: t.exit??'',
-    result: t.result||'',
-    resultR: toNumberSafe(t.resultR),
-    resultPct: toNumberSafe(t.resultPct),
-    profitLossMoney: toNumberSafe(t.resultMoney),
-    riskMoney: toNumberSafe(t.riskMoney),
-    riskPct: toNumberSafe(t.riskPct),
-    system: t.tradeSystem||t.system||'',
-    setup: normalizeTradeSetup(t),
-    pattern: t.pattern||t.checklistPattern||'',
-    quality: t.quality||'',
-    checklist: safeArray(t.checklist),
-    confluences: safeArray(t.confluencesUsed),
-    checklistValidation: {
-      checklistId: trade.checklistId||'',
-      createdFromChecklist: trade.createdFromChecklist===true,
-      finalGreen: trade.checklistFinalGreen===true,
-      score: trade.checklistScore??'',
-      aPlus: trade.checklistAPlus===true,
-      operationalState: trade.checklistOperationalState||'',
-      executedWithoutFullChecklist: trade.executedWithoutFullChecklist===true
-    },
-    behavior: {
-      followedPlan: t.followedPlan===true,
-      score: Number(t.behaviorScore||behaviorScoreFromTrade(t)),
-      scoreLabel: t.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(t)),
-      emotionBefore: t.emotionBefore||'',
-      emotionDuring: t.emotionDuring||'',
-      emotionAfter: t.emotionAfter||'',
-      executionBehaviors: safeArray(t.executionBehaviors),
-      postTradeBehavior: t.postTradeBehavior||'',
-      respetoProceso: t.respetoProceso||'',
-      estadoMental: t.estadoMental||'',
-      motivoOperacion: t.motivoOperacion||'',
-      notasComportamiento: t.notasComportamiento||''
-    },
-    contextQuality: {
-      calidadTesis: t.calidadTesis??'',
-      calidadEjecucion: t.calidadEjecucion??'',
-      calidadComportamiento: t.calidadComportamiento??'',
-      calidadRevision: t.calidadRevision??'',
-      indiceCalidadContextual: t.indiceCalidadContextual??'',
-      alineacionMacro: t.alineacionMacro||'',
-      alineacionHTF: t.alineacionHTF||'',
-      alineacionIntra: t.alineacionIntra||'',
-      liquidezClara: t.liquidezClara||'',
-      dxyConfirma: t.dxyConfirma||'',
-      zonaConFuncion: t.zonaConFuncion||'',
-      notasContexto: t.notasContexto||''
-    },
-    notes: t.lesson||t.notes||'',
-    privateJournal: t.privateJournal||'',
-    screenshots: safeArray(t.screenshots).length?safeArray(t.screenshots):[t.captureLink,t.captureUrl,t.captureFileName].filter(Boolean),
-    captureLink: t.captureLink||'',
-    captureUrl: t.captureUrl||'',
-    captureFileName: t.captureFileName||'',
-    tags: safeArray(t.tags),
-    status: trade.status||trade.mentorReviewStatus||'saved',
-    mentorReview: {
-      requested: trade.mentorReviewRequested===true,
-      status: trade.mentorReviewStatus||'',
-      focus: trade.mentorReviewFocus||'',
-      note: trade.mentorReviewNote||'',
-      response: trade.mentorReviewResponse||''
-    }
-  };
-}
-function flattenTradeForCsv(trade){
-  const t=normalizeTradeForExport(trade);
-  return {
-    id:t.id,date:t.date,tradingDay:t.tradingDay,symbol:t.symbol,account:t.account,session:t.session,direction:t.direction,
-    entry:t.entry,stopLoss:t.stopLoss,takeProfit:t.takeProfit,exit:t.exit,result:t.result,resultR:t.resultR,resultPct:t.resultPct,
-    profitLossMoney:t.profitLossMoney,riskMoney:t.riskMoney,riskPct:t.riskPct,system:t.system,setup:t.setup,pattern:t.pattern,quality:t.quality,
-    checklist:exportText(t.checklist),confluences:exportText(t.confluences),checklistFinalGreen:t.checklistValidation.finalGreen,checklistScore:t.checklistValidation.score,
-    followedPlan:t.behavior.followedPlan,behaviorScore:t.behavior.score,behaviorScoreLabel:t.behavior.scoreLabel,emotionBefore:t.behavior.emotionBefore,
-    emotionDuring:t.behavior.emotionDuring,emotionAfter:t.behavior.emotionAfter,executionBehaviors:exportText(t.behavior.executionBehaviors),
-    postTradeBehavior:t.behavior.postTradeBehavior,respetoProceso:t.behavior.respetoProceso,estadoMental:t.behavior.estadoMental,motivoOperacion:t.behavior.motivoOperacion,
-    notasComportamiento:t.behavior.notasComportamiento,calidadTesis:t.contextQuality.calidadTesis,calidadEjecucion:t.contextQuality.calidadEjecucion,
-    calidadComportamiento:t.contextQuality.calidadComportamiento,calidadRevision:t.contextQuality.calidadRevision,indiceCalidadContextual:t.contextQuality.indiceCalidadContextual,
-    alineacionMacro:t.contextQuality.alineacionMacro,alineacionHTF:t.contextQuality.alineacionHTF,alineacionIntra:t.contextQuality.alineacionIntra,
-    liquidezClara:t.contextQuality.liquidezClara,dxyConfirma:t.contextQuality.dxyConfirma,zonaConFuncion:t.contextQuality.zonaConFuncion,notasContexto:t.contextQuality.notasContexto,
-    notes:t.notes,privateJournal:t.privateJournal,screenshots:exportText(t.screenshots),captureLink:t.captureLink,captureUrl:t.captureUrl,captureFileName:t.captureFileName,
-    tags:exportText(t.tags),status:t.status,mentorReviewRequested:t.mentorReview.requested,mentorReviewStatus:t.mentorReview.status,mentorReviewFocus:t.mentorReview.focus,
-    mentorReviewNote:t.mentorReview.note,mentorReviewResponse:t.mentorReview.response,createdAt:t.createdAt,updatedAt:t.updatedAt
-  };
-}
-function downloadBlob(content,filename,type){
-  const blob=new Blob([content],{type});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-function exportToJson(data,filename){downloadBlob(JSON.stringify(data,null,2),filename,'application/json;charset=utf-8')}
-function escapeCsvCell(value){return `"${exportText(value).replaceAll('"','""').replace(/\r?\n/g,'\n')}"`}
-function exportToCsv(rows,filename){
-  const safeRows=rows||[];
-  const headers=Object.keys(safeRows[0]||flattenTradeForCsv({}));
-  const body=[headers.join(','),...safeRows.map(row=>headers.map(h=>escapeCsvCell(row[h])).join(','))].join('\n');
-  downloadBlob(`\uFEFF${body}`,filename,'text/csv;charset=utf-8');
-}
-function sanitizeFilenamePart(value){return String(value||'trade').trim().replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,48)||'trade'}
-function buildTradeExportFilename(trade,extension){
-  const symbol=sanitizeFilenamePart(trade.asset||trade.symbol||'trade').toUpperCase();
-  const date=sanitizeFilenamePart(String(trade.tradingDay||trade.date||safeDate(trade.createdAt)||today()).slice(0,10));
-  return `mtc-trade-${symbol}-${date}.${extension}`;
-}
-function buildTradesExportFilename(extension){return `mtc-trades-export-${today()}.${extension}`}
 function exportSingleTrade(trade,format){
   try{
     if(format==='json')exportToJson({exportMeta:{app:'MTC Analytics',exportedAt:new Date().toISOString(),version:'1.0',scope:'single_trade'},trade:normalizeTradeForExport(trade)},buildTradeExportFilename(trade,'json'));
@@ -720,23 +293,6 @@ function buildTradeShareFilename(trade){
   return `mtc-trade-story-${symbol}-${date}.png`;
 }
 function buildDailyShareFilename(date){return `mtc-daily-review-${sanitizeFilenamePart(String(date||today()).slice(0,10))}.png`}
-function formatCurrencySafe(value){return Number.isFinite(Number(value))?money(Number(value)):'N/A'}
-function formatRShare(value){
-  const n=Number(value||0);
-  if(!Number.isFinite(n))return 'N/A';
-  return `${n>0?'+':''}${n.toFixed(2)}R`;
-}
-function formatPercentageSafe(value){
-  const n=Number(value||0);
-  if(!Number.isFinite(n))return 'N/A';
-  return `${n.toFixed(0)}%`;
-}
-function formatRiskPctLabel(value){
-  const n=Number(value);
-  if(!Number.isFinite(n)||n<=0)return '';
-  const fixed=n<1?n.toFixed(2):n.toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
-  return `${fixed}%`;
-}
 function resolveTradeRiskPct(trade={},riskSettings=getRiskSettings()){
   const rawPct=[trade.riskPct,trade.riskPercent,trade.risk_percentage,trade.risk].map(Number).find(n=>Number.isFinite(n)&&n>0);
   const settingsPct=Number(riskSettings?.riskPerTradePct||0);
@@ -801,36 +357,6 @@ function normalizeTradeForShare(trade={},privacy={}){
     note:privacy.hideNote?'':(trade.lesson||trade.notes||trade.privateJournal||''),
     tags:safeArray(trade.tags),
     footer:'Process over outcome.'
-  };
-}
-function getTradesForDate(trades=[],date){const key=normalizeDateKey(date)||String(date||today()).slice(0,10); return (trades||[]).filter(t=>getTradeOperationalDateKey(t)===key)}
-function calculateDailyTradeStats(trades=[]){
-  const rows=trades||[];
-  const rValues=rows.map(t=>Number(t.resultR||0)).filter(Number.isFinite);
-  const moneyValues=rows.map(t=>Number(t.resultMoney||0)).filter(Number.isFinite);
-  const wins=rows.filter(t=>Number(t.resultMoney||0)>0||Number(t.resultR||0)>0).length;
-  const losses=rows.filter(t=>Number(t.resultMoney||0)<0||Number(t.resultR||0)<0).length;
-  const breakevens=Math.max(0,rows.length-wins-losses);
-  const netR=rValues.reduce((a,b)=>a+b,0);
-  const netPL=moneyValues.reduce((a,b)=>a+b,0);
-  const riskValues=rows.map(t=>Number(t.riskMoney||0)).filter(n=>Number.isFinite(n)&&n>0);
-  const behaviorScores=rows.map(t=>Number(t.behaviorScore||behaviorScoreFromTrade(t)||0)).filter(n=>Number.isFinite(n)&&n>0);
-  const checklistScores=rows.map(t=>Number(t.checklistScore||0)).filter(n=>Number.isFinite(n)&&n>0);
-  const mostCommon=(values)=>{const map={}; values.filter(Boolean).forEach(v=>{map[v]=(map[v]||0)+1}); return Object.entries(map).sort((a,b)=>b[1]-a[1])[0]?.[0]||''};
-  return {
-    totalTrades:rows.length,
-    netR,netPL,wins,losses,breakevens,
-    winRate:rows.length?(wins/rows.length)*100:0,
-    bestR:rValues.length?Math.max(...rValues):0,
-    worstR:rValues.length?Math.min(...rValues):0,
-    avgR:rValues.length?netR/rValues.length:0,
-    avgRisk:riskValues.length?riskValues.reduce((a,b)=>a+b,0)/riskValues.length:0,
-    maxRisk:riskValues.length?Math.max(...riskValues):0,
-    behaviorScore:behaviorScores.length?behaviorScores.reduce((a,b)=>a+b,0)/behaviorScores.length:0,
-    planComplianceRate:rows.length?(rows.filter(t=>t.followedPlan===true).length/rows.length)*100:0,
-    checklistAverage:checklistScores.length?checklistScores.reduce((a,b)=>a+b,0)/checklistScores.length:0,
-    topSetup:mostCommon(rows.map(t=>normalizeTradeSetup(t)||t.setup||t.pattern)),
-    mainSession:mostCommon(rows.map(t=>t.session))
   };
 }
 function normalizeDailyStatsForShare(trades=[],date,plan={},privacy={}){
@@ -1175,105 +701,6 @@ async function markNotificationsForTarget(notifications=[],target){
   await Promise.allSettled(pending.map(n=>markNotificationAsRead(n.id)));
 }
 
-function normalizeStringArray(value){
-  if(value==null||value==='')return [];
-  if(Array.isArray(value))return value.map(x=>String(x??'').trim()).filter(Boolean);
-  if(typeof value==='string'){
-    const raw=value.trim();
-    if(!raw)return [];
-    if(raw.startsWith('[')){try{const parsed=JSON.parse(raw); if(Array.isArray(parsed))return parsed.map(x=>String(x??'').trim()).filter(Boolean);}catch{}}
-    return raw.split(/[|,;\n\r]+/).map(x=>x.trim()).filter(Boolean);
-  }
-  return [];
-}
-function safeArray(value){
-  return Array.isArray(value)?value.map(x=>String(x??'').trim()).filter(Boolean):normalizeStringArray(value);
-}
-const TRADE_ARRAY_FIELDS=['executionBehaviors','checklist','confluencesUsed','confluences','tags','mistakes','confirmations','emotions','checklistItems','screenshots'];
-function normalizeTradeArrayFields(trade={}){
-  const out={...trade};
-  TRADE_ARRAY_FIELDS.forEach(key=>{
-    if(out[key]!=null&&out[key]!=='')out[key]=safeArray(out[key]);
-    else if(key in out)out[key]=[];
-  });
-  if(!safeArray(out.confluencesUsed).length&&safeArray(out.confluences).length)out.confluencesUsed=safeArray(out.confluences);
-  if('confluences' in out)delete out.confluences;
-  return out;
-}
-function parsePipeList(value){return normalizeStringArray(value);}
-function normalizeImportSide(value){
-  const side=String(value||'').trim().toUpperCase();
-  if(side==='LONG'||side==='BUY')return 'BUY';
-  if(side==='SHORT'||side==='SELL')return 'SELL';
-  return side||'BUY';
-}
-function normalizeImportedTradeRow(row={},userId=''){
-  const opDate=normalizeDateKey(row.tradingDay||row.date||row.trading_date)||tradingDayKey();
-  const asset=String(row.asset||row.symbol||'').trim().toUpperCase();
-  const side=normalizeImportSide(row.side||row.direction);
-  const resultMoney=toNumberSafe(row.resultMoney??row.profitLossMoney??row.pl??row.pnl);
-  const resultR=toNumberSafe(row.resultR??row.r);
-  const resultPct=toNumberSafe(row.resultPct??row.result_pct);
-  const {id:importedId,...rest}=row;
-  return normalizeTradeArrayFields({
-    ...rest,
-    userId:row.userId||userId,
-    asset,
-    side,
-    date:opDate,
-    tradingDay:opDate,
-    entry:row.entry??'',
-    sl:row.sl??row.stopLoss??'',
-    tp:row.tp??row.takeProfit??'',
-    exit:row.exit??'',
-    resultMoney,
-    resultR,
-    resultPct,
-    riskMoney:toNumberSafe(row.riskMoney),
-    riskPct:toNumberSafe(row.riskPct),
-    tradeSystem:row.tradeSystem||row.system||'Sistema de Moisés',
-    system:row.tradeSystem||row.system||'Sistema de Moisés',
-    setup:row.setup||'',
-    pattern:row.pattern||'',
-    quality:row.quality||'',
-    result:row.result||'',
-    lesson:row.lesson||row.notes||'',
-    checklist:row.checklist,
-    confluencesUsed:row.confluencesUsed,
-    confluences:row.confluences,
-    executionBehaviors:row.executionBehaviors,
-    tags:row.tags,
-    mistakes:row.mistakes,
-    confirmations:row.confirmations,
-    emotions:row.emotions,
-    checklistItems:row.checklistItems,
-    screenshots:row.screenshots,
-    followedPlan:row.followedPlan===true||String(row.followedPlan).toLowerCase()==='true',
-    account:row.account||'Cuenta principal',
-    session:row.session||'NY'
-  });
-}
-function parseCsv(text,userId){
-  const trimmed=String(text||'').replace(/^\uFEFF/,'').trim();
-  if(!trimmed)return [];
-  const [h,...lines]=trimmed.split(/\r?\n/);
-  if(!h)return [];
-  const headers=h.split(',').map(x=>x.replaceAll('"','').trim());
-  return lines.filter(Boolean).map(line=>{
-    const cells=line.match(/("[^"]*(?:""[^"]*)*"|[^,]+)/g)||[];
-    const o={userId,checklist:[]};
-    headers.forEach((k,i)=>o[k]=(cells[i]||'').replace(/^"|"$/g,'').replaceAll('""','"'));
-    ['entry','sl','tp','exit','riskMoney','riskPct','resultMoney','resultPct','resultR','profitLossMoney'].forEach(k=>{
-      const raw=o[k];
-      if(raw===''||raw==null||raw===undefined)return;
-      const n=Number(String(raw).replace(',','.'));
-      if(Number.isFinite(n))o[k]=n;
-    });
-    o.followedPlan=String(o.followedPlan).toLowerCase()==='true';
-    return normalizeImportedTradeRow(o,userId);
-  });
-}
-function safeDate(v){return typeof v==='string'?v:(v?.toDate?.()?.toISOString?.().slice(0,10)||today());}
 function useLiveData(profile){
   const [data,setData]=useState({
     trades:[],posts:[],ideas:[],books:[],academyLessons:[],dailyPlans:[],emotionalJournals:[],checklists:[],brokerConnections:[],notifications:[],messages:[],resultPosts:[],users:[],courses:courseSeed,settings:settingsDefault,loading:true
