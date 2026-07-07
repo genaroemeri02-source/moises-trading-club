@@ -14332,7 +14332,7 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .main{
     radial-gradient(circle at 8% 30%,rgba(37,99,235,.055),transparent 420px),
     linear-gradient(180deg,#f8fafc,#eef2f7)!important;
 }
-.app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+.app :is(.dashboardCalendarHero,.journalPage .journalCalendarCard,.journalPage .journalControlGrid>.card:nth-child(2)){
   position:relative!important;
   overflow:hidden!important;
   border-color:rgba(212,168,67,.20)!important;
@@ -14345,7 +14345,7 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .main{
     inset 0 1px 0 rgba(255,255,255,.070),
     inset 0 -1px 0 rgba(255,255,255,.025)!important;
 }
-.app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)):before{
+.app :is(.dashboardCalendarHero,.journalPage .journalCalendarCard,.journalPage .journalControlGrid>.card:nth-child(2)):before{
   content:""!important;
   position:absolute!important;
   inset:1px!important;
@@ -14355,7 +14355,7 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .main{
     linear-gradient(115deg,rgba(255,255,255,.060),transparent 28%,rgba(212,168,67,.028) 58%,transparent 84%)!important;
   opacity:.86!important;
 }
-.app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2))>*{
+.app :is(.dashboardCalendarHero,.journalPage .journalCalendarCard,.journalPage .journalControlGrid>.card:nth-child(2))>*{
   position:relative!important;
   z-index:1!important;
 }
@@ -14417,7 +14417,7 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .main{
     0 0 0 3px rgba(212,168,67,.13),
     inset 0 1px 0 rgba(255,255,255,.10)!important;
 }
-html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.dashboardCalendarHero,.journalPage .journalCalendarCard,.journalPage .journalControlGrid>.card:nth-child(2)){
   border-color:rgba(184,132,23,.18)!important;
   background:
     radial-gradient(circle at 16% 0%,rgba(184,132,23,.105),transparent 36%),
@@ -14465,7 +14465,7 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingWeekSummary
     opacity:.22!important;
     background-size:72px 72px!important;
   }
-  .app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+  .app :is(.dashboardCalendarHero,.journalPage .journalCalendarCard,.journalPage .journalControlGrid>.card:nth-child(2)){
     box-shadow:0 18px 48px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06)!important;
   }
   .app .tradingDayCell,
@@ -14494,7 +14494,7 @@ html[data-theme="dark"] body .app :is(.dashboardV38 .card,.journalPage .card,.an
   background:var(--surface-premium-elevated)!important;
   box-shadow:var(--surface-premium-shadow)!important;
 }
-html[data-theme="dark"] body .app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+html[data-theme="dark"] body .app :is(.dashboardCalendarHero,.journalPage .journalCalendarCard,.journalPage .journalControlGrid>.card:nth-child(2)){
   border-color:rgba(212,168,67,.22)!important;
 }
 html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.modalCard,.post,.idea,.trade,.rank,.adminRow,.notif,.checkItem,.resultPreview,.insightPro,.statMatrix>div,.onboardingSteps button){
@@ -16955,4 +16955,421 @@ html[data-theme="dark"] body .dashboardMtcScoreGauge>span{
     width:140px!important;
     height:140px!important;
   }
+}
+
+/* v48 — Journal mobile UX: operación primero, herramientas al final */
+/* v49 — Journal desktop balance: jornada+trades izq / calendario der */
+.journalToolShort{display:none}
+.journalDesktopNewTrade{display:inline-flex}
+.app .journalPage .journalToolsGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+  gap:8px;
+  align-items:stretch;
+}
+.app .journalPage .journalToolsGrid .exportGroup{
+  display:contents;
+  padding:0;
+  border:0;
+  background:transparent;
+}
+.app .journalPage .journalToolBtn{
+  min-height:40px;
+  justify-content:center;
+  white-space:nowrap;
+  font-size:12px;
+  gap:6px;
+}
+.app .journalPage .journalToolWide{grid-column:1/-1}
+.app .journalPage .journalToolImport{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  margin:0;
+}
+@media(min-width:861px){
+  .app .journalPage .journalMainGrid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.08fr) minmax(300px,.9fr)!important;
+    gap:16px!important;
+    align-items:start!important;
+    width:100%!important;
+  }
+  .app .journalPage .journalMainLeft{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:16px!important;
+    min-width:0!important;
+  }
+  .app .journalPage .journalMainRight{
+    min-width:0!important;
+    align-self:start!important;
+  }
+  .app .journalPage .journalMainLeft>.card,
+  .app .journalPage .journalMainLeft .journalTradesTable,
+  .app .journalPage .journalMainRight>.card{
+    margin-bottom:0!important;
+  }
+  .app .journalPage .journalOpsCard{
+    width:100%!important;
+    margin-bottom:0!important;
+  }
+  .app .journalPage .journalOpsRow{
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:10px!important;
+  }
+  .app .journalPage .journalOpsRow .accountSwitcher{
+    flex:1 1 220px!important;
+    margin:0!important;
+  }
+  .app .journalPage .journalFilterSelect{
+    flex:1 1 180px!important;
+    min-width:0!important;
+  }
+  .app .journalPage .journalSearch{
+    flex:2 1 260px!important;
+    min-width:0!important;
+  }
+  .app .journalPage .journalToolsCard{
+    width:100%!important;
+    margin-top:0!important;
+  }
+  .app .journalPage .journalToolsGrid .journalToolWide{grid-column:span 2}
+}
+@media(max-width:860px){
+  .app .journalPage{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:10px!important;
+    padding-bottom:calc(152px + env(safe-area-inset-bottom))!important;
+  }
+  .app .journalPage .journalPrimaryCta,
+  .app .journalPage .mobileNewTradeFab{
+    order:1!important;
+    position:static!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    min-height:50px!important;
+    justify-content:center!important;
+    border-radius:14px!important;
+    font-size:15px!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.22)!important;
+    z-index:1!important;
+  }
+  .app .journalPage .riskAlert{order:0!important}
+  .app .journalPage>.tradeFormCard,
+  .app .journalPage>.formShell,
+  .app .journalPage>.card.tradeFormCard{order:-5!important}
+  .app .journalPage .journalMainGrid,
+  .app .journalPage .journalMainLeft{display:contents!important}
+  .app .journalPage .journalMainRight{
+    order:3!important;
+    display:block!important;
+    width:100%!important;
+  }
+  .app .journalPage .journalOpsCard{
+    order:2!important;
+    padding:10px 12px!important;
+    margin-bottom:0!important;
+  }
+  .app .journalPage .journalOpsCard .cardHead{
+    margin-bottom:4px!important;
+    gap:2px!important;
+  }
+  .app .journalPage .journalOpsCard .cardHead h3{
+    font-size:13px!important;
+    line-height:1.2!important;
+  }
+  .app .journalPage .journalOpsCard .cardHead p{
+    display:none!important;
+  }
+  .app .journalPage .journalDailyPlanWrap{order:4!important}
+  .app .journalPage .journalDailyPlanWrap>.card{margin-bottom:0!important}
+  .app .journalPage .journalTradesTable{order:5!important;margin-bottom:0!important}
+  .app .journalPage .journalCalendarCard{margin-bottom:0!important}
+  .app .journalPage .journalToolsCard{
+    order:6!important;
+    padding:12px!important;
+    margin-bottom:0!important;
+  }
+  .app .journalPage .journalToolsCard .cardHead{margin-bottom:8px!important}
+  .app .journalPage .journalToolsCard .cardHead h3{font-size:14px!important}
+  .app .journalPage .journalToolsCard .cardHead p{font-size:11px!important}
+  .app .journalPage .journalToolsGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  .app .journalPage .journalToolBtn{
+    min-height:38px!important;
+    padding:8px 10px!important;
+    font-size:11px!important;
+    border-radius:11px!important;
+  }
+  .app .journalPage .journalToolLong{display:none!important}
+  .app .journalPage .journalToolShort{display:inline!important}
+  .app .journalPage .journalDesktopNewTrade{display:none!important}
+  .app .journalPage .journalOpsRow{
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:8px!important;
+  }
+  .app .journalPage .journalOpsRow .accountSwitcher{
+    width:100%!important;
+    margin:0!important;
+    padding:6px 8px!important;
+    min-height:40px!important;
+    border-radius:12px!important;
+  }
+  .app .journalPage .journalOpsRow .accountSwitcher select{
+    min-height:36px!important;
+    padding:6px 8px!important;
+  }
+  .app .journalPage .journalFilterSelect,
+  .app .journalPage .journalSearch{
+    width:100%!important;
+    min-width:0!important;
+    min-height:40px!important;
+    padding-top:7px!important;
+    padding-bottom:7px!important;
+  }
+  .app .journalPage .journalSearch{
+    padding:6px 10px!important;
+    min-height:40px!important;
+  }
+  .app .journalPage .journalSearch input{
+    width:100%!important;
+    min-height:0!important;
+    padding:0!important;
+    font-size:16px!important;
+  }
+}
+
+/* v50 — Journal trade row layout: texto flexible, resultado/acciones fijas */
+.app .journalPage .journalTradesTable{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.app .journalPage .journalTradeRow{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  gap:12px 14px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:14px 16px!important;
+  margin-bottom:0!important;
+  box-sizing:border-box!important;
+}
+.app .journalPage .journalTradeMain{
+  flex:1 1 0%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+.app .journalPage .journalTradeHead{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  min-width:0!important;
+}
+.app .journalPage .journalTradeSymbol{
+  flex:0 1 auto!important;
+  min-width:0!important;
+  font-size:15px!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.app .journalPage .journalTradeTags{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  flex:0 0 auto!important;
+}
+.app .journalPage .journalTradeMeta{
+  margin:5px 0 0!important;
+  min-width:0!important;
+  font-size:12px!important;
+  line-height:1.45!important;
+  overflow:hidden!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+  hyphens:none!important;
+}
+.app .journalPage .journalTradeResult{
+  flex:0 0 auto!important;
+  min-width:118px!important;
+  max-width:148px!important;
+  text-align:right!important;
+  padding:8px 11px!important;
+  border-radius:12px!important;
+  margin:0!important;
+}
+.app .journalPage .journalTradeResult strong{
+  display:block!important;
+  font-size:15px!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+}
+.app .journalPage .journalTradeResult small{
+  display:block!important;
+  margin-top:3px!important;
+  white-space:nowrap!important;
+}
+.app .journalPage .journalTradeActions{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  gap:5px!important;
+  flex-wrap:nowrap!important;
+}
+.app .journalPage .journalTradeActions .ghost.compact{
+  min-height:32px!important;
+  padding:6px 8px!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+}
+@media(min-width:861px){
+  .app .journalPage .journalTradesTable .journalTradeRow{
+    grid-template-columns:unset!important;
+  }
+}
+@media(max-width:860px){
+  .app .journalPage .journalTradeRow{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-areas:
+      "main"
+      "result"
+      "actions"!important;
+    gap:10px!important;
+    align-items:stretch!important;
+    padding:14px!important;
+  }
+  .app .journalPage .journalTradeMain{grid-area:main!important}
+  .app .journalPage .journalTradeHead{
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+    gap:8px!important;
+  }
+  .app .journalPage .journalTradeMeta{
+    -webkit-line-clamp:3!important;
+    white-space:normal!important;
+  }
+  .app .journalPage .journalTradeResult{
+    grid-area:result!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    text-align:left!important;
+  }
+  .app .journalPage .journalTradeActions{
+    grid-area:actions!important;
+    width:100%!important;
+    flex-wrap:wrap!important;
+    gap:8px!important;
+  }
+  .app .journalPage .journalTradeActions .ghost.compact{
+    flex:1 1 calc(33% - 8px)!important;
+    min-width:88px!important;
+    justify-content:center!important;
+  }
+  .app .journalPage .journalTradeActions .tradeDeleteButton{
+    flex:0 0 36px!important;
+  }
+}
+
+/* v51 — QA global mobile/light mode hotfix */
+@media(max-width:860px){
+  /* v34 ocultaba TODOS los botones ghost en modales mobile; limitar al account manager */
+  .modalActions .ghost{display:inline-flex!important;align-items:center!important;}
+  .accountManager .modalActions .ghost{display:none!important;}
+  .tradeDetailModal .modalActions .ghost,
+  .checklistModal .modalActions .ghost,
+  .resultDetailModal .modalActions .ghost,
+  .shareOverlay .modalActions .ghost{display:inline-flex!important;}
+
+  /* Legacy FAB sin uso en JSX */
+  .mobileMenu{display:none!important;}
+
+  /* CTAs finales del formulario de trade no quedan bajo bottom nav */
+  .journalPage .tradeFormCard .row,
+  .journalPage > .card .row:last-child,
+  .journalPage .formShell .row{
+    position:relative!important;
+    z-index:2!important;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom))!important;
+    margin-bottom:6px!important;
+  }
+
+  /* Páginas con acciones al pie */
+  .page.checklistPage,
+  .page.riskPage,
+  .page.analyticsPro,
+  .page.emotionalJournalPage{
+    padding-bottom:calc(156px + env(safe-area-inset-bottom))!important;
+  }
+
+  /* Toolbar sticky del journal en light mode (antes quedaba oscura) */
+  html[data-theme="light"] .journalPage .toolbar,
+  html[data-theme="light"] .toolbar{
+    background:rgba(240,242,245,.94)!important;
+    border-bottom:1px solid rgba(0,0,0,.06)!important;
+  }
+}
+
+html[data-theme="light"] .premiumSide nav button.active{
+  border-left:2px solid #b8860b!important;
+  color:#8a6800!important;
+}
+
+html[data-theme="light"] .modalHead{
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94))!important;
+  border-bottom-color:rgba(15,23,42,.08)!important;
+}
+
+html[data-theme="light"] .checkBlockHeader b{
+  color:#374151!important;
+}
+
+html[data-theme="light"] .ghost.danger,
+html[data-theme="light"] .actions button.danger{
+  color:#be123c!important;
+  border-color:rgba(225,29,72,.28)!important;
+  background:rgba(225,29,72,.06)!important;
+}
+
+html[data-theme="light"] .riskHero{
+  background:linear-gradient(135deg,rgba(212,168,67,.08),rgba(240,242,245,.98))!important;
+  border-color:rgba(0,0,0,.08)!important;
+}
+html[data-theme="light"] .riskHero h2{color:#111827!important;}
+html[data-theme="light"] .riskHero p{color:#4b5563!important;}
+html[data-theme="light"] .riskHeroStats{
+  background:rgba(255,255,255,.92)!important;
+  border-color:rgba(0,0,0,.08)!important;
+}
+html[data-theme="light"] .riskHeroStats b{color:#111827!important;}
+
+html[data-theme="light"] .sampleNotice{
+  background:rgba(255,255,255,.92)!important;
+  border-color:rgba(184,134,11,.22)!important;
+  color:#374151!important;
+}
+html[data-theme="light"] .sampleNotice b{color:#111827!important;}
+
+.app .journalPage .journalTradeActions .shareReviewButton{
+  min-width:0!important;
+  padding-inline:8px!important;
 }
