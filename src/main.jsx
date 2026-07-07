@@ -1977,9 +1977,18 @@ function MonthCalendar({trades=[],selectedDate,onSelect}){
   const monthLabel=new Date(key+'-02T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
   const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key);
   const total=monthStats.reduce((a,b)=>a+b.total,0);
+  const formatCalendarMoney=value=>{
+    const n=Number(value||0);
+    if(n===0) return 'BE';
+    return `${n>0?'+':'-'}$${formatCompactNumber(Math.abs(n),1)}`;
+  };
+  const formatCalendarR=value=>{
+    const n=Number(value||0);
+    return `${n>0?'+':''}${n.toFixed(2)}R`;
+  };
   const prev=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()-1); setKey(d.toISOString().slice(0,7));}
   const next=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()+1); setKey(d.toISOString().slice(0,7));}
-  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatMoneyCompactCard(st.total):''; return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${st.count} trade${st.count>1?'s':''}`:d}><b>{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small>{amount}</small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div></div>
+  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatCalendarMoney(st.total):''; const totalR=st?(st.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultR),0):0; return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${formatCalendarR(totalR)} · ${st.count} trade${st.count>1?'s':''}`:d}><b className="monthCellDay">{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small className="monthCellResult"><span className="monthCellMoney">{amount}</span><span className="monthCellR">{formatCalendarR(totalR)}</span></small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div></div>
 }
 function TradeRow({t,onOpen,onDelete,onExport,onShare}){
   const value=Number(t.resultMoney||0), pctVal=Number(t.resultPct||0), rVal=Number(t.resultR||0);

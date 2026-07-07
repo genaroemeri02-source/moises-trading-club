@@ -13477,3 +13477,112 @@ html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) 
     gap:4px!important;
   }
 }
+/* v47.29 - Mobile calendar result readability */
+.app .monthCellResult{
+  display:block!important;
+  max-width:100%!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
+  text-overflow:clip!important;
+  font-variant-numeric:tabular-nums!important;
+}
+.app .monthCellMoney{
+  display:block!important;
+  max-width:100%!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.app .monthCellR{
+  display:none!important;
+}
+@media(max-width:760px){
+  .app .monthCell{
+    position:relative!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    min-height:58px!important;
+    height:58px!important;
+    padding:6px 3px 5px!important;
+    overflow:visible!important;
+  }
+  .app .monthCell b,
+  .app .monthCellDay{
+    font-size:12px!important;
+    line-height:1!important;
+    width:100%!important;
+    text-align:center!important;
+  }
+  .app .monthCell i{
+    position:absolute!important;
+    top:4px!important;
+    right:4px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:14px!important;
+    height:14px!important;
+    padding:0 4px!important;
+    font-size:8px!important;
+    line-height:1!important;
+  }
+  .app .monthCellResult{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:1px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin-top:1px!important;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace!important;
+    line-height:1.05!important;
+    white-space:normal!important;
+  }
+  .app .monthCellMoney{
+    display:block!important;
+    width:100%!important;
+    overflow:visible!important;
+    text-align:center!important;
+    font-size:9.5px!important;
+    line-height:1.05!important;
+    font-weight:900!important;
+    letter-spacing:-.02em!important;
+  }
+  .app .monthCellR{
+    display:block!important;
+    width:100%!important;
+    overflow:visible!important;
+    text-align:center!important;
+    font-size:8px!important;
+    line-height:1.05!important;
+    font-weight:800!important;
+    opacity:.92!important;
+    letter-spacing:-.02em!important;
+  }
+  .app .monthCell.win .monthCellResult{
+    color:var(--green)!important;
+  }
+  .app .monthCell.loss .monthCellResult{
+    color:var(--red)!important;
+  }
+  .app .monthCell.be .monthCellResult{
+    color:#60a5fa!important;
+  }
+  html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .monthCell.be .monthCellResult{
+    color:#2563eb!important;
+  }
+}
+@media(max-width:380px){
+  .app .monthCell{
+    min-height:54px!important;
+    height:54px!important;
+    padding-inline:2px!important;
+  }
+  .app .monthCellMoney{
+    font-size:8.8px!important;
+  }
+  .app .monthCellR{
+    font-size:7.4px!important;
+  }
+}
