@@ -24,12 +24,9 @@ export async function persistTrade({
   const payload = buildTradeSavePayload({ form, profile, selectedAccountValue, captureUrl, reviewPatch });
   const clean = buildTradeFirestoreDocument({ payload, profile, captureUrl, updatedAt: serverTimestamp() });
 
-  console.info('saveTrade:payload', clean);
-
   if (form.id) {
     const { id, ...rest } = clean;
     await setDoc(doc(db, 'trades', form.id), rest, { merge: true });
-    console.info('saveTrade:success', form.id);
     return { ok: true, id: form.id, isUpdate: true, clean };
   }
 
@@ -45,7 +42,6 @@ export async function persistTrade({
       console.warn('No se pudo vincular checklist', e?.message);
     }
   }
-  console.info('saveTrade:success', refTrade.id);
   return { ok: true, id: refTrade.id, isUpdate: false, clean };
 }
 

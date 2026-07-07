@@ -16,12 +16,23 @@ export function numericTradePayload(form) {
 }
 
 export function buildMentorReviewPatch(form = {}, profileUid = '') {
-  if (!form.mentorReviewRequested) return {};
+  if (!form.mentorReviewRequested) {
+    return {
+      mentorReviewRequested: false,
+      mentorReviewStatus: null,
+      mentorReviewRequestedBy: null,
+      mentorReviewRequestedAt: null,
+      mentorReviewFocus: null,
+      mentorReviewNote: null
+    };
+  }
   return {
     mentorReviewRequested: true,
     mentorReviewStatus: form.mentorReviewStatus || 'pending',
     mentorReviewRequestedBy: profileUid,
-    mentorReviewRequestedAt: form.mentorReviewRequestedAt || new Date().toISOString()
+    mentorReviewRequestedAt: form.mentorReviewRequestedAt || new Date().toISOString(),
+    mentorReviewFocus: form.mentorReviewFocus || 'general',
+    mentorReviewNote: form.mentorReviewNote || ''
   };
 }
 

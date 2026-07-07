@@ -36,7 +36,6 @@ export function TradeForm({ form, setForm, profile, data, db, uploadFile, uid, t
 
   async function save() {
     setBusy(true);
-    console.info('saveTrade:start');
     try {
       let captureUrl = form.captureUrl || '';
       if (captureFileObj) {
