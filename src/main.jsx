@@ -38,6 +38,16 @@ const formatMoneyClean=value=>`${Number(value||0)<0?'-':''}$${formatCompactNumbe
 const formatPercentCard=value=>`${compactNumber(Number(value||0),0)}%`;
 const formatMetricCard=(value,max=0)=>formatCompactNumber(value,max);
 const formatR=value=>`${Number(value||0).toLocaleString('en-US',{minimumFractionDigits:Math.abs(Number(value||0))<10?2:1,maximumFractionDigits:2})}R`;
+const formatCalendarMoney=value=>{
+  const n=Number(value||0);
+  if(n===0) return 'BE';
+  return `${n>0?'+':'-'}$${formatCompactNumber(Math.abs(n),1)}`;
+};
+const formatCalendarR=value=>{
+  const n=Number(value||0);
+  return `${n>0?'+':''}${n.toFixed(2)}R`;
+};
+const calendarDayR=dayStats=>(dayStats?.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultR),0);
 function normalizeNumInput(v){
   const raw=String(v ?? '').replace(',', '.').trim();
   if(raw==='' || raw==='-' || /^-?\d*(\.\d*)?$/.test(raw)) return raw;
@@ -1811,7 +1821,7 @@ function ActivityFeed({data,setTab}){
   ].sort((a,b)=>b.time-a.time).slice(0,8);
   return <Card title="Actividad reciente" sub="Últimos movimientos del ecosistema."><div className="activityFeed">{items.map((it,i)=><button key={`${it.type}-${i}`} onClick={()=>setTab(it.target)}><span>{it.type}</span><b>{it.text}</b><small>{it.meta}</small></button>)}{!items.length&&<PremiumEmptyState title="Sin actividad reciente" text="Cuando haya trades, checklists o publicaciones apareceran aca." cta="Registrar trade" icon={Activity} onClick={()=>setTab('journal')}/>}</div></Card>
 }
-function CalendarHeatmapPreview({trades=[],setTab}){const stats=groupTradesByDay(trades); const key=monthKey(); const cells=daysInMonth(key); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key); const total=monthStats.reduce((a,b)=>a+b.total,0); const openDay=d=>{localStorage.setItem('mtc-open-journal-date',d); setTab?.('journal');}; return <Card title="Calendario P/L" sub={`${monthStats.length} días operados · ${total>=0?'+':''}${formatMoneyClean(total)}`} className="calendarPreviewCard"><div className="calendarMiniGrid">{cells.map((d,i)=>{if(!d)return <span key={i}/>; const st=stats[d]; const cls=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const daily=st?`${st.total>0?'+':st.total<0?'-':''}$${formatCompactNumber(Math.abs(st.total),1)}`:''; return <button key={d} className={cls} title={st?`${d} · ${money(st.total)}`:d} onClick={()=>st&&openDay(d)} disabled={!st}><b>{Number(d.slice(-2))}</b>{st&&<em>{daily}</em>}</button>})}</div></Card>}
+function CalendarHeatmapPreview({trades=[],setTab}){const stats=groupTradesByDay(trades); const key=monthKey(); const cells=daysInMonth(key); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key); const total=monthStats.reduce((a,b)=>a+b.total,0); const latestTradeForDay=d=>[...(stats[d]?.trades||[])].sort((a,b)=>String(b.updatedAt?.toDate?.()?.toISOString?.()||b.createdAt?.toDate?.()?.toISOString?.()||b.createdAt?.seconds||b.date||b.tradingDay||'').localeCompare(String(a.updatedAt?.toDate?.()?.toISOString?.()||a.createdAt?.toDate?.()?.toISOString?.()||a.createdAt?.seconds||a.date||a.tradingDay||'')))[0]; const openDay=d=>{localStorage.setItem('mtc-open-journal-date',d); const latest=latestTradeForDay(d); if(latest?.id)localStorage.setItem('mtc-open-trade',latest.id); setTab?.('journal');}; return <Card title="Calendario P/L" sub={`${monthStats.length} días operados · ${total>=0?'+':''}${formatMoneyClean(total)}`} className="calendarPreviewCard"><div className="calendarMiniGrid">{cells.map((d,i)=>{if(!d)return <span key={i}/>; const st=stats[d]; const cls=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const totalR=calendarDayR(st); return <button key={d} className={cls} title={st?`${d} · ${money(st.total)} · ${formatCalendarR(totalR)}`:d} onClick={()=>st&&openDay(d)} disabled={!st}><b>{Number(d.slice(-2))}</b>{st&&<em className="calendarMiniResult"><span className="calendarMiniMoney">{formatCalendarMoney(st.total)}</span><span className="calendarMiniR">{formatCalendarR(totalR)}</span></em>}</button>})}</div></Card>}
 function EquityCurvePreview({s}){const change=s.total; return <Card title="Curva de equity" sub={`Equity actual ${money(s.equity)} · ${change>=0?'+':''}${money(change)}`} className="equityPreviewCard"><ResponsiveContainer width="100%" height={300}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.045)"/><XAxis dataKey="name"/><YAxis/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card>}
 function Dashboard({data,profile,setTab}){
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
@@ -1977,18 +1987,9 @@ function MonthCalendar({trades=[],selectedDate,onSelect}){
   const monthLabel=new Date(key+'-02T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
   const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key);
   const total=monthStats.reduce((a,b)=>a+b.total,0);
-  const formatCalendarMoney=value=>{
-    const n=Number(value||0);
-    if(n===0) return 'BE';
-    return `${n>0?'+':'-'}$${formatCompactNumber(Math.abs(n),1)}`;
-  };
-  const formatCalendarR=value=>{
-    const n=Number(value||0);
-    return `${n>0?'+':''}${n.toFixed(2)}R`;
-  };
   const prev=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()-1); setKey(d.toISOString().slice(0,7));}
   const next=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()+1); setKey(d.toISOString().slice(0,7));}
-  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatCalendarMoney(st.total):''; const totalR=st?(st.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultR),0):0; return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${formatCalendarR(totalR)} · ${st.count} trade${st.count>1?'s':''}`:d}><b className="monthCellDay">{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small className="monthCellResult"><span className="monthCellMoney">{amount}</span><span className="monthCellR">{formatCalendarR(totalR)}</span></small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div></div>
+  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatCalendarMoney(st.total):''; const totalR=calendarDayR(st); return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${formatCalendarR(totalR)} · ${st.count} trade${st.count>1?'s':''}`:d}><b className="monthCellDay">{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small className="monthCellResult"><span className="monthCellMoney">{amount}</span><span className="monthCellR">{formatCalendarR(totalR)}</span></small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div></div>
 }
 function TradeRow({t,onOpen,onDelete,onExport,onShare}){
   const value=Number(t.resultMoney||0), pctVal=Number(t.resultPct||0), rVal=Number(t.resultR||0);

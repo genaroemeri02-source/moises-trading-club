@@ -13586,3 +13586,164 @@ html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) 
     font-size:7.4px!important;
   }
 }
+/* v47.30 - Unified premium mobile P/L calendars */
+.app .calendarMiniResult{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:1px!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:visible!important;
+  font-style:normal!important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace!important;
+  font-variant-numeric:tabular-nums!important;
+  line-height:1.05!important;
+  white-space:normal!important;
+  text-overflow:clip!important;
+}
+.app .calendarMiniMoney,
+.app .calendarMiniR{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:visible!important;
+  text-align:center!important;
+  text-overflow:clip!important;
+  white-space:nowrap!important;
+}
+.app .calendarMiniR{
+  display:none!important;
+}
+@media(max-width:760px){
+  .app .calendarPreviewCard .cardHead{
+    margin-bottom:8px!important;
+  }
+  .app .calendarPreviewCard .cardHead h3{
+    font-size:18px!important;
+    line-height:1.12!important;
+  }
+  .app .calendarPreviewCard .cardHead p{
+    font-size:12px!important;
+    line-height:1.35!important;
+  }
+  .app .calendarMiniGrid{
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:4px!important;
+  }
+  .app .calendarMiniGrid button,
+  .app .calendarMiniGrid span{
+    height:50px!important;
+    min-width:0!important;
+    border-radius:10px!important;
+    padding:5px 2px 4px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    line-height:1!important;
+    overflow:visible!important;
+  }
+  .app .calendarMiniGrid button b{
+    width:100%!important;
+    text-align:center!important;
+    font-size:11.5px!important;
+    line-height:1!important;
+    font-weight:900!important;
+  }
+  .app .calendarMiniResult{
+    width:100%!important;
+  }
+  .app .calendarMiniMoney{
+    font-size:8.9px!important;
+    line-height:1.05!important;
+    font-weight:950!important;
+    letter-spacing:-.035em!important;
+  }
+  .app .calendarMiniR{
+    display:block!important;
+    font-size:7.4px!important;
+    line-height:1.05!important;
+    font-weight:850!important;
+    letter-spacing:-.025em!important;
+    opacity:.9!important;
+  }
+  .app .calendarMiniGrid button.win .calendarMiniResult{
+    color:var(--green)!important;
+  }
+  .app .calendarMiniGrid button.loss .calendarMiniResult{
+    color:var(--red)!important;
+  }
+  .app .calendarMiniGrid button.be .calendarMiniResult{
+    color:#60a5fa!important;
+  }
+  html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .calendarMiniGrid button.be .calendarMiniResult{
+    color:#2563eb!important;
+  }
+  .app .journalControlGrid{
+    gap:12px!important;
+  }
+  .app .monthCalendar{
+    gap:9px!important;
+  }
+  .app .monthHead{
+    min-height:34px!important;
+  }
+  .app .monthHead b{
+    font-size:13px!important;
+  }
+  .app .monthHead small{
+    font-size:11px!important;
+  }
+  .app .weekDays{
+    gap:4px!important;
+  }
+  .app .weekDays span{
+    font-size:9px!important;
+    letter-spacing:.04em!important;
+  }
+  .app .monthGrid{
+    gap:4px!important;
+  }
+  .app .monthCell{
+    min-height:56px!important;
+    height:56px!important;
+    border-radius:10px!important;
+    padding:6px 3px 5px!important;
+  }
+  .app .monthCellMoney{
+    font-size:9.1px!important;
+  }
+  .app .monthCellR{
+    font-size:7.7px!important;
+  }
+  .app .monthLegend{
+    gap:9px!important;
+    flex-wrap:wrap!important;
+    font-size:10px!important;
+    line-height:1.2!important;
+  }
+  .app .monthLegend i{
+    width:7px!important;
+    height:7px!important;
+    margin-right:4px!important;
+  }
+}
+@media(max-width:380px){
+  .app .calendarMiniGrid{
+    gap:3px!important;
+  }
+  .app .calendarMiniGrid button,
+  .app .calendarMiniGrid span{
+    height:47px!important;
+    padding-inline:1px!important;
+  }
+  .app .calendarMiniMoney{
+    font-size:8.2px!important;
+  }
+  .app .calendarMiniR{
+    font-size:6.9px!important;
+  }
+}
