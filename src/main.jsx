@@ -93,6 +93,52 @@ function nyParts(d=new Date()){
 const nyISO=(d=new Date())=>{const p=nyParts(d); return `${p.year}-${p.month}-${p.day}`};
 const tradingDayKey=(d=new Date())=>{const p=nyParts(d); const iso=`${p.year}-${p.month}-${p.day}`; return p.hour>=17?dateAddDays(iso,1):iso};
 const formatDateLabel=iso=>{try{return new Date(`${iso}T12:00:00`).toLocaleDateString('es-AR',{weekday:'short',day:'2-digit',month:'short'})}catch{return iso}};
+function normalizeDateKey(value){
+  if(value==null||value==='')return null;
+  if(value instanceof Date){
+    const ms=value.getTime();
+    return Number.isFinite(ms)?new Date(ms).toISOString().slice(0,10):null;
+  }
+  if(typeof value==='object'){
+    if(typeof value.toDate==='function')return normalizeDateKey(value.toDate());
+    if(Number.isFinite(Number(value.seconds)))return normalizeDateKey(Number(value.seconds));
+    if(Number.isFinite(Number(value._seconds)))return normalizeDateKey(Number(value._seconds));
+  }
+  if(typeof value==='number'||/^\d+$/.test(String(value).trim())){
+    const n=Number(value);
+    if(!Number.isFinite(n)||n<=0)return null;
+    return new Date(n>9999999999?n:n*1000).toISOString().slice(0,10);
+  }
+  const raw=String(value).trim();
+  let m=raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m){
+    const y=Number(m[1]),mo=Number(m[2]),d=Number(m[3]);
+    if(mo<1||mo>12||d<1||d>31)return null;
+    return `${m[1]}-${m[2]}-${m[3]}`;
+  }
+  m=raw.match(/^(\d{2})[-/](\d{2})$/);
+  if(m){
+    const year=String(monthKey()).slice(0,4);
+    const mo=Number(m[1]),d=Number(m[2]);
+    if(mo<1||mo>12||d<1||d>31)return null;
+    return `${year}-${m[1]}-${m[2]}`;
+  }
+  const parsed=Date.parse(raw);
+  return Number.isFinite(parsed)?new Date(parsed).toISOString().slice(0,10):null;
+}
+function getTradeOperationalDateKey(trade={}){
+  const explicit=[trade.date,trade.tradeDate,trade.entryDate,trade.closeDate,trade.sessionDate,trade.tradingDate,trade.operationalDate,trade.dayKey,trade.tradingDay];
+  for(const value of explicit){
+    const date=normalizeDateKey(value);
+    if(date)return date;
+  }
+  const fallback=[trade.closedAt,trade.executedAt,trade.timestamp,trade.createdAt,trade.updatedAt];
+  for(const value of fallback){
+    const date=normalizeDateKey(value);
+    if(date)return date;
+  }
+  return null;
+}
 
 function daysInMonth(key){
   const [year,month]=String(key||monthKey()).split('-').map(Number);
@@ -121,7 +167,8 @@ function resetCountdown(now=new Date()){
 }
 function groupTradesByDay(trades=[]){
   return trades.reduce((acc,t)=>{
-    const date=String(t.tradingDay || t.date || safeDate(t.createdAt) || today()).slice(0,10);
+    const date=getTradeOperationalDateKey(t);
+    if(!date)return acc;
     if(!acc[date]) acc[date]={date,total:0,count:0,wins:0,losses:0,trades:[]};
     const v=toNumberSafe(t.resultMoney);
     acc[date].total+=v;
@@ -352,9 +399,9 @@ function AccountManager({settings,onChange}){
 function weekStartISO(){const base=tradingDayKey(); const d=new Date(`${base}T12:00:00`); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d.toISOString().slice(0,10)}
 function evaluateRiskGuard(trades=[],settings=getRiskSettings(),initial=10000,dailyPlan=null){
   const todayStr=tradingDayKey(), weekStart=weekStartISO();
-  const todayTrades=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)===todayStr);
-  const weekTrades=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)>=weekStart);
-  const previousPnL=trades.filter(t=>(t.tradingDay||t.date||'').slice(0,10)<todayStr).reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
+  const todayTrades=trades.filter(t=>getTradeOperationalDateKey(t)===todayStr);
+  const weekTrades=trades.filter(t=>{const d=getTradeOperationalDateKey(t); return d&&d>=weekStart;});
+  const previousPnL=trades.filter(t=>{const d=getTradeOperationalDateKey(t); return d&&d<todayStr;}).reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
   const dayStartEquity=Number(initial||0)+previousPnL;
   const dailyPnL=todayTrades.reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
   const weeklyPnL=weekTrades.reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
@@ -415,7 +462,7 @@ function normalizeTradeSetup(trade){
   return raw || 'Otro';
 }
 function tradeDayKey(t={}){
-  return String(t.tradingDay || t.date || safeDate(t.createdAt) || '').slice(0,10);
+  return getTradeOperationalDateKey(t)||'';
 }
 function isClosedEvaluableTrade(t={}){
   const result=String(t.result||t.status||'').trim().toLowerCase();
@@ -755,7 +802,7 @@ function normalizeTradeForShare(trade={},privacy={}){
     footer:'Process over outcome.'
   };
 }
-function getTradesForDate(trades=[],date){return (trades||[]).filter(t=>String(t.tradingDay||t.date||'').slice(0,10)===String(date||today()).slice(0,10))}
+function getTradesForDate(trades=[],date){const key=normalizeDateKey(date)||String(date||today()).slice(0,10); return (trades||[]).filter(t=>getTradeOperationalDateKey(t)===key)}
 function calculateDailyTradeStats(trades=[]){
   const rows=trades||[];
   const rValues=rows.map(t=>Number(t.resultR||0)).filter(Number.isFinite);
@@ -1771,9 +1818,9 @@ function greetingNY(){
 }
 function sessionNameNY(){const h=Number(new Intl.DateTimeFormat('en-US',{hour:'numeric',hour12:false,timeZone:'America/New_York'}).format(new Date())); if(h<3)return 'Asia / cierre NY'; if(h<8)return 'Londres'; if(h<13)return 'NY activa'; if(h<17)return 'Post NY'; return 'Rollover / after-hours'}
 function DashboardControlCenter({profile,s,monthly,setTab,filtered=[]}){
-  const dayTrades=filtered.filter(t=>(t.tradingDay||t.date||'').slice(0,10)===tradingDayKey());
+  const dayTrades=filtered.filter(t=>getTradeOperationalDateKey(t)===tradingDayKey());
   const dayPnL=dayTrades.reduce((a,t)=>a+Number(t.resultMoney||0),0);
-  const weekTrades=filtered.filter(t=>(t.tradingDay||t.date||'').slice(0,10)>=weekStartISO());
+  const weekTrades=filtered.filter(t=>{const d=getTradeOperationalDateKey(t); return d&&d>=weekStartISO();});
   const weekWins=weekTrades.filter(t=>Number(t.resultMoney)>0).length;
   const weekWr=weekTrades.length?weekWins/weekTrades.length*100:0;
   const discipline=Math.round(Number(s.discipline||0));
@@ -1788,7 +1835,7 @@ function RecommendedActionCard({data,setTab,s}){
   const hasTrades=(data.trades||[]).length>0;
   const hasEmotional=(data.emotionalJournals||[]).length>0;
   const todayKey=tradingDayKey();
-  const todayTrades=(data.trades||[]).filter(t=>(t.tradingDay||t.date||'').slice(0,10)===todayKey);
+  const todayTrades=(data.trades||[]).filter(t=>getTradeOperationalDateKey(t)===todayKey);
   const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===todayKey);
   const action=!hasChecklist?{icon:CheckCircle2,title:'Completar checklist',text:'Validá contexto, zona y riesgo antes de buscar entrada.',cta:'Abrir checklist',target:'checklist'}:todayPlan&&!todayTrades.length?{icon:Target,title:'Esperar setup válido',text:'Hay plan para hoy. La siguiente acción es ejecutar solo si aparece el patrón.',cta:'Ver jornada',target:'journal'}:todayTrades.length?{icon:FileText,title:'Revisar ejecución',text:'Ya hay operaciones registradas. Cerrá lectura de conducta y aprendizaje.',cta:'Ver journal',target:'journal'}:!hasTrades?{icon:Plus,title:'Registrar jornada',text:'Cargá plan o primer trade para activar lectura operativa real.',cta:'Registrar trade',target:'journal'}:!hasEmotional?{icon:Heart,title:'Cerrar revisión',text:'Dejá registrado estado emocional y corrección concreta de la sesión.',cta:'Cerrar sesión',target:'emotional'}:{icon:BarChart3,title:'Revisar métricas',text:'Usá analytics para detectar consistencia, riesgo y calidad de ejecución.',cta:'Revisar analytics',target:'analytics'};
   const Icon=action.icon;
@@ -1802,7 +1849,7 @@ function StructuredOnboardingCard({data,setTab}){
   const settingsReady=Number(data.settings?.initialBalance||0)>0||normalizedAccounts(data.settings).some(a=>Number(a.capital||0)>0);
   const dayKey=tradingDayKey();
   const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===dayKey);
-  const todayTrades=(data.trades||[]).filter(t=>(t.tradingDay||t.date||'').slice(0,10)===dayKey);
+  const todayTrades=(data.trades||[]).filter(t=>getTradeOperationalDateKey(t)===dayKey);
   const journeyReady=!!todayPlan||todayTrades.length>0;
   const steps=[
     {label:'Configurar cuenta/base operativa',done:settingsReady,target:'settings',cta:'Configurar',icon:Settings},
@@ -2120,9 +2167,12 @@ function MtcScoreCard({s,disciplineScore,hasProfitFactorSample,hasWinLossSample}
   const dash=scoreReady?`${Math.round((score/100)*339)} 339`:'0 339';
   return <Card title="MTC Score" sub={scoreReady?'Score compuesto de ventaja, disciplina y riesgo.':'Sin muestra suficiente · requiere +10 operaciones.'} className="dashboardMtcScoreCard">
     <div className="dashboardMtcScoreBody">
-      <div className={`dashboardMtcScoreRing ${scoreTone}`}>
-        <svg viewBox="0 0 130 130" aria-hidden="true"><circle cx="65" cy="65" r="54"/><circle cx="65" cy="65" r="54" pathLength="339" strokeDasharray={dash}/></svg>
-        <div><b>{scoreReady?score:'—'}</b><small>/100</small><em>{scoreReady?'MTC Score':'Muestra insuficiente'}</em></div>
+      <div className="dashboardMtcScoreGauge">
+        <div className={`dashboardMtcScoreRing ${scoreTone}`}>
+          <svg viewBox="0 0 130 130" aria-hidden="true"><circle cx="65" cy="65" r="54"/><circle cx="65" cy="65" r="54" pathLength="339" strokeDasharray={dash}/></svg>
+          <div><b>{scoreReady?score:'—'}</b><small>/100</small></div>
+        </div>
+        <span>{scoreReady?'MTC Score':'Muestra insuficiente'}</span>
       </div>
       <div className="dashboardMtcAxes">{axes.map(axis=><div key={axis.label} className={axis.value==null?'muted':''}><span>{axis.label}</span><i><em style={{width:`${axis.value??0}%`}}/></i><b>{axis.value==null?'—':`${axis.value}`}</b></div>)}{!scoreReady&&<p>Requiere +10 operaciones para activar el score compuesto.</p>}</div>
     </div>
@@ -2167,9 +2217,9 @@ function Dashboard({data,profile,setTab}){
   const spark=s.curve.slice(-8).map((p,i,arr)=>i?Number(p.equity||0)-Number(arr[i-1].equity||0):0);
   const closedTrades=filtered.filter(isClosedEvaluableTrade).sort((a,b)=>String(tradeDayKey(a)).localeCompare(String(tradeDayKey(b))) || tradeSortTime(a)-tradeSortTime(b));
   const todayKey=tradingDayKey();
-  const todayTrades=filtered.filter(t=>(t.tradingDay||t.date||'').slice(0,10)===todayKey);
+  const todayTrades=filtered.filter(t=>getTradeOperationalDateKey(t)===todayKey);
   const dayPnL=todayTrades.reduce((a,t)=>a+Number(t.resultMoney||0),0);
-  const weekTrades=filtered.filter(t=>(t.tradingDay||t.date||'').slice(0,10)>=weekStartISO());
+  const weekTrades=filtered.filter(t=>{const d=getTradeOperationalDateKey(t); return d&&d>=weekStartISO();});
   const weekWins=weekTrades.filter(t=>Number(t.resultMoney)>0).length;
   const weekWr=weekTrades.length?weekWins/weekTrades.length*100:0;
   const riskSettings=getRiskSettings();
@@ -2340,10 +2390,10 @@ function Journal({data,profile}){
   useEffect(()=>{const h=()=>setRiskSettings(getRiskSettings()); window.addEventListener('mtc-risk-settings-updated',h); return()=>window.removeEventListener('mtc-risk-settings-updated',h)},[]);
   const dayPlan=(data.dailyPlans||[]).find(p=>p.dayKey===selectedDate&&p.userId===profile.uid);
   const guard=evaluateRiskGuard(filtered,riskSettings,accountInitial(data.settings,active),dayPlan);
-  const tradeDates=[...new Set((filtered||[]).map(t=>(t.tradingDay||t.date||'').slice(0,10)).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
+  const tradeDates=[...new Set((filtered||[]).map(getTradeOperationalDateKey).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
   const visibleDates=tradeDates.includes(selectedDate)?tradeDates:[selectedDate,...tradeDates].filter(Boolean);
   const list=filtered
-    .filter(t=>(t.tradingDay||t.date||'').slice(0,10)===selectedDate)
+    .filter(t=>getTradeOperationalDateKey(t)===selectedDate)
     .filter(t=>JSON.stringify(t).toLowerCase().includes(search.toLowerCase()))
     .filter(t=>checklistFilterMatch(t,checklistFilter));
   const tradeTimeValue=(trade,index=0)=>{
@@ -2358,7 +2408,7 @@ function Journal({data,profile}){
     return index;
   };
   const getLatestTradeForDay=day=>{
-    const dayTrades=(filtered||[]).filter(t=>(t.tradingDay||t.date||'').slice(0,10)===day);
+    const dayTrades=(filtered||[]).filter(t=>getTradeOperationalDateKey(t)===day);
     if(!dayTrades.length) return null;
     return dayTrades
       .map((trade,index)=>({trade,index,time:tradeTimeValue(trade,index)}))
@@ -2370,7 +2420,7 @@ function Journal({data,profile}){
     if(latestTrade) setSelectedTrade(latestTrade);
   };
   async function del(trade){await deleteTradeSafely(trade);}
-  async function importCsv(e){const f=e.target.files[0]; if(!f)return; const rows=parseCsv(await f.text(),profile.uid); const signature=t=>[profile.uid,String(t.tradingDay||t.date||'').slice(0,10),String(t.asset||'').toUpperCase(),String(t.side||''),toNumberSafe(t.resultMoney),toNumberSafe(t.resultR),normalizeTradeSetup(t)].join('|'); const existing=new Set((data.trades||[]).map(signature)); let imported=0,skipped=0; for(const r of rows){const clean={...r,tradingDay:r.tradingDay||r.date||tradingDayKey(),date:r.date||r.tradingDay||tradingDayKey()}; const sig=signature(clean); if(existing.has(sig)){skipped++; continue;} existing.add(sig); imported++; await addDoc(collection(db,'trades'),{...clean,createdAt:serverTimestamp()});} toast(`${imported} trades importados${skipped?` · ${skipped} duplicados omitidos`:''}`); e.target.value='';}
+  async function importCsv(e){const f=e.target.files[0]; if(!f)return; const rows=parseCsv(await f.text(),profile.uid); const signature=t=>[profile.uid,getTradeOperationalDateKey(t)||'',String(t.asset||'').toUpperCase(),String(t.side||''),toNumberSafe(t.resultMoney),toNumberSafe(t.resultR),normalizeTradeSetup(t)].join('|'); const existing=new Set((data.trades||[]).map(signature)); let imported=0,skipped=0; for(const r of rows){const clean={...r,tradingDay:r.tradingDay||r.date||tradingDayKey(),date:r.date||r.tradingDay||tradingDayKey()}; const sig=signature(clean); if(existing.has(sig)){skipped++; continue;} existing.add(sig); imported++; await addDoc(collection(db,'trades'),{...clean,createdAt:serverTimestamp()});} toast(`${imported} trades importados${skipped?` · ${skipped} duplicados omitidos`:''}`); e.target.value='';}
   const activeNames=activeAccountNames(data.settings);
   const lastAccount=localStorage.getItem('mtc-last-account')||'';
   const defaultTradeAccount=activeNames.includes(lastAccount)?lastAccount:(active!=='__all__'&&activeNames.includes(active)?active:(activeNames[0]||'Cuenta principal'));
@@ -2391,7 +2441,7 @@ function Journal({data,profile}){
     const id=localStorage.getItem('mtc-open-trade');
     if(!id||!(data.trades||[]).length)return;
     const t=(data.trades||[]).find(x=>x.id===id);
-    if(t){setSelectedDate((t.tradingDay||t.date||tradingDayKey()).slice(0,10)); setSelectedTrade(t); localStorage.removeItem('mtc-open-trade');}
+    if(t){setSelectedDate(getTradeOperationalDateKey(t)||tradingDayKey()); setSelectedTrade(t); localStorage.removeItem('mtc-open-trade');}
   },[data.trades]);
   useEffect(()=>{
     const d=localStorage.getItem('mtc-open-journal-date');
