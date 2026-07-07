@@ -31,3 +31,4 @@ service-account*.txt
 .netlify
 
 .vercel
+.env*
