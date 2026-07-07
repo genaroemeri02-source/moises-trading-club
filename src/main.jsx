@@ -1928,35 +1928,56 @@ function buildDailyNetCurve(trades=[]){
   const key=monthKey();
   return Object.values(groupTradesByDay((trades||[]).filter(isClosedEvaluableTrade))).filter(day=>String(day.date).slice(0,7)===key).sort((a,b)=>a.date.localeCompare(b.date)).map(day=>{running+=Number(day.total||0); return {name:String(day.date).slice(5),date:day.date,value:Math.round(running),daily:Math.round(day.total||0),r:Number(calendarDayR(day)||0)};});
 }
-function resolveLwChartDate(point={},nextPoint={},index=0){
-  if(point.date)return String(point.date).slice(0,10);
-  const name=String(point.name||'').trim();
-  if(/^\d{4}-\d{2}-\d{2}$/.test(name))return name;
-  if(/^\d{2}-\d{2}$/.test(name))return `${monthKey()}-${name}`;
-  if(name==='Inicio'){
-    const nextDate=nextPoint?.date||nextPoint?.name;
-    if(/^\d{4}-\d{2}-\d{2}$/.test(String(nextDate||'')))return String(nextDate).slice(0,10);
-    if(/^\d{2}-\d{2}$/.test(String(nextDate||'')))return `${monthKey()}-${nextDate}`;
+function toUtcTimestampSeconds(input){
+  if(input==null||input==='')return null;
+  if(input instanceof Date){
+    const ms=input.getTime();
+    return Number.isFinite(ms)?Math.floor(ms/1000):null;
   }
-  return `${monthKey()}-${String(index+1).padStart(2,'0')}`;
+  if(typeof input==='object'){
+    if(Number.isFinite(Number(input.seconds)))return Math.floor(Number(input.seconds));
+    if(Number.isFinite(Number(input._seconds)))return Math.floor(Number(input._seconds));
+    if(typeof input.toDate==='function')return toUtcTimestampSeconds(input.toDate());
+  }
+  if(typeof input==='number'||/^\d+$/.test(String(input).trim())){
+    const n=Number(input);
+    if(!Number.isFinite(n)||n<=0)return null;
+    return Math.floor(n>9999999999?n/1000:n);
+  }
+  const raw=String(input).trim();
+  let m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m){
+    const y=Number(m[1]),mo=Number(m[2]),d=Number(m[3]);
+    if(mo<1||mo>12||d<1||d>31)return null;
+    const ts=Date.UTC(y,mo-1,d)/1000;
+    return Number.isFinite(ts)?Math.floor(ts):null;
+  }
+  m=raw.match(/^(\d{2})[-/](\d{2})$/);
+  if(m){
+    const year=Number(String(monthKey()).slice(0,4));
+    const mo=Number(m[1]),d=Number(m[2]);
+    if(mo<1||mo>12||d<1||d>31)return null;
+    const ts=Date.UTC(year,mo-1,d)/1000;
+    return Number.isFinite(ts)?Math.floor(ts):null;
+  }
+  const parsed=Date.parse(raw);
+  return Number.isFinite(parsed)?Math.floor(parsed/1000):null;
+}
+function normalizeLightweightChartData(points=[],mode='pnl'){
+  if(!Array.isArray(points)||!points.length)return [];
+  const byTime=new Map();
+  points.forEach(point=>{
+    const value=Number(mode==='pnl'?point?.value:point?.equity??point?.value);
+    if(!Number.isFinite(value))return;
+    const rawTime=point?.time??point?.date??point?.day??point?.label??point?.name??point?.createdAt??point?.updatedAt;
+    const time=toUtcTimestampSeconds(rawTime);
+    if(!Number.isInteger(time)||time<=0)return;
+    byTime.set(time,{time,value});
+  });
+  return [...byTime.values()].sort((a,b)=>a.time-b.time);
 }
 function normalizeLwChartPoints(data=[],mode='pnl'){
-  if(!Array.isArray(data)||!data.length)return [];
-  const daySeen={};
-  return data.map((point,index)=>{
-    const dateKey=resolveLwChartDate(point,data[index+1],index);
-    const value=mode==='pnl'?Number(point.value??0):Number(point.equity??0);
-    if(!Number.isFinite(value))return null;
-    let time=dateKey;
-    if(mode==='equity'){
-      daySeen[dateKey]=(daySeen[dateKey]||0)+1;
-      if(daySeen[dateKey]>1 || String(point.name||'')==='Inicio'){
-        const base=Math.floor(new Date(`${dateKey}T12:00:00`).getTime()/1000);
-        time=String(point.name||'')==='Inicio'?base-86400:base+(daySeen[dateKey]-1);
-      }
-    }
-    return {time,value};
-  }).filter(Boolean);
+  return normalizeLightweightChartData(data,mode);
 }
 function getLwChartOptions(theme='dark',compact=false,showCrosshair=true){
   const isDark=theme!=='light';
@@ -2039,7 +2060,7 @@ function MtcLightweightLineChart({data=[],mode='pnl',height=240,compact=false,th
     ro.observe(el);
     return ()=>{ro.disconnect(); chart.remove();};
   },[points,hasEnoughData,resolvedTheme,compact,showCrosshair,height,positive,currency]);
-  if(!hasEnoughData)return null;
+  if(!hasEnoughData)return <DashboardChartFallback compact={compact}/>;
   return <div ref={containerRef} className={`mtcLwChart ${compact?'compact':''} ${resolvedTheme==='light'?'light':'dark'} ${positive?'positive':'negative'}`} style={{height}} role="img" aria-label={mode==='pnl'?'Gráfico de P/L neto acumulado':'Gráfico de curva de equity'}/>;
 }
 function normalizeDashboardSession(value=''){
