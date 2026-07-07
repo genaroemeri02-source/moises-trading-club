@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createPortal } from 'react-dom';
 import { initializeApp } from 'firebase/app';
@@ -6,6 +6,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, where, orderBy, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { createChart, AreaSeries, CrosshairMode, LineType } from 'lightweight-charts';
 import { Home, BookOpen, BarChart3, LineChart, Users, Lightbulb, Trophy, Shield, Bell, Settings, Plus, Trash2, Download, Upload, Search, LogOut, CheckCircle2, Lock, PlayCircle, FileText, Heart, MessageCircle, Bookmark, Menu, X, Megaphone, Edit3, Sparkles, Crown, Newspaper, ExternalLink, Camera, Image as ImageIcon, Copy, ChevronDown, ChevronRight, SlidersHorizontal, CalendarDays, Clock3, Flame, Medal, Activity, TrendingUp, Target, XCircle, AlertTriangle, Info, Rocket, Share2 } from 'lucide-react';
 import './styles.css';
 
@@ -1901,7 +1902,240 @@ function TradingMonthCalendar({trades=[],selectedDate,onSelectDay,variant='detai
   </div>;
 }
 function CalendarHeatmapPreview({trades=[],setTab,initial=0}){const stats=groupTradesByDay(trades); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===monthKey()); const total=monthStats.reduce((a,b)=>a+b.total,0); const totalR=monthStats.reduce((a,b)=>a+calendarDayR(b),0); const monthPct=Number(initial||0)?total/Number(initial||0)*100:0; const monthLabel=new Date(monthKey()+'-02T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'}); const openDay=(d,st)=>{localStorage.setItem('mtc-open-journal-date',d); const latest=latestTradeFromStats(st); if(latest?.id)localStorage.setItem('mtc-open-trade',latest.id); setTab?.('journal');}; return <Card title="Calendario P/L" sub={`${monthLabel} · ${monthStats.length} día${monthStats.length===1?'':'s'} operado${monthStats.length===1?'':'s'} · ${total>=0?'+':''}${formatMoneyClean(total)} · ${formatCalendarPct(monthPct)} · ${formatCalendarR(totalR)}`} className="calendarPreviewCard dashboardCalendarHero"><TradingMonthCalendar trades={trades} variant="dashboard" initialKey={monthKey()} onSelectDay={openDay}/></Card>}
-function EquityCurvePreview({s}){const change=s.total; const forming=Number(s.count||0)<3; return <Card title="Curva de equity" sub={forming?'Curva en formación · se necesitan más operaciones':`Equity actual ${money(s.equity)} · ${change>=0?'+':''}${money(change)}`} className="equityPreviewCard dashboardEquityCompact"><ResponsiveContainer width="100%" height={160}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.045)"/><XAxis dataKey="name"/><YAxis/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card>}
+function EquityCurvePreview({s}){const change=s.total; const hasCurve=(s.curve||[]).length>=2; return <Card title="Curva de equity" sub={hasCurve?`Equity actual ${money(s.equity)} · ${change>=0?'+':''}${money(change)}`:'Curva en formación · se necesitan más operaciones'} className="equityPreviewCard dashboardEquityCompact">{hasCurve?<MtcLightweightLineChart data={s.curve} mode="equity" height={190} compact currency={money}/>:<DashboardChartFallback compact/>}</Card>}
+function clampScore(value){return Math.max(0,Math.min(100,Math.round(Number(value||0))))}
+function DashboardGauge({value,tone='neutral'}){const safe=Number.isFinite(Number(value))?clampScore(value):0; return <div className={`dashboardGauge ${tone}`} style={{'--value':safe}}><span>{safe}%</span></div>}
+function MiniSparkline({data=[],tone='neutral'}){
+  const values=(data||[]).map(Number).filter(Number.isFinite).slice(-8);
+  const safe=values.length>1?values:[0,0];
+  const min=Math.min(...safe),max=Math.max(...safe),range=max-min||1;
+  const points=safe.map((v,i)=>`${i*(100/(safe.length-1))},${24-((v-min)/range)*18-3}`).join(' ');
+  return <svg className={`kpiMicroSpark ${tone}`} viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><polyline points={points}/></svg>;
+}
+function KpiMiniGauge({value=0,tone='neutral'}){const safe=clampScore(value); return <div className={`kpiMiniGauge ${tone}`} style={{'--value':safe}}><span>{safe}</span></div>}
+function KpiBars({items=[]}){return <div className="kpiSegmentBar">{items.map((item,i)=><i key={i} className={item.tone||'neutral'} style={{width:`${Math.max(4,Number(item.value||0))}%`}} title={item.label}/>)}</div>}
+function KpiStreakDots({count=0,sign=0}){const dots=Array.from({length:5},(_,i)=>i<Math.min(5,Number(count||0))); return <div className={`kpiStreakDots ${sign>0?'positive':sign<0?'negative':'neutral'}`}>{dots.map((on,i)=><i key={i} className={on?'on':''}/>)}</div>}
+function DashboardKpiCard({label,value,sub,state='neutral',visual,meta}){
+  return <article className={`dashboardProKpi metricPremium ${state}`}>
+    <div className="dashboardProKpiTop"><span>{label}</span>{meta&&<em>{meta}</em>}</div>
+    <b>{value}</b>
+    <small>{sub}</small>
+    <div className="dashboardProKpiVisual">{visual}</div>
+  </article>;
+}
+function buildDailyNetCurve(trades=[]){
+  let running=0;
+  const key=monthKey();
+  return Object.values(groupTradesByDay((trades||[]).filter(isClosedEvaluableTrade))).filter(day=>String(day.date).slice(0,7)===key).sort((a,b)=>a.date.localeCompare(b.date)).map(day=>{running+=Number(day.total||0); return {name:String(day.date).slice(5),date:day.date,value:Math.round(running),daily:Math.round(day.total||0),r:Number(calendarDayR(day)||0)};});
+}
+function resolveLwChartDate(point={},nextPoint={},index=0){
+  if(point.date)return String(point.date).slice(0,10);
+  const name=String(point.name||'').trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(name))return name;
+  if(/^\d{2}-\d{2}$/.test(name))return `${monthKey()}-${name}`;
+  if(name==='Inicio'){
+    const nextDate=nextPoint?.date||nextPoint?.name;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(String(nextDate||'')))return String(nextDate).slice(0,10);
+    if(/^\d{2}-\d{2}$/.test(String(nextDate||'')))return `${monthKey()}-${nextDate}`;
+  }
+  return `${monthKey()}-${String(index+1).padStart(2,'0')}`;
+}
+function normalizeLwChartPoints(data=[],mode='pnl'){
+  if(!Array.isArray(data)||!data.length)return [];
+  const daySeen={};
+  return data.map((point,index)=>{
+    const dateKey=resolveLwChartDate(point,data[index+1],index);
+    const value=mode==='pnl'?Number(point.value??0):Number(point.equity??0);
+    if(!Number.isFinite(value))return null;
+    let time=dateKey;
+    if(mode==='equity'){
+      daySeen[dateKey]=(daySeen[dateKey]||0)+1;
+      if(daySeen[dateKey]>1 || String(point.name||'')==='Inicio'){
+        const base=Math.floor(new Date(`${dateKey}T12:00:00`).getTime()/1000);
+        time=String(point.name||'')==='Inicio'?base-86400:base+(daySeen[dateKey]-1);
+      }
+    }
+    return {time,value};
+  }).filter(Boolean);
+}
+function getLwChartOptions(theme='dark',compact=false,showCrosshair=true){
+  const isDark=theme!=='light';
+  const crosshairColor=isDark?'rgba(255,255,255,0.16)':'rgba(15,17,23,0.14)';
+  return {
+    layout:{
+      background:{type:'solid',color:'transparent'},
+      textColor:isDark?'#8b94a7':'#4b5563',
+      fontFamily:"'Manrope','Inter',system-ui,sans-serif",
+      fontSize:compact?10:11,
+      attributionLogo:false
+    },
+    grid:{
+      vertLines:{visible:true,color:isDark?'rgba(255,255,255,0.035)':'rgba(15,17,23,0.05)'},
+      horzLines:{visible:true,color:isDark?'rgba(255,255,255,0.035)':'rgba(15,17,23,0.05)'}
+    },
+    crosshair:{
+      mode:showCrosshair?CrosshairMode.Magnet:CrosshairMode.Hidden,
+      vertLine:{visible:showCrosshair,width:1,color:crosshairColor,style:2,labelBackgroundColor:isDark?'rgba(18,22,30,0.92)':'rgba(255,255,255,0.96)'},
+      horzLine:{visible:showCrosshair,width:1,color:crosshairColor,style:2,labelBackgroundColor:isDark?'rgba(18,22,30,0.92)':'rgba(255,255,255,0.96)'}
+    },
+    rightPriceScale:{borderVisible:false,scaleMargins:{top:compact?0.18:0.16,bottom:compact?0.14:0.12}},
+    leftPriceScale:{visible:false},
+    timeScale:{borderVisible:false,fixLeftEdge:true,fixRightEdge:true,rightOffset:4},
+    handleScroll:false,
+    handleScale:false
+  };
+}
+function getLwAreaSeriesOptions(positive,theme='dark',compact=false,currency){
+  const line=positive?'#22c55e':'#ef4444';
+  const top=positive?(theme!=='light'?'rgba(34,197,94,0.16)':'rgba(34,197,94,0.11)'):(theme!=='light'?'rgba(239,68,68,0.15)':'rgba(239,68,68,0.10)');
+  const formatValue=(price)=>currency?currency(price):money(price);
+  return {
+    lineColor:line,
+    topColor:top,
+    bottomColor:'rgba(0,0,0,0)',
+    lineWidth:compact?1.8:2.15,
+    lineType:LineType.Simple,
+    crosshairMarkerVisible:true,
+    crosshairMarkerRadius:compact?3.5:4,
+    crosshairMarkerBorderColor:theme!=='light'?'rgba(7,9,13,0.85)':'rgba(255,255,255,0.95)',
+    crosshairMarkerBackgroundColor:line,
+    priceFormat:{type:'custom',formatter:formatValue,minMove:0.01}
+  };
+}
+function DashboardChartFallback({compact=false}){
+  return <div className={`dashboardChartFallback ${compact?'compact':''}`}><LineChart size={compact?22:26}/><b>Curva en formación</b><span>Requiere al menos 2 días operados</span></div>;
+}
+function MtcLightweightLineChart({data=[],mode='pnl',height=240,compact=false,theme='auto',currency,showCrosshair=true}){
+  const containerRef=useRef(null);
+  const [resolvedTheme,setResolvedTheme]=useState('dark');
+  const points=useMemo(()=>normalizeLwChartPoints(data,mode),[data,mode]);
+  const hasEnoughData=points.length>=2;
+  const positive=useMemo(()=>{
+    if(!points.length)return true;
+    if(mode==='pnl')return Number(points[points.length-1]?.value||0)>=0;
+    return Number(points[points.length-1]?.value||0)>=Number(points[0]?.value||0);
+  },[points,mode]);
+  useEffect(()=>{
+    if(theme!=='auto'){setResolvedTheme(theme); return undefined;}
+    const readTheme=()=>setResolvedTheme(document.documentElement?.dataset?.theme==='light'?'light':'dark');
+    readTheme();
+    const mo=new MutationObserver(readTheme);
+    mo.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+    return ()=>mo.disconnect();
+  },[theme]);
+  useEffect(()=>{
+    const el=containerRef.current;
+    if(!el||!hasEnoughData)return undefined;
+    const chart=createChart(el,{...getLwChartOptions(resolvedTheme,compact,showCrosshair),width:el.clientWidth||320,height});
+    const series=chart.addSeries(AreaSeries,getLwAreaSeriesOptions(positive,resolvedTheme,compact,currency));
+    series.setData(points);
+    chart.timeScale().fitContent();
+    const ro=new ResizeObserver((entries)=>{
+      const entry=entries[0];
+      if(!entry)return;
+      const nextWidth=Math.floor(entry.contentRect.width);
+      if(nextWidth>0)chart.applyOptions({width:nextWidth,height});
+    });
+    ro.observe(el);
+    return ()=>{ro.disconnect(); chart.remove();};
+  },[points,hasEnoughData,resolvedTheme,compact,showCrosshair,height,positive,currency]);
+  if(!hasEnoughData)return null;
+  return <div ref={containerRef} className={`mtcLwChart ${compact?'compact':''} ${resolvedTheme==='light'?'light':'dark'} ${positive?'positive':'negative'}`} style={{height}} role="img" aria-label={mode==='pnl'?'Gráfico de P/L neto acumulado':'Gráfico de curva de equity'}/>;
+}
+function normalizeDashboardSession(value=''){
+  const raw=String(value||'').toLowerCase();
+  if(raw.includes('ny')||raw.includes('new york'))return 'NY';
+  if(raw.includes('lond')||raw.includes('london'))return 'Londres';
+  if(raw.includes('asia'))return 'Asia';
+  return value||'Sin sesión';
+}
+function buildOperationalHeatmap(trades=[]){
+  const sessions=['NY','Londres','Asia'];
+  const days=['Lun','Mar','Mié','Jue','Vie'];
+  const seed=sessions.reduce((acc,session)=>({...acc,[session]:days.map(day=>({session,day,count:0,total:0,r:0,avgR:0,tone:'empty'}))}),{});
+  (trades||[]).filter(isClosedEvaluableTrade).forEach(t=>{
+    const d=new Date(`${tradeDayKey(t)||t.date||''}T12:00:00`);
+    const dayIndex=(d.getDay()+6)%7;
+    if(dayIndex>4)return;
+    const session=normalizeDashboardSession(t.session);
+    if(!seed[session])seed[session]=days.map(day=>({session,day,count:0,total:0,r:0,avgR:0,tone:'empty'}));
+    const cell=seed[session][dayIndex];
+    const v=toNumberSafe(t.resultMoney), r=toNumberSafe(t.resultR);
+    cell.count++;
+    cell.total+=v;
+    cell.r+=r;
+    cell.avgR=cell.count?cell.r/cell.count:0;
+    cell.tone=cell.avgR>0?'positive':cell.avgR<0?'negative':'neutral';
+  });
+  return Object.entries(seed).map(([session,cells])=>({session,cells}));
+}
+function DashboardInsightKpis({s,monthly,streakInfo,profitFactor,profitFactorSub,avgWinLoss,avgWinLossSub,expectancyValue,expectancySub}){
+  const pfNumber=Number(s.profitFactor||0);
+  const pfGauge=Number.isFinite(pfNumber)?Math.min(100,pfNumber/2*100):0;
+  const wrTone=Number(s.winrate||0)>=50?'positive':'neutral';
+  const pfTone=pfNumber>=1.5?'positive':pfNumber>0?'neutral':'fallback';
+  return <div className="dashboardInsightKpis">
+    <article className={`dashboardInsightKpi ${monthly.total>=0?'positive':'negative'}`}><span>P/L neto</span><b>{formatMoneyCompactCard(monthly.total)}</b><small>Mes actual · {formatCalendarR(monthly.r)}</small><i/></article>
+    <article className={`dashboardInsightKpi withGauge ${wrTone}`}><div><span>Efectividad</span><b>{formatPercentCard(s.winrate)}</b><small>{s.wins} ganadas · {s.losses} perdidas · {s.breakeven} BE</small></div><DashboardGauge value={s.winrate} tone={wrTone}/></article>
+    <article className="dashboardInsightKpi split"><span>Promedio ganador / perdedor</span><b>{s.wins?formatMoneyCompactCard(s.avgWin):'Sin muestra'}</b><small>{s.losses?formatMoneyCompactCard(-Math.abs(Number(s.avgLoss||0))):'Requiere pérdidas'} · Ratio {avgWinLoss}</small><em>{avgWinLossSub}</em></article>
+    <article className={`dashboardInsightKpi withGauge ${pfTone}`}><div><span>Factor de beneficio</span><b>{profitFactor}</b><small>{profitFactorSub}</small></div><DashboardGauge value={pfGauge} tone={pfTone}/></article>
+    <article className={`dashboardInsightKpi ${s.count>=10&&Number(s.meanR||0)>=0?'positive':'neutral'}`}><span>Expectativa</span><b>{s.count>=10?formatMoneyCompactCard(s.expectancy):expectancyValue}</b><small>{expectancySub}{s.count>=10?` · ${formatR(s.meanR)}`:''}</small><i/></article>
+    <article className={`dashboardInsightKpi ${streakInfo.sign>0?'positive':streakInfo.sign<0?'negative':'neutral'}`}><span>Racha actual</span><b>{streakInfo.count?`${streakInfo.count} ${streakInfo.count===1?'operación':'operaciones'}`:'Sin racha'}</b><small>{streakInfo.count?(streakInfo.sign>0?'Últimos cierres positivos':'Últimos cierres negativos'):'Sin muestra reciente'}</small><i/></article>
+  </div>
+}
+function MtcScoreCard({s,disciplineScore,hasProfitFactorSample,hasWinLossSample}){
+  const axes=[
+    {label:'Efectividad',value:s.count>=5?clampScore(s.winrate):null},
+    {label:'Payoff',value:hasWinLossSample?clampScore(Number(s.payoffRatio||0)/2*100):null},
+    {label:'Factor beneficio',value:hasProfitFactorSample?clampScore(Number(s.profitFactor||0)/2*100):null},
+    {label:'Consistencia',value:s.count>=5?clampScore(100-Math.min(85,Number(s.stdR||0)*38)):null},
+    {label:'Disciplina',value:Number.isFinite(Number(disciplineScore))?clampScore(disciplineScore):null},
+    {label:'Drawdown',value:s.count>=5?clampScore(100-Math.min(90,Number(s.maxDD||0)*10)):null}
+  ];
+  const valid=axes.filter(x=>Number.isFinite(x.value));
+  const scoreReady=s.count>=10&&valid.length>=5;
+  const score=scoreReady?clampScore(valid.reduce((sum,x)=>sum+x.value,0)/valid.length):null;
+  const scoreTone=scoreReady?(score>=70?'positive':score>=45?'neutral':'negative'):'fallback';
+  const dash=scoreReady?`${Math.round((score/100)*339)} 339`:'0 339';
+  return <Card title="MTC Score" sub={scoreReady?'Score compuesto de ventaja, disciplina y riesgo.':'Sin muestra suficiente · requiere +10 operaciones.'} className="dashboardMtcScoreCard">
+    <div className="dashboardMtcScoreBody">
+      <div className={`dashboardMtcScoreRing ${scoreTone}`}>
+        <svg viewBox="0 0 130 130" aria-hidden="true"><circle cx="65" cy="65" r="54"/><circle cx="65" cy="65" r="54" pathLength="339" strokeDasharray={dash}/></svg>
+        <div><b>{scoreReady?score:'—'}</b><small>/100</small><em>{scoreReady?'MTC Score':'Muestra insuficiente'}</em></div>
+      </div>
+      <div className="dashboardMtcAxes">{axes.map(axis=><div key={axis.label} className={axis.value==null?'muted':''}><span>{axis.label}</span><i><em style={{width:`${axis.value??0}%`}}/></i><b>{axis.value==null?'—':`${axis.value}`}</b></div>)}{!scoreReady&&<p>Requiere +10 operaciones para activar el score compuesto.</p>}</div>
+    </div>
+  </Card>
+}
+function DailyNetCumulativeCard({curve=[]}){
+  const hasData=curve.length>=2;
+  const last=curve[curve.length-1]?.value||0;
+  let peak=0,maxDrawdown=0; curve.forEach(point=>{peak=Math.max(peak,Number(point.value||0)); maxDrawdown=Math.max(maxDrawdown,peak-Number(point.value||0));});
+  return <Card title="P/L neto acumulado" sub={hasData?`Mes actual · ${formatMoneyCompactCard(last)} acumulado`:'Curva en formación · requiere al menos 2 días operados.'} className="dashboardCumulativeCard">
+    {hasData?<><div className="dashboardCumulativeHeader"><div><span>Cierre actual</span><b>{formatMoneyCompactCard(last)}</b></div><div><span>Drawdown máx.</span><b className="negative">{formatMoneyCompactCard(-Math.abs(maxDrawdown))}</b></div></div><MtcLightweightLineChart data={curve} mode="pnl" height={292} currency={formatMoneyCompactCard}/></>:<DashboardChartFallback/>}
+  </Card>
+}
+function OperationalHeatmapCard({matrix=[]}){
+  const days=['Lun','Mar','Mié','Jue','Vie'];
+  return <Card title="Heatmap operativo" sub="Sesiones ordenadas por actividad real." className="dashboardHeatmapCard">
+    <div className="dashboardHeatmapMatrix">
+      <span/>
+      {days.map(day=><b key={day}>{day}</b>)}
+      {matrix.map(row=><React.Fragment key={row.session}><strong>{row.session}</strong>{row.cells.map(cell=><i key={`${row.session}-${cell.day}`} className={cell.tone} title={`${row.session} · ${cell.day} · ${cell.count?`${cell.count} op · ${formatR(cell.avgR)} · ${formatMoneyCompactCard(cell.total)}`:'Sin operaciones'}`}>{cell.count?<em>{formatR(cell.avgR)}</em>:null}</i>)}</React.Fragment>)}
+    </div>
+    <div className="dashboardHeatmapLegend"><span><i className="positive"/>R positivo</span><span><i className="negative"/>R negativo</span><span><i/>Sin operaciones</span></div>
+  </Card>
+}
+function DashboardInsightSection({s,disciplineScore,hasProfitFactorSample,hasWinLossSample,dailyCurve,heatmapMatrix}){
+  return <section className="dashboardInsightsSection">
+    <div className="dashboardInsightsHead"><div><span>Analítica avanzada</span><h3>Insights operativos</h3><p>Score, curva mensual y sesiones para leer ventaja sin repetir los KPIs ejecutivos.</p></div></div>
+    <div className="dashboardInsightsGrid">
+      <MtcScoreCard s={s} disciplineScore={disciplineScore} hasProfitFactorSample={hasProfitFactorSample} hasWinLossSample={hasWinLossSample}/>
+      <DailyNetCumulativeCard curve={dailyCurve}/>
+      <OperationalHeatmapCard matrix={heatmapMatrix}/>
+    </div>
+  </section>
+}
 function Dashboard({data,profile,setTab}){
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
   const initial=accountInitial(data.settings,active);
@@ -1927,20 +2161,28 @@ function Dashboard({data,profile,setTab}){
   const profitFactorSub=hasProfitFactorSample?'Salud del sistema':'Requiere +10 operaciones';
   const hasWinLossSample=Number(s.wins||0)>0&&Number(s.losses||0)>0;
   const avgWinLoss=hasWinLossSample?Number(s.payoffRatio||0).toFixed(2):'Sin muestra';
-  const avgWinLossSub=hasWinLossSample?`${formatMoneyCompactCard(s.avgWin)} / ${formatMoneyCompactCard(-Math.abs(Number(s.avgLoss||0)))}`:'Requiere ganancias y perdidas';
+  const avgWinLossSub=hasWinLossSample?`${formatMoneyCompactCard(s.avgWin)} / ${formatMoneyCompactCard(-Math.abs(Number(s.avgLoss||0)))}`:'Requiere ganancias y pérdidas';
   const expectancyValue=s.count<10?'Sin muestra':formatR(s.meanR);
-  const expectancySub=s.count<10?'Requiere +10 operaciones':'Promedio R por operacion';
+  const expectancySub=s.count<10?'Requiere +10 operaciones':'Promedio R por operación';
   const streakInfo=(()=>{let sign=0,count=0; for(let i=closedTrades.length-1;i>=0;i--){const v=Number(closedTrades[i].resultMoney||0); const nextSign=v>0?1:v<0?-1:0; if(!nextSign)continue; if(!sign)sign=nextSign; if(nextSign!==sign)break; count++;} return {count,sign};})();
-  const streakValue=streakInfo.count?`${streakInfo.count} ${streakInfo.count===1?'operacion':'operaciones'}`:'Sin racha';
-  const streakSub=streakInfo.count?(streakInfo.sign>0?'Ultimo resultado positivo':'Ultimo resultado negativo'):'Sin muestra reciente';
+  const streakValue=streakInfo.count?`${streakInfo.count} ${streakInfo.count===1?'operación':'operaciones'}`:'Sin racha';
+  const streakSub=streakInfo.count?(streakInfo.sign>0?'Último cierre positivo':'Último cierre negativo'):'Sin muestra reciente';
   const activeLabel=active==='__all__'?'Todas las cuentas':active;
   const disciplineReady=s.count>=5;
   const disciplineScore=disciplineReady?Math.round((Number(s.behaviorAvg||0)*.45)+(Number(s.discipline||0)*.35)+(Math.min(100,Number(s.qualityAvg||0))*.20)):null;
   const qualityLabel=Number(s.qualityAvg||0)>=95?'A+':Number(s.qualityAvg||0)>=80?'A':Number(s.qualityAvg||0)>=60?'B':Number(s.qualityAvg||0)>0?'C':'—';
-  const mainSession=[...(s.bySession||[])].sort((a,b)=>b.count-a.count)[0]?.name||'Sin muestra';
+  const mainSession=[...(s.bySession||[])].sort((a,b)=>b.count-a.count)[0]?.name||'Pendiente';
   const bestDayLabel=s.bestDay?`${String(s.bestDay.date).slice(5)} · ${formatMoneyCompactCard(s.bestDay.total)}`:'—';
   const worstDayLabel=s.worstDay?`${String(s.worstDay.date).slice(5)} · ${formatMoneyCompactCard(s.worstDay.total)}`:'—';
   const mapReady=s.count>=3;
+  const dailyCurve=useMemo(()=>buildDailyNetCurve(filtered),[filtered]);
+  const heatmapMatrix=useMemo(()=>buildOperationalHeatmap(filtered),[filtered]);
+  const winLossTotal=Math.max(1,Number(s.wins||0)+Number(s.losses||0)+Number(s.breakeven||0));
+  const payoffWin=Math.max(0,Number(s.avgWin||0));
+  const payoffLoss=Math.abs(Number(s.avgLoss||0));
+  const payoffTotal=Math.max(1,payoffWin+payoffLoss);
+  const profitFactorGauge=hasProfitFactorSample?Math.min(100,Number(s.profitFactor||0)/2*100):0;
+  const expectancyGauge=s.count>=10?clampScore((Number(s.meanR||0)+1)*50):Math.min(100,s.count*10);
   return <main className="page dashboardV38 dashboardClean">
     <section className="dashboardCommandHeader">
       <div>
@@ -1953,22 +2195,22 @@ function Dashboard({data,profile,setTab}){
       </div>
     </section>
     <div className="metrics premiumMetricGrid dashboardKpiStrip">
-      <MetricCardPremium label="P/L neto" value={formatMoneyCompactCard(monthly.total)} sub={`${formatMetricCard(monthly.days)} día${monthly.days===1?'':'s'} · ${formatCalendarR(monthly.r)}`} icon={LineChart} state={monthly.total>=0?'positive':'negative'} sparkData={spark} showSpark={false}/>
-      <MetricCardPremium label="Efectividad" value={formatPercentCard(s.winrate)} sub={`${s.wins} ganada${s.wins===1?'':'s'} · ${s.losses} perdida${s.losses===1?'':'s'} · ${s.breakeven} BE`} icon={Trophy} state={s.winrate>=50?'positive':'neutral'} sparkData={spark} showSpark={false}/>
-      <MetricCardPremium label="Ratio G/P" value={avgWinLoss} sub={avgWinLossSub} icon={BarChart3} state={s.payoffRatio>=1?'positive':'neutral'} sparkData={spark} showSpark={false}/>
-      <MetricCardPremium label="Factor de beneficio" value={profitFactor} sub={profitFactorSub} icon={Shield} state={hasProfitFactorSample&&Number(s.profitFactor||0)>=1.5?'positive':'neutral'} sparkData={spark} showSpark={false}/>
-      <MetricCardPremium label="Racha actual" value={streakValue} sub={streakSub} icon={Activity} state={streakInfo.sign>0?'positive':streakInfo.sign<0?'negative':'neutral'} sparkData={spark} showSpark={false}/>
-      <MetricCardPremium label="Expectativa" value={expectancyValue} sub={expectancySub} icon={Target} state={s.count>=10&&Number(s.meanR||0)>0?'positive':s.count>=10&&Number(s.meanR||0)<0?'negative':'neutral'} sparkData={spark} showSpark={false}/>
+      <DashboardKpiCard label="P/L neto" value={formatMoneyCompactCard(monthly.total)} sub={`${formatMetricCard(monthly.days)} día${monthly.days===1?'':'s'} · ${formatCalendarR(monthly.r)}`} state={monthly.total>=0?'positive':'negative'} meta="Mes" visual={<MiniSparkline data={dailyCurve.length?dailyCurve.map(x=>x.value):spark} tone={monthly.total>=0?'positive':'negative'}/>}/>
+      <DashboardKpiCard label="Efectividad" value={formatPercentCard(s.winrate)} sub={`${s.wins} ganada${s.wins===1?'':'s'} · ${s.losses} perdida${s.losses===1?'':'s'} · ${s.breakeven} BE`} state={s.winrate>=50?'positive':'neutral'} meta="Win rate" visual={<KpiBars items={[{value:s.wins/winLossTotal*100,tone:'positive',label:'Ganadas'},{value:s.losses/winLossTotal*100,tone:'negative',label:'Perdidas'},{value:s.breakeven/winLossTotal*100,tone:'neutral',label:'BE'}]}/>}/>
+      <DashboardKpiCard label="Ratio G/P" value={avgWinLoss} sub={avgWinLossSub} state={s.payoffRatio>=1?'positive':'neutral'} meta="Payoff" visual={<KpiBars items={[{value:payoffWin/payoffTotal*100,tone:'positive',label:'Ganador promedio'},{value:payoffLoss/payoffTotal*100,tone:'negative',label:'Perdedor promedio'}]}/>}/>
+      <DashboardKpiCard label="Factor de beneficio" value={profitFactor} sub={profitFactorSub} state={hasProfitFactorSample&&Number(s.profitFactor||0)>=1.5?'positive':'neutral'} meta="Sistema" visual={<KpiMiniGauge value={profitFactorGauge} tone={hasProfitFactorSample&&Number(s.profitFactor||0)>=1.5?'positive':'neutral'}/>}/>
+      <DashboardKpiCard label="Racha actual" value={streakValue} sub={streakSub} state={streakInfo.sign>0?'positive':streakInfo.sign<0?'negative':'neutral'} meta="Momentum" visual={<KpiStreakDots count={streakInfo.count} sign={streakInfo.sign}/>}/>
+      <DashboardKpiCard label="Expectativa" value={expectancyValue} sub={expectancySub} state={s.count>=10&&Number(s.meanR||0)>0?'positive':s.count>=10&&Number(s.meanR||0)<0?'negative':'neutral'} meta="Muestra" visual={<KpiBars items={[{value:expectancyGauge,tone:s.count>=10&&Number(s.meanR||0)<0?'negative':'positive',label:'Estabilidad'},{value:Math.max(4,100-expectancyGauge),tone:'neutral',label:'Pendiente'}]}/>}/>
     </div>
     <div className="dashboardVisualGrid">
       <div className="dashboardCalendarColumn">
         <CalendarHeatmapPreview trades={filtered} setTab={setTab} initial={initial}/>
-        <Card title="Resumen estadistico" sub="Lectura compacta de calidad, sesion y dias clave." className="dashboardStatsSummary">
+        <Card title="Resumen estadístico" sub="Lectura compacta de calidad, sesión y días clave." className="dashboardStatsSummary">
           <div className="dashboardStatsGrid">
-            <div><span>Calidad promedio</span><b>{mapReady?qualityLabel:'Sin muestra'}</b><small>{mapReady?`${Math.round(s.qualityAvg||0)}/100`:'Requiere mas operaciones'}</small></div>
-            <div><span>Sesion principal</span><b>{mapReady?mainSession:'Sin muestra'}</b><small>{mapReady?`${s.count} operaciones evaluadas`:'Sin datos suficientes'}</small></div>
-            <div><span>Mejor dia</span><b>{mapReady?bestDayLabel:'Sin muestra'}</b><small>Resultado neto</small></div>
-            <div><span>Peor dia</span><b>{mapReady?worstDayLabel:'Sin muestra'}</b><small>{s.worstDay?.total<0?'Control de perdida':'Sin perdidas registradas'}</small></div>
+            <div><span>Calidad promedio</span><b>{mapReady?qualityLabel:'Pendiente'}</b><small>{mapReady?`${Math.round(s.qualityAvg||0)}/100`:'Requiere más operaciones'}</small></div>
+            <div><span>Sesión principal</span><b>{mapReady?mainSession:'Pendiente'}</b><small>{mapReady?`${s.count} operaciones evaluadas`:'Sin datos suficientes'}</small></div>
+            <div><span>Mejor día</span><b>{mapReady?bestDayLabel:'Pendiente'}</b><small>Resultado neto</small></div>
+            <div><span>Peor día</span><b>{mapReady?worstDayLabel:'Pendiente'}</b><small>{s.worstDay?.total<0?'Control de pérdida':'Sin pérdidas registradas'}</small></div>
           </div>
         </Card>
       </div>
@@ -1976,7 +2218,7 @@ function Dashboard({data,profile,setTab}){
         <RecommendedActionCard data={scopedData} setTab={setTab} s={s}/>
         <Card title="Disciplina" sub="Conducta, plan y calidad." className="dashboardDisciplineCard">
           <div className={`dashboardScorePanel ${disciplineReady?'ready':'isFallback'}`}>
-            <div className={`dashboardDisciplineBadge ${disciplineReady?'ready':'isFallback'}`}><b>{disciplineReady?`${disciplineScore}/100`:'Sin muestra'}</b><small>{disciplineReady?'Score operativo':'Requiere +5 operaciones'}</small></div>
+            <div className={`dashboardDisciplineBadge ${disciplineReady?'ready':'isFallback'}`}><b>{disciplineReady?`${disciplineScore}/100`:'Pendiente'}</b><small>{disciplineReady?'Score operativo':'Requiere +5 operaciones'}</small></div>
             <div><span>{disciplineReady?'Score de conducta':'Muestra insuficiente'}</span><p>{disciplineReady?`${Math.round(s.discipline||0)}% plan · Conducta ${Math.round(s.behaviorAvg||0)}/100 · Calidad ${qualityLabel}`:'Requiere +5 operaciones'}</p></div>
           </div>
         </Card>
@@ -1984,21 +2226,21 @@ function Dashboard({data,profile,setTab}){
           <div className="dashboardRiskList">
             <div><span>Estado</span><b>{riskLevel}</b><small>{riskGuard.blocked?(riskGuard.reasons[0]||'Límite operativo activo'):'Sin bloqueo operativo'}</small></div>
             <div><span>Riesgo diario</span><b>{money(riskSettings.maxDailyLoss)}</b><small>Máx. pérdida configurada</small></div>
-            <div><span>Trades hoy</span><b>{todayTrades.length}/{riskSettings.maxTradesDay||'—'}</b><small>P/L día {formatMoneyCompactCard(dayPnL)}</small></div>
+            <div><span>Operaciones hoy</span><b>{todayTrades.length}/{riskSettings.maxTradesDay||'—'}</b><small>P/L día {formatMoneyCompactCard(dayPnL)}</small></div>
             <div><span>Efectividad semanal</span><b>{formatPercentCard(weekWr)}</b><small>{weekTrades.length} operaciones registradas</small></div>
           </div>
         </Card>
-        <Card title="Mapa operativo" sub={mapReady?`${mainSession} · ${monthly.days} día${monthly.days===1?'':'s'} operado${monthly.days===1?'':'s'}`:'Lectura mensual en formacion.'} className="dashboardMapCard">
+        <Card title="Mapa operativo" sub={mapReady?`${mainSession} · ${monthly.days} día${monthly.days===1?'':'s'} operado${monthly.days===1?'':'s'}`:'Lectura mensual en formación.'} className="dashboardMapCard">
           <div className="dashboardMapGrid">
             <div><span>Mes</span><b>{monthly.wins} ganada{monthly.wins===1?'':'s'} · {monthly.losses} perdida{monthly.losses===1?'':'s'} · {monthly.be} BE</b><small>Resultado {formatCalendarR(monthly.r)}</small></div>
-            <div><span>Sesion principal</span><b>{mapReady?mainSession:'Sin muestra'}</b><small>{mapReady?'Mayor frecuencia operativa':'Sin datos suficientes'}</small></div>
+            <div><span>Resultado R</span><b>{formatCalendarR(monthly.r)}</b><small>{formatMoneyCompactCard(monthly.total)}</small></div>
+            <div><span>Sesión principal</span><b>{mapReady?mainSession:'Pendiente'}</b><small>{mapReady?'Mayor frecuencia operativa':'Sin datos suficientes'}</small></div>
             <div><span>Calidad promedio</span><b>{mapReady?qualityLabel:'—'}</b><small>{mapReady?`${Math.round(s.qualityAvg||0)}/100`:'Sin muestra suficiente'}</small></div>
-            <div><span>Mejor día</span><b>{mapReady?bestDayLabel:'—'}</b><small>Resultado neto</small></div>
-            <div><span>Peor día</span><b>{mapReady?worstDayLabel:'—'}</b><small>Control de riesgo</small></div>
           </div>
         </Card>
         <EquityCurvePreview s={s}/>
       </aside>
+      <DashboardInsightSection s={s} disciplineScore={disciplineScore} hasProfitFactorSample={hasProfitFactorSample} hasWinLossSample={hasWinLossSample} dailyCurve={dailyCurve} heatmapMatrix={heatmapMatrix}/>
     </div>
   </main>
 }
