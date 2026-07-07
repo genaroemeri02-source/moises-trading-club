@@ -2503,10 +2503,10 @@ function TradeRow({t,onOpen,onDelete,onExport,onShare}){
     </div>
     <div className={value>0?'journalTradeResult tradeResult pos':value<0?'journalTradeResult tradeResult neg':'journalTradeResult tradeResult'}><strong>{value>0?'+':''}{money(value)}</strong><small>{pctVal>0?'+':''}{pct(pctVal)} · {rVal>0?'+':''}{rVal.toFixed(2)}R</small></div>
     <div className="tradeExportActions journalTradeActions" onClick={e=>e.stopPropagation()}>
-      <button className="ghost compact shareReviewButton" onClick={onShare} title="Compartir revisión"><Share2 size={14}/>Revisión</button>
-      <button className="ghost compact" onClick={()=>onExport(t,'json')} title="Exportar JSON"><Download size={14}/>JSON</button>
-      <button className="ghost compact" onClick={()=>onExport(t,'csv')} title="Exportar CSV"><Download size={14}/>CSV</button>
-      <button className="tradeDeleteButton" onClick={onDelete} title="Borrar trade" aria-label="Borrar trade"><Trash2 size={16}/></button>
+      <button className="ghost compact shareReviewButton journalTradeActionBtn" onClick={onShare} title="Compartir revisión"><Share2 size={14}/>Revisión</button>
+      <button className="ghost compact journalTradeActionBtn" onClick={()=>onExport(t,'json')} title="Exportar JSON"><Download size={14}/>JSON</button>
+      <button className="ghost compact journalTradeActionBtn" onClick={()=>onExport(t,'csv')} title="Exportar CSV"><Download size={14}/>CSV</button>
+      <button className="ghost compact journalTradeActionBtn journalTradeActionDelete" onClick={onDelete} title="Borrar trade" aria-label="Borrar trade"><Trash2 size={14}/>Eliminar</button>
     </div>
   </div>
 }
