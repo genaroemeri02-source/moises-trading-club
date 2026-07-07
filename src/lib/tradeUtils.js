@@ -156,3 +156,33 @@ export function normalizedText(value = '') {
 }
 
 export function accountName(t) { return String(t?.account || t?.accountName || t?.challenge || 'Cuenta principal').trim() || 'Cuenta principal'; }
+
+export function sanitizeFirestoreValue(value) {
+  if (value === undefined) return undefined;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map(sanitizeFirestoreValue).filter(v => v !== undefined);
+  if (Object.prototype.toString.call(value) !== '[object Object]') return value;
+  const out = {};
+  Object.entries(value).forEach(([k, v]) => {
+    const clean = sanitizeFirestoreValue(v);
+    if (clean !== undefined) out[k] = clean;
+  });
+  return out;
+}
+
+export function sanitizeFirestoreObject(obj = {}) {
+  return sanitizeFirestoreValue(obj) || {};
+}
+
+export function normalizedAccounts(settings = {}) {
+  const list = Array.isArray(settings.accounts) ? settings.accounts : [];
+  const base = list.length ? list : [{ id: 'main', name: 'Cuenta principal', capital: Number(settings.initialBalance || 10000), type: 'Personal', currency: 'USD' }];
+  return base.map((a, i) => ({
+    id: a.id || `acc_${i}`,
+    name: String(a.name || 'Cuenta principal').trim() || 'Cuenta principal',
+    capital: Number(a.capital || a.initialBalance || settings.initialBalance || 10000),
+    type: a.type || 'Personal',
+    currency: a.currency || 'USD'
+  }));
+}

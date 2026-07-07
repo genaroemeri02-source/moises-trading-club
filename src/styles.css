@@ -17498,3 +17498,13 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .journalPage .journ
     min-height:32px!important;
   }
 }
+
+/* v50.1 smoke-test — journal tools clearance at ~390px mobile */
+@media(max-width:430px){
+  .app .journalPage{
+    padding-bottom:calc(168px + env(safe-area-inset-bottom))!important;
+  }
+  .app .journalPage .journalToolsCard{
+    scroll-margin-bottom:calc(96px + env(safe-area-inset-bottom))!important;
+  }
+}

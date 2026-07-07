@@ -23,7 +23,8 @@ import {
   toNumberSafe, normalizeNumInput, parseLimitMoney,
   safeArray, normalizeTradeArrayFields,
   normalizeImportedTradeRow, parseCsv,
-  normalizeTradeSetup, tradeDayKey, isClosedEvaluableTrade, accountName
+  normalizeTradeSetup, tradeDayKey, isClosedEvaluableTrade, accountName,
+  sanitizeFirestoreObject, normalizedAccounts
 } from './lib/tradeUtils.js';
 import {
   behaviorScoreFromTrade, behaviorScoreLabel,
@@ -44,6 +45,13 @@ import { DashboardRightRail } from './components/dashboard/DashboardRightRail.js
 import { DashboardAdvancedInsights } from './components/dashboard/DashboardAdvancedInsights.jsx';
 import { ResetTicker } from './components/dashboard/ResetTicker.jsx';
 import { clampScore, buildDailyNetCurve, buildOperationalHeatmap, sessionNameNY, tradeSortTime } from './components/dashboard/dashboardUtils.js';
+import { JournalHeader } from './components/journal/JournalHeader.jsx';
+import { JournalActions } from './components/journal/JournalActions.jsx';
+import { JournalMainGrid } from './components/journal/JournalMainGrid.jsx';
+import { JournalToolsCard } from './components/journal/JournalToolsCard.jsx';
+import { TradeForm } from './components/trade/TradeForm.jsx';
+import { TradeDetailModal } from './components/trade/TradeDetailModal.jsx';
+import { mentorStatusLabel } from './components/trade/tradeFormConstants.js';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -59,40 +67,8 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const ADMIN_EMAILS = String(import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
 
-function numericTradePayload(form){
-  const numeric=['riskPct','entry','sl','tp','exit','riskMoney','resultMoney','resultPct','resultR'];
-  const out=normalizeTradeArrayFields({...form});
-  numeric.forEach(k=>out[k]=toNumberSafe(out[k]));
-  ['calidadTesis','calidadEjecucion','calidadComportamiento','calidadRevision','indiceCalidadContextual'].forEach(k=>{
-    const raw=String(out[k] ?? '').trim();
-    out[k]=raw===''?undefined:Math.max(1,Math.min(10,Math.round(toNumberSafe(raw))));
-  });
-  out.behaviorScore=behaviorScoreFromTrade(out);
-  out.behaviorScoreLabel=behaviorScoreLabel(out.behaviorScore);
-  return out;
-}
 const uid=()=>crypto.randomUUID?.()||String(Date.now()+Math.random());
 async function copyText(text,label='Copiado'){try{await navigator.clipboard.writeText(String(text||'')); toast(label);}catch(e){toast('No se pudo copiar');}}
-const checklistBase=['Contexto claro','Sesión válida','Tomó liquidez','Confirmación estructural','RR válido','Sigo el plan','Neutralidad emocional','Entrada A/A+'];
-const emotionBeforeOptions=['Calmo','Ansioso','Apurado','Eufórico','Frustrado','Neutral'];
-const executionBehaviorOptions=['Seguí el plan','Dudé antes de entrar','Entré tarde','Me anticipé','Moví el stop','Cerré antes de tiempo','Sobreoperé','Respeté el riesgo','Operé por impulso'];
-const postTradeBehaviorOptions=['Buena ejecución','Ejecución mejorable','Rompí reglas','Aprendizaje claro'];
-const traderReviewScores=[
-  ['calidadTesis','Calidad de la tesis','¿La operación nació de una narrativa clara de mercado?'],
-  ['calidadEjecucion','Calidad de ejecución','¿Entré, gestioné y salí según el plan?'],
-  ['calidadComportamiento','Calidad de comportamiento','¿Actué como trader profesional o desde impulso/emoción?'],
-  ['calidadRevision','Calidad de revisión','¿La operación dejó aprendizaje útil para mejorar?']
-];
-const respetoProcesoOptions=['Completo','Parcial','No respetado'];
-const estadoMentalOptions=['Calmo','Ansioso','Impulsivo','Neutral','Cansado','Enfocado'];
-const motivoOperacionOptions=['Ventaja clara','Duda','Impulso','FOMO','Revancha','Aburrimiento'];
-const alineacionContextualOptions=['A favor','En contra','Mixto','No claro'];
-const siParcialNoOptions=['Sí','Parcial','No'];
-const dxyConfirmaOptions=['Sí','Parcial','No','No aplica'];
-const negativeBehaviorOptions=['Dudé antes de entrar','Entré tarde','Me anticipé','Moví el stop','Cerré antes de tiempo','Sobreoperé','Operé por impulso','Rompí reglas'];
-const positiveBehaviorOptions=['Seguí el plan','Respeté el riesgo','Buena ejecución','Aprendizaje claro','Ejecución disciplinada'];
-const moisesPatterns=['Método Estructural: ChoCH en M1','Método Volumen × Desplazamiento','Envolvente','Estrella de la Mañana / Noche','Hombro Cabeza Hombro','HCH Invertido','Secuencia de 3 Velas'];
-const moisesConfluences=['7 Mandamientos validados','Liquidity Sweep','ChoCH','OB de confirmación','FVG institucional / Vacío','Vacío + EMA','Subasta completada','Toma de liquidez interna','Sesión válida','RR mínimo 1:2','Confirmación estructural','Volumen institucional','Desplazamiento 50%+','Retest limpio','Distancia M15→M1 válida'];
 const avatarOptions=[
  {id:'trader-m',gender:'masculino',label:'Trader institucional',emoji:'👨‍💻',bg:'gold'},
  {id:'trader-f',gender:'femenino',label:'Trader institucional',emoji:'👩‍💻',bg:'gold'},
@@ -165,11 +141,6 @@ const instrumentPresets={
 function getRiskSettings(){try{return {...riskDefaults,...JSON.parse(localStorage.getItem('mtc-risk-settings')||'{}')}}catch{return riskDefaults}}
 function saveRiskSettings(v){localStorage.setItem('mtc-risk-settings',JSON.stringify(v)); window.dispatchEvent(new Event('mtc-risk-settings-updated'));}
 
-function normalizedAccounts(settings={}){
-  const list=Array.isArray(settings.accounts)?settings.accounts:[];
-  const base=list.length?list:[{id:'main',name:'Cuenta principal',capital:Number(settings.initialBalance||10000),type:'Personal',currency:'USD'}];
-  return base.map((a,i)=>({id:a.id||`acc_${i}`,name:String(a.name||'Cuenta principal').trim()||'Cuenta principal',capital:Number(a.capital||a.initialBalance||settings.initialBalance||10000),type:a.type||'Personal',currency:a.currency||'USD'}));
-}
 function cleanAccountsForSave(settings={}){
   const list=Array.isArray(settings.accounts)?settings.accounts:[];
   const base=list.length?list:[{id:'main',name:'Cuenta principal',capital:Number(settings.initialBalance||10000),type:'Personal',currency:'USD'}];
@@ -650,17 +621,6 @@ async function renderDailyStoryPng(stats){
   return toCanvasBlob(canvas);
 }
 
-function sanitizeFirestoreValue(value){
-  if(value === undefined) return undefined;
-  if(typeof value === 'number') return Number.isFinite(value) ? value : 0;
-  if(value === null || typeof value !== 'object') return value;
-  if(Array.isArray(value)) return value.map(sanitizeFirestoreValue).filter(v=>v !== undefined);
-  if(Object.prototype.toString.call(value) !== '[object Object]') return value;
-  const out={};
-  Object.entries(value).forEach(([k,v])=>{const clean=sanitizeFirestoreValue(v); if(clean !== undefined) out[k]=clean;});
-  return out;
-}
-function sanitizeFirestoreObject(obj={}){return sanitizeFirestoreValue(obj) || {};}
 function tradeOwnerId(t={}){return t.userId || t.uid || t.ownerId || t.authorId || '';}
 async function unlinkChecklistFromTradeIfNeeded(trade){
   if(!trade?.checklistId) return;
@@ -1642,87 +1602,42 @@ function Journal({data,profile}){
   const exportDisabled=!filtered.length;
   const filteredExportDisabled=!list.length;
   return <main className="page journalPage">
-    {!form&&<button className="mobileNewTradeFab journalPrimaryCta" onClick={openNewTrade}><Plus size={18}/>Nuevo trade</button>}
-    {guard.blocked&&<div className="riskAlert"><Shield size={20}/><div><b>Modo reflexión activo</b><p>{guard.reasons.join(' · ')}. Este bloqueo se calcula por jornada operativa New York y se reinicia al rollover 17:00 NY. Ajustá límites en Riesgo si corresponde.</p></div></div>}
-    {form&&<TradeForm form={form} setForm={setForm} profile={profile} data={data}/>}
-    <Card title="Acciones rápidas" className="journalOpsCard" sub="Cuenta activa, filtros y búsqueda">
-      <div className="row journalQuickActions journalOpsRow">
-        <AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>
-        <button className="primary journalDesktopNewTrade" onClick={openNewTrade}><Plus/>Nuevo trade</button>
-        <select className="input small journalFilterSelect" value={checklistFilter} onChange={e=>setChecklistFilter(e.target.value)}>{["Todos","Con checklist","Sin checklist","Con luz verde","Sin luz verde","Setups A+","Ejecutados sin checklist completo"].map(x=><option key={x}>{x}</option>)}</select>
-        <div className="search journalSearch"><Search size={16}/><input placeholder="Buscar por activo, setup, patrón o nota" value={search} onChange={e=>setSearch(e.target.value)}/></div>
-      </div>
-    </Card>
-    <div className="journalMainGrid">
-      <div className="journalMainLeft">
-        <div className="journalDailyPlanWrap"><DailyPlanPanel profile={profile} data={scopedData} dayKey={selectedDate}/></div>
-        <div className="table journalTradesTable">{list.map(t=><TradeRow key={t.id} t={t} onOpen={()=>setSelectedTrade(t)} onDelete={()=>del(t)} onExport={exportSingleTrade} onShare={()=>setShareTrade(t)}/>) }{!list.length&&<Empty title="Sin trades en esta jornada" text="Elegí otra fecha o registrá una nueva operación para este día." cta="Nuevo trade" icon={Plus} onClick={openNewTrade}/>}</div>
-      </div>
-      <aside className="journalMainRight">
-        <Card className="journalCalendarCard" title="Calendario mensual de jornadas" sub="Profit, Stop Loss y Breakeven por resultado neto de cada jornada. Click para abrir una jornada."><MonthCalendar trades={filtered} selectedDate={selectedDate} onSelect={selectCalendarDay}/>{dayPlan&&<div className="dayPlanSummary"><b>Plan guardado</b><p>{dayPlan.bias||'Sin sesgo'} · {dayPlan.maxRisk||'Sin riesgo definido'}</p></div>}</Card>
-      </aside>
-    </div>
-    <Card title="Herramientas" className="journalToolsCard" sub="Exportar, importar y compartir datos del journal">
-      <div className="journalToolsGrid">
-        <button className="ghost compact journalToolBtn" disabled={exportDisabled} onClick={()=>exportTradesCollection(filtered,'json','all')}><Download size={15}/><span className="journalToolLong">Exportar todos JSON</span><span className="journalToolShort">Todos JSON</span></button>
-        <button className="ghost compact journalToolBtn" disabled={exportDisabled} onClick={()=>exportTradesCollection(filtered,'csv','all')}><Download size={15}/><span className="journalToolLong">Exportar todos CSV</span><span className="journalToolShort">Todos CSV</span></button>
-        <button className="ghost compact journalToolBtn" disabled={filteredExportDisabled} onClick={()=>exportTradesCollection(list,'json','filtered')}><Download size={15}/><span className="journalToolLong">Exportar filtrados JSON</span><span className="journalToolShort">Filtrados JSON</span></button>
-        <button className="ghost compact journalToolBtn" disabled={filteredExportDisabled} onClick={()=>exportTradesCollection(list,'csv','filtered')}><Download size={15}/><span className="journalToolLong">Exportar filtrados CSV</span><span className="journalToolShort">Filtrados CSV</span></button>
-        <button className="ghost compact shareReviewButton journalToolBtn journalToolWide" disabled={!list.length} onClick={()=>setShareDay(true)}><Share2 size={15}/><span className="journalToolLong">Compartir resumen del día</span><span className="journalToolShort">Compartir día</span></button>
-        <label className="ghost file journalToolBtn journalToolImport"><Upload/><span className="journalToolLong">Importar CSV</span><span className="journalToolShort">Importar</span><input type="file" accept=".csv" onChange={importCsv}/></label>
-      </div>
-    </Card>
-    {selectedTrade&&<TradeDetailModal trade={selectedTrade} data={data} onClose={()=>setSelectedTrade(null)} onEdit={()=>{setForm(normalizeTradeArrayFields({...selectedTrade}));setSelectedTrade(null)}} onDelete={async()=>{await deleteTradeSafely(selectedTrade); setSelectedTrade(null);}}/>}  
+    <JournalHeader showMobileFab={!form} onNewTrade={openNewTrade} guard={guard}/>
+    {form&&<TradeForm form={form} setForm={setForm} profile={profile} data={data} db={db} uploadFile={uploadFile} uid={uid} toast={toast}/>}
+    <JournalActions
+      accountSwitcher={<AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>}
+      onNewTrade={openNewTrade}
+      checklistFilter={checklistFilter}
+      onChecklistFilterChange={setChecklistFilter}
+      search={search}
+      onSearchChange={setSearch}
+    />
+    <JournalMainGrid
+      dailyPlanPanel={<DailyPlanPanel profile={profile} data={scopedData} dayKey={selectedDate}/>}
+      trades={list}
+      onOpenTrade={setSelectedTrade}
+      onDeleteTrade={del}
+      onExportTrade={exportSingleTrade}
+      onShareTrade={setShareTrade}
+      onNewTrade={openNewTrade}
+      calendarTrades={filtered}
+      selectedDate={selectedDate}
+      onSelectCalendarDay={selectCalendarDay}
+      dayPlan={dayPlan}
+    />
+    <JournalToolsCard
+      exportDisabled={exportDisabled}
+      filteredExportDisabled={filteredExportDisabled}
+      listTrades={list}
+      onExportAll={(format)=>exportTradesCollection(filtered,format,'all')}
+      onExportFiltered={(format)=>exportTradesCollection(list,format,'filtered')}
+      onShareDay={()=>setShareDay(true)}
+      onImportCsv={importCsv}
+    />
+    {selectedTrade&&<TradeDetailModal trade={selectedTrade} data={data} onClose={()=>setSelectedTrade(null)} onEdit={()=>{setForm(normalizeTradeArrayFields({...selectedTrade}));setSelectedTrade(null)}} onDelete={async()=>{await deleteTradeSafely(selectedTrade); setSelectedTrade(null);}} onExport={exportSingleTrade} ShareModal={TradeShareModal}/>}
     {shareTrade&&<TradeShareModal trade={shareTrade} onClose={()=>setShareTrade(null)}/>}
     {shareDay&&<DailyReviewShareModal trades={list} date={selectedDate} plan={dayPlan} onClose={()=>setShareDay(false)}/>}
   </main>
-}
-function MonthCalendar({trades=[],selectedDate,onSelect}){
-  return <TradingMonthCalendar trades={trades} selectedDate={selectedDate} variant="detailed" onSelectDay={onSelect}/>
-}
-function TradeRow({t,onOpen,onDelete,onExport,onShare}){
-  const value=Number(t.resultMoney||0), pctVal=Number(t.resultPct||0), rVal=Number(t.resultR||0);
-  const confluencesUsed=safeArray(t.confluencesUsed);
-  return <div className="trade tradePro clickableTrade journalTradeRow" onClick={onOpen} role="button" tabIndex={0} onKeyDown={e=>e.key==='Enter'&&onOpen()}>
-    <div className="journalTradeMain">
-      <div className="journalTradeHead">
-        <b className="journalTradeSymbol">{t.asset}</b>
-        <div className="journalTradeTags">
-          <span className={t.side==='BUY'?'buy':'sell'}>{t.side}</span>
-          <span className="quality">{t.quality}</span>
-        </div>
-      </div>
-      <p className="journalTradeMeta">{accountName(t)} · {t.date} · {t.session} · {t.tradeSystem||'Sistema'} · {t.pattern||normalizeTradeSetup(t)||t.otherSystem}{confluencesUsed.length?` · ${confluencesUsed.length} confluencias`:''}</p>
-    </div>
-    <div className={value>0?'journalTradeResult tradeResult pos':value<0?'journalTradeResult tradeResult neg':'journalTradeResult tradeResult'}><strong>{value>0?'+':''}{money(value)}</strong><small>{pctVal>0?'+':''}{pct(pctVal)} · {rVal>0?'+':''}{rVal.toFixed(2)}R</small></div>
-    <div className="tradeExportActions journalTradeActions" onClick={e=>e.stopPropagation()}>
-      <button className="ghost compact shareReviewButton journalTradeActionBtn" onClick={onShare} title="Compartir revisión"><Share2 size={14}/>Revisión</button>
-      <button className="ghost compact journalTradeActionBtn" onClick={()=>onExport(t,'json')} title="Exportar JSON"><Download size={14}/>JSON</button>
-      <button className="ghost compact journalTradeActionBtn" onClick={()=>onExport(t,'csv')} title="Exportar CSV"><Download size={14}/>CSV</button>
-      <button className="ghost compact journalTradeActionBtn journalTradeActionDelete" onClick={onDelete} title="Borrar trade" aria-label="Borrar trade"><Trash2 size={14}/>Eliminar</button>
-    </div>
-  </div>
-}
-function DetailBlock({title,children}){return <div className="detailBlock"><span>{title}</span><div>{children||<em>Sin datos</em>}</div></div>}
-function TradeDetailModal({trade,onClose,onEdit,onDelete,data}){
-  const [shareOpen,setShareOpen]=useState(false);
-  const executionBehaviors=safeArray(trade.executionBehaviors);
-  const confluencesUsed=safeArray(trade.confluencesUsed);
-  const checklist=safeArray(trade.checklist);
-  useEffect(()=>{
-    document.body.classList.add('trade-detail-modal-open');
-    return()=>document.body.classList.remove('trade-detail-modal-open');
-  },[]);
-  const value=Number(trade.resultMoney||0), pctVal=Number(trade.resultPct||0), rVal=Number(trade.resultR||0);
-  const linkedChecklist=trade.checklistId?(data?.checklists||[]).find(c=>c.id===trade.checklistId):null;
-  const modal=<><div className="modal tradeDetailOverlay"><div className="modalCard tradeDetailModal"><div className="modalHead"><div><h3>{trade.asset} · {trade.side}</h3><p>{trade.date} · {trade.session} · {trade.tradeSystem||'Sistema de Moisés'}</p></div><div className="modalActions"><button className="exportModalButton compact" onClick={()=>exportSingleTrade(trade,'json')}><Download size={15}/>Exportar JSON</button><button className="exportModalButton compact" onClick={()=>exportSingleTrade(trade,'csv')}><Download size={15}/>Exportar CSV</button><button className="exportModalButton compact" onClick={()=>setShareOpen(true)}><Share2 size={15}/>Compartir revisión</button><button className="ghost compact" onClick={onEdit}><Edit3 size={15}/>Editar</button>{onDelete&&<button className="ghost danger compact" onClick={onDelete}><Trash2 size={15}/>Eliminar</button>}<button onClick={onClose}><X size={20}/></button></div></div>
-    <div className="detailKpis"><div className={value>0?'pos':value<0?'neg':''}><span>P/L $</span><b>{value>0?'+':''}{money(value)}</b></div><div className={pctVal>0?'pos':pctVal<0?'neg':''}><span>P/L %</span><b>{pctVal>0?'+':''}{pct(pctVal)}</b></div><div className={rVal>0?'pos':rVal<0?'neg':''}><span>Resultado R</span><b>{rVal>0?'+':''}{rVal.toFixed(2)}R</b></div><div><span>Calidad</span><b>{trade.quality||'—'}</b></div></div>
-    {trade.createdFromChecklist||trade.checklistId?<div className={`linkedValidationCard ${trade.checklistFinalGreen?'ok':'warn'}`}><div><span>Validación vinculada</span><b>{trade.checklistFinalGreen?'Luz verde':'Luz roja / incompleta'} · Score {trade.checklistScore||0}/100</b><small>{trade.checklistAPlus?'Setup A+':trade.executedWithoutFullChecklist?'Ejecutado sin checklist completo':'Checklist vinculado'}</small></div><div className="detailChips"><span>{trade.checklistOperationalState||'Estado no registrado'}</span>{trade.checklistPattern&&<span>{trade.checklistPattern}</span>}{trade.checklistZoneM15&&<span>{trade.checklistZoneM15}</span>}{trade.checklistLiquidity&&<span>{trade.checklistLiquidity}</span>}</div>{trade.executedWithoutFullChecklist&&<p className="warnText">Este trade fue ejecutado sin checklist completo.</p>}<button className="ghost compact" onClick={()=>{localStorage.setItem('mtc-open-checklist',trade.checklistId||''); window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}));}}>Ver checklist original</button></div>:null}
-    {trade.mentorReviewRequested&&<div className={`mentorReviewStatusCard ${trade.mentorReviewStatus||'pending'}`}><span>Revisión del mentor</span><b>{mentorStatusLabel(trade.mentorReviewStatus||'pending')}</b><small>Foco: {trade.mentorReviewFocus||'general'}{trade.mentorReviewRequestedAt?` · solicitado ${String(trade.mentorReviewRequestedAt).slice(0,10)}`:''}</small>{trade.mentorReviewNote&&<p><b>Pregunta del trader:</b> {trade.mentorReviewNote}</p>}{trade.mentorReviewResponse&&<p><b>Devolución:</b> {trade.mentorReviewResponse}</p>}</div>}
-    <div className="detailGrid"><DetailBlock title="Patrón de Moisés"><p>{trade.pattern||trade.otherSystem||'—'}</p></DetailBlock><DetailBlock title="Setup / contexto"><p>{normalizeTradeSetup(trade)}</p></DetailBlock><DetailBlock title="Precios"><p>{`Entry: ${trade.entry||'—'} · SL: ${trade.sl||'—'} · TP: ${trade.tp||'—'} · Exit: ${trade.exit||'—'} · Riesgo: ${trade.riskMoney?money(trade.riskMoney):'—'}`}</p></DetailBlock><DetailBlock title="Confluencias usadas"><div className="detailChips">{confluencesUsed.length?confluencesUsed.map(x=><span key={x}>{x}</span>):<em>Sin confluencias registradas</em>}</div></DetailBlock><DetailBlock title="Checklist operativo"><div className="detailChips">{checklist.length?checklist.map(x=><span key={x}>{x}</span>):<em>Sin checklist marcado</em>}</div></DetailBlock><DetailBlock title="Comportamiento"><p><b>{Number(trade.behaviorScore||behaviorScoreFromTrade(trade))}/100</b> · {trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(trade))}<br/>Antes: {trade.emotionBefore||'—'}<br/>Durante: {executionBehaviors.join(', ')||'—'}<br/>Después: {trade.postTradeBehavior||trade.emotionAfter||'—'}</p></DetailBlock><TraderBehaviorReviewDetail trade={trade}/><DetailBlock title="Notas / lección"><p>{trade.lesson||'—'}</p></DetailBlock><DetailBlock title="Captura"><p>{trade.captureUrl?<a href={trade.captureUrl} target="_blank" rel="noreferrer">Abrir imagen subida</a>:trade.captureLink?<a href={trade.captureLink} target="_blank" rel="noreferrer">Abrir captura</a>:(trade.captureFileName||'—')}</p></DetailBlock></div>
-    <div className="emotionPanel"><h3>Journal emocional privado</h3><div className="detailGrid"><DetailBlock title="Antes del trade"><p>{trade.emotionBefore||'—'}</p></DetailBlock><DetailBlock title="Durante el trade"><p>{trade.emotionDuring||'—'}</p></DetailBlock><DetailBlock title="Después del trade"><p>{trade.emotionAfter||'—'}</p></DetailBlock><DetailBlock title="Registro libre"><p>{trade.privateJournal||'—'}</p></DetailBlock></div></div>
-  </div></div>{shareOpen&&<TradeShareModal trade={trade} onClose={()=>setShareOpen(false)}/>}</>;
-  return createPortal(modal,document.body);
 }
 function DailyPlanPanel({profile,data,dayKey}){
   const existing=(data.dailyPlans||[]).find(p=>p.dayKey===dayKey&&p.userId===profile.uid)||{};
@@ -1741,145 +1656,6 @@ function DecimalInput({className='input',value,onChange,placeholder,prefix='',su
   const toggleMinus=()=>{const s=String(value ?? ''); onChange(s.startsWith('-')?s.slice(1):('-'+(s||'')))};
   const input=<input className={className} type="text" inputMode="decimal" enterKeyHint="done" autoComplete="off" placeholder={placeholder} value={value ?? ''} onChange={handle} onBeforeInput={e=>{const next=String(value??'')+String(e.data??''); if(e.data && normalizeNumInput(next)===null) e.preventDefault();}}/>;
   return <div className={`metricInputWrap signedDecimal ${prefix?'moneyWrap':''}`}>{prefix&&<em>{prefix}</em>}{input}<button type="button" className="numAssist" onClick={toggleMinus}>−</button><button type="button" className="numAssist" onClick={addDot}>.</button>{suffix&&<em>{suffix}</em>}</div>;
-}
-
-function TradeForm({form,setForm,profile,data}){
-  const [busy,setBusy]=useState(false);
-  const [captureFileObj,setCaptureFileObj]=useState(null);
-  const accountOptions=normalizedAccounts(data?.settings||{});
-  const selectedAccountValue=accountOptions.some(a=>a.name===form.account)?form.account:(accountOptions[0]?.name||'Cuenta principal');
-  const formChecklist=safeArray(form.checklist);
-  const formConfluences=safeArray(form.confluencesUsed);
-  const formExecutionBehaviors=safeArray(form.executionBehaviors);
-  const autoR=(next)=>{const rm=toNumberSafe(next.resultMoney), risk=toNumberSafe(next.riskMoney); return risk>0 ? String(Number((rm/Math.abs(risk)).toFixed(2))) : next.resultR;};
-  const ch=(k,v)=>setForm(prev=>{const next={...prev,[k]:v}; if(k==='account') localStorage.setItem('mtc-last-account',v||'Cuenta principal'); if(k==='date'){const day=String(v||'').slice(0,10); next.date=day; next.tradingDay=day;} if(['resultMoney','riskMoney'].includes(k)) next.resultR=autoR(next); if(k==='entry'||k==='exit'){const entry=toNumberSafe(next.entry), ex=toNumberSafe(next.exit), side=next.side||'BUY'; if(entry&&ex&&toNumberSafe(next.resultPct)===0) next.resultPct=String(Number((((side==='BUY'?ex-entry:entry-ex)/entry)*100).toFixed(2)));} return next;});
-  const toggle=x=>ch('checklist',formChecklist.includes(x)?formChecklist.filter(a=>a!==x):[...formChecklist,x]);
-  const toggleConfluence=x=>ch('confluencesUsed',formConfluences.includes(x)?formConfluences.filter(a=>a!==x):[...formConfluences,x]);
-  async function save(){setBusy(true); console.info('saveTrade:start'); try{
-    const hasResultMetric=String(form.resultMoney??'').trim()!=='' || String(form.resultPct??'').trim()!=='' || String(form.resultR??'').trim()!=='';
-    if(!String(form.asset||'').trim()){toast('Falta seleccionar activo.','error'); return;}
-    if(!String(form.result||'').trim()){toast('Falta seleccionar resultado.','error'); return;}
-    if(!hasResultMetric){toast('Cargá al menos P/L en $, resultado en R o porcentaje.','error'); return;}
-    let captureUrl=form.captureUrl||''; if(captureFileObj){try{captureUrl=await uploadFile(`users/${profile.uid}/trades/${uid()}-${captureFileObj.name}`,captureFileObj);}catch(e){console.warn('Captura no guardada',e?.message);}}
-    const reviewPatch=form.mentorReviewRequested?{
-      mentorReviewRequested:true,
-      mentorReviewStatus:form.mentorReviewStatus||'pending',
-      mentorReviewRequestedBy:profile.uid,
-      mentorReviewRequestedAt:form.mentorReviewRequestedAt||new Date().toISOString()
-    }:{};
-    const payload=numericTradePayload({...form,account:selectedAccountValue,...reviewPatch,tradeSystem:form.tradeSystem||'Sistema de Moisés',system:form.tradeSystem||'Sistema de Moisés',setup:form.setup||normalizeTradeSetup(form)});
-    const clean=sanitizeFirestoreObject({...payload,captureUrl,tradingDay:payload.tradingDay||payload.date||tradingDayKey(),date:payload.date||payload.tradingDay||tradingDayKey(),userId:profile.uid,uid:profile.uid,ownerId:profile.uid,updatedAt:serverTimestamp()});
-    console.info('saveTrade:payload', clean);
-    if(form.id){const {id,...rest}=clean; await setDoc(doc(db,'trades',form.id),rest,{merge:true}); console.info('saveTrade:success', form.id); toast('Trade actualizado correctamente');}
-    else {const refTrade=await addDoc(collection(db,'trades'),{...clean,createdAt:serverTimestamp()}); if(clean.checklistId&&clean.createdFromChecklist){try{await setDoc(doc(db,'checklists',clean.checklistId),{linkedTradeId:refTrade.id,linkedTradeCreatedAt:serverTimestamp(),tradeDeleted:false},{merge:true});}catch(e){console.warn('No se pudo vincular checklist',e?.message)}} console.info('saveTrade:success', refTrade.id); toast(clean.createdFromChecklist?'Trade creado desde Checklist':'Trade guardado correctamente');}
-    setForm(null);
-  }catch(e){console.error('saveTrade:error',e); toast(e?.code==='permission-denied'?'No se pudo guardar el trade. Revisá conexión o permisos.':'No se pudo guardar el trade. Revisá conexión o datos.','error');}
-  finally{setBusy(false)}}
-  function captureFile(e){const f=e.target.files?.[0]; if(!f)return; setCaptureFileObj(f); ch('captureFileName',f.name)}
-  const resultClass=toNumberSafe(form.resultMoney)>0?'resultPreview pos':toNumberSafe(form.resultMoney)<0?'resultPreview neg':'resultPreview';
-  const quickFromChecklist=!!form.createdFromChecklist;
-  if(quickFromChecklist){
-    const preloadedRows=[['Activo',form.asset],['Sesión',form.session],['Dirección',form.side],['Sistema',form.tradeSystem||form.system||'Sistema de Moisés'],['Patrón',form.checklistPattern||form.pattern],['Zona M15',form.checklistZoneM15||form.zoneM15],['Liquidez',form.checklistLiquidity||form.liquidityTaken],['Score',form.checklistScore!=null?`${form.checklistScore}/100`:'—'],['Luz verde',form.checklistFinalGreen?'Sí':'No']];
-    return <Card title="Trade rápido desde Checklist" sub="Completá resultado y comportamiento. Los datos técnicos ya vienen desde la validación." className="tradeFormCard quickChecklistTradeForm">
-      <div className={`quickChecklistBanner ${form.checklistFinalGreen?'ok':'warn'}`}><CheckCircle2 size={18}/><div><b>{form.checklistFinalGreen?'Luz verde vinculada':'Checklist sin luz verde'}</b><p>{form.checklistFinalGreen?'Este trade nace de una validación completa. Solo cargá resultado, R y comportamiento.':'Este trade quedará marcado como ejecución sin checklist completo.'}</p></div></div>
-      <div className="formGrid labeled quickTradeMinimal">
-        <Field label="Resultado" hint="Campo mínimo requerido para guardar."><select className="input" value={form.result||''} onChange={e=>ch('result',e.target.value)}><option value="">Seleccionar resultado...</option>{['Profit','Stop','BE','Invalidada','No ejecutada'].map(x=><option key={x}>{x}</option>)}</select></Field>
-        <Field label="Estado emocional antes"><select className="input" value={form.emotionBefore||''} onChange={e=>ch('emotionBefore',e.target.value)}><option value="">Seleccionar...</option>{emotionBeforeOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-      </div>
-      <div className="resultStrip resultHero editableResults">
-        <div className={resultClass}><span>Ganancia / Pérdida en $</span><DecimalInput className="resultLiveInput" value={form.resultMoney} onChange={v=>ch('resultMoney',v)} placeholder="300" prefix="$"/><small>Dinero generado o perdido en este trade.</small></div>
-        <div className={resultClass}><span>Ganancia / Pérdida en %</span><DecimalInput className="resultLiveInput" value={form.resultPct} onChange={v=>ch('resultPct',v)} placeholder="2.5" suffix="%"/><small>% hecho o perdido sobre la cuenta.</small></div>
-        <div className={resultClass}><span>Resultado en R</span><DecimalInput className="resultLiveInput" value={form.resultR} onChange={v=>ch('resultR',v)} placeholder="3" suffix="R"/><small>Multiplicador de riesgo.</small></div>
-      </div>
-      <div className="behaviorJournal quickBehavior"><div><h3>Comportamiento del trader</h3><p>Medí proceso, no solo resultado. Esto separa disciplina real de suerte.</p></div><div className="formGrid labeled"><Field label="Después del trade"><select className="input" value={form.postTradeBehavior||''} onChange={e=>ch('postTradeBehavior',e.target.value)}><option value="">Seleccionar...</option>{postTradeBehaviorOptions.map(x=><option key={x}>{x}</option>)}</select></Field><div className="behaviorScoreBox"><span>Score de conducta</span><b>{behaviorScoreFromTrade(form)}/100</b><small>{behaviorScoreLabel(behaviorScoreFromTrade(form))}</small></div></div><Field label="Durante la ejecución" hint="Podés marcar varias."><div className="chipSelect behaviorChips">{executionBehaviorOptions.map(x=><button type="button" key={x} className={(formExecutionBehaviors).includes(x)?'on':''} onClick={()=>ch('executionBehaviors',(formExecutionBehaviors).includes(x)?(formExecutionBehaviors).filter(a=>a!==x):[...(formExecutionBehaviors),x])}>{(formExecutionBehaviors).includes(x)?'✓ ':''}{x}</button>)}</div></Field></div>
-      <TraderBehaviorReviewFields form={form} ch={ch}/>
-      <Field label="Comentario / lección" hint="Qué aprendiste, qué repetir y qué corregir."><TextareaWithEmoji className="input" value={form.lesson||''} onChange={e=>ch('lesson',e.target.value)} placeholder="Ej: ejecuté limpio, respeté la zona y confirmé patrón..."/></Field>
-      <MentorReviewRequest form={form} ch={ch}/>
-      <details className="preloadedChecklistDetails" open={false}><summary>Datos precargados desde el Checklist</summary><div className="preloadedGrid">{preloadedRows.map(([k,v])=><div key={k}><span>{k}</span><b>{v||'—'}</b></div>)}</div><div className="formGrid labeled compactEdit"><Field label="Activo"><input className="input" value={form.asset||''} onChange={e=>ch('asset',e.target.value.toUpperCase())}/></Field><Field label="Sesión"><select className="input" value={form.session||'NY'} onChange={e=>ch('session',e.target.value)}>{['Asia','Londres','NY','Post NY','Otra'].map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Dirección"><select className="input" value={form.side||'BUY'} onChange={e=>ch('side',e.target.value)}><option>BUY</option><option>SELL</option></select></Field><Field label="Sistema"><select className="input" value={form.tradeSystem||'Sistema de Moisés'} onChange={e=>ch('tradeSystem',e.target.value)}><option>Sistema de Moisés</option><option>Otro</option></select></Field></div></details>
-      <div className="row"><button className="primary" onClick={save} disabled={busy}>{busy?'Guardando...':'Guardar trade'}</button><button className="ghost" onClick={()=>setForm(null)}>Cancelar</button></div>
-    </Card>
-  }
-  return <Card title={form.id?'Editar trade':'Nuevo trade'} sub="Carga solo lo medible. Primero resultado en dinero, % y R; después contexto y checklist." className="tradeFormCard">
-    <div className="tradeGuide"><Sparkles size={18}/><div><b>Guía rápida</b><p>En móvil ya podés escribir negativos y decimales. Usá -1.25 o -1,25 y la app lo normaliza al guardar.</p></div></div>
-    <div className="resultStrip resultHero editableResults">
-      <div className={resultClass}><span>Ganancia / Pérdida en $</span><DecimalInput className="resultLiveInput" value={form.resultMoney} onChange={v=>ch('resultMoney',v)} placeholder="300" prefix="$"/><small>Dinero generado o perdido en este trade. Ej: -150.50</small></div>
-      <div className={resultClass}><span>Ganancia / Pérdida en %</span><DecimalInput className="resultLiveInput" value={form.resultPct} onChange={v=>ch('resultPct',v)} placeholder="2.5" suffix="%"/><small>% hecho o perdido sobre la cuenta. Ej: -0.75</small></div>
-      <div className={resultClass}><span>Resultado en R</span><DecimalInput className="resultLiveInput" value={form.resultR} onChange={v=>ch('resultR',v)} placeholder="3" suffix="R"/><small>Multiplicador de riesgo. Stop completo = -1R.</small></div>
-    </div>
-    <div className="formGrid labeled">
-      <Field label="Fecha"><input className="input" type="date" value={form.date} onChange={e=>ch('date',e.target.value)}/></Field>
-      <Field label="Resultado" hint="Campo mínimo requerido para guardar."><select className="input" value={form.result||''} onChange={e=>ch('result',e.target.value)}><option value="">Seleccionar resultado...</option>{['Profit','Stop','BE','Invalidada','No ejecutada'].map(x=><option key={x}>{x}</option>)}</select></Field>
-      <Field label="Cuenta / challenge"><select className="input" value={selectedAccountValue} onChange={e=>ch('account',e.target.value)}>{accountOptions.map(a=><option key={a.name}>{a.name}</option>)}</select><small>Configura cuentas y capital desde Perfil.</small></Field>
-      <Field label="Activo"><input className="input" placeholder="XAUUSD, NAS100, EURUSD..." value={form.asset} onChange={e=>ch('asset',e.target.value.toUpperCase())}/></Field>
-      <Field label="Sesión"><select className="input" value={form.session} onChange={e=>ch('session',e.target.value)}>{['Asia','Londres','NY','Post NY','Otra'].map(x=><option key={x}>{x}</option>)}</select></Field>
-      <Field label="Dirección"><select className="input" value={form.side} onChange={e=>ch('side',e.target.value)}><option>BUY</option><option>SELL</option></select></Field>
-      <Field label="Tipo de trade / sistema" hint="Sistema oficial del club u otro modelo."><select className="input" value={form.tradeSystem||'Sistema de Moisés'} onChange={e=>ch('tradeSystem',e.target.value)}><option>Sistema de Moisés</option><option>Otro</option></select></Field>
-      {(form.tradeSystem||'Sistema de Moisés')==='Sistema de Moisés'?<><Field label="Patrón de Moisés" hint="Solo patrones reales del playbook."><select className="input" value={form.pattern||'Método Estructural: ChoCH en M1'} onChange={e=>ch('pattern',e.target.value)}>{moisesPatterns.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Confluencias usadas" hint="Tocá una vez para activar/desactivar. En mobile queda visible y seleccionable."><div className="chipSelect touchSafe">{moisesConfluences.map(x=><button type="button" key={x} aria-pressed={formConfluences.includes(x)} className={formConfluences.includes(x)?'on':''} onPointerDown={(e)=>{e.preventDefault();toggleConfluence(x)}} onClick={(e)=>e.preventDefault()}>{formConfluences.includes(x)?'✓ ':''}{x}</button>)}</div></Field></>:<Field label="Especificar sistema"><input className="input" placeholder="Nombre de tu sistema" value={form.otherSystem||''} onChange={e=>ch('otherSystem',e.target.value)}/></Field>}
-      <Field label="Setup / contexto específico" hint="Ej: sweep de Asia + ChoCH M1 + OB."><input className="input" placeholder="Describe el contexto" value={form.setup||''} onChange={e=>ch('setup',e.target.value)}/></Field>
-      <Field label="Precio de entrada" hint="Precio de entrada."><DecimalInput value={form.entry||''} onChange={v=>ch('entry',v)} placeholder="Ej: 2350.50"/></Field>
-      <Field label="Stop loss" hint="Precio del stop."><DecimalInput value={form.sl||''} onChange={v=>ch('sl',v)} placeholder="Ej: 2347.00"/></Field>
-      <Field label="Take profit" hint="Objetivo planificado."><DecimalInput value={form.tp||''} onChange={v=>ch('tp',v)} placeholder="Ej: 2358.00"/></Field>
-      <Field label="Precio de salida" hint="Precio real de salida."><DecimalInput value={form.exit||''} onChange={v=>ch('exit',v)} placeholder="Ej: 2357.50"/></Field>
-      <Field label="Riesgo $" hint="Si lo completás, el resultado en R se calcula automático."><DecimalInput value={form.riskMoney||''} onChange={v=>ch('riskMoney',v)} placeholder="Ej: 100"/></Field>
-      <div className="formNote wide"><b>Resultado cargado arriba</b><span>Los campos de $, % y R se completan en las tarjetas superiores. El R se calcula automático si cargas Riesgo $.</span></div>
-      <Field label="Calidad"><select className="input" value={form.quality} onChange={e=>ch('quality',e.target.value)}>{['A+','A','B','C','Impulsivo'].map(x=><option key={x}>{x}</option>)}</select></Field>
-      <Field label="Link de captura" hint="Drive, Discord, Telegram o imagen externa."><input className="input" placeholder="https://..." value={form.captureLink||''} onChange={e=>ch('captureLink',e.target.value)}/></Field>
-      <Field label="Captura del trade" hint="Sumá una imagen para documentar la ejecución y revisar tu proceso con más claridad."><label className="ghost file futureUpload"><ImageIcon size={16}/>Seleccionar imagen<input type="file" accept="image/*" onChange={captureFile}/></label>{form.captureFileName&&<small className="fileName">Seleccionado: {form.captureFileName}</small>}</Field>
-      <TextareaWithEmoji className="input wide" placeholder="Notas / lección / por qué era válido / qué mejorar" value={form.lesson||''} onChange={e=>ch('lesson',e.target.value)}/>
-    </div>
-
-    <div className="behaviorJournal"><div><h3>Comportamiento del trader</h3><p>Este score mide proceso, no dinero. Un trade perdedor puede ser disciplinado y un trade ganador puede ser impulsivo.</p></div><div className="formGrid labeled"><Field label="Estado emocional antes"><select className="input" value={form.emotionBefore||''} onChange={e=>ch('emotionBefore',e.target.value)}><option value="">Seleccionar...</option>{emotionBeforeOptions.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Después del trade"><select className="input" value={form.postTradeBehavior||''} onChange={e=>ch('postTradeBehavior',e.target.value)}><option value="">Seleccionar...</option>{postTradeBehaviorOptions.map(x=><option key={x}>{x}</option>)}</select></Field><div className="behaviorScoreBox"><span>Score de conducta</span><b>{behaviorScoreFromTrade(form)}/100</b><small>{behaviorScoreLabel(behaviorScoreFromTrade(form))}</small></div></div><Field label="Durante la ejecución" hint="Podés marcar varias."><div className="chipSelect behaviorChips">{executionBehaviorOptions.map(x=><button type="button" key={x} className={(formExecutionBehaviors).includes(x)?'on':''} onClick={()=>ch('executionBehaviors',(formExecutionBehaviors).includes(x)?(formExecutionBehaviors).filter(a=>a!==x):[...(formExecutionBehaviors),x])}>{(formExecutionBehaviors).includes(x)?'✓ ':''}{x}</button>)}</div></Field></div>
-    <TraderBehaviorReviewFields form={form} ch={ch}/>
-    <div className="emotionalJournal"><div><h3>Journal emocional privado</h3><p>Espacio personal para registrar cómo te sentiste. Esto no es para mostrar resultados: es para detectar patrones internos, impulsividad, ansiedad, confianza o miedo.</p></div><div className="formGrid labeled"><Field label="Antes del trade" hint="Estado mental previo a entrar."><input className="input" placeholder="Ej: tranquilo, ansioso, confiado..." value={form.emotionBefore||''} onChange={e=>ch('emotionBefore',e.target.value)}/></Field><Field label="Durante el trade" hint="Qué sentiste mientras estaba abierto."><input className="input" placeholder="Ej: presión, calma, ganas de cerrar..." value={form.emotionDuring||''} onChange={e=>ch('emotionDuring',e.target.value)}/></Field><Field label="Después del trade" hint="Reacción emocional al resultado."><input className="input" placeholder="Ej: neutral, eufórico, frustrado..." value={form.emotionAfter||''} onChange={e=>ch('emotionAfter',e.target.value)}/></Field><TextareaWithEmoji className="input wide" placeholder="Escribí libremente: qué pensaste, qué sentiste, si hubo impulso, miedo, confianza, apego al resultado o claridad. Este registro es privado y te ayuda a evolucionar." value={form.privateJournal||''} onChange={e=>ch('privateJournal',e.target.value)}/></div></div>
-    <h3>Checklist operativo</h3><div className="checks">{checklistBase.map(c=><button type="button" key={c} className={formChecklist.includes(c)?'on':''} onClick={()=>toggle(c)}>{c}</button>)}</div>
-    <MentorReviewRequest form={form} ch={ch}/>
-    <div className="row"><button className="primary" onClick={save} disabled={busy}>{busy?'Guardando...':'Guardar trade'}</button><button className="ghost" onClick={()=>setForm(null)}>Cancelar</button></div>
-  </Card>
-}
-
-function TraderBehaviorReviewFields({form,ch}){
-  return <div className="behaviorReviewSection"><div><h3>Revisión del Comportamiento del Trader</h3></div><div className="formGrid labeled">
-    {traderReviewScores.map(([key,label,hint])=><Field key={key} label={label} hint={hint}><input className="input" type="number" min="1" max="10" step="1" placeholder="1 a 10" value={form[key]??''} onChange={e=>ch(key,e.target.value)}/></Field>)}
-    <Field label="Respeto del proceso"><select className="input" value={form.respetoProceso||''} onChange={e=>ch('respetoProceso',e.target.value)}><option value="">Seleccionar...</option>{respetoProcesoOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="Estado mental antes de operar"><select className="input" value={form.estadoMental||''} onChange={e=>ch('estadoMental',e.target.value)}><option value="">Seleccionar...</option>{estadoMentalOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="Motivo principal de la operación"><select className="input" value={form.motivoOperacion||''} onChange={e=>ch('motivoOperacion',e.target.value)}><option value="">Seleccionar...</option>{motivoOperacionOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <div className="wide"><Field label="Notas de comportamiento"><TextareaWithEmoji className="input" value={form.notasComportamiento||''} onChange={e=>ch('notasComportamiento',e.target.value)} placeholder="¿Qué pensé, sentí o hice bien/mal durante esta operación?"/></Field></div>
-    <div className="behaviorReviewSubhead wide"><h4>Índice de Calidad Contextual (ICC)</h4></div>
-    <Field label="Índice de Calidad Contextual (ICC)" hint="¿Qué tan válido era el contexto general de esta operación?"><input className="input" type="number" min="1" max="10" step="1" placeholder="1 a 10" value={form.indiceCalidadContextual??''} onChange={e=>ch('indiceCalidadContextual',e.target.value)}/></Field>
-    <Field label="Alineación macro"><select className="input" value={form.alineacionMacro||''} onChange={e=>ch('alineacionMacro',e.target.value)}><option value="">Seleccionar...</option>{alineacionContextualOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="Alineación HTF"><select className="input" value={form.alineacionHTF||''} onChange={e=>ch('alineacionHTF',e.target.value)}><option value="">Seleccionar...</option>{alineacionContextualOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="Alineación intradía"><select className="input" value={form.alineacionIntra||''} onChange={e=>ch('alineacionIntra',e.target.value)}><option value="">Seleccionar...</option>{alineacionContextualOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="Liquidez clara"><select className="input" value={form.liquidezClara||''} onChange={e=>ch('liquidezClara',e.target.value)}><option value="">Seleccionar...</option>{siParcialNoOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="DXY confirma la tesis"><select className="input" value={form.dxyConfirma||''} onChange={e=>ch('dxyConfirma',e.target.value)}><option value="">Seleccionar...</option>{dxyConfirmaOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <Field label="Zona con función institucional" hint="La zona no se evalúa por el dibujo, sino por su función dentro de la narrativa."><select className="input" value={form.zonaConFuncion||''} onChange={e=>ch('zonaConFuncion',e.target.value)}><option value="">Seleccionar...</option>{siParcialNoOptions.map(x=><option key={x}>{x}</option>)}</select></Field>
-    <div className="wide"><Field label="Notas de contexto"><TextareaWithEmoji className="input" value={form.notasContexto||''} onChange={e=>ch('notasContexto',e.target.value)} placeholder="¿Por qué esta zona tenía o no tenía validez institucional?"/></Field></div>
-  </div></div>
-}
-
-function TraderBehaviorReviewDetail({trade}){
-  const scoreValue=key=>{const n=Number(trade?.[key]); return n>=1&&n<=10?`${n}/10`:'No registrado'};
-  const textValue=key=>String(trade?.[key]||'').trim()||'No registrado';
-  return <DetailBlock title="Revisión del Comportamiento del Trader"><div className="behaviorReviewDetail">
-    {traderReviewScores.map(([key,label])=><p key={key}><b>{label}:</b> {scoreValue(key)}</p>)}
-    <p><b>Respeto del proceso:</b> {textValue('respetoProceso')}</p>
-    <p><b>Estado mental antes de operar:</b> {textValue('estadoMental')}</p>
-    <p><b>Motivo principal de la operación:</b> {textValue('motivoOperacion')}</p>
-    <p><b>Notas de comportamiento:</b> {textValue('notasComportamiento')}</p>
-    <p><b>Índice de Calidad Contextual (ICC):</b> {scoreValue('indiceCalidadContextual')}</p>
-    <p><b>Alineación macro:</b> {textValue('alineacionMacro')}</p>
-    <p><b>Alineación HTF:</b> {textValue('alineacionHTF')}</p>
-    <p><b>Alineación intradía:</b> {textValue('alineacionIntra')}</p>
-    <p><b>Liquidez clara:</b> {textValue('liquidezClara')}</p>
-    <p><b>DXY confirma la tesis:</b> {textValue('dxyConfirma')}</p>
-    <p><b>Zona con función institucional:</b> {textValue('zonaConFuncion')}</p>
-    <p><b>Notas de contexto:</b> {textValue('notasContexto')}</p>
-  </div></DetailBlock>
-}
-
-
-function MentorReviewRequest({form,ch}){
-  const requested=!!form.mentorReviewRequested;
-  return <div className={`mentorReviewRequest ${requested?'on':''}`}><div><b>Revisión del mentor</b><p>Marcá este trade para que el mentor revise entrada, timing, gestión, contexto o psicología.</p></div><label className="switchLine"><input type="checkbox" checked={requested} onChange={e=>ch('mentorReviewRequested',e.target.checked)}/><span>Enviar este trade a revisión del mentor</span></label>{requested&&<div className="formGrid labeled"><Field label="¿Qué querés que revise?"><select className="input" value={form.mentorReviewFocus||'general'} onChange={e=>ch('mentorReviewFocus',e.target.value)}>{['general','entrada','timing','gestión','contexto','ejecución','psicología'].map(x=><option key={x} value={x}>{x[0].toUpperCase()+x.slice(1)}</option>)}</select></Field><Field label="Nota para el mentor"><TextareaWithEmoji className="input" value={form.mentorReviewNote||''} onChange={e=>ch('mentorReviewNote',e.target.value)} placeholder="Ej: quiero saber si entré tarde o si el contexto era válido."/></Field></div>}</div>
 }
 
 function SystemPage(){return <main className="page"><section className="heroSystem"><span className="pill gold">Sistema operativo del club</span><h2>Canal de Moisés</h2><p>Una guía rápida para consultar antes, durante y después de operar. El objetivo es evitar improvisación y convertir cada entrada en una decisión medible.</p></section><div className="grid2"><Card title="Los 7 Mandamientos de Moisés" sub="Checklist madre del sistema"><div className="mandamientos">{mandamientos.map((m,i)=><div key={i} className="mandamiento"><b>{i+1}</b><span>{m}</span></div>)}</div></Card><Card title="Regla de ejecución" sub="Filtro para no anticipar"><div className="ruleBox"><h3>Contexto → Liquidez → ChoCH → Trigger → RR</h3><p>No se entra por ansiedad. Se entra cuando el mercado entrega contexto, toma liquidez, confirma cambio de carácter y ofrece ubicación lógica de stop.</p></div><div className="ruleMini"><span>Si la distancia M15 → ChoCH es corta, se puede ejecutar más directo.</span><span>Si la distancia es amplia, esperar descuento o zona refinada.</span><span>Si el trade no llega a 1:2, se descarta o se reduce expectativa.</span></div></Card></div><Card title="Patrones de Moisés" sub="Modelos visuales que debe reconocer el trader"><div className="patternGrid">{patronesMoises.map((p,i)=><article key={i} className="patternCard"><Lightbulb size={18}/><h3>{p.title}</h3><p>{p.text}</p></article>)}</div></Card><Card title="Cómo usar esta sección"><div className="readingProtocol"><div><b>Antes del trade</b><p>Revisar los 7 mandamientos y validar que el setup no sea impulsivo.</p></div><div><b>Después del trade</b><p>Registrar en Journal el patrón usado, el resultado en $, %, R y la lección.</p></div><div><b>Fin de semana</b><p>Buscar el patrón que más dinero generó y el error que más dinero costó.</p></div></div></Card></main>}
@@ -2737,7 +2513,6 @@ function SettingsPage({data,profile,setProfile}){
   return <main className="page"><Card title="Perfil" sub="Configura cómo apareces dentro de la comunidad."><div className="profileEditor"><div className="profilePhoto">{preview?<img src={preview} alt="Foto de perfil"/>:<span>{avatarOptions.find(a=>a.id===u.avatarChoice)?.emoji||u.avatar||'MT'}</span>}</div><div><label className="ghost file futureUpload"><Camera size={16}/>Cargar foto de perfil<input type="file" accept="image/*" onChange={loadProfileImage}/></label><p className="muted">También podés elegir una miniatura animada de trading. Más adelante quedará conectado a Storage para fotos grandes.</p></div></div><div className="formGrid labeled"><Field label="Nombre visible"><input className="input" value={u.name||''} onChange={e=>setU({...u,name:e.target.value,avatar:e.target.value.slice(0,2).toUpperCase()})}/></Field><Field label="Género visual"><select className="input" value={u.gender||'masculino'} onChange={e=>setU({...u,gender:e.target.value})}>{['masculino','femenino','neutral'].map(x=><option key={x}>{x}</option>)}</select></Field><Field label="País"><input className="input" value={u.country||''} placeholder="Argentina, México..." onChange={e=>setU({...u,country:e.target.value})}/></Field><Field label="Tipo de trader"><select className="input" value={u.type||'Day Trader'} onChange={e=>setU({...u,type:e.target.value})}>{['Day Trader','Scalper','Swing Trader','Position Trader'].map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Nivel"><select className="input" value={u.level||'Inicial'} onChange={e=>setU({...u,level:e.target.value})}>{['Inicial','Intermedio','Avanzado','Fondeado','Mentor'].map(x=><option key={x}>{x}</option>)}</select></Field></div><div className="avatarPicker"><h3>Elegí sticker/miniatura de trading</h3>{avatarOptions.filter(a=>a.gender==='neutral'||a.gender===(u.gender||'masculino')).map(a=><button key={a.id} type="button" className={u.avatarChoice===a.id?'on':''} onClick={()=>setU({...u,avatarChoice:a.id,avatar:a.emoji})}><span className={`avatarMini ${a.bg}`}>{a.emoji}</span><b>{a.label}</b></button>)}</div></Card><Card title="Configuración de trading"><AccountManager settings={s} onChange={setS}/><div className="formGrid labeled"><Field label="Balance inicial"><input className="input" type="number" min="1" value={s.initialBalance} onChange={e=>updateInitialBalance(e.target.value)}/></Field><Field label="Objetivo mensual %"><input className="input" type="number" value={s.monthlyGoal} onChange={e=>setS({...s,monthlyGoal:Number(e.target.value)})}/></Field><Field label="Estrategia principal"><input className="input" value={s.mainStrategy} onChange={e=>setS({...s,mainStrategy:e.target.value})}/></Field><Field label="Activos favoritos"><input className="input" value={(s.assets||[]).join(',')} onChange={e=>setS({...s,assets:e.target.value.split(',').map(x=>x.trim())})}/></Field></div><button className="primary" onClick={saveAll}>Guardar cambios</button></Card></main>}
 
 
-function mentorStatusLabel(status){return ({pending:'Pendiente de revisión',in_review:'En revisión',reviewed:'Revisado',approved:'Aprobado',needs_work:'Requiere corrección'})[status]||'Pendiente de revisión'}
 
 
 function MentorReviewAdminCard({trade,users,onSave}){
