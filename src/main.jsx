@@ -72,7 +72,7 @@ function parseLimitMoney(v){
 }
 function numericTradePayload(form){
   const numeric=['riskPct','entry','sl','tp','exit','riskMoney','resultMoney','resultPct','resultR'];
-  const out={...form};
+  const out=normalizeTradeArrayFields({...form});
   numeric.forEach(k=>out[k]=toNumberSafe(out[k]));
   ['calidadTesis','calidadEjecucion','calidadComportamiento','calidadRevision','indiceCalidadContextual'].forEach(k=>{
     const raw=String(out[k] ?? '').trim();
@@ -226,7 +226,7 @@ const negativeBehaviorOptions=['Dudé antes de entrar','Entré tarde','Me antici
 const positiveBehaviorOptions=['Seguí el plan','Respeté el riesgo','Buena ejecución','Aprendizaje claro','Ejecución disciplinada'];
 function behaviorScoreFromTrade(t={}){
   let score=70;
-  const b=Array.isArray(t.executionBehaviors)?t.executionBehaviors:[];
+  const b=safeArray(t.executionBehaviors);
   if(t.followedPlan===true || b.includes('Seguí el plan')) score+=15;
   if(b.includes('Respeté el riesgo')) score+=10;
   if(t.postTradeBehavior==='Buena ejecución') score+=10;
@@ -475,7 +475,7 @@ function normalizedText(value=''){
 function tradeFollowedPlan(t={}){
   const raw=normalizedText(t.followedPlan);
   if(t.followedPlan===true || ['si','sí','yes','true','cumplido','seguido'].includes(raw)) return true;
-  const behaviors=[...(Array.isArray(t.executionBehaviors)?t.executionBehaviors:[]),t.postTradeBehavior].map(normalizedText);
+  const behaviors=[...safeArray(t.executionBehaviors),t.postTradeBehavior].map(normalizedText);
   return behaviors.some(x=>x.includes('segui el plan') || x.includes('ejecucion disciplinada'));
 }
 function calc(trades,initial=10000){
@@ -512,14 +512,14 @@ function calc(trades,initial=10000){
   const plan=closed.filter(tradeFollowedPlan);
   const recovery=ddMoney?total/ddMoney:0;
   const impulseWords=['Operé por impulso','Sobreoperé','Me anticipé','Moví el stop'];
-  const impulseTrades=closed.filter(t=>(t.executionBehaviors||[]).some(x=>impulseWords.includes(x)) || t.quality==='Impulsivo');
-  const lateEntries=closed.filter(t=>(t.executionBehaviors||[]).includes('Entré tarde'));
-  const movedSL=closed.filter(t=>(t.executionBehaviors||[]).includes('Moví el stop'));
+  const impulseTrades=closed.filter(t=>safeArray(t.executionBehaviors).some(x=>impulseWords.includes(x)) || t.quality==='Impulsivo');
+  const lateEntries=closed.filter(t=>safeArray(t.executionBehaviors).includes('Entré tarde'));
+  const movedSL=closed.filter(t=>safeArray(t.executionBehaviors).includes('Moví el stop'));
   const planFollowed=closed.filter(tradeFollowedPlan);
   const negativeBehaviorOptions=['Dudé antes de entrar','Entré tarde','Me anticipé','Moví el stop','Cerré antes de tiempo','Sobreoperé','Operé por impulso','Rompí reglas'];
   const freq=(arr)=>{const items=(arr||[]).filter(Boolean); if(!items.length)return null; return Object.values(items.reduce((a,x)=>{a[x]=a[x]||{name:x,count:0}; a[x].count++; return a;},{})).sort((a,b)=>b.count-a.count)[0]?.name||null;};
-  const allBehaviors=closed.flatMap(t=>t.executionBehaviors||[]);
-  const repeatedErrors=closed.flatMap(t=>{const behaviors=Array.isArray(t.executionBehaviors)?t.executionBehaviors:[]; const negativeExecution=behaviors.filter(x=>negativeBehaviorOptions.includes(x)); const post=negativeBehaviorOptions.includes(t.postTradeBehavior)?[t.postTradeBehavior]:[]; return [...negativeExecution,...post];});
+  const allBehaviors=closed.flatMap(t=>safeArray(t.executionBehaviors));
+  const repeatedErrors=closed.flatMap(t=>{const behaviors=safeArray(t.executionBehaviors); const negativeExecution=behaviors.filter(x=>negativeBehaviorOptions.includes(x)); const post=negativeBehaviorOptions.includes(t.postTradeBehavior)?[t.postTradeBehavior]:[]; return [...negativeExecution,...post];});
   const lossEmotions=closed.filter(t=>resultValue(t)<0).map(t=>t.emotionBefore).filter(Boolean);
   const goodLosses=closed.filter(t=>resultValue(t)<0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))>=70);
   const badWins=closed.filter(t=>resultValue(t)>0 && Number(t.behaviorScore||behaviorScoreFromTrade(t))<70);
@@ -559,33 +559,34 @@ function exportText(value){
   return String(value);
 }
 function normalizeTradeForExport(trade={}){
-  const date=String(trade.tradingDay||trade.date||safeDate(trade.createdAt)||today()).slice(0,10);
+  const t=normalizeTradeArrayFields(trade);
+  const date=String(t.tradingDay||t.date||safeDate(t.createdAt)||today()).slice(0,10);
   return {
-    id: trade.id||'',
+    id: t.id||'',
     date,
-    tradingDay: trade.tradingDay||date,
-    createdAt: exportSafeDate(trade.createdAt),
-    updatedAt: exportSafeDate(trade.updatedAt),
-    symbol: trade.asset||trade.symbol||'',
-    account: accountName(trade),
-    session: trade.session||'',
-    direction: trade.side||trade.direction||'',
-    entry: trade.entry??'',
-    stopLoss: trade.sl??trade.stopLoss??'',
-    takeProfit: trade.tp??trade.takeProfit??'',
-    exit: trade.exit??'',
-    result: trade.result||'',
-    resultR: toNumberSafe(trade.resultR),
-    resultPct: toNumberSafe(trade.resultPct),
-    profitLossMoney: toNumberSafe(trade.resultMoney),
-    riskMoney: toNumberSafe(trade.riskMoney),
-    riskPct: toNumberSafe(trade.riskPct),
-    system: trade.tradeSystem||trade.system||'',
-    setup: normalizeTradeSetup(trade),
-    pattern: trade.pattern||trade.checklistPattern||'',
-    quality: trade.quality||'',
-    checklist: Array.isArray(trade.checklist)?trade.checklist:[],
-    confluences: Array.isArray(trade.confluencesUsed)?trade.confluencesUsed:[],
+    tradingDay: t.tradingDay||date,
+    createdAt: exportSafeDate(t.createdAt),
+    updatedAt: exportSafeDate(t.updatedAt),
+    symbol: t.asset||t.symbol||'',
+    account: accountName(t),
+    session: t.session||'',
+    direction: t.side||t.direction||'',
+    entry: t.entry??'',
+    stopLoss: t.sl??t.stopLoss??'',
+    takeProfit: t.tp??t.takeProfit??'',
+    exit: t.exit??'',
+    result: t.result||'',
+    resultR: toNumberSafe(t.resultR),
+    resultPct: toNumberSafe(t.resultPct),
+    profitLossMoney: toNumberSafe(t.resultMoney),
+    riskMoney: toNumberSafe(t.riskMoney),
+    riskPct: toNumberSafe(t.riskPct),
+    system: t.tradeSystem||t.system||'',
+    setup: normalizeTradeSetup(t),
+    pattern: t.pattern||t.checklistPattern||'',
+    quality: t.quality||'',
+    checklist: safeArray(t.checklist),
+    confluences: safeArray(t.confluencesUsed),
     checklistValidation: {
       checklistId: trade.checklistId||'',
       createdFromChecklist: trade.createdFromChecklist===true,
@@ -596,40 +597,40 @@ function normalizeTradeForExport(trade={}){
       executedWithoutFullChecklist: trade.executedWithoutFullChecklist===true
     },
     behavior: {
-      followedPlan: trade.followedPlan===true,
-      score: Number(trade.behaviorScore||behaviorScoreFromTrade(trade)),
-      scoreLabel: trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(trade)),
-      emotionBefore: trade.emotionBefore||'',
-      emotionDuring: trade.emotionDuring||'',
-      emotionAfter: trade.emotionAfter||'',
-      executionBehaviors: Array.isArray(trade.executionBehaviors)?trade.executionBehaviors:[],
-      postTradeBehavior: trade.postTradeBehavior||'',
-      respetoProceso: trade.respetoProceso||'',
-      estadoMental: trade.estadoMental||'',
-      motivoOperacion: trade.motivoOperacion||'',
-      notasComportamiento: trade.notasComportamiento||''
+      followedPlan: t.followedPlan===true,
+      score: Number(t.behaviorScore||behaviorScoreFromTrade(t)),
+      scoreLabel: t.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(t)),
+      emotionBefore: t.emotionBefore||'',
+      emotionDuring: t.emotionDuring||'',
+      emotionAfter: t.emotionAfter||'',
+      executionBehaviors: safeArray(t.executionBehaviors),
+      postTradeBehavior: t.postTradeBehavior||'',
+      respetoProceso: t.respetoProceso||'',
+      estadoMental: t.estadoMental||'',
+      motivoOperacion: t.motivoOperacion||'',
+      notasComportamiento: t.notasComportamiento||''
     },
     contextQuality: {
-      calidadTesis: trade.calidadTesis??'',
-      calidadEjecucion: trade.calidadEjecucion??'',
-      calidadComportamiento: trade.calidadComportamiento??'',
-      calidadRevision: trade.calidadRevision??'',
-      indiceCalidadContextual: trade.indiceCalidadContextual??'',
-      alineacionMacro: trade.alineacionMacro||'',
-      alineacionHTF: trade.alineacionHTF||'',
-      alineacionIntra: trade.alineacionIntra||'',
-      liquidezClara: trade.liquidezClara||'',
-      dxyConfirma: trade.dxyConfirma||'',
-      zonaConFuncion: trade.zonaConFuncion||'',
-      notasContexto: trade.notasContexto||''
+      calidadTesis: t.calidadTesis??'',
+      calidadEjecucion: t.calidadEjecucion??'',
+      calidadComportamiento: t.calidadComportamiento??'',
+      calidadRevision: t.calidadRevision??'',
+      indiceCalidadContextual: t.indiceCalidadContextual??'',
+      alineacionMacro: t.alineacionMacro||'',
+      alineacionHTF: t.alineacionHTF||'',
+      alineacionIntra: t.alineacionIntra||'',
+      liquidezClara: t.liquidezClara||'',
+      dxyConfirma: t.dxyConfirma||'',
+      zonaConFuncion: t.zonaConFuncion||'',
+      notasContexto: t.notasContexto||''
     },
-    notes: trade.lesson||trade.notes||'',
-    privateJournal: trade.privateJournal||'',
-    screenshots: [trade.captureLink,trade.captureUrl,trade.captureFileName].filter(Boolean),
-    captureLink: trade.captureLink||'',
-    captureUrl: trade.captureUrl||'',
-    captureFileName: trade.captureFileName||'',
-    tags: Array.isArray(trade.tags)?trade.tags:[],
+    notes: t.lesson||t.notes||'',
+    privateJournal: t.privateJournal||'',
+    screenshots: safeArray(t.screenshots).length?safeArray(t.screenshots):[t.captureLink,t.captureUrl,t.captureFileName].filter(Boolean),
+    captureLink: t.captureLink||'',
+    captureUrl: t.captureUrl||'',
+    captureFileName: t.captureFileName||'',
+    tags: safeArray(t.tags),
     status: trade.status||trade.mentorReviewStatus||'saved',
     mentorReview: {
       requested: trade.mentorReviewRequested===true,
@@ -798,7 +799,7 @@ function normalizeTradeForShare(trade={},privacy={}){
     checklistScore:trade.checklistScore||trade.checklistValidation?.score||'',
     checklistGreen:trade.checklistFinalGreen===true||trade.checklistValidation?.finalGreen===true,
     note:privacy.hideNote?'':(trade.lesson||trade.notes||trade.privateJournal||''),
-    tags:Array.isArray(trade.tags)?trade.tags:[],
+    tags:safeArray(trade.tags),
     footer:'Process over outcome.'
   };
 }
@@ -1174,7 +1175,104 @@ async function markNotificationsForTarget(notifications=[],target){
   await Promise.allSettled(pending.map(n=>markNotificationAsRead(n.id)));
 }
 
-function parseCsv(text,userId){const [h,...lines]=text.trim().split(/\r?\n/); const headers=h.split(',').map(x=>x.replaceAll('"','').trim()); return lines.map(line=>{const cells=line.match(/("[^"]*(?:""[^"]*)*"|[^,]+)/g)||[]; const o={userId,checklist:[]}; headers.forEach((k,i)=>o[k]=(cells[i]||'').replace(/^"|"$/g,'').replaceAll('""','"')); ['entry','sl','tp','exit','riskMoney','riskPct','resultMoney','resultPct','resultR'].forEach(k=>o[k]=Number(o[k]||0)); o.followedPlan=String(o.followedPlan)==='true'; return o;});}
+function normalizeStringArray(value){
+  if(value==null||value==='')return [];
+  if(Array.isArray(value))return value.map(x=>String(x??'').trim()).filter(Boolean);
+  if(typeof value==='string'){
+    const raw=value.trim();
+    if(!raw)return [];
+    if(raw.startsWith('[')){try{const parsed=JSON.parse(raw); if(Array.isArray(parsed))return parsed.map(x=>String(x??'').trim()).filter(Boolean);}catch{}}
+    return raw.split(/[|,;\n\r]+/).map(x=>x.trim()).filter(Boolean);
+  }
+  return [];
+}
+function safeArray(value){
+  return Array.isArray(value)?value.map(x=>String(x??'').trim()).filter(Boolean):normalizeStringArray(value);
+}
+const TRADE_ARRAY_FIELDS=['executionBehaviors','checklist','confluencesUsed','confluences','tags','mistakes','confirmations','emotions','checklistItems','screenshots'];
+function normalizeTradeArrayFields(trade={}){
+  const out={...trade};
+  TRADE_ARRAY_FIELDS.forEach(key=>{
+    if(out[key]!=null&&out[key]!=='')out[key]=safeArray(out[key]);
+    else if(key in out)out[key]=[];
+  });
+  if(!safeArray(out.confluencesUsed).length&&safeArray(out.confluences).length)out.confluencesUsed=safeArray(out.confluences);
+  if('confluences' in out)delete out.confluences;
+  return out;
+}
+function parsePipeList(value){return normalizeStringArray(value);}
+function normalizeImportSide(value){
+  const side=String(value||'').trim().toUpperCase();
+  if(side==='LONG'||side==='BUY')return 'BUY';
+  if(side==='SHORT'||side==='SELL')return 'SELL';
+  return side||'BUY';
+}
+function normalizeImportedTradeRow(row={},userId=''){
+  const opDate=normalizeDateKey(row.tradingDay||row.date||row.trading_date)||tradingDayKey();
+  const asset=String(row.asset||row.symbol||'').trim().toUpperCase();
+  const side=normalizeImportSide(row.side||row.direction);
+  const resultMoney=toNumberSafe(row.resultMoney??row.profitLossMoney??row.pl??row.pnl);
+  const resultR=toNumberSafe(row.resultR??row.r);
+  const resultPct=toNumberSafe(row.resultPct??row.result_pct);
+  const {id:importedId,...rest}=row;
+  return normalizeTradeArrayFields({
+    ...rest,
+    userId:row.userId||userId,
+    asset,
+    side,
+    date:opDate,
+    tradingDay:opDate,
+    entry:row.entry??'',
+    sl:row.sl??row.stopLoss??'',
+    tp:row.tp??row.takeProfit??'',
+    exit:row.exit??'',
+    resultMoney,
+    resultR,
+    resultPct,
+    riskMoney:toNumberSafe(row.riskMoney),
+    riskPct:toNumberSafe(row.riskPct),
+    tradeSystem:row.tradeSystem||row.system||'Sistema de Moisés',
+    system:row.tradeSystem||row.system||'Sistema de Moisés',
+    setup:row.setup||'',
+    pattern:row.pattern||'',
+    quality:row.quality||'',
+    result:row.result||'',
+    lesson:row.lesson||row.notes||'',
+    checklist:row.checklist,
+    confluencesUsed:row.confluencesUsed,
+    confluences:row.confluences,
+    executionBehaviors:row.executionBehaviors,
+    tags:row.tags,
+    mistakes:row.mistakes,
+    confirmations:row.confirmations,
+    emotions:row.emotions,
+    checklistItems:row.checklistItems,
+    screenshots:row.screenshots,
+    followedPlan:row.followedPlan===true||String(row.followedPlan).toLowerCase()==='true',
+    account:row.account||'Cuenta principal',
+    session:row.session||'NY'
+  });
+}
+function parseCsv(text,userId){
+  const trimmed=String(text||'').replace(/^\uFEFF/,'').trim();
+  if(!trimmed)return [];
+  const [h,...lines]=trimmed.split(/\r?\n/);
+  if(!h)return [];
+  const headers=h.split(',').map(x=>x.replaceAll('"','').trim());
+  return lines.filter(Boolean).map(line=>{
+    const cells=line.match(/("[^"]*(?:""[^"]*)*"|[^,]+)/g)||[];
+    const o={userId,checklist:[]};
+    headers.forEach((k,i)=>o[k]=(cells[i]||'').replace(/^"|"$/g,'').replaceAll('""','"'));
+    ['entry','sl','tp','exit','riskMoney','riskPct','resultMoney','resultPct','resultR','profitLossMoney'].forEach(k=>{
+      const raw=o[k];
+      if(raw===''||raw==null||raw===undefined)return;
+      const n=Number(String(raw).replace(',','.'));
+      if(Number.isFinite(n))o[k]=n;
+    });
+    o.followedPlan=String(o.followedPlan).toLowerCase()==='true';
+    return normalizeImportedTradeRow(o,userId);
+  });
+}
 function safeDate(v){return typeof v==='string'?v:(v?.toDate?.()?.toISOString?.().slice(0,10)||today());}
 function useLiveData(profile){
   const [data,setData]=useState({
@@ -1920,6 +2018,11 @@ function latestTradeFromStats(dayStats){
 }
 function TradingMonthCalendar({trades=[],selectedDate,onSelectDay,variant='detailed',initialKey}){
   const [key,setKey]=useState((initialKey||selectedDate||tradingDayKey()).slice(0,7));
+  useEffect(()=>{
+    if(!selectedDate)return;
+    const month=selectedDate.slice(0,7);
+    setKey(prev=>prev===month?prev:month);
+  },[selectedDate]);
   const stats=groupTradesByDay(trades);
   const weeks=buildTradingCalendarWeeks(key,stats);
   const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key);
@@ -2420,7 +2523,30 @@ function Journal({data,profile}){
     if(latestTrade) setSelectedTrade(latestTrade);
   };
   async function del(trade){await deleteTradeSafely(trade);}
-  async function importCsv(e){const f=e.target.files[0]; if(!f)return; const rows=parseCsv(await f.text(),profile.uid); const signature=t=>[profile.uid,getTradeOperationalDateKey(t)||'',String(t.asset||'').toUpperCase(),String(t.side||''),toNumberSafe(t.resultMoney),toNumberSafe(t.resultR),normalizeTradeSetup(t)].join('|'); const existing=new Set((data.trades||[]).map(signature)); let imported=0,skipped=0; for(const r of rows){const clean={...r,tradingDay:r.tradingDay||r.date||tradingDayKey(),date:r.date||r.tradingDay||tradingDayKey()}; const sig=signature(clean); if(existing.has(sig)){skipped++; continue;} existing.add(sig); imported++; await addDoc(collection(db,'trades'),{...clean,createdAt:serverTimestamp()});} toast(`${imported} trades importados${skipped?` · ${skipped} duplicados omitidos`:''}`); e.target.value='';}
+  async function importCsv(e){
+    const f=e.target.files?.[0];
+    if(!f)return;
+    try{
+      const rows=parseCsv(await f.text(),profile.uid);
+      if(!rows.length){toast('El CSV está vacío o no tiene filas válidas.','error'); e.target.value=''; return;}
+      const signature=t=>[profile.uid,getTradeOperationalDateKey(t)||'',String(t.asset||'').toUpperCase(),String(t.side||''),toNumberSafe(t.resultMoney),toNumberSafe(t.resultR),normalizeTradeSetup(t)].join('|');
+      const existing=new Set((data.trades||[]).map(signature));
+      let imported=0,skipped=0;
+      for(const r of rows){
+        const clean=normalizeImportedTradeRow(r,profile.uid);
+        if(!String(clean.asset||'').trim()){skipped++; continue;}
+        const sig=signature(clean);
+        if(existing.has(sig)){skipped++; continue;}
+        existing.add(sig);
+        imported++;
+        await addDoc(collection(db,'trades'),sanitizeFirestoreObject({...clean,uid:profile.uid,ownerId:profile.uid,createdAt:serverTimestamp()}));
+      }
+      toast(`${imported} trades importados${skipped?` · ${skipped} omitidos`:''}`);
+    }catch(err){
+      console.error('importCsv:error',err);
+      toast('No se pudo importar el CSV. Revisá el formato del archivo.','error');
+    }finally{e.target.value='';}
+  }
   const activeNames=activeAccountNames(data.settings);
   const lastAccount=localStorage.getItem('mtc-last-account')||'';
   const defaultTradeAccount=activeNames.includes(lastAccount)?lastAccount:(active!=='__all__'&&activeNames.includes(active)?active:(activeNames[0]||'Cuenta principal'));
@@ -2480,7 +2606,7 @@ function Journal({data,profile}){
         <label className="ghost file journalToolBtn journalToolImport"><Upload/><span className="journalToolLong">Importar CSV</span><span className="journalToolShort">Importar</span><input type="file" accept=".csv" onChange={importCsv}/></label>
       </div>
     </Card>
-    {selectedTrade&&<TradeDetailModal trade={selectedTrade} data={data} onClose={()=>setSelectedTrade(null)} onEdit={()=>{setForm({...selectedTrade});setSelectedTrade(null)}} onDelete={async()=>{await deleteTradeSafely(selectedTrade); setSelectedTrade(null);}}/>}  
+    {selectedTrade&&<TradeDetailModal trade={selectedTrade} data={data} onClose={()=>setSelectedTrade(null)} onEdit={()=>{setForm(normalizeTradeArrayFields({...selectedTrade}));setSelectedTrade(null)}} onDelete={async()=>{await deleteTradeSafely(selectedTrade); setSelectedTrade(null);}}/>}  
     {shareTrade&&<TradeShareModal trade={shareTrade} onClose={()=>setShareTrade(null)}/>}
     {shareDay&&<DailyReviewShareModal trades={list} date={selectedDate} plan={dayPlan} onClose={()=>setShareDay(false)}/>}
   </main>
@@ -2490,6 +2616,7 @@ function MonthCalendar({trades=[],selectedDate,onSelect}){
 }
 function TradeRow({t,onOpen,onDelete,onExport,onShare}){
   const value=Number(t.resultMoney||0), pctVal=Number(t.resultPct||0), rVal=Number(t.resultR||0);
+  const confluencesUsed=safeArray(t.confluencesUsed);
   return <div className="trade tradePro clickableTrade journalTradeRow" onClick={onOpen} role="button" tabIndex={0} onKeyDown={e=>e.key==='Enter'&&onOpen()}>
     <div className="journalTradeMain">
       <div className="journalTradeHead">
@@ -2499,7 +2626,7 @@ function TradeRow({t,onOpen,onDelete,onExport,onShare}){
           <span className="quality">{t.quality}</span>
         </div>
       </div>
-      <p className="journalTradeMeta">{accountName(t)} · {t.date} · {t.session} · {t.tradeSystem||'Sistema'} · {t.pattern||normalizeTradeSetup(t)||t.otherSystem}{t.confluencesUsed?.length?` · ${t.confluencesUsed.length} confluencias`:''}</p>
+      <p className="journalTradeMeta">{accountName(t)} · {t.date} · {t.session} · {t.tradeSystem||'Sistema'} · {t.pattern||normalizeTradeSetup(t)||t.otherSystem}{confluencesUsed.length?` · ${confluencesUsed.length} confluencias`:''}</p>
     </div>
     <div className={value>0?'journalTradeResult tradeResult pos':value<0?'journalTradeResult tradeResult neg':'journalTradeResult tradeResult'}><strong>{value>0?'+':''}{money(value)}</strong><small>{pctVal>0?'+':''}{pct(pctVal)} · {rVal>0?'+':''}{rVal.toFixed(2)}R</small></div>
     <div className="tradeExportActions journalTradeActions" onClick={e=>e.stopPropagation()}>
@@ -2513,6 +2640,9 @@ function TradeRow({t,onOpen,onDelete,onExport,onShare}){
 function DetailBlock({title,children}){return <div className="detailBlock"><span>{title}</span><div>{children||<em>Sin datos</em>}</div></div>}
 function TradeDetailModal({trade,onClose,onEdit,onDelete,data}){
   const [shareOpen,setShareOpen]=useState(false);
+  const executionBehaviors=safeArray(trade.executionBehaviors);
+  const confluencesUsed=safeArray(trade.confluencesUsed);
+  const checklist=safeArray(trade.checklist);
   useEffect(()=>{
     document.body.classList.add('trade-detail-modal-open');
     return()=>document.body.classList.remove('trade-detail-modal-open');
@@ -2523,7 +2653,7 @@ function TradeDetailModal({trade,onClose,onEdit,onDelete,data}){
     <div className="detailKpis"><div className={value>0?'pos':value<0?'neg':''}><span>P/L $</span><b>{value>0?'+':''}{money(value)}</b></div><div className={pctVal>0?'pos':pctVal<0?'neg':''}><span>P/L %</span><b>{pctVal>0?'+':''}{pct(pctVal)}</b></div><div className={rVal>0?'pos':rVal<0?'neg':''}><span>Resultado R</span><b>{rVal>0?'+':''}{rVal.toFixed(2)}R</b></div><div><span>Calidad</span><b>{trade.quality||'—'}</b></div></div>
     {trade.createdFromChecklist||trade.checklistId?<div className={`linkedValidationCard ${trade.checklistFinalGreen?'ok':'warn'}`}><div><span>Validación vinculada</span><b>{trade.checklistFinalGreen?'Luz verde':'Luz roja / incompleta'} · Score {trade.checklistScore||0}/100</b><small>{trade.checklistAPlus?'Setup A+':trade.executedWithoutFullChecklist?'Ejecutado sin checklist completo':'Checklist vinculado'}</small></div><div className="detailChips"><span>{trade.checklistOperationalState||'Estado no registrado'}</span>{trade.checklistPattern&&<span>{trade.checklistPattern}</span>}{trade.checklistZoneM15&&<span>{trade.checklistZoneM15}</span>}{trade.checklistLiquidity&&<span>{trade.checklistLiquidity}</span>}</div>{trade.executedWithoutFullChecklist&&<p className="warnText">Este trade fue ejecutado sin checklist completo.</p>}<button className="ghost compact" onClick={()=>{localStorage.setItem('mtc-open-checklist',trade.checklistId||''); window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'checklist'}));}}>Ver checklist original</button></div>:null}
     {trade.mentorReviewRequested&&<div className={`mentorReviewStatusCard ${trade.mentorReviewStatus||'pending'}`}><span>Revisión del mentor</span><b>{mentorStatusLabel(trade.mentorReviewStatus||'pending')}</b><small>Foco: {trade.mentorReviewFocus||'general'}{trade.mentorReviewRequestedAt?` · solicitado ${String(trade.mentorReviewRequestedAt).slice(0,10)}`:''}</small>{trade.mentorReviewNote&&<p><b>Pregunta del trader:</b> {trade.mentorReviewNote}</p>}{trade.mentorReviewResponse&&<p><b>Devolución:</b> {trade.mentorReviewResponse}</p>}</div>}
-    <div className="detailGrid"><DetailBlock title="Patrón de Moisés"><p>{trade.pattern||trade.otherSystem||'—'}</p></DetailBlock><DetailBlock title="Setup / contexto"><p>{normalizeTradeSetup(trade)}</p></DetailBlock><DetailBlock title="Precios"><p>{`Entry: ${trade.entry||'—'} · SL: ${trade.sl||'—'} · TP: ${trade.tp||'—'} · Exit: ${trade.exit||'—'} · Riesgo: ${trade.riskMoney?money(trade.riskMoney):'—'}`}</p></DetailBlock><DetailBlock title="Confluencias usadas"><div className="detailChips">{(trade.confluencesUsed||[]).length?trade.confluencesUsed.map(x=><span key={x}>{x}</span>):<em>Sin confluencias registradas</em>}</div></DetailBlock><DetailBlock title="Checklist operativo"><div className="detailChips">{(trade.checklist||[]).length?trade.checklist.map(x=><span key={x}>{x}</span>):<em>Sin checklist marcado</em>}</div></DetailBlock><DetailBlock title="Comportamiento"><p><b>{Number(trade.behaviorScore||behaviorScoreFromTrade(trade))}/100</b> · {trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(trade))}<br/>Antes: {trade.emotionBefore||'—'}<br/>Durante: {(trade.executionBehaviors||[]).join(', ')||'—'}<br/>Después: {trade.postTradeBehavior||trade.emotionAfter||'—'}</p></DetailBlock><TraderBehaviorReviewDetail trade={trade}/><DetailBlock title="Notas / lección"><p>{trade.lesson||'—'}</p></DetailBlock><DetailBlock title="Captura"><p>{trade.captureUrl?<a href={trade.captureUrl} target="_blank" rel="noreferrer">Abrir imagen subida</a>:trade.captureLink?<a href={trade.captureLink} target="_blank" rel="noreferrer">Abrir captura</a>:(trade.captureFileName||'—')}</p></DetailBlock></div>
+    <div className="detailGrid"><DetailBlock title="Patrón de Moisés"><p>{trade.pattern||trade.otherSystem||'—'}</p></DetailBlock><DetailBlock title="Setup / contexto"><p>{normalizeTradeSetup(trade)}</p></DetailBlock><DetailBlock title="Precios"><p>{`Entry: ${trade.entry||'—'} · SL: ${trade.sl||'—'} · TP: ${trade.tp||'—'} · Exit: ${trade.exit||'—'} · Riesgo: ${trade.riskMoney?money(trade.riskMoney):'—'}`}</p></DetailBlock><DetailBlock title="Confluencias usadas"><div className="detailChips">{confluencesUsed.length?confluencesUsed.map(x=><span key={x}>{x}</span>):<em>Sin confluencias registradas</em>}</div></DetailBlock><DetailBlock title="Checklist operativo"><div className="detailChips">{checklist.length?checklist.map(x=><span key={x}>{x}</span>):<em>Sin checklist marcado</em>}</div></DetailBlock><DetailBlock title="Comportamiento"><p><b>{Number(trade.behaviorScore||behaviorScoreFromTrade(trade))}/100</b> · {trade.behaviorScoreLabel||behaviorScoreLabel(behaviorScoreFromTrade(trade))}<br/>Antes: {trade.emotionBefore||'—'}<br/>Durante: {executionBehaviors.join(', ')||'—'}<br/>Después: {trade.postTradeBehavior||trade.emotionAfter||'—'}</p></DetailBlock><TraderBehaviorReviewDetail trade={trade}/><DetailBlock title="Notas / lección"><p>{trade.lesson||'—'}</p></DetailBlock><DetailBlock title="Captura"><p>{trade.captureUrl?<a href={trade.captureUrl} target="_blank" rel="noreferrer">Abrir imagen subida</a>:trade.captureLink?<a href={trade.captureLink} target="_blank" rel="noreferrer">Abrir captura</a>:(trade.captureFileName||'—')}</p></DetailBlock></div>
     <div className="emotionPanel"><h3>Journal emocional privado</h3><div className="detailGrid"><DetailBlock title="Antes del trade"><p>{trade.emotionBefore||'—'}</p></DetailBlock><DetailBlock title="Durante el trade"><p>{trade.emotionDuring||'—'}</p></DetailBlock><DetailBlock title="Después del trade"><p>{trade.emotionAfter||'—'}</p></DetailBlock><DetailBlock title="Registro libre"><p>{trade.privateJournal||'—'}</p></DetailBlock></div></div>
   </div></div>{shareOpen&&<TradeShareModal trade={trade} onClose={()=>setShareOpen(false)}/>}</>;
   return createPortal(modal,document.body);
@@ -2552,10 +2682,13 @@ function TradeForm({form,setForm,profile,data}){
   const [captureFileObj,setCaptureFileObj]=useState(null);
   const accountOptions=normalizedAccounts(data?.settings||{});
   const selectedAccountValue=accountOptions.some(a=>a.name===form.account)?form.account:(accountOptions[0]?.name||'Cuenta principal');
+  const formChecklist=safeArray(form.checklist);
+  const formConfluences=safeArray(form.confluencesUsed);
+  const formExecutionBehaviors=safeArray(form.executionBehaviors);
   const autoR=(next)=>{const rm=toNumberSafe(next.resultMoney), risk=toNumberSafe(next.riskMoney); return risk>0 ? String(Number((rm/Math.abs(risk)).toFixed(2))) : next.resultR;};
-  const ch=(k,v)=>setForm(prev=>{const next={...prev,[k]:v}; if(k==='account') localStorage.setItem('mtc-last-account',v||'Cuenta principal'); if(['resultMoney','riskMoney'].includes(k)) next.resultR=autoR(next); if(k==='entry'||k==='exit'){const entry=toNumberSafe(next.entry), ex=toNumberSafe(next.exit), side=next.side||'BUY'; if(entry&&ex&&toNumberSafe(next.resultPct)===0) next.resultPct=String(Number((((side==='BUY'?ex-entry:entry-ex)/entry)*100).toFixed(2)));} return next;});
-  const toggle=x=>ch('checklist',form.checklist?.includes(x)?form.checklist.filter(a=>a!==x):[...(form.checklist||[]),x]);
-  const toggleConfluence=x=>ch('confluencesUsed',(form.confluencesUsed||[]).includes(x)?(form.confluencesUsed||[]).filter(a=>a!==x):[...(form.confluencesUsed||[]),x]);
+  const ch=(k,v)=>setForm(prev=>{const next={...prev,[k]:v}; if(k==='account') localStorage.setItem('mtc-last-account',v||'Cuenta principal'); if(k==='date'){const day=String(v||'').slice(0,10); next.date=day; next.tradingDay=day;} if(['resultMoney','riskMoney'].includes(k)) next.resultR=autoR(next); if(k==='entry'||k==='exit'){const entry=toNumberSafe(next.entry), ex=toNumberSafe(next.exit), side=next.side||'BUY'; if(entry&&ex&&toNumberSafe(next.resultPct)===0) next.resultPct=String(Number((((side==='BUY'?ex-entry:entry-ex)/entry)*100).toFixed(2)));} return next;});
+  const toggle=x=>ch('checklist',formChecklist.includes(x)?formChecklist.filter(a=>a!==x):[...formChecklist,x]);
+  const toggleConfluence=x=>ch('confluencesUsed',formConfluences.includes(x)?formConfluences.filter(a=>a!==x):[...formConfluences,x]);
   async function save(){setBusy(true); console.info('saveTrade:start'); try{
     const hasResultMetric=String(form.resultMoney??'').trim()!=='' || String(form.resultPct??'').trim()!=='' || String(form.resultR??'').trim()!=='';
     if(!String(form.asset||'').trim()){toast('Falta seleccionar activo.','error'); return;}
@@ -2581,7 +2714,7 @@ function TradeForm({form,setForm,profile,data}){
   const quickFromChecklist=!!form.createdFromChecklist;
   if(quickFromChecklist){
     const preloadedRows=[['Activo',form.asset],['Sesión',form.session],['Dirección',form.side],['Sistema',form.tradeSystem||form.system||'Sistema de Moisés'],['Patrón',form.checklistPattern||form.pattern],['Zona M15',form.checklistZoneM15||form.zoneM15],['Liquidez',form.checklistLiquidity||form.liquidityTaken],['Score',form.checklistScore!=null?`${form.checklistScore}/100`:'—'],['Luz verde',form.checklistFinalGreen?'Sí':'No']];
-    return <Card title="Trade rápido desde Checklist" sub="Completá resultado y comportamiento. Los datos técnicos ya vienen desde la validación." className="quickChecklistTradeForm">
+    return <Card title="Trade rápido desde Checklist" sub="Completá resultado y comportamiento. Los datos técnicos ya vienen desde la validación." className="tradeFormCard quickChecklistTradeForm">
       <div className={`quickChecklistBanner ${form.checklistFinalGreen?'ok':'warn'}`}><CheckCircle2 size={18}/><div><b>{form.checklistFinalGreen?'Luz verde vinculada':'Checklist sin luz verde'}</b><p>{form.checklistFinalGreen?'Este trade nace de una validación completa. Solo cargá resultado, R y comportamiento.':'Este trade quedará marcado como ejecución sin checklist completo.'}</p></div></div>
       <div className="formGrid labeled quickTradeMinimal">
         <Field label="Resultado" hint="Campo mínimo requerido para guardar."><select className="input" value={form.result||''} onChange={e=>ch('result',e.target.value)}><option value="">Seleccionar resultado...</option>{['Profit','Stop','BE','Invalidada','No ejecutada'].map(x=><option key={x}>{x}</option>)}</select></Field>
@@ -2592,7 +2725,7 @@ function TradeForm({form,setForm,profile,data}){
         <div className={resultClass}><span>Ganancia / Pérdida en %</span><DecimalInput className="resultLiveInput" value={form.resultPct} onChange={v=>ch('resultPct',v)} placeholder="2.5" suffix="%"/><small>% hecho o perdido sobre la cuenta.</small></div>
         <div className={resultClass}><span>Resultado en R</span><DecimalInput className="resultLiveInput" value={form.resultR} onChange={v=>ch('resultR',v)} placeholder="3" suffix="R"/><small>Multiplicador de riesgo.</small></div>
       </div>
-      <div className="behaviorJournal quickBehavior"><div><h3>Comportamiento del trader</h3><p>Medí proceso, no solo resultado. Esto separa disciplina real de suerte.</p></div><div className="formGrid labeled"><Field label="Después del trade"><select className="input" value={form.postTradeBehavior||''} onChange={e=>ch('postTradeBehavior',e.target.value)}><option value="">Seleccionar...</option>{postTradeBehaviorOptions.map(x=><option key={x}>{x}</option>)}</select></Field><div className="behaviorScoreBox"><span>Score de conducta</span><b>{behaviorScoreFromTrade(form)}/100</b><small>{behaviorScoreLabel(behaviorScoreFromTrade(form))}</small></div></div><Field label="Durante la ejecución" hint="Podés marcar varias."><div className="chipSelect behaviorChips">{executionBehaviorOptions.map(x=><button type="button" key={x} className={(form.executionBehaviors||[]).includes(x)?'on':''} onClick={()=>ch('executionBehaviors',(form.executionBehaviors||[]).includes(x)?(form.executionBehaviors||[]).filter(a=>a!==x):[...(form.executionBehaviors||[]),x])}>{(form.executionBehaviors||[]).includes(x)?'✓ ':''}{x}</button>)}</div></Field></div>
+      <div className="behaviorJournal quickBehavior"><div><h3>Comportamiento del trader</h3><p>Medí proceso, no solo resultado. Esto separa disciplina real de suerte.</p></div><div className="formGrid labeled"><Field label="Después del trade"><select className="input" value={form.postTradeBehavior||''} onChange={e=>ch('postTradeBehavior',e.target.value)}><option value="">Seleccionar...</option>{postTradeBehaviorOptions.map(x=><option key={x}>{x}</option>)}</select></Field><div className="behaviorScoreBox"><span>Score de conducta</span><b>{behaviorScoreFromTrade(form)}/100</b><small>{behaviorScoreLabel(behaviorScoreFromTrade(form))}</small></div></div><Field label="Durante la ejecución" hint="Podés marcar varias."><div className="chipSelect behaviorChips">{executionBehaviorOptions.map(x=><button type="button" key={x} className={(formExecutionBehaviors).includes(x)?'on':''} onClick={()=>ch('executionBehaviors',(formExecutionBehaviors).includes(x)?(formExecutionBehaviors).filter(a=>a!==x):[...(formExecutionBehaviors),x])}>{(formExecutionBehaviors).includes(x)?'✓ ':''}{x}</button>)}</div></Field></div>
       <TraderBehaviorReviewFields form={form} ch={ch}/>
       <Field label="Comentario / lección" hint="Qué aprendiste, qué repetir y qué corregir."><TextareaWithEmoji className="input" value={form.lesson||''} onChange={e=>ch('lesson',e.target.value)} placeholder="Ej: ejecuté limpio, respeté la zona y confirmé patrón..."/></Field>
       <MentorReviewRequest form={form} ch={ch}/>
@@ -2600,7 +2733,7 @@ function TradeForm({form,setForm,profile,data}){
       <div className="row"><button className="primary" onClick={save} disabled={busy}>{busy?'Guardando...':'Guardar trade'}</button><button className="ghost" onClick={()=>setForm(null)}>Cancelar</button></div>
     </Card>
   }
-  return <Card title="Nuevo trade" sub="Carga solo lo medible. Primero resultado en dinero, % y R; después contexto y checklist.">
+  return <Card title={form.id?'Editar trade':'Nuevo trade'} sub="Carga solo lo medible. Primero resultado en dinero, % y R; después contexto y checklist." className="tradeFormCard">
     <div className="tradeGuide"><Sparkles size={18}/><div><b>Guía rápida</b><p>En móvil ya podés escribir negativos y decimales. Usá -1.25 o -1,25 y la app lo normaliza al guardar.</p></div></div>
     <div className="resultStrip resultHero editableResults">
       <div className={resultClass}><span>Ganancia / Pérdida en $</span><DecimalInput className="resultLiveInput" value={form.resultMoney} onChange={v=>ch('resultMoney',v)} placeholder="300" prefix="$"/><small>Dinero generado o perdido en este trade. Ej: -150.50</small></div>
@@ -2615,7 +2748,7 @@ function TradeForm({form,setForm,profile,data}){
       <Field label="Sesión"><select className="input" value={form.session} onChange={e=>ch('session',e.target.value)}>{['Asia','Londres','NY','Post NY','Otra'].map(x=><option key={x}>{x}</option>)}</select></Field>
       <Field label="Dirección"><select className="input" value={form.side} onChange={e=>ch('side',e.target.value)}><option>BUY</option><option>SELL</option></select></Field>
       <Field label="Tipo de trade / sistema" hint="Sistema oficial del club u otro modelo."><select className="input" value={form.tradeSystem||'Sistema de Moisés'} onChange={e=>ch('tradeSystem',e.target.value)}><option>Sistema de Moisés</option><option>Otro</option></select></Field>
-      {(form.tradeSystem||'Sistema de Moisés')==='Sistema de Moisés'?<><Field label="Patrón de Moisés" hint="Solo patrones reales del playbook."><select className="input" value={form.pattern||'Método Estructural: ChoCH en M1'} onChange={e=>ch('pattern',e.target.value)}>{moisesPatterns.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Confluencias usadas" hint="Tocá una vez para activar/desactivar. En mobile queda visible y seleccionable."><div className="chipSelect touchSafe">{moisesConfluences.map(x=><button type="button" key={x} aria-pressed={(form.confluencesUsed||[]).includes(x)} className={(form.confluencesUsed||[]).includes(x)?'on':''} onPointerDown={(e)=>{e.preventDefault();toggleConfluence(x)}} onClick={(e)=>e.preventDefault()}>{(form.confluencesUsed||[]).includes(x)?'✓ ':''}{x}</button>)}</div></Field></>:<Field label="Especificar sistema"><input className="input" placeholder="Nombre de tu sistema" value={form.otherSystem||''} onChange={e=>ch('otherSystem',e.target.value)}/></Field>}
+      {(form.tradeSystem||'Sistema de Moisés')==='Sistema de Moisés'?<><Field label="Patrón de Moisés" hint="Solo patrones reales del playbook."><select className="input" value={form.pattern||'Método Estructural: ChoCH en M1'} onChange={e=>ch('pattern',e.target.value)}>{moisesPatterns.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Confluencias usadas" hint="Tocá una vez para activar/desactivar. En mobile queda visible y seleccionable."><div className="chipSelect touchSafe">{moisesConfluences.map(x=><button type="button" key={x} aria-pressed={formConfluences.includes(x)} className={formConfluences.includes(x)?'on':''} onPointerDown={(e)=>{e.preventDefault();toggleConfluence(x)}} onClick={(e)=>e.preventDefault()}>{formConfluences.includes(x)?'✓ ':''}{x}</button>)}</div></Field></>:<Field label="Especificar sistema"><input className="input" placeholder="Nombre de tu sistema" value={form.otherSystem||''} onChange={e=>ch('otherSystem',e.target.value)}/></Field>}
       <Field label="Setup / contexto específico" hint="Ej: sweep de Asia + ChoCH M1 + OB."><input className="input" placeholder="Describe el contexto" value={form.setup||''} onChange={e=>ch('setup',e.target.value)}/></Field>
       <Field label="Precio de entrada" hint="Precio de entrada."><DecimalInput value={form.entry||''} onChange={v=>ch('entry',v)} placeholder="Ej: 2350.50"/></Field>
       <Field label="Stop loss" hint="Precio del stop."><DecimalInput value={form.sl||''} onChange={v=>ch('sl',v)} placeholder="Ej: 2347.00"/></Field>
@@ -2629,10 +2762,10 @@ function TradeForm({form,setForm,profile,data}){
       <TextareaWithEmoji className="input wide" placeholder="Notas / lección / por qué era válido / qué mejorar" value={form.lesson||''} onChange={e=>ch('lesson',e.target.value)}/>
     </div>
 
-    <div className="behaviorJournal"><div><h3>Comportamiento del trader</h3><p>Este score mide proceso, no dinero. Un trade perdedor puede ser disciplinado y un trade ganador puede ser impulsivo.</p></div><div className="formGrid labeled"><Field label="Estado emocional antes"><select className="input" value={form.emotionBefore||''} onChange={e=>ch('emotionBefore',e.target.value)}><option value="">Seleccionar...</option>{emotionBeforeOptions.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Después del trade"><select className="input" value={form.postTradeBehavior||''} onChange={e=>ch('postTradeBehavior',e.target.value)}><option value="">Seleccionar...</option>{postTradeBehaviorOptions.map(x=><option key={x}>{x}</option>)}</select></Field><div className="behaviorScoreBox"><span>Score de conducta</span><b>{behaviorScoreFromTrade(form)}/100</b><small>{behaviorScoreLabel(behaviorScoreFromTrade(form))}</small></div></div><Field label="Durante la ejecución" hint="Podés marcar varias."><div className="chipSelect behaviorChips">{executionBehaviorOptions.map(x=><button type="button" key={x} className={(form.executionBehaviors||[]).includes(x)?'on':''} onClick={()=>ch('executionBehaviors',(form.executionBehaviors||[]).includes(x)?(form.executionBehaviors||[]).filter(a=>a!==x):[...(form.executionBehaviors||[]),x])}>{(form.executionBehaviors||[]).includes(x)?'✓ ':''}{x}</button>)}</div></Field></div>
+    <div className="behaviorJournal"><div><h3>Comportamiento del trader</h3><p>Este score mide proceso, no dinero. Un trade perdedor puede ser disciplinado y un trade ganador puede ser impulsivo.</p></div><div className="formGrid labeled"><Field label="Estado emocional antes"><select className="input" value={form.emotionBefore||''} onChange={e=>ch('emotionBefore',e.target.value)}><option value="">Seleccionar...</option>{emotionBeforeOptions.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Después del trade"><select className="input" value={form.postTradeBehavior||''} onChange={e=>ch('postTradeBehavior',e.target.value)}><option value="">Seleccionar...</option>{postTradeBehaviorOptions.map(x=><option key={x}>{x}</option>)}</select></Field><div className="behaviorScoreBox"><span>Score de conducta</span><b>{behaviorScoreFromTrade(form)}/100</b><small>{behaviorScoreLabel(behaviorScoreFromTrade(form))}</small></div></div><Field label="Durante la ejecución" hint="Podés marcar varias."><div className="chipSelect behaviorChips">{executionBehaviorOptions.map(x=><button type="button" key={x} className={(formExecutionBehaviors).includes(x)?'on':''} onClick={()=>ch('executionBehaviors',(formExecutionBehaviors).includes(x)?(formExecutionBehaviors).filter(a=>a!==x):[...(formExecutionBehaviors),x])}>{(formExecutionBehaviors).includes(x)?'✓ ':''}{x}</button>)}</div></Field></div>
     <TraderBehaviorReviewFields form={form} ch={ch}/>
     <div className="emotionalJournal"><div><h3>Journal emocional privado</h3><p>Espacio personal para registrar cómo te sentiste. Esto no es para mostrar resultados: es para detectar patrones internos, impulsividad, ansiedad, confianza o miedo.</p></div><div className="formGrid labeled"><Field label="Antes del trade" hint="Estado mental previo a entrar."><input className="input" placeholder="Ej: tranquilo, ansioso, confiado..." value={form.emotionBefore||''} onChange={e=>ch('emotionBefore',e.target.value)}/></Field><Field label="Durante el trade" hint="Qué sentiste mientras estaba abierto."><input className="input" placeholder="Ej: presión, calma, ganas de cerrar..." value={form.emotionDuring||''} onChange={e=>ch('emotionDuring',e.target.value)}/></Field><Field label="Después del trade" hint="Reacción emocional al resultado."><input className="input" placeholder="Ej: neutral, eufórico, frustrado..." value={form.emotionAfter||''} onChange={e=>ch('emotionAfter',e.target.value)}/></Field><TextareaWithEmoji className="input wide" placeholder="Escribí libremente: qué pensaste, qué sentiste, si hubo impulso, miedo, confianza, apego al resultado o claridad. Este registro es privado y te ayuda a evolucionar." value={form.privateJournal||''} onChange={e=>ch('privateJournal',e.target.value)}/></div></div>
-    <h3>Checklist operativo</h3><div className="checks">{checklistBase.map(c=><button type="button" key={c} className={form.checklist?.includes(c)?'on':''} onClick={()=>toggle(c)}>{c}</button>)}</div>
+    <h3>Checklist operativo</h3><div className="checks">{checklistBase.map(c=><button type="button" key={c} className={formChecklist.includes(c)?'on':''} onClick={()=>toggle(c)}>{c}</button>)}</div>
     <MentorReviewRequest form={form} ch={ch}/>
     <div className="row"><button className="primary" onClick={save} disabled={busy}>{busy?'Guardando...':'Guardar trade'}</button><button className="ghost" onClick={()=>setForm(null)}>Cancelar</button></div>
   </Card>
