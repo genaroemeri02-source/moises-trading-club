@@ -13747,3 +13747,1684 @@ html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)) 
     font-size:6.9px!important;
   }
 }
+/* v47.31 - Trading calendar with weekly summary */
+.app .tradingCalendar{
+  --tc-border:rgba(255,255,255,.09);
+  --tc-surface:rgba(255,255,255,.030);
+  --tc-surface-strong:rgba(255,255,255,.050);
+  --tc-text:#f8fafc;
+  --tc-muted:#98a6b9;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.app .tradingCalendarHead{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  min-width:0!important;
+}
+.app .tradingCalendarHead>div{
+  min-width:0!important;
+  text-align:center!important;
+}
+.app .tradingCalendarHead b{
+  display:block!important;
+  color:var(--tc-text)!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  text-transform:capitalize!important;
+}
+.app .tradingCalendarHead small{
+  display:block!important;
+  margin-top:3px!important;
+  color:var(--tc-muted)!important;
+  font-size:11px!important;
+  line-height:1.25!important;
+  font-weight:700!important;
+}
+.app .tradingCalendarGrid{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) minmax(94px,1.22fr)!important;
+  gap:6px!important;
+  min-width:0!important;
+}
+.app .tradingCalendarLabel{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:0!important;
+  color:var(--tc-muted)!important;
+  font-size:10px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.06em!important;
+  text-transform:uppercase!important;
+}
+.app .tradingDayCell,
+.app .tradingWeekSummary{
+  min-width:0!important;
+  min-height:68px!important;
+  border:1px solid var(--tc-border)!important;
+  border-radius:13px!important;
+  background:linear-gradient(180deg,var(--tc-surface-strong),var(--tc-surface))!important;
+  color:var(--tc-text)!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.app .tradingDayCell{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  padding:9px 6px!important;
+  cursor:pointer!important;
+  transition:border-color .16s ease,background .16s ease,transform .16s ease!important;
+}
+.app .tradingDayCell:disabled{
+  cursor:default!important;
+  opacity:.72!important;
+}
+.app .tradingDayCell:not(:disabled):hover{
+  border-color:rgba(212,168,67,.30)!important;
+  transform:translateY(-1px)!important;
+}
+.app .tradingDayCell.empty{
+  opacity:.24!important;
+  pointer-events:none!important;
+}
+.app .tradingDayCell b{
+  display:block!important;
+  width:100%!important;
+  text-align:center!important;
+  color:var(--tc-text)!important;
+  font-size:14px!important;
+  line-height:1!important;
+  font-weight:950!important;
+}
+.app .tradingDayResult{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  width:100%!important;
+  min-width:0!important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace!important;
+  font-variant-numeric:tabular-nums!important;
+}
+.app .tradingDayResult strong,
+.app .tradingDayResult small{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  text-overflow:clip!important;
+  line-height:1.05!important;
+}
+.app .tradingDayResult strong{
+  font-size:11px!important;
+  font-weight:950!important;
+  letter-spacing:-.03em!important;
+}
+.app .tradingDayResult small{
+  color:currentColor!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  opacity:.92!important;
+}
+.app .tradingWeekSummary{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:3px!important;
+  padding:9px 10px!important;
+}
+.app .tradingWeekSummary span{
+  color:var(--tc-muted)!important;
+  font-size:10px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  text-transform:uppercase!important;
+  letter-spacing:.05em!important;
+}
+.app .tradingWeekSummary strong,
+.app .tradingWeekSummary small,
+.app .tradingWeekSummary em{
+  display:block!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:clip!important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace!important;
+  font-style:normal!important;
+  line-height:1.08!important;
+}
+.app .tradingWeekSummary strong{
+  color:var(--tc-text)!important;
+  font-size:12px!important;
+  font-weight:950!important;
+}
+.app .tradingWeekSummary small,
+.app .tradingWeekSummary em{
+  color:currentColor!important;
+  font-size:10px!important;
+  font-weight:850!important;
+  opacity:.90!important;
+}
+.app .tradingDayCell.win,
+.app .tradingWeekSummary.win{
+  background:linear-gradient(180deg,rgba(34,197,94,.13),rgba(34,197,94,.045))!important;
+  border-color:rgba(34,197,94,.24)!important;
+  color:var(--green)!important;
+}
+.app .tradingDayCell.loss,
+.app .tradingWeekSummary.loss{
+  background:linear-gradient(180deg,rgba(239,68,68,.13),rgba(239,68,68,.045))!important;
+  border-color:rgba(239,68,68,.24)!important;
+  color:var(--red)!important;
+}
+.app .tradingDayCell.be,
+.app .tradingWeekSummary.be{
+  background:linear-gradient(180deg,rgba(96,165,250,.12),rgba(96,165,250,.04))!important;
+  border-color:rgba(96,165,250,.30)!important;
+  color:#60a5fa!important;
+}
+.app .tradingDayCell.none,
+.app .tradingWeekSummary.none{
+  color:var(--tc-muted)!important;
+}
+.app .tradingDayCell.selected{
+  outline:2px solid rgba(212,168,67,.48)!important;
+  border-color:rgba(212,168,67,.62)!important;
+  box-shadow:0 0 0 4px rgba(212,168,67,.08)!important;
+}
+.app .tradingCalendarLegend{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  flex-wrap:wrap!important;
+  color:var(--tc-muted)!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  font-weight:700!important;
+}
+.app .tradingCalendarLegend i{
+  display:inline-block!important;
+  width:8px!important;
+  height:8px!important;
+  border-radius:999px!important;
+  margin-right:5px!important;
+  background:var(--tc-muted)!important;
+}
+.app .tradingCalendarLegend i.win{background:var(--green)!important}
+.app .tradingCalendarLegend i.loss{background:var(--red)!important}
+.app .tradingCalendarLegend i.be{background:#60a5fa!important}
+.app .tradingCalendar.compact{
+  gap:9px!important;
+}
+.app .tradingCalendar.compact .tradingCalendarGrid{
+  gap:5px!important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) minmax(78px,1.18fr)!important;
+}
+.app .tradingCalendar.compact .tradingDayCell,
+.app .tradingCalendar.compact .tradingWeekSummary{
+  min-height:54px!important;
+  border-radius:11px!important;
+}
+.app .tradingCalendar.compact .tradingDayCell{
+  padding:6px 4px!important;
+  gap:3px!important;
+}
+.app .tradingCalendar.compact .tradingWeekSummary{
+  padding:7px 8px!important;
+}
+.app .tradingCalendar.compact .tradingDayCell b{
+  font-size:12px!important;
+}
+.app .tradingCalendar.compact .tradingDayResult strong{
+  font-size:9.2px!important;
+}
+.app .tradingCalendar.compact .tradingDayResult small{
+  font-size:7.6px!important;
+}
+.app .tradingCalendar.compact .tradingWeekSummary span{
+  font-size:8.6px!important;
+}
+.app .tradingCalendar.compact .tradingWeekSummary strong{
+  font-size:10px!important;
+}
+.app .tradingCalendar.compact .tradingWeekSummary small{
+  font-size:8.2px!important;
+}
+.app .tradingCalendar.compact .tradingWeekSummary em{
+  display:none!important;
+}
+.app .tradingCalendar.compact .tradingCalendarLegend{
+  display:none!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingCalendar{
+  --tc-border:rgba(15,23,42,.10);
+  --tc-surface:rgba(255,255,255,.74);
+  --tc-surface-strong:rgba(248,250,252,.96);
+  --tc-text:#0f172a;
+  --tc-muted:#64748b;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingDayCell.be,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingWeekSummary.be{
+  color:#2563eb!important;
+  border-color:rgba(59,130,246,.32)!important;
+  background:linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.035))!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingCalendarLegend i.be{
+  background:#2563eb!important;
+}
+@media(max-width:760px){
+  .app .tradingCalendar{
+    gap:9px!important;
+  }
+  .app .tradingCalendarGrid{
+    grid-template-columns:repeat(5,minmax(0,1fr)) minmax(66px,1.08fr)!important;
+    gap:4px!important;
+  }
+  .app .tradingCalendarLabel{
+    font-size:8.5px!important;
+    letter-spacing:.035em!important;
+  }
+  .app .tradingDayCell,
+  .app .tradingWeekSummary{
+    min-height:54px!important;
+    border-radius:10px!important;
+  }
+  .app .tradingDayCell{
+    padding:6px 2px 5px!important;
+    gap:3px!important;
+  }
+  .app .tradingDayCell b{
+    font-size:11.5px!important;
+  }
+  .app .tradingDayResult strong{
+    font-size:8.8px!important;
+    letter-spacing:-.04em!important;
+  }
+  .app .tradingDayResult small{
+    font-size:7.2px!important;
+  }
+  .app .tradingWeekSummary{
+    padding:6px 5px!important;
+    gap:2px!important;
+  }
+  .app .tradingWeekSummary span{
+    font-size:7.8px!important;
+    letter-spacing:.025em!important;
+  }
+  .app .tradingWeekSummary strong{
+    font-size:8.8px!important;
+    letter-spacing:-.04em!important;
+  }
+  .app .tradingWeekSummary small{
+    font-size:7.5px!important;
+  }
+  .app .tradingWeekSummary em{
+    display:none!important;
+  }
+  .app .tradingCalendarHead b{
+    font-size:13px!important;
+  }
+  .app .tradingCalendarHead small{
+    font-size:10.5px!important;
+  }
+  .app .tradingCalendar.detailed .tradingDayCell,
+  .app .tradingCalendar.detailed .tradingWeekSummary{
+    min-height:58px!important;
+  }
+  .app .tradingCalendarLegend{
+    gap:9px!important;
+    font-size:10px!important;
+  }
+  .app .journalPage .mobileNewTradeFab{
+    position:static!important;
+    width:100%!important;
+    margin:0 0 10px!important;
+    justify-content:center!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.18)!important;
+  }
+}
+@media(max-width:380px){
+  .app .tradingCalendarGrid{
+    grid-template-columns:repeat(5,minmax(0,1fr)) minmax(60px,1.04fr)!important;
+    gap:3px!important;
+  }
+  .app .tradingDayCell,
+  .app .tradingWeekSummary{
+    min-height:50px!important;
+  }
+  .app .tradingDayResult strong,
+  .app .tradingWeekSummary strong{
+    font-size:8px!important;
+  }
+  .app .tradingDayResult small,
+  .app .tradingWeekSummary small{
+    font-size:6.8px!important;
+  }
+}
+/* v47.32 - Dashboard performance hierarchy */
+.app .dashboardVisualGrid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.65fr) minmax(300px,.72fr)!important;
+  gap:16px!important;
+  align-items:start!important;
+}
+.app .dashboardCalendarHero{
+  order:1!important;
+  padding:22px!important;
+  border-color:rgba(212,168,67,.16)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.060),rgba(255,255,255,.026))!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.18)!important;
+}
+.app .dashboardEquityCompact{
+  order:2!important;
+  padding:18px!important;
+  opacity:.92!important;
+}
+.app .dashboardEquityCompact .cardHead{
+  margin-bottom:6px!important;
+}
+.app .dashboardEquityCompact .cardHead h3{
+  font-size:18px!important;
+}
+.app .dashboardEquityCompact .cardHead p{
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.app .dashboardCalendarHero .cardHead{
+  margin-bottom:14px!important;
+}
+.app .dashboardCalendarHero .cardHead h3{
+  font-size:23px!important;
+  line-height:1.12!important;
+}
+.app .dashboardCalendarHero .cardHead p{
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+.app .tradingCalendar.dashboard{
+  gap:14px!important;
+}
+.app .tradingCalendar.dashboard .tradingCalendarHead{
+  padding-bottom:2px!important;
+}
+.app .tradingCalendar.dashboard .tradingCalendarHead b{
+  font-size:16px!important;
+}
+.app .tradingCalendar.dashboard .tradingCalendarHead small{
+  font-size:12px!important;
+}
+.app .tradingCalendar.dashboard .tradingCalendarGrid{
+  grid-template-columns:repeat(5,minmax(0,1fr)) minmax(122px,1.28fr)!important;
+  gap:8px!important;
+}
+.app .tradingCalendar.dashboard .tradingDayCell,
+.app .tradingCalendar.dashboard .tradingWeekSummary{
+  min-height:82px!important;
+  border-radius:15px!important;
+}
+.app .tradingCalendar.dashboard .tradingDayCell{
+  padding:11px 7px!important;
+  gap:7px!important;
+}
+.app .tradingCalendar.dashboard .tradingDayCell b{
+  font-size:16px!important;
+}
+.app .tradingCalendar.dashboard .tradingDayResult strong{
+  font-size:12px!important;
+}
+.app .tradingCalendar.dashboard .tradingDayResult small{
+  font-size:10px!important;
+}
+.app .tradingCalendar.dashboard .tradingWeekSummary{
+  padding:11px 12px!important;
+  gap:4px!important;
+}
+.app .tradingCalendar.dashboard .tradingWeekSummary span{
+  font-size:10px!important;
+}
+.app .tradingCalendar.dashboard .tradingWeekSummary strong{
+  font-size:13px!important;
+}
+.app .tradingCalendar.dashboard .tradingWeekSummary small,
+.app .tradingCalendar.dashboard .tradingWeekSummary em{
+  font-size:10.5px!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .dashboardCalendarHero{
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.92))!important;
+  border-color:rgba(184,132,23,.18)!important;
+  box-shadow:0 18px 46px rgba(15,23,42,.08)!important;
+}
+@media(max-width:1080px){
+  .app .dashboardVisualGrid{
+    grid-template-columns:1fr!important;
+  }
+  .app .dashboardCalendarHero{order:1!important}
+  .app .dashboardEquityCompact{order:2!important}
+}
+@media(max-width:760px){
+  .app .dashboardVisualGrid{
+    gap:12px!important;
+  }
+  .app .dashboardCalendarHero{
+    padding:16px!important;
+    border-radius:20px!important;
+  }
+  .app .dashboardEquityCompact{
+    padding:15px!important;
+    border-radius:18px!important;
+  }
+  .app .dashboardCalendarHero .cardHead h3{
+    font-size:19px!important;
+  }
+  .app .dashboardCalendarHero .cardHead p{
+    font-size:12px!important;
+  }
+  .app .tradingCalendar.dashboard{
+    gap:10px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingCalendarGrid{
+    grid-template-columns:repeat(5,minmax(0,1fr)) minmax(66px,1.08fr)!important;
+    gap:4px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingDayCell,
+  .app .tradingCalendar.dashboard .tradingWeekSummary{
+    min-height:54px!important;
+    border-radius:10px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingDayCell{
+    padding:6px 2px 5px!important;
+    gap:3px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingDayCell b{
+    font-size:11.5px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingDayResult strong{
+    font-size:8.8px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingDayResult small{
+    font-size:7.2px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingWeekSummary{
+    padding:6px 5px!important;
+    gap:2px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingWeekSummary span{
+    font-size:7.8px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingWeekSummary strong{
+    font-size:8.8px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingWeekSummary small{
+    font-size:7.5px!important;
+  }
+  .app .tradingCalendar.dashboard .tradingWeekSummary em{
+    display:none!important;
+  }
+}
+/* v47.33 - Premium atmospheric surfaces for Dashboard and Journal calendars */
+html[data-theme="dark"] body,
+html[data-theme="dark"] #root{
+  background:
+    radial-gradient(circle at 18% -8%,rgba(212,168,67,.105),transparent 34%),
+    radial-gradient(circle at 92% 10%,rgba(59,130,246,.075),transparent 30%),
+    radial-gradient(circle at 55% 112%,rgba(16,185,129,.045),transparent 38%),
+    linear-gradient(180deg,#070a10 0%,#0a0d14 46%,#05070b 100%)!important;
+}
+html[data-theme="dark"] body .app{
+  background:
+    radial-gradient(circle at 20% 8%,rgba(212,168,67,.075),transparent 28%),
+    radial-gradient(circle at 86% 16%,rgba(37,99,235,.060),transparent 34%),
+    linear-gradient(135deg,rgba(255,255,255,.018),transparent 34%),
+    linear-gradient(180deg,#070a10,#05070b)!important;
+}
+html[data-theme="dark"] body .main{
+  background:
+    radial-gradient(circle at 78% 0%,rgba(212,168,67,.075),transparent 360px),
+    radial-gradient(circle at 10% 32%,rgba(59,130,246,.045),transparent 420px),
+    radial-gradient(circle at 56% 100%,rgba(15,23,42,.62),transparent 520px),
+    linear-gradient(180deg,rgba(9,13,20,.98),rgba(5,7,11,.99))!important;
+  position:relative!important;
+}
+html[data-theme="dark"] body .main:before{
+  content:""!important;
+  position:fixed!important;
+  inset:0!important;
+  pointer-events:none!important;
+  z-index:0!important;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(180deg,rgba(255,255,255,.014) 1px,transparent 1px)!important;
+  background-size:88px 88px!important;
+  mask-image:radial-gradient(circle at 50% 18%,rgba(0,0,0,.44),transparent 72%)!important;
+  opacity:.34!important;
+}
+html[data-theme="dark"] body .page,
+html[data-theme="dark"] body .top{
+  position:relative!important;
+  z-index:1!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)),
+html[data-theme="light"] body:not(:has(.paywallFunnel)) #root{
+  background:
+    radial-gradient(circle at 18% -8%,rgba(184,132,23,.105),transparent 34%),
+    radial-gradient(circle at 88% 8%,rgba(59,130,246,.075),transparent 30%),
+    linear-gradient(180deg,#f8fafc 0%,#eef2f7 48%,#f8fafc 100%)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .main{
+  background:
+    radial-gradient(circle at 82% 0%,rgba(184,132,23,.085),transparent 360px),
+    radial-gradient(circle at 8% 30%,rgba(37,99,235,.055),transparent 420px),
+    linear-gradient(180deg,#f8fafc,#eef2f7)!important;
+}
+.app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+  position:relative!important;
+  overflow:hidden!important;
+  border-color:rgba(212,168,67,.20)!important;
+  background:
+    radial-gradient(circle at 15% 0%,rgba(212,168,67,.115),transparent 36%),
+    radial-gradient(circle at 92% 8%,rgba(96,165,250,.075),transparent 38%),
+    linear-gradient(180deg,rgba(17,24,39,.82),rgba(7,10,15,.88))!important;
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.070),
+    inset 0 -1px 0 rgba(255,255,255,.025)!important;
+}
+.app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)):before{
+  content:""!important;
+  position:absolute!important;
+  inset:1px!important;
+  border-radius:calc(var(--radius) - 2px)!important;
+  pointer-events:none!important;
+  background:
+    linear-gradient(115deg,rgba(255,255,255,.060),transparent 28%,rgba(212,168,67,.028) 58%,transparent 84%)!important;
+  opacity:.86!important;
+}
+.app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2))>*{
+  position:relative!important;
+  z-index:1!important;
+}
+.app .tradingCalendar{
+  --tc-border:rgba(255,255,255,.115);
+  --tc-surface:rgba(255,255,255,.034);
+  --tc-surface-strong:rgba(255,255,255,.070);
+}
+.app .tradingDayCell,
+.app .tradingWeekSummary{
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.16),
+    inset 0 1px 0 rgba(255,255,255,.065)!important;
+  backdrop-filter:blur(10px) saturate(.96)!important;
+}
+.app .tradingDayCell:not(:disabled):hover{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(212,168,67,.105),transparent 54%),
+    linear-gradient(180deg,rgba(255,255,255,.082),rgba(255,255,255,.034))!important;
+  border-color:rgba(212,168,67,.36)!important;
+  box-shadow:
+    0 16px 42px rgba(0,0,0,.24),
+    0 0 0 1px rgba(212,168,67,.055) inset!important;
+}
+.app .tradingDayCell.win,
+.app .tradingWeekSummary.win{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(34,197,94,.18),transparent 58%),
+    linear-gradient(180deg,rgba(34,197,94,.115),rgba(34,197,94,.038))!important;
+  border-color:rgba(34,197,94,.26)!important;
+  color:#86efac!important;
+}
+.app .tradingDayCell.loss,
+.app .tradingWeekSummary.loss{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(239,68,68,.16),transparent 58%),
+    linear-gradient(180deg,rgba(239,68,68,.105),rgba(239,68,68,.034))!important;
+  border-color:rgba(239,68,68,.26)!important;
+  color:#fda4af!important;
+}
+.app .tradingDayCell.be,
+.app .tradingWeekSummary.be{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(96,165,250,.17),transparent 58%),
+    linear-gradient(180deg,rgba(96,165,250,.105),rgba(96,165,250,.034))!important;
+  border-color:rgba(96,165,250,.30)!important;
+  color:#93c5fd!important;
+}
+.app .tradingWeekSummary{
+  background:
+    radial-gradient(circle at 100% 0%,rgba(212,168,67,.095),transparent 50%),
+    linear-gradient(180deg,rgba(255,255,255,.060),rgba(255,255,255,.026))!important;
+}
+.app .tradingDayCell.selected{
+  outline:0!important;
+  border-color:rgba(240,201,106,.74)!important;
+  box-shadow:
+    0 18px 50px rgba(0,0,0,.24),
+    0 0 0 3px rgba(212,168,67,.13),
+    inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+  border-color:rgba(184,132,23,.18)!important;
+  background:
+    radial-gradient(circle at 16% 0%,rgba(184,132,23,.105),transparent 36%),
+    radial-gradient(circle at 92% 8%,rgba(59,130,246,.065),transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94))!important;
+  box-shadow:
+    0 22px 56px rgba(15,23,42,.09),
+    inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingCalendar{
+  --tc-border:rgba(15,23,42,.105);
+  --tc-surface:rgba(255,255,255,.78);
+  --tc-surface-strong:rgba(255,255,255,.96);
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingDayCell,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingWeekSummary{
+  box-shadow:
+    0 10px 24px rgba(15,23,42,.055),
+    inset 0 1px 0 rgba(255,255,255,.92)!important;
+  backdrop-filter:none!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingDayCell.win,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingWeekSummary.win{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(21,128,61,.13),transparent 58%),
+    linear-gradient(180deg,rgba(21,128,61,.095),rgba(255,255,255,.82))!important;
+  color:#15803d!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingDayCell.loss,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingWeekSummary.loss{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(190,18,60,.12),transparent 58%),
+    linear-gradient(180deg,rgba(190,18,60,.085),rgba(255,255,255,.84))!important;
+  color:#be123c!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingDayCell.be,
+html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .tradingWeekSummary.be{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(37,99,235,.12),transparent 58%),
+    linear-gradient(180deg,rgba(37,99,235,.080),rgba(255,255,255,.84))!important;
+  color:#2563eb!important;
+}
+@media(max-width:760px){
+  html[data-theme="dark"] body .main:before{
+    opacity:.22!important;
+    background-size:72px 72px!important;
+  }
+  .app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+    box-shadow:0 18px 48px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06)!important;
+  }
+  .app .tradingDayCell,
+  .app .tradingWeekSummary{
+    box-shadow:0 8px 20px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.055)!important;
+  }
+}
+/* v47.34 - Dark premium surface system across the authenticated app */
+html[data-theme="dark"] body .app{
+  --surface-premium-base:linear-gradient(180deg,rgba(17,24,39,.78),rgba(7,10,15,.88));
+  --surface-premium-elevated:radial-gradient(circle at 14% 0%,rgba(212,168,67,.075),transparent 34%),radial-gradient(circle at 92% 10%,rgba(96,165,250,.045),transparent 38%),linear-gradient(180deg,rgba(18,25,38,.84),rgba(8,11,17,.90));
+  --surface-premium-subtle:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.020));
+  --surface-premium-field:linear-gradient(180deg,rgba(15,23,42,.76),rgba(8,12,19,.86));
+  --surface-premium-border:rgba(255,255,255,.105);
+  --surface-premium-border-strong:rgba(212,168,67,.18);
+  --surface-premium-shadow:0 22px 70px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.055);
+  --surface-premium-shadow-soft:0 14px 42px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.045);
+}
+html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.post,.idea,.rank,.adminRow,.notif,.checkItem,.academyLesson,.onlineRow,.libraryBookPro,.brokerHeroPanel,.brokerFlow div,.brokerSecurityNote,.comingSoonItem,.sampleNotice,.nextActionCard,.processSummaryCard,.structuredOnboardingCard,.premiumEmptyAction,.mentorReviewStatusCard,.linkedValidationCard,.linkedTradeCard,.emotionPanel,.resultPreview,.heatCell,.insightPro,.statMatrix>div,.onboardingSteps button,.controlStats div,.pulseGrid>div,.checklistStats,.emptyPremium){
+  border-color:var(--surface-premium-border)!important;
+  background:var(--surface-premium-elevated)!important;
+  box-shadow:var(--surface-premium-shadow-soft)!important;
+}
+html[data-theme="dark"] body .app :is(.dashboardV38 .card,.journalPage .card,.analyticsPro .card,.riskPage .card,.resultComposer,.modalCard){
+  border-color:var(--surface-premium-border-strong)!important;
+  background:var(--surface-premium-elevated)!important;
+  box-shadow:var(--surface-premium-shadow)!important;
+}
+html[data-theme="dark"] body .app :is(.dashboardCalendarHero,.journalPage .journalControlGrid>.card:nth-child(2)){
+  border-color:rgba(212,168,67,.22)!important;
+}
+html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.modalCard,.post,.idea,.trade,.rank,.adminRow,.notif,.checkItem,.resultPreview,.insightPro,.statMatrix>div,.onboardingSteps button){
+  backdrop-filter:blur(10px) saturate(.94);
+}
+html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.post,.idea,.modalCard){
+  position:relative;
+}
+html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.post,.idea,.modalCard):after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(115deg,rgba(255,255,255,.040),transparent 24%,rgba(212,168,67,.020) 58%,transparent 82%);
+  opacity:.64;
+}
+html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.post,.idea,.modalCard)>*{
+  position:relative;
+  z-index:1;
+}
+html[data-theme="dark"] body .app :is(.trade,.tradePro,.proTable>div,.answerList>div,.activityFeed button,.resultPreview,.ruleMini span,.patternCard,.readingProtocol div,.readCard,.mandamiento,.brokerMetaGrid div,.settingsPanel,.dayPlanSummary,.scenarioBox,.reviewBox){
+  border-color:rgba(255,255,255,.095)!important;
+  background:var(--surface-premium-subtle)!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.038)!important;
+}
+html[data-theme="dark"] body .app :is(.trade:hover,.activityFeed button:hover,.onboardingSteps button:hover,.premiumEmptyAction:hover){
+  border-color:rgba(212,168,67,.26)!important;
+  background:radial-gradient(circle at 16% 0%,rgba(212,168,67,.075),transparent 44%),linear-gradient(180deg,rgba(255,255,255,.066),rgba(255,255,255,.026))!important;
+}
+html[data-theme="dark"] body .app :is(.input,select,textarea,.search,.toolbar,.seg,.exportGroup){
+  border-color:rgba(255,255,255,.105)!important;
+  background:var(--surface-premium-field)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px rgba(0,0,0,.10)!important;
+}
+html[data-theme="dark"] body .app :is(.input:focus,select:focus,textarea:focus,.search:focus-within){
+  border-color:rgba(212,168,67,.42)!important;
+  box-shadow:0 0 0 3px rgba(212,168,67,.075),inset 0 1px 0 rgba(255,255,255,.060)!important;
+}
+html[data-theme="dark"] body .app :is(.ghost,.quick button,.actions button,.icon,.user button,.me button){
+  border-color:rgba(255,255,255,.115)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+html[data-theme="dark"] body .app :is(.ghost:hover,.quick button:hover,.actions button:hover,.icon:hover,.user button:hover,.me button:hover){
+  border-color:rgba(212,168,67,.30)!important;
+  background:linear-gradient(180deg,rgba(212,168,67,.095),rgba(255,255,255,.024))!important;
+  color:var(--gold2)!important;
+}
+html[data-theme="dark"] body .app :is(.buy,.sell,.quality,.pill,.detailChips span,.checks button,.chipSelect button,.filterPills button,.emotionalToggle,.lesson,.bookCover .coverBadge,.brokerStatus){
+  border-color:rgba(255,255,255,.115)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.050),rgba(255,255,255,.020))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+html[data-theme="dark"] body .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active,.lesson.active){
+  border-color:rgba(212,168,67,.30)!important;
+  background:linear-gradient(180deg,rgba(212,168,67,.13),rgba(212,168,67,.035))!important;
+}
+html[data-theme="dark"] body .side{
+  background:radial-gradient(circle at 50% 0%,rgba(212,168,67,.095),transparent 34%),linear-gradient(180deg,rgba(10,14,21,.98),rgba(5,7,11,.995))!important;
+  border-right-color:rgba(212,168,67,.12)!important;
+  box-shadow:18px 0 64px rgba(0,0,0,.22)!important;
+}
+html[data-theme="dark"] body .brand{
+  border-bottom-color:rgba(212,168,67,.12)!important;
+}
+html[data-theme="dark"] body .side nav button{
+  color:#cbd5e1!important;
+}
+html[data-theme="dark"] body .side nav button:hover{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.020))!important;
+  border-color:rgba(255,255,255,.090)!important;
+}
+html[data-theme="dark"] body .side nav button.active{
+  background:radial-gradient(circle at 0% 50%,rgba(212,168,67,.22),transparent 58%),linear-gradient(180deg,rgba(212,168,67,.12),rgba(255,255,255,.020))!important;
+  border-color:rgba(212,168,67,.28)!important;
+  box-shadow:inset 3px 0 0 rgba(240,201,106,.76),0 12px 28px rgba(0,0,0,.12)!important;
+}
+html[data-theme="dark"] body .top{
+  background:linear-gradient(180deg,rgba(9,13,20,.86),rgba(8,11,17,.72))!important;
+  border-bottom-color:rgba(212,168,67,.10)!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+html[data-theme="dark"] body .mobileNav{
+  background:linear-gradient(180deg,rgba(10,14,21,.94),rgba(5,7,11,.96))!important;
+  border-color:rgba(212,168,67,.20)!important;
+  box-shadow:0 18px 54px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.055)!important;
+}
+html[data-theme="dark"] body .modalCard{
+  background:radial-gradient(circle at 16% 0%,rgba(212,168,67,.085),transparent 34%),linear-gradient(180deg,rgba(15,23,42,.96),rgba(5,8,13,.985))!important;
+  border-color:rgba(212,168,67,.18)!important;
+}
+html[data-theme="dark"] body .modalHead{
+  border-bottom-color:rgba(212,168,67,.12)!important;
+}
+@media(max-width:760px){
+  html[data-theme="dark"] body .app :is(.card,.metric,.metricPremium,.post,.idea,.modalCard,.trade,.checkItem,.resultPreview,.insightPro,.statMatrix>div){
+    backdrop-filter:none;
+    box-shadow:0 14px 38px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.040)!important;
+  }
+}
+/* v47.35 - Final surface consistency: Trade Detail + premium light system */
+html[data-theme="dark"] body .tradeDetailOverlay{
+  background:rgba(2,6,23,.58)!important;
+  backdrop-filter:blur(6px) saturate(.88)!important;
+}
+html[data-theme="dark"] body .tradeDetailOverlay>.tradeDetailModal{
+  background:
+    radial-gradient(circle at 14% 0%,rgba(212,168,67,.085),transparent 34%),
+    radial-gradient(circle at 92% 8%,rgba(96,165,250,.040),transparent 38%),
+    linear-gradient(180deg,rgba(15,22,34,.96),rgba(6,9,14,.985))!important;
+  border:1px solid rgba(212,168,67,.18)!important;
+  box-shadow:0 44px 128px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.060)!important;
+}
+html[data-theme="dark"] body .tradeDetailModal>.modalHead{
+  background:
+    linear-gradient(180deg,rgba(15,22,34,.92),rgba(12,17,26,.82))!important;
+  border-bottom:1px solid rgba(212,168,67,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.050),0 1px 0 rgba(0,0,0,.20)!important;
+  backdrop-filter:blur(8px) saturate(.92)!important;
+}
+html[data-theme="dark"] body .tradeDetailModal :is(.detailKpis>div,.detailBlock,.behaviorReviewDetail,.linkedValidationCard,.mentorReviewStatusCard,.emotionPanel){
+  border-color:rgba(255,255,255,.105)!important;
+  background:
+    radial-gradient(circle at 14% 0%,rgba(212,168,67,.060),transparent 42%),
+    linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.020))!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+html[data-theme="dark"] body .tradeDetailModal .detailKpis>div{
+  min-height:92px;
+}
+html[data-theme="dark"] body .tradeDetailModal .detailBlock>span,
+html[data-theme="dark"] body .tradeDetailModal .detailKpis span{
+  color:rgba(245,201,91,.86)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app{
+  --surface-light-base:linear-gradient(180deg,#f8fafc,#eef2f7);
+  --surface-light-elevated:radial-gradient(circle at 14% 0%,rgba(184,132,23,.075),transparent 34%),radial-gradient(circle at 92% 10%,rgba(59,130,246,.045),transparent 38%),linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));
+  --surface-light-subtle:linear-gradient(180deg,rgba(255,255,255,.86),rgba(241,245,249,.76));
+  --surface-light-field:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.92));
+  --surface-light-border:rgba(15,23,42,.095);
+  --surface-light-border-strong:rgba(184,132,23,.18);
+  --surface-light-shadow:0 22px 56px rgba(15,23,42,.085),inset 0 1px 0 rgba(255,255,255,.92);
+  --surface-light-shadow-soft:0 12px 32px rgba(15,23,42,.060),inset 0 1px 0 rgba(255,255,255,.86);
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.card,.metric,.metricPremium,.post,.idea,.rank,.adminRow,.notif,.checkItem,.academyLesson,.onlineRow,.libraryBookPro,.brokerHeroPanel,.brokerFlow div,.brokerSecurityNote,.comingSoonItem,.sampleNotice,.nextActionCard,.processSummaryCard,.structuredOnboardingCard,.premiumEmptyAction,.mentorReviewStatusCard,.linkedValidationCard,.linkedTradeCard,.emotionPanel,.resultPreview,.heatCell,.insightPro,.statMatrix>div,.onboardingSteps button,.controlStats div,.pulseGrid>div,.checklistStats,.emptyPremium){
+  border-color:var(--surface-light-border)!important;
+  background:var(--surface-light-elevated)!important;
+  box-shadow:var(--surface-light-shadow-soft)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.dashboardV38 .card,.journalPage .card,.analyticsPro .card,.riskPage .card,.resultComposer,.modalCard){
+  border-color:var(--surface-light-border-strong)!important;
+  background:var(--surface-light-elevated)!important;
+  box-shadow:var(--surface-light-shadow)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.trade,.tradePro,.proTable>div,.answerList>div,.activityFeed button,.resultPreview,.ruleMini span,.patternCard,.readingProtocol div,.readCard,.mandamiento,.brokerMetaGrid div,.settingsPanel,.dayPlanSummary,.scenarioBox,.reviewBox){
+  border-color:var(--surface-light-border)!important;
+  background:var(--surface-light-subtle)!important;
+  box-shadow:0 10px 26px rgba(15,23,42,.045),inset 0 1px 0 rgba(255,255,255,.84)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.trade:hover,.activityFeed button:hover,.onboardingSteps button:hover,.premiumEmptyAction:hover){
+  border-color:rgba(184,132,23,.24)!important;
+  background:radial-gradient(circle at 16% 0%,rgba(184,132,23,.075),transparent 44%),linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.88))!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.input,select,textarea,.search,.toolbar,.seg,.exportGroup){
+  border-color:rgba(15,23,42,.105)!important;
+  background:var(--surface-light-field)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90),0 8px 20px rgba(15,23,42,.035)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.input:focus,select:focus,textarea:focus,.search:focus-within){
+  border-color:rgba(184,132,23,.36)!important;
+  box-shadow:0 0 0 3px rgba(184,132,23,.085),inset 0 1px 0 rgba(255,255,255,.96)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.ghost,.quick button,.actions button,.icon,.user button,.me button){
+  border-color:rgba(15,23,42,.11)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.86))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90),0 8px 20px rgba(15,23,42,.035)!important;
+  color:#334155!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.ghost:hover,.quick button:hover,.actions button:hover,.icon:hover,.user button:hover,.me button:hover){
+  border-color:rgba(184,132,23,.26)!important;
+  background:linear-gradient(180deg,rgba(255,251,235,.98),rgba(248,250,252,.92))!important;
+  color:#8a5d0a!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.buy,.sell,.quality,.pill,.detailChips span,.checks button,.chipSelect button,.filterPills button,.emotionalToggle,.lesson,.bookCover .coverBadge,.brokerStatus){
+  border-color:rgba(15,23,42,.105)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.82))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .side{
+  background:radial-gradient(circle at 50% 0%,rgba(184,132,23,.095),transparent 34%),linear-gradient(180deg,rgba(255,255,255,.98),rgba(241,245,249,.96))!important;
+  border-right-color:rgba(184,132,23,.14)!important;
+  box-shadow:18px 0 48px rgba(15,23,42,.055)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .top{
+  background:linear-gradient(180deg,rgba(255,255,255,.90),rgba(248,250,252,.78))!important;
+  border-bottom-color:rgba(184,132,23,.12)!important;
+  box-shadow:0 12px 30px rgba(15,23,42,.045),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .mobileNav{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.92))!important;
+  border-color:rgba(184,132,23,.18)!important;
+  box-shadow:0 18px 42px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailOverlay{
+  background:rgba(15,23,42,.36)!important;
+  backdrop-filter:blur(5.5px) saturate(.90)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailOverlay>.tradeDetailModal,
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .modalCard{
+  background:radial-gradient(circle at 16% 0%,rgba(184,132,23,.075),transparent 34%),linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.96))!important;
+  border-color:rgba(184,132,23,.18)!important;
+  box-shadow:0 34px 90px rgba(15,23,42,.16),inset 0 1px 0 rgba(255,255,255,.96)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailModal>.modalHead{
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(248,250,252,.84))!important;
+  border-bottom:1px solid rgba(184,132,23,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.96),0 1px 0 rgba(15,23,42,.045)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailModal :is(.detailKpis>div,.detailBlock,.behaviorReviewDetail,.linkedValidationCard,.mentorReviewStatusCard,.emotionPanel){
+  border-color:rgba(15,23,42,.095)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(248,250,252,.82))!important;
+  box-shadow:0 12px 28px rgba(15,23,42,.055),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradingCalendar{
+  --tc-border:rgba(15,23,42,.095);
+  --tc-surface:rgba(255,255,255,.84);
+  --tc-surface-strong:rgba(255,255,255,.98);
+}
+@media(max-width:760px){
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app :is(.card,.metric,.metricPremium,.post,.idea,.modalCard,.trade,.checkItem,.resultPreview,.insightPro,.statMatrix>div){
+    box-shadow:0 12px 28px rgba(15,23,42,.060),inset 0 1px 0 rgba(255,255,255,.84)!important;
+  }
+}
+
+/* v47.36 - Dashboard product cleanup shell */
+.dashboardClean{
+  gap:16px!important;
+}
+.dashboardCommandHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:24px;
+  padding:22px 24px;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(212,168,67,.095),transparent 36%),
+    radial-gradient(circle at 92% 6%,rgba(96,165,250,.045),transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.020));
+  box-shadow:0 20px 58px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.052);
+}
+.dashboardCommandHeader h2{
+  margin:10px 0 4px;
+  color:var(--text);
+  font-size:clamp(28px,3vw,44px);
+  line-height:1.02;
+  letter-spacing:-.045em;
+  font-weight:900;
+}
+.dashboardCommandHeader p{
+  margin:0;
+  color:var(--muted);
+  font-weight:700;
+  line-height:1.45;
+}
+.dashboardHeaderActions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.dashboardHeaderActions .accountSwitcher{
+  margin:0!important;
+  flex:0 1 auto;
+}
+.dashboardKpiStrip{
+  grid-template-columns:repeat(5,minmax(150px,1fr))!important;
+}
+.dashboardSupportGrid{
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:14px;
+}
+.dashboardExecutionGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.dashboardExecutionGrid>div{
+  min-height:104px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  padding:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.050),rgba(255,255,255,.020));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+}
+.dashboardExecutionGrid span{
+  display:block;
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardExecutionGrid b{
+  display:block;
+  margin:8px 0 4px;
+  color:var(--text);
+  font-size:24px;
+  line-height:1.04;
+  letter-spacing:-.035em;
+}
+.dashboardExecutionGrid small{
+  color:var(--muted);
+  font-weight:700;
+}
+.dashboardExecutionGrid .pos b{color:#10b981}
+.dashboardExecutionGrid .neg b{color:#ef4444}
+html[data-theme="dark"] body .dashboardCommandHeader,
+html[data-theme="dark"] body .dashboardSupportGrid .card{
+  border-color:rgba(212,168,67,.16)!important;
+  background:
+    radial-gradient(circle at 14% 0%,rgba(212,168,67,.085),transparent 34%),
+    radial-gradient(circle at 92% 8%,rgba(96,165,250,.035),transparent 38%),
+    linear-gradient(180deg,rgba(15,22,34,.94),rgba(6,9,14,.985))!important;
+  box-shadow:0 26px 72px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.052)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardCommandHeader,
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardSupportGrid .card{
+  border-color:rgba(184,132,23,.16)!important;
+  background:
+    radial-gradient(circle at 14% 0%,rgba(184,132,23,.070),transparent 34%),
+    radial-gradient(circle at 92% 8%,rgba(59,130,246,.040),transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94))!important;
+  box-shadow:0 18px 46px rgba(15,23,42,.070),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardExecutionGrid>div{
+  border-color:rgba(15,23,42,.090)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.84))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86)!important;
+}
+@media(max-width:1180px){
+  .dashboardKpiStrip{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  .dashboardSupportGrid,
+  .dashboardCommandHeader{
+    grid-template-columns:1fr!important;
+  }
+  .dashboardCommandHeader{
+    display:grid;
+    align-items:start;
+  }
+  .dashboardHeaderActions{
+    justify-content:flex-start;
+  }
+  .dashboardExecutionGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:760px){
+  .dashboardCommandHeader{
+    padding:18px!important;
+    border-radius:20px!important;
+  }
+  .dashboardCommandHeader h2{
+    font-size:clamp(28px,9vw,38px);
+  }
+  .dashboardHeaderActions{
+    display:grid;
+    grid-template-columns:1fr;
+    width:100%;
+  }
+  .dashboardHeaderActions .accountSwitcher,
+  .dashboardHeaderActions button{
+    width:100%;
+    justify-content:center;
+  }
+  .dashboardKpiStrip,
+  .dashboardSupportGrid,
+  .dashboardExecutionGrid{
+    grid-template-columns:1fr!important;
+  }
+  .dashboardExecutionGrid>div{
+    min-height:88px;
+  }
+}
+
+/* v47.37 - Product design curation: Dashboard + Trade Detail Modal */
+html[data-theme="dark"] body.trade-detail-modal-open .tradeDetailOverlay .tradeDetailModal,
+html[data-theme="dark"] body.trade-detail-modal-open .tradeDetailOverlay .tradeDetailModal.modalCard{
+  background:
+    radial-gradient(circle at 16% 0%,rgba(212,168,67,.060),transparent 34%),
+    radial-gradient(circle at 90% 10%,rgba(59,130,246,.026),transparent 38%),
+    linear-gradient(180deg,rgba(12,17,26,.965),rgba(7,10,16,.985))!important;
+  border-color:rgba(212,168,67,.145)!important;
+}
+html[data-theme="dark"] body.trade-detail-modal-open .tradeDetailOverlay .tradeDetailModal>.modalHead{
+  background:
+    linear-gradient(180deg,rgba(12,17,26,.965),rgba(12,17,26,.935))!important;
+  border-bottom:1px solid rgba(255,255,255,.065)!important;
+  box-shadow:inset 0 -1px 0 rgba(212,168,67,.045)!important;
+  backdrop-filter:none!important;
+}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailOverlay .tradeDetailModal,
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailOverlay .tradeDetailModal.modalCard{
+  background:
+    radial-gradient(circle at 16% 0%,rgba(184,132,23,.050),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.985),rgba(248,250,252,.965))!important;
+  border-color:rgba(184,132,23,.145)!important;
+}
+html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeDetailOverlay .tradeDetailModal>.modalHead{
+  background:linear-gradient(180deg,rgba(255,255,255,.985),rgba(250,252,255,.955))!important;
+  border-bottom:1px solid rgba(15,23,42,.070)!important;
+  box-shadow:inset 0 -1px 0 rgba(184,132,23,.045)!important;
+  backdrop-filter:none!important;
+}
+.dashboardClean .dashboardCommandHeader{
+  padding:16px 18px!important;
+  border-radius:20px!important;
+}
+.dashboardClean .dashboardCommandHeader h2{
+  margin:7px 0 3px!important;
+  font-size:clamp(24px,2.2vw,34px)!important;
+  letter-spacing:-.032em!important;
+}
+.dashboardClean .controlBadge{
+  padding:6px 10px!important;
+  font-size:10px!important;
+  letter-spacing:.10em!important;
+}
+.dashboardClean .dashboardHeaderActions .primary,
+.dashboardClean .dashboardHeaderActions .ghost{
+  min-height:38px!important;
+}
+.dashboardClean .dashboardKpiStrip{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium{
+  min-height:116px!important;
+  padding:15px 16px!important;
+  border-radius:16px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.040),rgba(255,255,255,.017))!important;
+  border-color:rgba(255,255,255,.088)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.105),inset 0 1px 0 rgba(255,255,255,.040)!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium:after{
+  display:none!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremiumTop{
+  align-items:center!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremiumTop svg{
+  display:none!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremiumTop span{
+  color:var(--muted2)!important;
+  font-size:10px!important;
+  letter-spacing:.11em!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium b{
+  margin:12px 0 6px!important;
+  font-size:clamp(20px,1.8vw,28px)!important;
+  line-height:1.03!important;
+  letter-spacing:-.035em!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium small{
+  color:var(--muted)!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.dashboardClean .dashboardKpiStrip .sparklineMini{
+  display:none!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium.positive{
+  border-color:rgba(34,197,94,.16)!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium.negative{
+  border-color:rgba(239,68,68,.18)!important;
+}
+.dashboardClean .dashboardVisualGrid{
+  grid-template-columns:minmax(0,1.55fr) minmax(320px,.72fr)!important;
+  align-items:start!important;
+  gap:16px!important;
+}
+.dashboardClean .dashboardCalendarHero{
+  order:0!important;
+}
+.dashboardRightRail{
+  display:grid;
+  gap:12px;
+  min-width:0;
+}
+.dashboardRightRail .card{
+  margin:0!important;
+}
+.dashboardRightRail .cardHead{
+  margin-bottom:8px!important;
+}
+.dashboardRightRail .cardHead h3{
+  font-size:16px!important;
+}
+.dashboardRightRail .cardHead p{
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+.dashboardRiskList{
+  display:grid;
+  gap:8px;
+}
+.dashboardRiskList>div{
+  display:grid;
+  grid-template-columns:minmax(78px,.55fr) minmax(80px,.55fr) minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  border:1px solid rgba(255,255,255,.080);
+  border-radius:14px;
+  padding:10px 12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.036),rgba(255,255,255,.014));
+}
+.dashboardRiskList span{
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardRiskList b{
+  color:var(--text);
+  font-size:17px;
+  line-height:1.1;
+}
+.dashboardRiskList small{
+  color:var(--muted);
+  font-weight:650;
+  line-height:1.35;
+}
+html[data-theme="dark"] body .dashboardClean .dashboardRightRail .card,
+html[data-theme="dark"] body .dashboardClean .dashboardKpiStrip .metricPremium{
+  background:
+    radial-gradient(circle at 14% 0%,rgba(212,168,67,.052),transparent 34%),
+    linear-gradient(180deg,rgba(15,22,34,.90),rgba(7,10,16,.965))!important;
+  border-color:rgba(212,168,67,.12)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardClean .dashboardKpiStrip .metricPremium,
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardClean .dashboardRightRail .card{
+  background:linear-gradient(180deg,rgba(255,255,255,.985),rgba(248,250,252,.950))!important;
+  border-color:rgba(15,23,42,.090)!important;
+  box-shadow:0 12px 30px rgba(15,23,42,.055),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardRiskList>div{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.88))!important;
+  border-color:rgba(15,23,42,.085)!important;
+}
+@media(max-width:1180px){
+  .dashboardClean .dashboardKpiStrip{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  .dashboardClean .dashboardVisualGrid{
+    grid-template-columns:1fr!important;
+  }
+  .dashboardRightRail{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:860px){
+  .dashboardRightRail{
+    grid-template-columns:1fr!important;
+  }
+  .dashboardClean .dashboardKpiStrip{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .dashboardRiskList>div{
+    grid-template-columns:1fr;
+    gap:4px;
+  }
+}
+@media(max-width:520px){
+  .dashboardClean .dashboardKpiStrip{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* v47.38 - Dashboard final rail refinement */
+.dashboardClean .dashboardHeaderActions{
+  min-width:260px;
+}
+.dashboardClean .dashboardHeaderActions .accountSwitcher{
+  width:100%;
+  justify-content:space-between;
+}
+.dashboardDisciplineCard,
+.dashboardMapCard,
+.dashboardRiskCard{
+  overflow:hidden;
+}
+.dashboardScorePanel{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:14px;
+}
+.dashboardScoreRing{
+  --score:0;
+  width:84px;
+  height:84px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  padding:7px;
+  background:
+    conic-gradient(from -90deg,rgba(212,168,67,.84) calc(var(--score)*1%),rgba(255,255,255,.080) 0),
+    linear-gradient(180deg,rgba(255,255,255,.040),rgba(255,255,255,.014));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.050);
+}
+.dashboardScoreRing b{
+  width:100%;
+  height:100%;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  padding:8px;
+  background:rgba(8,12,18,.92);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.05;
+  text-align:center;
+}
+.dashboardScorePanel span{
+  display:block;
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardScorePanel p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:650;
+  line-height:1.45;
+}
+.dashboardMapGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.dashboardMapGrid>div{
+  min-height:76px;
+  border:1px solid rgba(255,255,255,.080);
+  border-radius:14px;
+  padding:10px 11px;
+  background:linear-gradient(180deg,rgba(255,255,255,.036),rgba(255,255,255,.014));
+}
+.dashboardMapGrid span{
+  display:block;
+  color:var(--muted2);
+  font-size:9.5px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardMapGrid b{
+  display:block;
+  margin:6px 0 2px;
+  color:var(--text);
+  font-size:15px;
+  line-height:1.15;
+}
+.dashboardMapGrid small{
+  color:var(--muted);
+  font-weight:650;
+  line-height:1.3;
+}
+.dashboardClean .dashboardRightRail .equityPreviewCard .recharts-wrapper{
+  max-height:160px;
+}
+html[data-theme="dark"] body .dashboardScoreRing b{
+  background:linear-gradient(180deg,rgba(10,15,22,.98),rgba(6,9,14,.98));
+}
+html[data-theme="dark"] body .dashboardMapGrid>div,
+html[data-theme="dark"] body .dashboardScorePanel{
+  border-color:rgba(255,255,255,.075);
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardScoreRing{
+  background:
+    conic-gradient(from -90deg,rgba(184,132,23,.72) calc(var(--score)*1%),rgba(15,23,42,.090) 0),
+    linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.86));
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardScoreRing b{
+  background:linear-gradient(180deg,#fff,#f8fafc);
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardMapGrid>div{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.88))!important;
+  border-color:rgba(15,23,42,.085)!important;
+}
+@media(max-width:1180px){
+  .dashboardRightRail{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .dashboardRightRail .nextActionCard{
+    grid-column:1/-1;
+  }
+}
+@media(max-width:860px){
+  .dashboardClean .dashboardHeaderActions{
+    min-width:0;
+  }
+  .dashboardRightRail{
+    grid-template-columns:1fr!important;
+  }
+  .dashboardScorePanel{
+    grid-template-columns:auto 1fr;
+  }
+}
+@media(max-width:520px){
+  .dashboardScoreRing{
+    width:76px;
+    height:76px;
+  }
+  .dashboardMapGrid{
+    grid-template-columns:1fr;
+  }
+  .dashboardMapGrid>div{
+    min-height:68px;
+  }
+}
+
+/* v47.39 - Dashboard analytics summary polish */
+.dashboardClean .dashboardKpiStrip{
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium{
+  min-height:108px!important;
+  padding:14px 15px!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium b{
+  font-size:clamp(18px,1.45vw,25px)!important;
+  white-space:normal!important;
+  overflow-wrap:normal!important;
+}
+.dashboardClean .dashboardKpiStrip .metricPremium small{
+  display:-webkit-box!important;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.dashboardScorePanel.isFallback{
+  grid-template-columns:auto minmax(0,1fr);
+}
+.dashboardScorePanel.isFallback .dashboardScoreRing{
+  width:72px;
+  height:72px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.050),rgba(255,255,255,.016))!important;
+}
+.dashboardScorePanel.isFallback .dashboardScoreRing b{
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:0;
+}
+.dashboardScoreRing b{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+}
+.dashboardScoreRing b span{
+  display:block;
+  max-width:100%;
+  line-height:1.02;
+}
+.dashboardScoreRing b small{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+}
+.dashboardScorePanel.isFallback p{
+  font-size:12px;
+  line-height:1.35;
+}
+.dashboardClean .dashboardCalendarHero .cardHead p{
+  font-weight:750!important;
+  color:var(--muted)!important;
+}
+html[data-theme="dark"] body .dashboardScorePanel.isFallback .dashboardScoreRing{
+  border:1px solid rgba(255,255,255,.085);
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardScorePanel.isFallback .dashboardScoreRing{
+  background:linear-gradient(180deg,#fff,#f8fafc)!important;
+  border:1px solid rgba(15,23,42,.085);
+}
+@media(max-width:1320px){
+  .dashboardClean .dashboardKpiStrip{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:860px){
+  .dashboardClean .dashboardKpiStrip{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:520px){
+  .dashboardClean .dashboardKpiStrip{
+    grid-template-columns:1fr!important;
+  }
+  .dashboardClean .dashboardKpiStrip .metricPremium{
+    min-height:96px!important;
+  }
+}
+
+/* v47.40 - Dashboard real summary + Spanish analytics finish */
+.dashboardCalendarColumn{
+  display:grid;
+  gap:14px;
+  min-width:0;
+}
+.dashboardStatsSummary{
+  margin:0!important;
+}
+.dashboardStatsGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.dashboardStatsGrid>div{
+  min-height:88px;
+  border:1px solid rgba(255,255,255,.080);
+  border-radius:15px;
+  padding:12px 13px;
+  background:linear-gradient(180deg,rgba(255,255,255,.038),rgba(255,255,255,.016));
+}
+.dashboardStatsGrid span{
+  display:block;
+  color:var(--muted2);
+  font-size:9.5px;
+  font-weight:900;
+  letter-spacing:.10em;
+  line-height:1.25;
+  text-transform:uppercase;
+}
+.dashboardStatsGrid b{
+  display:block;
+  margin:7px 0 3px;
+  color:var(--text);
+  font-size:17px;
+  line-height:1.12;
+  font-weight:900;
+}
+.dashboardStatsGrid small{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:650;
+  line-height:1.35;
+}
+.dashboardDisciplineBadge{
+  min-width:126px;
+  min-height:56px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+  border:1px solid rgba(212,168,67,.18);
+  border-radius:16px;
+  padding:10px 12px;
+  background:linear-gradient(180deg,rgba(212,168,67,.105),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+}
+.dashboardDisciplineBadge b{
+  color:var(--text);
+  font-size:18px;
+  font-weight:950;
+  line-height:1;
+  letter-spacing:-.02em;
+}
+.dashboardDisciplineBadge small{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:750;
+  line-height:1.25;
+}
+.dashboardDisciplineBadge.isFallback{
+  border-color:rgba(255,255,255,.090);
+  background:linear-gradient(180deg,rgba(255,255,255,.042),rgba(255,255,255,.014));
+}
+.dashboardClean .dashboardMapGrid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.dashboardClean .dashboardMapGrid>div:first-child{
+  grid-column:1/-1;
+  min-height:72px;
+}
+html[data-theme="dark"] body .dashboardStatsGrid>div,
+html[data-theme="dark"] body .dashboardDisciplineBadge{
+  border-color:rgba(212,168,67,.115);
+  background:
+    radial-gradient(circle at 16% 0%,rgba(212,168,67,.045),transparent 38%),
+    linear-gradient(180deg,rgba(15,22,34,.86),rgba(7,10,16,.955));
+}
+html[data-theme="dark"] body .dashboardDisciplineBadge.isFallback{
+  border-color:rgba(255,255,255,.075);
+  background:linear-gradient(180deg,rgba(255,255,255,.034),rgba(255,255,255,.012));
+}
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardStatsGrid>div,
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardDisciplineBadge{
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.91))!important;
+  border-color:rgba(15,23,42,.085)!important;
+  box-shadow:0 10px 26px rgba(15,23,42,.045),inset 0 1px 0 rgba(255,255,255,.88)!important;
+}
+@media(max-width:1180px){
+  .dashboardStatsGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:640px){
+  .dashboardStatsGrid{
+    grid-template-columns:1fr;
+  }
+  .dashboardScorePanel{
+    grid-template-columns:1fr!important;
+    align-items:start;
+  }
+  .dashboardDisciplineBadge{
+    width:100%;
+  }
+}

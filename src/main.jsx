@@ -48,6 +48,12 @@ const formatCalendarR=value=>{
   return `${n>0?'+':''}${n.toFixed(2)}R`;
 };
 const calendarDayR=dayStats=>(dayStats?.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultR),0);
+const formatCalendarPct=value=>{
+  const n=Number(value||0);
+  return `${n>0?'+':''}${n.toFixed(1)}%`;
+};
+const calendarDayPct=dayStats=>(dayStats?.trades||[]).reduce((sum,t)=>sum+toNumberSafe(t.resultPct),0);
+const calendarToneFromTotal=value=>Number(value||0)>0?'win':Number(value||0)<0?'loss':'be';
 function normalizeNumInput(v){
   const raw=String(v ?? '').replace(',', '.').trim();
   if(raw==='' || raw==='-' || /^-?\d*(\.\d*)?$/.test(raw)) return raw;
@@ -124,6 +130,30 @@ function groupTradesByDay(trades=[]){
     acc[date].trades.push(t);
     return acc;
   },{});
+}
+function buildTradingCalendarWeeks(key,stats={}){
+  const rows=[];
+  const cells=daysInMonth(key);
+  for(let i=0;i<cells.length;i+=7){
+    const weekdays=cells.slice(i,i+5);
+    const weekStats=weekdays.reduce((acc,date)=>{
+      const st=date?stats[date]:null;
+      if(!st) return acc;
+      const r=calendarDayR(st), pctValue=calendarDayPct(st);
+      acc.total+=st.total;
+      acc.r+=r;
+      acc.pct+=pctValue;
+      acc.pctCount+=(st.trades||[]).filter(t=>String(t.resultPct??'').trim()!=='').length;
+      acc.count+=st.count;
+      acc.wins+=st.total>0?1:0;
+      acc.losses+=st.total<0?1:0;
+      acc.breakevens+=st.total===0?1:0;
+      acc.trades.push(...(st.trades||[]));
+      return acc;
+    },{total:0,r:0,pct:0,pctCount:0,count:0,wins:0,losses:0,breakevens:0,trades:[]});
+    rows.push({index:rows.length+1,days:weekdays,summary:weekStats});
+  }
+  return rows;
 }
 const uid=()=>crypto.randomUUID?.()||String(Date.now()+Math.random());
 async function copyText(text,label='Copiado'){try{await navigator.clipboard.writeText(String(text||'')); toast(label);}catch(e){toast('No se pudo copiar');}}
@@ -452,7 +482,7 @@ function insights(s){
   const cards=[];
   const score=s.count?Math.round(Math.min(100,Math.max(0,(s.profitFactor>=1?25:8)+(s.discipline*.28)+(s.winrate*.18)+(Math.max(0,Math.min(2,s.avgR))*16)+(s.qualityAvg*.13)))):0;
   cards.push({label:'Score operativo',value:s.count?`${score}/100`:'Sin datos',tone:score>=75?'good':score>=55?'warn':'neutral',text:s.count?'Combina disciplina, calidad, R promedio, winrate y factor de beneficio.':'Carga trades para activar el score.'});
-  cards.push({label:'Profit factor',value:s.count?(s.profitFactor? s.profitFactor.toFixed(2):'0.00'):'—',tone:s.profitFactor>=1.5?'good':s.profitFactor>=1?'warn':'bad',text:'Mide cuánto ganas por cada $1 perdido. >1.30 empieza a ser saludable.'});
+  cards.push({label:'Factor de beneficio',value:s.count?(s.profitFactor? s.profitFactor.toFixed(2):'0.00'):'—',tone:s.profitFactor>=1.5?'good':s.profitFactor>=1?'warn':'bad',text:'Mide cuánto ganas por cada $1 perdido. >1.30 empieza a ser saludable.'});
   cards.push({label:'Sharpe operativo',value:s.count?s.sharpeLike.toFixed(2):'—',tone:s.sharpeLike>1?'good':s.sharpeLike>0?'warn':'bad',text:'Relación entre retorno promedio en R y volatilidad de tus resultados.'});
   cards.push({label:'Expectativa',value:s.count?formatMoneyClean(s.expectancy):'—',tone:s.expectancy>0?'good':s.expectancy<0?'bad':'neutral',text:'Promedio real que entrega cada trade registrado.'});
   if(s.bySession.length){const b=[...s.bySession].sort((a,b)=>b.value-a.value)[0]; cards.push({label:'Mejor sesión',value:b.name,tone:b.value>=0?'good':'bad',text:`Resultado acumulado: ${formatMoneyClean(b.value)} en ${formatMetricCard(b.count)} trade(s).`});}
@@ -463,7 +493,7 @@ function insights(s){
   return cards;
 }
 function InsightGrid({items}){return <div className="insightGrid">{items.map((x,i)=><div className={`insightPro ${x.tone||'neutral'}`} key={i}><div><span>{x.label}</span><strong>{x.value}</strong></div><p>{x.text}</p></div>)}</div>}
-function TraderStats({s}){const rows=[['Trades',formatMetricCard(s.count)],['Ganados / Perdidos',`${formatMetricCard(s.wins)}W / ${formatMetricCard(s.losses)}L`],['Sesgo más rentable',s.count?`${s.bestBias.name} · ${formatMoneyClean(s.bestBias.value)}`:'—'],['Ganancia bruta',formatMoneyClean(s.grossProfit)],['Pérdida bruta',formatMoneyClean(s.grossLoss)],['Avg win',formatMoneyClean(s.avgWin)],['Avg loss',formatMoneyClean(s.avgLoss)],['Payoff ratio',s.payoffRatio?s.payoffRatio.toFixed(2):'0.00'],['Recovery factor',s.recovery?s.recovery.toFixed(2):'0.00'],['Media R',`${s.meanR.toFixed(2)}R`],['Volatilidad R',`${s.stdR.toFixed(2)}R`]];return <div className="statMatrix">{rows.map(([a,b])=><div key={a}><span>{a}</span><b>{b}</b></div>)}</div>}
+function TraderStats({s}){const rows=[['Trades',formatMetricCard(s.count)],['Ganados / Perdidos',`${formatMetricCard(s.wins)}W / ${formatMetricCard(s.losses)}L`],['Sesgo más rentable',s.count?`${s.bestBias.name} · ${formatMoneyClean(s.bestBias.value)}`:'—'],['Ganancia bruta',formatMoneyClean(s.grossProfit)],['Pérdida bruta',formatMoneyClean(s.grossLoss)],['Ganancia prom.',formatMoneyClean(s.avgWin)],['Perdida prom.',formatMoneyClean(s.avgLoss)],['Ratio G/P',s.payoffRatio?s.payoffRatio.toFixed(2):'0.00'],['Factor de recuperacion',s.recovery?s.recovery.toFixed(2):'0.00'],['Media R',`${s.meanR.toFixed(2)}R`],['Volatilidad R',`${s.stdR.toFixed(2)}R`]];return <div className="statMatrix">{rows.map(([a,b])=><div key={a}><span>{a}</span><b>{b}</b></div>)}</div>}
 function exportSafeDate(value){
   try{
     if(!value)return '';
@@ -1729,8 +1759,8 @@ function SparklineMini({data=[],tone='neutral'}){
   const max=Math.max(1,...values.map(v=>Math.abs(Number(v)||0)));
   return <div className="sparklineMini" aria-hidden="true">{values.map((v,i)=>{const n=Number(v)||0; const h=14+(Math.abs(n)/max)*26; return <span key={i} className={n>0?'pos':n<0?'neg':tone} style={{height:h}}/>})}</div>
 }
-function MetricCardPremium({label,value,sub,icon:Icon,state='neutral',sparkData=[]}){
-  return <div className={`metricPremium ${state}`}><div className="metricPremiumTop"><span>{label}</span>{Icon&&<Icon size={17}/>}</div><b>{value}</b>{sub&&<small>{sub}</small>}<SparklineMini data={sparkData} tone={state}/></div>
+function MetricCardPremium({label,value,sub,icon:Icon,state='neutral',sparkData=[],showSpark=true}){
+  return <div className={`metricPremium ${state}`}><div className="metricPremiumTop"><span>{label}</span>{Icon&&<Icon size={17}/>}</div><b>{value}</b>{sub&&<small>{sub}</small>}{showSpark&&<SparklineMini data={sparkData} tone={state}/>}</div>
 }
 function greetingNY(){
   const h=Number(new Intl.DateTimeFormat('en-US',{hour:'numeric',hour12:false,timeZone:'America/New_York'}).format(new Date()));
@@ -1746,7 +1776,7 @@ function DashboardControlCenter({profile,s,monthly,setTab,filtered=[]}){
   const weekWins=weekTrades.filter(t=>Number(t.resultMoney)>0).length;
   const weekWr=weekTrades.length?weekWins/weekTrades.length*100:0;
   const discipline=Math.round(Number(s.discipline||0));
-  return <section className="controlCenter"><div className="controlLeft"><span className="controlBadge"><Crown size={15}/> Trading Control Center</span><h2>{greetingNY()}, {profile.name||'Trader'}</h2><p>Tu centro de mando para operar con estructura, medir con evidencia y corregir con sistema.</p><div className="sessionRow"><SessionStatusPill label={sessionNameNY()}/><span>Rollover 17:00 NY · <ResetTicker/></span></div><div className="controlActions"><button className="primary" onClick={()=>setTab('checklist')}><CheckCircle2 size={17}/>Abrir checklist</button><button className="ghost" onClick={()=>setTab('journal')}><Plus size={17}/>Registrar trade</button><button className="ghost" onClick={()=>setTab('journal')}><LineChart size={17}/>Ver journal</button><button className="ghost" onClick={()=>setTab('analytics')}><BarChart3 size={17}/>Revisar analytics</button><button className="ghost" onClick={()=>setTab('emotional')}><Heart size={17}/>Cerrar sesion emocional</button></div></div><div className="controlRight"><div className="controlChart"><ResponsiveContainer width="100%" height={120}><AreaChart data={s.curve}><defs><linearGradient id="controlEq" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#d4a843" stopOpacity={0.28}/><stop offset="95%" stopColor="#d4a843" stopOpacity={0}/></linearGradient></defs><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#d4a843" strokeWidth={2} fill="url(#controlEq)"/></AreaChart></ResponsiveContainer></div><div className="controlStats"><div className={dayPnL>=0?'pos':'neg'}><span>P/L día</span><b>{formatMoneyCompactCard(dayPnL)}</b></div><div><span>WR semana</span><b>{formatPercentCard(weekWr)}</b></div><div><span>Disciplina</span><b>{discipline?formatPercentCard(discipline):'—'}</b></div><div><span>Días operados</span><b>{formatMetricCard(monthly.days)}</b></div></div></div></section>
+  return <section className="controlCenter"><div className="controlLeft"><span className="controlBadge"><Crown size={15}/> Centro de Control Operativo</span><h2>{greetingNY()}, {profile.name||'Trader'}</h2><p>Tu centro de mando para operar con estructura, medir con evidencia y corregir con sistema.</p><div className="sessionRow"><SessionStatusPill label={sessionNameNY()}/><span>Rollover 17:00 NY · <ResetTicker/></span></div><div className="controlActions"><button className="primary" onClick={()=>setTab('checklist')}><CheckCircle2 size={17}/>Abrir checklist</button><button className="ghost" onClick={()=>setTab('journal')}><Plus size={17}/>Registrar trade</button><button className="ghost" onClick={()=>setTab('journal')}><LineChart size={17}/>Ver journal</button><button className="ghost" onClick={()=>setTab('analytics')}><BarChart3 size={17}/>Revisar analytics</button><button className="ghost" onClick={()=>setTab('emotional')}><Heart size={17}/>Cerrar sesion emocional</button></div></div><div className="controlRight"><div className="controlChart"><ResponsiveContainer width="100%" height={120}><AreaChart data={s.curve}><defs><linearGradient id="controlEq" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#d4a843" stopOpacity={0.28}/><stop offset="95%" stopColor="#d4a843" stopOpacity={0}/></linearGradient></defs><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#d4a843" strokeWidth={2} fill="url(#controlEq)"/></AreaChart></ResponsiveContainer></div><div className="controlStats"><div className={dayPnL>=0?'pos':'neg'}><span>P/L día</span><b>{formatMoneyCompactCard(dayPnL)}</b></div><div><span>WR semana</span><b>{formatPercentCard(weekWr)}</b></div><div><span>Disciplina</span><b>{discipline?formatPercentCard(discipline):'—'}</b></div><div><span>Días operados</span><b>{formatMetricCard(monthly.days)}</b></div></div></div></section>
 }
 function SessionStatusPill({label}){return <span className="sessionStatusPill"><Activity size={13}/>{label}</span>}
 function PremiumEmptyState({title,text,cta,onClick,icon:Icon=Sparkles}){
@@ -1756,9 +1786,12 @@ function RecommendedActionCard({data,setTab,s}){
   const hasChecklist=(data.checklists||[]).length>0;
   const hasTrades=(data.trades||[]).length>0;
   const hasEmotional=(data.emotionalJournals||[]).length>0;
-  const action=!hasChecklist?{icon:CheckCircle2,title:'Valida tu checklist antes de operar',text:'Separa plan, riesgo y ejecucion antes de abrir una posicion.',cta:'Abrir checklist',target:'checklist'}:!hasTrades?{icon:Plus,title:'Registra tu primera operacion',text:'Construi evidencia real desde el journal operativo.',cta:'Registrar trade',target:'journal'}:!hasEmotional?{icon:Heart,title:'Cerra tu sesion emocional',text:'Deja registrado como ejecutaste y que vas a corregir.',cta:'Cerrar sesion emocional',target:'emotional'}:Number(s?.count||0)<5?{icon:LineChart,title:'Suma mas evidencia operativa',text:'Segui registrando trades para que los patrones ganen calidad.',cta:'Ver journal',target:'journal'}:{icon:BarChart3,title:'Revisa tus metricas semanales',text:'Usa analytics para detectar consistencia, riesgo y calidad de ejecucion.',cta:'Revisar analytics',target:'analytics'};
+  const todayKey=tradingDayKey();
+  const todayTrades=(data.trades||[]).filter(t=>(t.tradingDay||t.date||'').slice(0,10)===todayKey);
+  const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===todayKey);
+  const action=!hasChecklist?{icon:CheckCircle2,title:'Completar checklist',text:'Validá contexto, zona y riesgo antes de buscar entrada.',cta:'Abrir checklist',target:'checklist'}:todayPlan&&!todayTrades.length?{icon:Target,title:'Esperar setup válido',text:'Hay plan para hoy. La siguiente acción es ejecutar solo si aparece el patrón.',cta:'Ver jornada',target:'journal'}:todayTrades.length?{icon:FileText,title:'Revisar ejecución',text:'Ya hay operaciones registradas. Cerrá lectura de conducta y aprendizaje.',cta:'Ver journal',target:'journal'}:!hasTrades?{icon:Plus,title:'Registrar jornada',text:'Cargá plan o primer trade para activar lectura operativa real.',cta:'Registrar trade',target:'journal'}:!hasEmotional?{icon:Heart,title:'Cerrar revisión',text:'Dejá registrado estado emocional y corrección concreta de la sesión.',cta:'Cerrar sesión',target:'emotional'}:{icon:BarChart3,title:'Revisar métricas',text:'Usá analytics para detectar consistencia, riesgo y calidad de ejecución.',cta:'Revisar analytics',target:'analytics'};
   const Icon=action.icon;
-  return <Card title="Tu proxima accion recomendada" sub="Basada en tu actividad real dentro del workspace." className="nextActionCard"><div className="nextActionBody"><span><Icon size={22}/></span><div><b>{action.title}</b><p>{action.text}</p><button className="primary compact" onClick={()=>setTab(action.target)}>{action.cta}</button></div></div></Card>
+  return <Card title="Proxima accion" sub="Basada en tu actividad real registrada." className="nextActionCard"><div className="nextActionBody"><span><Icon size={22}/></span><div><b>{action.title}</b><p>{action.text}</p><button className="primary compact" onClick={()=>setTab(action.target)}>{action.cta}</button></div></div></Card>
 }
 function ProcessSummaryCard({data,setTab}){
   const rows=[['Trades',data.trades?.length||0,'journal'],['Checklists',data.checklists?.length||0,'checklist'],['Cierres emocionales',data.emotionalJournals?.length||0,'emotional'],['Ideas',data.ideas?.length||0,'ideas'],['Resultados',data.resultPosts?.length||0,'results']];
@@ -1821,18 +1854,153 @@ function ActivityFeed({data,setTab}){
   ].sort((a,b)=>b.time-a.time).slice(0,8);
   return <Card title="Actividad reciente" sub="Últimos movimientos del ecosistema."><div className="activityFeed">{items.map((it,i)=><button key={`${it.type}-${i}`} onClick={()=>setTab(it.target)}><span>{it.type}</span><b>{it.text}</b><small>{it.meta}</small></button>)}{!items.length&&<PremiumEmptyState title="Sin actividad reciente" text="Cuando haya trades, checklists o publicaciones apareceran aca." cta="Registrar trade" icon={Activity} onClick={()=>setTab('journal')}/>}</div></Card>
 }
-function CalendarHeatmapPreview({trades=[],setTab}){const stats=groupTradesByDay(trades); const key=monthKey(); const cells=daysInMonth(key); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key); const total=monthStats.reduce((a,b)=>a+b.total,0); const latestTradeForDay=d=>[...(stats[d]?.trades||[])].sort((a,b)=>String(b.updatedAt?.toDate?.()?.toISOString?.()||b.createdAt?.toDate?.()?.toISOString?.()||b.createdAt?.seconds||b.date||b.tradingDay||'').localeCompare(String(a.updatedAt?.toDate?.()?.toISOString?.()||a.createdAt?.toDate?.()?.toISOString?.()||a.createdAt?.seconds||a.date||a.tradingDay||'')))[0]; const openDay=d=>{localStorage.setItem('mtc-open-journal-date',d); const latest=latestTradeForDay(d); if(latest?.id)localStorage.setItem('mtc-open-trade',latest.id); setTab?.('journal');}; return <Card title="Calendario P/L" sub={`${monthStats.length} días operados · ${total>=0?'+':''}${formatMoneyClean(total)}`} className="calendarPreviewCard"><div className="calendarMiniGrid">{cells.map((d,i)=>{if(!d)return <span key={i}/>; const st=stats[d]; const cls=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const totalR=calendarDayR(st); return <button key={d} className={cls} title={st?`${d} · ${money(st.total)} · ${formatCalendarR(totalR)}`:d} onClick={()=>st&&openDay(d)} disabled={!st}><b>{Number(d.slice(-2))}</b>{st&&<em className="calendarMiniResult"><span className="calendarMiniMoney">{formatCalendarMoney(st.total)}</span><span className="calendarMiniR">{formatCalendarR(totalR)}</span></em>}</button>})}</div></Card>}
-function EquityCurvePreview({s}){const change=s.total; return <Card title="Curva de equity" sub={`Equity actual ${money(s.equity)} · ${change>=0?'+':''}${money(change)}`} className="equityPreviewCard"><ResponsiveContainer width="100%" height={300}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.045)"/><XAxis dataKey="name"/><YAxis/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card>}
+function tradeSortTime(trade,index=0){
+  const values=[trade?.updatedAt,trade?.createdAt,trade?.closedAt,trade?.dateTime,trade?.time,trade?.date,trade?.tradingDay];
+  for(const value of values){
+    if(!value) continue;
+    if(typeof value?.toMillis==='function') return value.toMillis();
+    if(Number.isFinite(Number(value?.seconds))) return Number(value.seconds)*1000+Number(value.nanoseconds||0)/1000000;
+    const parsed=Date.parse(String(value));
+    if(Number.isFinite(parsed)) return parsed;
+  }
+  return index;
+}
+function latestTradeFromStats(dayStats){
+  const rows=dayStats?.trades||[];
+  if(!rows.length) return null;
+  return rows.map((trade,index)=>({trade,index,time:tradeSortTime(trade,index)})).sort((a,b)=>(b.time-a.time)||(b.index-a.index))[0].trade;
+}
+function TradingMonthCalendar({trades=[],selectedDate,onSelectDay,variant='detailed',initialKey}){
+  const [key,setKey]=useState((initialKey||selectedDate||tradingDayKey()).slice(0,7));
+  const stats=groupTradesByDay(trades);
+  const weeks=buildTradingCalendarWeeks(key,stats);
+  const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key);
+  const total=monthStats.reduce((a,b)=>a+b.total,0);
+  const totalR=monthStats.reduce((a,b)=>a+calendarDayR(b),0);
+  const monthLabel=new Date(key+'-02T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  const compact=variant==='compact';
+  const prev=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()-1); setKey(d.toISOString().slice(0,7));};
+  const next=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()+1); setKey(d.toISOString().slice(0,7));};
+  return <div className={`tradingCalendar ${variant} ${compact?'compact':'detailed'}`}>
+    <div className="tradingCalendarHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)} · {formatCalendarR(totalR)}</small></div><button className="ghost compact" onClick={next}>›</button></div>
+    <div className="tradingCalendarGrid">
+      {['Lun','Mar','Mié','Jue','Vie','Semana'].map(label=><span className="tradingCalendarLabel" key={label}>{label}</span>)}
+      {weeks.map(week=><React.Fragment key={`week-${week.index}`}>
+        {week.days.map((date,dayIndex)=>{
+          if(!date) return <span key={`blank-${week.index}-${dayIndex}`} className="tradingDayCell empty"/>;
+          const st=stats[date],tone=st?calendarToneFromTotal(st.total):'none',dayR=calendarDayR(st);
+          return <button key={date} className={`tradingDayCell ${tone} ${selectedDate===date?'selected':''}`} disabled={!st&&compact} onClick={()=>{if(st||!compact)onSelectDay?.(date,st)}} title={st?`${date} · ${money(st.total)} · ${formatCalendarR(dayR)} · ${st.count} trade${st.count>1?'s':''}`:date}><b>{Number(date.slice(-2))}</b>{st&&<span className="tradingDayResult"><strong>{formatCalendarMoney(st.total)}</strong><small>{formatCalendarR(dayR)}</small></span>}</button>;
+        })}
+        <div className={`tradingWeekSummary ${week.summary.count?calendarToneFromTotal(week.summary.total):'none'}`}>
+          <span>Semana {week.index}</span>
+          {week.summary.count?<><strong>{formatCalendarMoney(week.summary.total)}</strong><small>{week.summary.pctCount?formatCalendarPct(week.summary.pct):formatCalendarR(week.summary.r)}</small>{!compact&&week.summary.pctCount>0&&<em>{formatCalendarR(week.summary.r)}</em>}</>:<small>Sin trades</small>}
+        </div>
+      </React.Fragment>)}
+    </div>
+    <div className="tradingCalendarLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div>
+  </div>;
+}
+function CalendarHeatmapPreview({trades=[],setTab,initial=0}){const stats=groupTradesByDay(trades); const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===monthKey()); const total=monthStats.reduce((a,b)=>a+b.total,0); const totalR=monthStats.reduce((a,b)=>a+calendarDayR(b),0); const monthPct=Number(initial||0)?total/Number(initial||0)*100:0; const monthLabel=new Date(monthKey()+'-02T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'}); const openDay=(d,st)=>{localStorage.setItem('mtc-open-journal-date',d); const latest=latestTradeFromStats(st); if(latest?.id)localStorage.setItem('mtc-open-trade',latest.id); setTab?.('journal');}; return <Card title="Calendario P/L" sub={`${monthLabel} · ${monthStats.length} día${monthStats.length===1?'':'s'} operado${monthStats.length===1?'':'s'} · ${total>=0?'+':''}${formatMoneyClean(total)} · ${formatCalendarPct(monthPct)} · ${formatCalendarR(totalR)}`} className="calendarPreviewCard dashboardCalendarHero"><TradingMonthCalendar trades={trades} variant="dashboard" initialKey={monthKey()} onSelectDay={openDay}/></Card>}
+function EquityCurvePreview({s}){const change=s.total; const forming=Number(s.count||0)<3; return <Card title="Curva de equity" sub={forming?'Curva en formación · se necesitan más operaciones':`Equity actual ${money(s.equity)} · ${change>=0?'+':''}${money(change)}`} className="equityPreviewCard dashboardEquityCompact"><ResponsiveContainer width="100%" height={160}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.045)"/><XAxis dataKey="name"/><YAxis/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card>}
 function Dashboard({data,profile,setTab}){
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
   const initial=accountInitial(data.settings,active);
   const scopedData=useMemo(()=>({...data,trades:filtered}),[data,filtered]);
   const s=useMemo(()=>calc(filtered,initial),[filtered,initial]);
-  const insightCards=useMemo(()=>insights(s),[s]);
   const byDay=groupTradesByDay(filtered);
-  const monthly=Object.values(byDay).filter(d=>d.date.slice(0,7)===monthKey()).reduce((a,d)=>({days:a.days+1,total:a.total+d.total,wins:a.wins+(d.total>0?1:0),losses:a.losses+(d.total<0?1:0)}),{days:0,total:0,wins:0,losses:0});
+  const monthly=Object.values(byDay).filter(d=>d.date.slice(0,7)===monthKey()).reduce((a,d)=>({days:a.days+1,total:a.total+d.total,r:a.r+calendarDayR(d),wins:a.wins+(d.total>0?1:0),losses:a.losses+(d.total<0?1:0),be:a.be+(d.total===0?1:0)}),{days:0,total:0,r:0,wins:0,losses:0,be:0});
   const spark=s.curve.slice(-8).map((p,i,arr)=>i?Number(p.equity||0)-Number(arr[i-1].equity||0):0);
-  return <main className="page dashboardV38"><DashboardControlCenter profile={profile} s={s} monthly={monthly} setTab={setTab} filtered={filtered}/><MarketClocks/><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><div className="dashboardGuidanceGrid"><RecommendedActionCard data={scopedData} setTab={setTab} s={s}/><ProcessSummaryCard data={scopedData} setTab={setTab}/></div><StructuredOnboardingCard data={scopedData} setTab={setTab}/><div className="metrics premiumMetricGrid"><MetricCardPremium label="Equity" value={formatMoneyClean(s.equity)} sub={`Inicial ${formatMoneyClean(s.initial)}`} icon={BarChart3} state="neutral" sparkData={spark}/><MetricCardPremium label="P/L total" value={formatMoneyCompactCard(s.total)} sub={pct(s.profitPct)} icon={LineChart} state={s.total>=0?'positive':'negative'} sparkData={spark}/><MetricCardPremium label="Win rate" value={formatPercentCard(s.winrate)} sub={`${s.wins}W / ${s.losses}L`} icon={Trophy} state={s.winrate>=50?'positive':'neutral'} sparkData={spark}/><MetricCardPremium label="R promedio" value={formatR(s.avgR)} sub={`DD ${pct(s.maxDD)}`} icon={Activity} state={s.avgR>0?'positive':s.avgR<0?'negative':'neutral'} sparkData={spark}/><MetricCardPremium label="Profit factor" value={s.count?formatMetricCard(s.profitFactor,0):'—'} sub="Salud del sistema" icon={Shield} state={s.profitFactor>=1.5?'positive':'neutral'} sparkData={spark}/><MetricCardPremium label="Disciplina" value={`${Math.round(s.discipline||0)}%`} sub="Score operativo" icon={CheckCircle2} state={s.discipline>=80?'positive':'neutral'} sparkData={spark}/></div><DashboardEmptyStates data={scopedData} setTab={setTab} s={s}/><div className="dashboardCommandGrid"><ChecklistStatusCard data={scopedData} setTab={setTab}/><Card title="Pulso del mes" sub="Días verdes, rojos y rendimiento mensual."><div className="pulseGrid premiumPulse"><div><span>Días operados</span><b>{formatMetricCard(monthly.days)}</b><small>{monthly.wins} verdes · {monthly.losses} rojos</small></div><div className={monthly.total>=0?'pos':'neg'}><span>P/L mensual</span><b>{formatMoneyCompactCard(monthly.total)}</b><small>Rendimiento consolidado</small></div><div><span>Rollover NY</span><b><ResetTicker/></b><small>Cierre operativo 17:00 NY</small></div></div></Card><TradeStreak trades={filtered}/></div><div className="dashboardVisualGrid"><EquityCurvePreview s={s}/><CalendarHeatmapPreview trades={filtered} setTab={setTab}/></div><div className="grid2"><DailyPlanPanel profile={profile} data={scopedData} dayKey={tradingDayKey()}/><ActivityFeed data={scopedData} setTab={setTab}/></div><div className="grid2"><Card title="Insights accionables" sub="Lectura directa de tu comportamiento operativo."><InsightGrid items={insightCards}/><button className="primary" onClick={()=>setTab('journal')}><Plus/>Registrar trade</button></Card><Card title="Panel profesional del trader" sub="Edge, consistencia, riesgo y calidad."><TraderStats s={s}/></Card></div></main>
+  const closedTrades=filtered.filter(isClosedEvaluableTrade).sort((a,b)=>String(tradeDayKey(a)).localeCompare(String(tradeDayKey(b))) || tradeSortTime(a)-tradeSortTime(b));
+  const todayKey=tradingDayKey();
+  const todayTrades=filtered.filter(t=>(t.tradingDay||t.date||'').slice(0,10)===todayKey);
+  const dayPnL=todayTrades.reduce((a,t)=>a+Number(t.resultMoney||0),0);
+  const weekTrades=filtered.filter(t=>(t.tradingDay||t.date||'').slice(0,10)>=weekStartISO());
+  const weekWins=weekTrades.filter(t=>Number(t.resultMoney)>0).length;
+  const weekWr=weekTrades.length?weekWins/weekTrades.length*100:0;
+  const riskSettings=getRiskSettings();
+  const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===todayKey);
+  const riskGuard=evaluateRiskGuard(filtered,riskSettings,initial,todayPlan);
+  const riskLevel=riskGuard.blocked?'Alto':Number(s.maxDD||0)>4?'Moderado':'Bajo';
+  const riskTone=riskGuard.blocked?'negative':Number(s.maxDD||0)>4?'neutral':'positive';
+  const hasProfitFactorSample=s.count>=10&&Number(s.grossLoss||0)>0;
+  const profitFactor=hasProfitFactorSample?Number(s.profitFactor||0).toFixed(2):'Sin muestra';
+  const profitFactorSub=hasProfitFactorSample?'Salud del sistema':'Requiere +10 operaciones';
+  const hasWinLossSample=Number(s.wins||0)>0&&Number(s.losses||0)>0;
+  const avgWinLoss=hasWinLossSample?Number(s.payoffRatio||0).toFixed(2):'Sin muestra';
+  const avgWinLossSub=hasWinLossSample?`${formatMoneyCompactCard(s.avgWin)} / ${formatMoneyCompactCard(-Math.abs(Number(s.avgLoss||0)))}`:'Requiere ganancias y perdidas';
+  const expectancyValue=s.count<10?'Sin muestra':formatR(s.meanR);
+  const expectancySub=s.count<10?'Requiere +10 operaciones':'Promedio R por operacion';
+  const streakInfo=(()=>{let sign=0,count=0; for(let i=closedTrades.length-1;i>=0;i--){const v=Number(closedTrades[i].resultMoney||0); const nextSign=v>0?1:v<0?-1:0; if(!nextSign)continue; if(!sign)sign=nextSign; if(nextSign!==sign)break; count++;} return {count,sign};})();
+  const streakValue=streakInfo.count?`${streakInfo.count} ${streakInfo.count===1?'operacion':'operaciones'}`:'Sin racha';
+  const streakSub=streakInfo.count?(streakInfo.sign>0?'Ultimo resultado positivo':'Ultimo resultado negativo'):'Sin muestra reciente';
+  const activeLabel=active==='__all__'?'Todas las cuentas':active;
+  const disciplineReady=s.count>=5;
+  const disciplineScore=disciplineReady?Math.round((Number(s.behaviorAvg||0)*.45)+(Number(s.discipline||0)*.35)+(Math.min(100,Number(s.qualityAvg||0))*.20)):null;
+  const qualityLabel=Number(s.qualityAvg||0)>=95?'A+':Number(s.qualityAvg||0)>=80?'A':Number(s.qualityAvg||0)>=60?'B':Number(s.qualityAvg||0)>0?'C':'—';
+  const mainSession=[...(s.bySession||[])].sort((a,b)=>b.count-a.count)[0]?.name||'Sin muestra';
+  const bestDayLabel=s.bestDay?`${String(s.bestDay.date).slice(5)} · ${formatMoneyCompactCard(s.bestDay.total)}`:'—';
+  const worstDayLabel=s.worstDay?`${String(s.worstDay.date).slice(5)} · ${formatMoneyCompactCard(s.worstDay.total)}`:'—';
+  const mapReady=s.count>=3;
+  return <main className="page dashboardV38 dashboardClean">
+    <section className="dashboardCommandHeader">
+      <div>
+        <span className="controlBadge"><Crown size={15}/> Centro de Control Operativo</span>
+        <h2>Centro de Control Operativo</h2>
+        <p>{activeLabel} · {sessionNameNY()} · Rollover 17:00 NY · <ResetTicker/></p>
+      </div>
+      <div className="dashboardHeaderActions">
+        <AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>
+      </div>
+    </section>
+    <div className="metrics premiumMetricGrid dashboardKpiStrip">
+      <MetricCardPremium label="P/L neto" value={formatMoneyCompactCard(monthly.total)} sub={`${formatMetricCard(monthly.days)} día${monthly.days===1?'':'s'} · ${formatCalendarR(monthly.r)}`} icon={LineChart} state={monthly.total>=0?'positive':'negative'} sparkData={spark} showSpark={false}/>
+      <MetricCardPremium label="Efectividad" value={formatPercentCard(s.winrate)} sub={`${s.wins} ganada${s.wins===1?'':'s'} · ${s.losses} perdida${s.losses===1?'':'s'} · ${s.breakeven} BE`} icon={Trophy} state={s.winrate>=50?'positive':'neutral'} sparkData={spark} showSpark={false}/>
+      <MetricCardPremium label="Ratio G/P" value={avgWinLoss} sub={avgWinLossSub} icon={BarChart3} state={s.payoffRatio>=1?'positive':'neutral'} sparkData={spark} showSpark={false}/>
+      <MetricCardPremium label="Factor de beneficio" value={profitFactor} sub={profitFactorSub} icon={Shield} state={hasProfitFactorSample&&Number(s.profitFactor||0)>=1.5?'positive':'neutral'} sparkData={spark} showSpark={false}/>
+      <MetricCardPremium label="Racha actual" value={streakValue} sub={streakSub} icon={Activity} state={streakInfo.sign>0?'positive':streakInfo.sign<0?'negative':'neutral'} sparkData={spark} showSpark={false}/>
+      <MetricCardPremium label="Expectativa" value={expectancyValue} sub={expectancySub} icon={Target} state={s.count>=10&&Number(s.meanR||0)>0?'positive':s.count>=10&&Number(s.meanR||0)<0?'negative':'neutral'} sparkData={spark} showSpark={false}/>
+    </div>
+    <div className="dashboardVisualGrid">
+      <div className="dashboardCalendarColumn">
+        <CalendarHeatmapPreview trades={filtered} setTab={setTab} initial={initial}/>
+        <Card title="Resumen estadistico" sub="Lectura compacta de calidad, sesion y dias clave." className="dashboardStatsSummary">
+          <div className="dashboardStatsGrid">
+            <div><span>Calidad promedio</span><b>{mapReady?qualityLabel:'Sin muestra'}</b><small>{mapReady?`${Math.round(s.qualityAvg||0)}/100`:'Requiere mas operaciones'}</small></div>
+            <div><span>Sesion principal</span><b>{mapReady?mainSession:'Sin muestra'}</b><small>{mapReady?`${s.count} operaciones evaluadas`:'Sin datos suficientes'}</small></div>
+            <div><span>Mejor dia</span><b>{mapReady?bestDayLabel:'Sin muestra'}</b><small>Resultado neto</small></div>
+            <div><span>Peor dia</span><b>{mapReady?worstDayLabel:'Sin muestra'}</b><small>{s.worstDay?.total<0?'Control de perdida':'Sin perdidas registradas'}</small></div>
+          </div>
+        </Card>
+      </div>
+      <aside className="dashboardRightRail">
+        <RecommendedActionCard data={scopedData} setTab={setTab} s={s}/>
+        <Card title="Disciplina" sub="Conducta, plan y calidad." className="dashboardDisciplineCard">
+          <div className={`dashboardScorePanel ${disciplineReady?'ready':'isFallback'}`}>
+            <div className={`dashboardDisciplineBadge ${disciplineReady?'ready':'isFallback'}`}><b>{disciplineReady?`${disciplineScore}/100`:'Sin muestra'}</b><small>{disciplineReady?'Score operativo':'Requiere +5 operaciones'}</small></div>
+            <div><span>{disciplineReady?'Score de conducta':'Muestra insuficiente'}</span><p>{disciplineReady?`${Math.round(s.discipline||0)}% plan · Conducta ${Math.round(s.behaviorAvg||0)}/100 · Calidad ${qualityLabel}`:'Requiere +5 operaciones'}</p></div>
+          </div>
+        </Card>
+        <Card title="Riesgo operativo" sub="Límites y estado actual." className={`dashboardRiskCard ${riskTone}`}>
+          <div className="dashboardRiskList">
+            <div><span>Estado</span><b>{riskLevel}</b><small>{riskGuard.blocked?(riskGuard.reasons[0]||'Límite operativo activo'):'Sin bloqueo operativo'}</small></div>
+            <div><span>Riesgo diario</span><b>{money(riskSettings.maxDailyLoss)}</b><small>Máx. pérdida configurada</small></div>
+            <div><span>Trades hoy</span><b>{todayTrades.length}/{riskSettings.maxTradesDay||'—'}</b><small>P/L día {formatMoneyCompactCard(dayPnL)}</small></div>
+            <div><span>Efectividad semanal</span><b>{formatPercentCard(weekWr)}</b><small>{weekTrades.length} operaciones registradas</small></div>
+          </div>
+        </Card>
+        <Card title="Mapa operativo" sub={mapReady?`${mainSession} · ${monthly.days} día${monthly.days===1?'':'s'} operado${monthly.days===1?'':'s'}`:'Lectura mensual en formacion.'} className="dashboardMapCard">
+          <div className="dashboardMapGrid">
+            <div><span>Mes</span><b>{monthly.wins} ganada{monthly.wins===1?'':'s'} · {monthly.losses} perdida{monthly.losses===1?'':'s'} · {monthly.be} BE</b><small>Resultado {formatCalendarR(monthly.r)}</small></div>
+            <div><span>Sesion principal</span><b>{mapReady?mainSession:'Sin muestra'}</b><small>{mapReady?'Mayor frecuencia operativa':'Sin datos suficientes'}</small></div>
+            <div><span>Calidad promedio</span><b>{mapReady?qualityLabel:'—'}</b><small>{mapReady?`${Math.round(s.qualityAvg||0)}/100`:'Sin muestra suficiente'}</small></div>
+            <div><span>Mejor día</span><b>{mapReady?bestDayLabel:'—'}</b><small>Resultado neto</small></div>
+            <div><span>Peor día</span><b>{mapReady?worstDayLabel:'—'}</b><small>Control de riesgo</small></div>
+          </div>
+        </Card>
+        <EquityCurvePreview s={s}/>
+      </aside>
+    </div>
+  </main>
 }
 function ResetTicker(){const [now,setNow]=useState(new Date()); useEffect(()=>{const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id)},[]); return <>{resetCountdown(now)}</>}
 
@@ -1981,15 +2149,7 @@ function Journal({data,profile}){
   </main>
 }
 function MonthCalendar({trades=[],selectedDate,onSelect}){
-  const [key,setKey]=useState((selectedDate||tradingDayKey()).slice(0,7));
-  const stats=groupTradesByDay(trades);
-  const cells=daysInMonth(key);
-  const monthLabel=new Date(key+'-02T12:00:00').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
-  const monthStats=Object.values(stats).filter(x=>x.date.slice(0,7)===key);
-  const total=monthStats.reduce((a,b)=>a+b.total,0);
-  const prev=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()-1); setKey(d.toISOString().slice(0,7));}
-  const next=()=>{const d=new Date(key+'-02T12:00:00'); d.setMonth(d.getMonth()+1); setKey(d.toISOString().slice(0,7));}
-  return <div className="monthCalendar"><div className="monthHead"><button className="ghost compact" onClick={prev}>‹</button><div><b>{monthLabel}</b><small>{monthStats.length} días operados · {formatMoneyCompactCard(total)}</small></div><button className="ghost compact" onClick={next}>›</button></div><div className="weekDays">{['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{cells.map((d,i)=>{if(!d)return <span key={'e'+i} className="monthCell ghostDay"/>; const st=stats[d]; const tone=!st?'none':st.total>0?'win':st.total<0?'loss':'be'; const amount=st?formatCalendarMoney(st.total):''; const totalR=calendarDayR(st); return <button key={d} className={`monthCell ${tone} ${selectedDate===d?'selected':''}`} onClick={()=>onSelect(d)} title={st?`${d} · ${money(st.total)} · ${formatCalendarR(totalR)} · ${st.count} trade${st.count>1?'s':''}`:d}><b className="monthCellDay">{Number(d.slice(-2))}</b>{st&&<><i>{st.count}</i><small className="monthCellResult"><span className="monthCellMoney">{amount}</span><span className="monthCellR">{formatCalendarR(totalR)}</span></small></>}</button>})}</div><div className="monthLegend"><span><i className="win"/>Profit</span><span><i className="loss"/>Stop Loss</span><span><i className="be"/>Breakeven</span></div></div>
+  return <TradingMonthCalendar trades={trades} selectedDate={selectedDate} variant="detailed" onSelectDay={onSelect}/>
 }
 function TradeRow({t,onOpen,onDelete,onExport,onShare}){
   const value=Number(t.resultMoney||0), pctVal=Number(t.resultPct||0), rVal=Number(t.resultR||0);
@@ -2690,7 +2850,7 @@ function Analytics({data}){
   const hasInitialSample=s.count<20;
   const hasVeryLowSample=s.count<5;
   const sampleNoticeTitle=hasVeryLowSample?'Muestra inicial en construccion':'Muestra inicial';
-  return <main className="page analyticsPro"><div className="analyticsToolbar"><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><select className="input small" value={checklistFilter} onChange={e=>setChecklistFilter(e.target.value)}>{["Todos","Con checklist","Sin checklist","Con luz verde","Sin luz verde","Setups A+","Ejecutados sin checklist completo"].map(x=><option key={x}>{x}</option>)}</select></div>{hasInitialSample&&<div className={`sampleNotice ${hasVeryLowSample?'strong':''}`}><Info size={17}/><div><b>{sampleNoticeTitle}</b><p>Necesitas al menos 20 trades para interpretar estas metricas con contexto solido. Los datos reales se muestran, pero evita conclusiones fuertes hasta ampliar la muestra.</p></div></div>}<div className="metrics eyeMetrics"><Metric label="Expectativa" value={s.count?money(s.expectancy):'—'} sub="por trade"/><Metric label="Profit Factor" value={s.count?s.profitFactor.toFixed(2):'—'} sub="salud del edge"/><Metric label="Recovery" value={s.count?s.recovery.toFixed(2):'—'} sub="retorno vs DD"/><Metric label="Calidad" value={s.count?`${Math.round(s.qualityAvg)}/100`:'—'} sub="score operativo"/><Metric label="Mejor día / Peor día" value={s.count?`${money(s.bestDay?.total||0)} / ${money(s.worstDay?.total||0)}`:'—'} sub={s.bestDay?`${s.bestDay.date} · ${s.bestDay.count} trade(s)`:'jornadas operativas'}/></div><Card title="Comportamiento del trader" sub="Mide proceso, no resultado. Te muestra si estás operando sistema o impulso."><div className="behaviorMetrics"><div><span>% siguiendo el plan</span><b>{pct(s.planFollowedPct||0)}</b></div><div><span>Trades impulsivos</span><b>{s.impulseTrades||0}</b></div><div><span>Error más repetido</span><b>{s.errorMostRepeated||'—'}</b></div><div><span>Emoción antes de perder</span><b>{s.emotionBeforeLoss||'—'}</b></div><div><span>Entradas tarde</span><b>{s.lateEntries||0}</b></div><div><span>Movió SL</span><b>{s.movedSL||0}</b></div><div><span>Pérdidas bien ejecutadas</span><b>{s.goodLosses||0}</b></div><div><span>Ganadas mal ejecutadas</span><b>{s.badWins||0}</b></div></div></Card><Card title="Equity curve y drawdown" sub="Lectura principal: crecimiento, caídas y recuperación."><ResponsiveContainer width="100%" height={320}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.18}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.04)"/><XAxis dataKey="name" tick={{fill:'#7a8499',fontSize:11}}/><YAxis tick={{fill:'#7a8499',fontSize:11}}/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card><div className="grid2"><Card title="Profit por jornada"><ResponsiveContainer width="100%" height={260}><BarChart data={byDay}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.04)"/><XAxis dataKey="name" tick={{fill:'#7a8499',fontSize:11}}/><YAxis tick={{fill:'#7a8499',fontSize:11}}/><Tooltip content={<ChartTooltipPremium/>}/><Bar dataKey="value" radius={[5,5,0,0]} fill="#22c55e"/></BarChart></ResponsiveContainer></Card><Card title="Rendimiento por patrón"><ResponsiveContainer width="100%" height={260}><BarChart data={byPattern.slice(0,6)} layout="vertical"><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.04)"/><XAxis type="number" tick={{fill:'#7a8499',fontSize:11}}/><YAxis type="category" dataKey="name" width={160} tick={{fill:'#7a8499',fontSize:10}}/><Tooltip content={<ChartTooltipPremium/>}/><Bar dataKey="value" radius={[0,5,5,0]} fill="#d4a843"/></BarChart></ResponsiveContainer></Card></div><div className="grid2"><Card title="Distribución en R"><ResponsiveContainer width="100%" height={240}><BarChart data={rDist}><XAxis dataKey="name" hide/><YAxis tick={{fill:'#7a8499',fontSize:11}}/><Tooltip content={<ChartTooltipPremium/>}/><Bar dataKey="r" radius={[5,5,0,0]} fill="#3b82f6"/></BarChart></ResponsiveContainer></Card><Card title="Horario / sesión más rentable"><div className="heatGrid">{(byHour.length?byHour:[{name:'NY',value:0,count:0},{name:'London',value:0,count:0},{name:'Asia',value:0,count:0}]).map(h=><div key={h.name} className={h.value>0?'heatCell win':h.value<0?'heatCell loss':'heatCell'}><b>{h.name}</b><span>{money(h.value)}</span><small>{h.count} trades</small></div>)}</div></Card></div><Card title="Top setups" sub="Ordenado por P/L total. Usalo para saber qué repetir y qué recortar."><div className="proTable"><div><b>Setup</b><b>Trades</b><b>P/L total</b></div>{topSetups.map(x=><div key={x.name}><span>{x.name}</span><span>{x.count}</span><strong className={x.value>=0?'pos':'neg'}>{x.value>=0?'+':''}{money(x.value)}</strong></div>)}</div></Card></main>
+  return <main className="page analyticsPro"><div className="analyticsToolbar"><AccountSwitcher active={active} setActive={setActive} accounts={accounts}/><select className="input small" value={checklistFilter} onChange={e=>setChecklistFilter(e.target.value)}>{["Todos","Con checklist","Sin checklist","Con luz verde","Sin luz verde","Setups A+","Ejecutados sin checklist completo"].map(x=><option key={x}>{x}</option>)}</select></div>{hasInitialSample&&<div className={`sampleNotice ${hasVeryLowSample?'strong':''}`}><Info size={17}/><div><b>{sampleNoticeTitle}</b><p>Necesitas al menos 20 trades para interpretar estas metricas con contexto solido. Los datos reales se muestran, pero evita conclusiones fuertes hasta ampliar la muestra.</p></div></div>}<div className="metrics eyeMetrics"><Metric label="Expectativa" value={s.count?money(s.expectancy):'—'} sub="por trade"/><Metric label="Factor de beneficio" value={s.count?s.profitFactor.toFixed(2):'—'} sub="salud del edge"/><Metric label="Recovery" value={s.count?s.recovery.toFixed(2):'—'} sub="retorno vs DD"/><Metric label="Calidad" value={s.count?`${Math.round(s.qualityAvg)}/100`:'—'} sub="score operativo"/><Metric label="Mejor día / Peor día" value={s.count?`${money(s.bestDay?.total||0)} / ${money(s.worstDay?.total||0)}`:'—'} sub={s.bestDay?`${s.bestDay.date} · ${s.bestDay.count} trade(s)`:'jornadas operativas'}/></div><Card title="Comportamiento del trader" sub="Mide proceso, no resultado. Te muestra si estás operando sistema o impulso."><div className="behaviorMetrics"><div><span>% siguiendo el plan</span><b>{pct(s.planFollowedPct||0)}</b></div><div><span>Trades impulsivos</span><b>{s.impulseTrades||0}</b></div><div><span>Error más repetido</span><b>{s.errorMostRepeated||'—'}</b></div><div><span>Emoción antes de perder</span><b>{s.emotionBeforeLoss||'—'}</b></div><div><span>Entradas tarde</span><b>{s.lateEntries||0}</b></div><div><span>Movió SL</span><b>{s.movedSL||0}</b></div><div><span>Pérdidas bien ejecutadas</span><b>{s.goodLosses||0}</b></div><div><span>Ganadas mal ejecutadas</span><b>{s.badWins||0}</b></div></div></Card><Card title="Equity curve y drawdown" sub="Lectura principal: crecimiento, caídas y recuperación."><ResponsiveContainer width="100%" height={320}><AreaChart data={s.curve}><defs><linearGradient id="eqPro" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#22c55e" stopOpacity={0.18}/><stop offset="95%" stopColor="#22c55e" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.04)"/><XAxis dataKey="name" tick={{fill:'#7a8499',fontSize:11}}/><YAxis tick={{fill:'#7a8499',fontSize:11}}/><Tooltip content={<ChartTooltipPremium/>}/><Area type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} fill="url(#eqPro)"/></AreaChart></ResponsiveContainer></Card><div className="grid2"><Card title="Profit por jornada"><ResponsiveContainer width="100%" height={260}><BarChart data={byDay}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.04)"/><XAxis dataKey="name" tick={{fill:'#7a8499',fontSize:11}}/><YAxis tick={{fill:'#7a8499',fontSize:11}}/><Tooltip content={<ChartTooltipPremium/>}/><Bar dataKey="value" radius={[5,5,0,0]} fill="#22c55e"/></BarChart></ResponsiveContainer></Card><Card title="Rendimiento por patrón"><ResponsiveContainer width="100%" height={260}><BarChart data={byPattern.slice(0,6)} layout="vertical"><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.04)"/><XAxis type="number" tick={{fill:'#7a8499',fontSize:11}}/><YAxis type="category" dataKey="name" width={160} tick={{fill:'#7a8499',fontSize:10}}/><Tooltip content={<ChartTooltipPremium/>}/><Bar dataKey="value" radius={[0,5,5,0]} fill="#d4a843"/></BarChart></ResponsiveContainer></Card></div><div className="grid2"><Card title="Distribución en R"><ResponsiveContainer width="100%" height={240}><BarChart data={rDist}><XAxis dataKey="name" hide/><YAxis tick={{fill:'#7a8499',fontSize:11}}/><Tooltip content={<ChartTooltipPremium/>}/><Bar dataKey="r" radius={[5,5,0,0]} fill="#3b82f6"/></BarChart></ResponsiveContainer></Card><Card title="Horario / sesión más rentable"><div className="heatGrid">{(byHour.length?byHour:[{name:'NY',value:0,count:0},{name:'London',value:0,count:0},{name:'Asia',value:0,count:0}]).map(h=><div key={h.name} className={h.value>0?'heatCell win':h.value<0?'heatCell loss':'heatCell'}><b>{h.name}</b><span>{money(h.value)}</span><small>{h.count} trades</small></div>)}</div></Card></div><Card title="Top setups" sub="Ordenado por P/L total. Usalo para saber qué repetir y qué recortar."><div className="proTable"><div><b>Setup</b><b>Trades</b><b>P/L total</b></div>{topSetups.map(x=><div key={x.name}><span>{x.name}</span><span>{x.count}</span><strong className={x.value>=0?'pos':'neg'}>{x.value>=0?'+':''}{money(x.value)}</strong></div>)}</div></Card></main>
 }
 
 function Academy({data,profile}){
