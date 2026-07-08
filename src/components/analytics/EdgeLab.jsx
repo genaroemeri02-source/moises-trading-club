@@ -2,163 +2,196 @@ import {
   formatSetupLabel,
   buildEdgeLabPipeline,
   pickActiveThesis,
-  prioritizeInsufficientSetups,
   prioritizeLeakSetups,
+  buildUpcomingEdgeSamples,
   SETUP_VALIDATION_TARGET
 } from '../../lib/analyticsUtils.js';
 import { formatMoneyClean, formatPercentCard, formatR } from '../../lib/formatUtils.js';
 import { AnalyticsSectionEmpty } from './AnalyticsEmptyState.jsx';
 
-function PipelineListItem({ item }) {
+function CompactSampleRow({ item }) {
   const plTone = item.value >= 0 ? 'pos' : 'neg';
   return (
-    <li className="analyticsPipelineItem">
-      <span className="analyticsPipelineItemName" title={item.name}>{item.label}</span>
-      <span className={`analyticsPipelineItemPl ${plTone}`}>{formatMoneyClean(item.value)}</span>
-      <span className="analyticsPipelineItemMeta">
-        {item.count} trade{item.count === 1 ? '' : 's'} · {item.status}
-      </span>
+    <li className="analyticsEdgePipelineCompactItem">
+      <div className="analyticsEdgePipelineCompactItemBody">
+        <span className="analyticsEdgePipelineCompactName" title={item.name}>{item.label}</span>
+        <span className="analyticsEdgePipelineCompactMeta">
+          {item.count} trade{item.count === 1 ? '' : 's'} · {item.status}
+        </span>
+      </div>
+      <span className={`analyticsEdgePipelineCompactPl ${plTone}`}>{formatMoneyClean(item.value)}</span>
     </li>
   );
 }
 
-function ActiveThesisCard({ thesis }) {
-  if (!thesis) return null;
-  const { row, tier, reading, progress } = thesis;
-  const label = formatSetupLabel(row.name);
-  const plTone = row.value >= 0 ? 'pos' : 'neg';
-  const metrics = [
-    formatMoneyClean(row.value),
-    `${row.count} trade${row.count === 1 ? '' : 's'}`,
-    `${formatR(row.avgR)} prom.`
-  ];
-  if (row.winrate > 0) metrics.push(`${formatPercentCard(row.winrate)} acierto`);
-
+function CompactLeakRow({ item }) {
   return (
-    <article className={`analyticsEdgeThesis ${tier}`}>
-      <div className="analyticsEdgeThesisHead">
-        <span>Tesis activa</span>
-        <em className={tier}>{tier === 'validated' ? 'Validado' : 'Observación'}</em>
+    <li className="analyticsActiveLeaksCompactItem">
+      <div className="analyticsActiveLeaksCompactItemBody">
+        <span className="analyticsActiveLeaksCompactName" title={item.name}>{item.label}</span>
+        <span className="analyticsActiveLeaksCompactMeta">
+          {item.count} trade{item.count === 1 ? '' : 's'}
+        </span>
+        <em>Reducir exposición</em>
       </div>
-      <b className="analyticsEdgeThesisName" title={row.name}>{label}</b>
-      <p className="analyticsEdgeThesisMetrics">
-        {metrics.map((part, i) => (
-          <span key={i} className={i === 0 ? plTone : undefined}>{part}</span>
-        ))}
-      </p>
-      <div className="analyticsEdgeThesisProgress">
-        <div className="analyticsEdgeThesisProgressBar">
-          <span style={{ width: `${progress.pct}%` }} />
-        </div>
-        <small>{progress.current}/{SETUP_VALIDATION_TARGET} trades para validar muestra</small>
-      </div>
-      <p className="analyticsEdgeThesisReading">{reading}</p>
-    </article>
+      <span className="analyticsActiveLeaksCompactPl neg">{formatMoneyClean(item.value)}</span>
+    </li>
   );
 }
 
-function LeakItem({ item }) {
+function EdgeIntelligenceMap({ thesis }) {
+  if (!thesis) {
+    return (
+      <div className="analyticsEdgeMapZone empty">
+        <span className="analyticsEdgeMapZoneLabel">Mapa de edge</span>
+        <div className="analyticsEdgeMapCoreEmpty">
+          <b>Sin setup activo</b>
+          <p>Necesitás al menos 3 trades por setup para iniciar observación.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { row, tier, reading, progress } = thesis;
+  const label = formatSetupLabel(row.name);
+  const plTone = row.value >= 0 ? 'pos' : 'neg';
+
   return (
-    <article className="analyticsLeakPanelItem">
-      <b title={item.name}>{item.label}</b>
-      <span className="neg">{formatMoneyClean(item.value)} · {item.count} trade{item.count === 1 ? '' : 's'}</span>
-      <em>Acción: Reducir exposición</em>
-    </article>
+    <div className={`analyticsEdgeMapZone ${tier}`}>
+      <span className="analyticsEdgeMapZoneLabel">Mapa de edge</span>
+
+      <div className="analyticsEdgeMapStage">
+        <div className="analyticsEdgeMapGlow" aria-hidden="true" />
+
+        <div className="analyticsEdgeMapCanvas">
+          <span className="analyticsEdgeMapConnector tl" aria-hidden="true" />
+          <span className="analyticsEdgeMapConnector tr" aria-hidden="true" />
+          <span className="analyticsEdgeMapConnector bl" aria-hidden="true" />
+          <span className="analyticsEdgeMapConnector br" aria-hidden="true" />
+
+          <div className={`analyticsEdgeMapMetric satellite tl ${plTone}`}>
+            <small>P/L</small>
+            <b>{formatMoneyClean(row.value)}</b>
+          </div>
+          <div className="analyticsEdgeMapMetric satellite tr">
+            <small>Trades</small>
+            <b>{row.count}</b>
+          </div>
+          <div className="analyticsEdgeMapMetric satellite bl">
+            <small>R prom.</small>
+            <b>{formatR(row.avgR)}</b>
+          </div>
+          <div className="analyticsEdgeMapMetric satellite br">
+            <small>Acierto</small>
+            <b>{row.winrate > 0 ? formatPercentCard(row.winrate) : '—'}</b>
+          </div>
+
+          <div className="analyticsEdgeMapCore">
+            <div className="analyticsEdgeMapRingWrap">
+              <div
+                className="analyticsEdgeMapRing"
+                style={{ '--map-pct': progress.pct }}
+                aria-hidden="true"
+              >
+                <div className="analyticsEdgeMapRingInner">
+                  <b>{progress.current}</b>
+                  <span>/{SETUP_VALIDATION_TARGET}</span>
+                </div>
+              </div>
+            </div>
+            <span className="analyticsEdgeMapCoreLabel">Setup activo</span>
+            <b className="analyticsEdgeMapCoreName" title={row.name}>{label}</b>
+            <div className="analyticsValidationTrack">
+              <div className="analyticsValidationTrackHead">
+                <span>Validación</span>
+                <strong>{progress.current}/{SETUP_VALIDATION_TARGET}</strong>
+              </div>
+              <div className="analyticsValidationTrackBar">
+                <span style={{ width: `${progress.pct}%` }} />
+              </div>
+              <small>{progress.current} de {SETUP_VALIDATION_TARGET} trades para validar</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p className="analyticsEdgeMapReading integrated">{reading}</p>
+    </div>
   );
 }
 
 export function EdgeLab({ setupRows = [], trades = [], hasSample }) {
   const thesis = pickActiveThesis(setupRows, trades);
   const pipeline = buildEdgeLabPipeline(setupRows);
-  const { visible: insufficientVisible, overflow: insufficientOverflow } =
-    prioritizeInsufficientSetups(pipeline.insufficient, 4);
+  const activeName = thesis?.row?.name || '';
+  const { visible: upcomingSamples, overflow: samplesOverflow } =
+    buildUpcomingEdgeSamples(pipeline, activeName, 4);
   const leaksVisible = prioritizeLeakSetups(pipeline.leaks, 2);
+  const statusLabel = thesis?.tier === 'validated' ? 'Validado' : thesis ? 'En observación' : null;
 
   return (
-    <section className="analyticsEdgeLab">
+    <section className="analyticsEdgeLab analyticsSurfaceFlagship analyticsEdgeLabUnified">
       <header className="analyticsEdgeLabHead">
-        <h3>Laboratorio de edge</h3>
-        <p>Validación de setups, muestra y calidad de repetición.</p>
+        <div className="analyticsEdgeLabHeadCopy">
+          <h3>Laboratorio de edge</h3>
+          <p>Validación, fugas y muestra pendiente en un solo mapa.</p>
+        </div>
+        {statusLabel && (
+          <em className={`analyticsEdgeLabStatus ${thesis?.tier || ''}`}>{statusLabel}</em>
+        )}
       </header>
 
       {!hasSample ? (
         <AnalyticsSectionEmpty compact title="Sin setups" text="Registrá trades con setup." />
       ) : (
-        <>
-          {thesis ? (
-            <ActiveThesisCard thesis={thesis} />
-          ) : (
-            <div className="analyticsEdgeThesisEmpty">
-              <b>Sin tesis activa</b>
-              <p>Necesitás al menos 3 trades por setup para iniciar observación.</p>
-            </div>
-          )}
+        <div className="analyticsEdgeLabCanvas">
+          <EdgeIntelligenceMap thesis={thesis} />
 
-          <div className="analyticsEdgeLabBody">
-            <div className="analyticsValidationPipeline">
-              <header className="analyticsValidationPipelineHead">
-                <h4>Pipeline de validación</h4>
-                <p>Setups que necesitan repetición antes de concluir.</p>
-              </header>
-
-              <div className="analyticsPipelineBlock">
-                <h5>En observación</h5>
-                {pipeline.observation.length ? (
-                  <ul className="analyticsPipelineList">
-                    {pipeline.observation.map((item) => (
-                      <PipelineListItem key={item.name} item={item} />
+          <div className="analyticsEdgeLabBase">
+            <div className="analyticsEdgePipelineCompact integrated">
+              <div className="analyticsEdgePipelineCompactCol samples">
+                <header className="analyticsEdgePipelineCompactHead">
+                  <h4>Próximas muestras</h4>
+                  <span>Cola de muestra</span>
+                </header>
+                {upcomingSamples.length ? (
+                  <ul className="analyticsEdgePipelineCompactList">
+                    {upcomingSamples.map((item) => (
+                      <CompactSampleRow key={item.name} item={item} />
                     ))}
                   </ul>
                 ) : (
-                  <p className="analyticsPipelineEmpty">Sin setups en observación activa.</p>
+                  <p className="analyticsEdgePipelineCompactEmpty">Sin otros setups en cola.</p>
                 )}
-              </div>
-
-              <div className="analyticsPipelineBlock">
-                <h5>Sin muestra suficiente</h5>
-                {insufficientVisible.length ? (
-                  <ul className="analyticsPipelineList">
-                    {insufficientVisible.map((item) => (
-                      <PipelineListItem key={item.name} item={item} />
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="analyticsPipelineEmpty">Todos los setups tienen muestra mínima.</p>
-                )}
-                {insufficientOverflow > 0 && (
-                  <p className="analyticsPipelineOverflow">
-                    +{insufficientOverflow} setup{insufficientOverflow === 1 ? '' : 's'} pendiente{insufficientOverflow === 1 ? '' : 's'} de muestra
+                {samplesOverflow > 0 && (
+                  <p className="analyticsEdgePipelineCompactMore">
+                    +{samplesOverflow} setup{samplesOverflow === 1 ? '' : 's'} pendiente{samplesOverflow === 1 ? '' : 's'}
                   </p>
                 )}
               </div>
-            </div>
 
-            <div className="analyticsRiskPanel">
-              <header className="analyticsRiskPanelHead">
-                <h4>Riesgo operativo</h4>
-              </header>
-
-              <div className="analyticsLeakPanel">
-                <h5>Fugas a controlar</h5>
+              <div className="analyticsEdgePipelineCompactCol leaks">
+                <header className="analyticsEdgePipelineCompactHead">
+                  <h4>Fugas activas</h4>
+                  <span>Cola de riesgo</span>
+                </header>
                 {leaksVisible.length ? (
-                  <div className="analyticsLeakPanelList">
+                  <ul className="analyticsActiveLeaksCompactList">
                     {leaksVisible.map((item) => (
-                      <LeakItem key={item.name} item={item} />
+                      <CompactLeakRow key={item.name} item={item} />
                     ))}
-                  </div>
+                  </ul>
                 ) : (
-                  <p className="analyticsPipelineEmpty">Sin fugas activas en la muestra.</p>
+                  <p className="analyticsEdgePipelineCompactEmpty">Sin fugas activas en la muestra.</p>
                 )}
               </div>
-
-              <div className="analyticsValidationCriteria">
-                <span>Validado = {SETUP_VALIDATION_TARGET}+ trades</span>
-                <span>Observación = 3–9 trades</span>
-                <span>Insuficiente = &lt;3 trades</span>
-              </div>
             </div>
+
+            <p className="analyticsValidationCriteriaInline integrated">
+              Validado {SETUP_VALIDATION_TARGET}+ trades · Observación 3–9 · Insuficiente &lt;3
+            </p>
           </div>
-        </>
+        </div>
       )}
     </section>
   );

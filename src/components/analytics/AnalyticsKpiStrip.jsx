@@ -1,11 +1,15 @@
 import { AnalyticsKpiCard } from './AnalyticsKpiCard.jsx';
 
-export function AnalyticsKpiStrip({ readings, hasSample }) {
+export function AnalyticsKpiStrip({ readings, hasSample, compact = false }) {
   if (!hasSample || !readings) return null;
   const r = readings;
 
   return (
-    <section className="analyticsSystemHealth">
+    <section className={`analyticsSystemHealth analyticsTier2Block analyticsControlBoard analyticsSurfaceSupport ${compact ? 'analyticsSystemHealthSecondary' : ''}`}>
+      <header className="analyticsSystemHealthHead">
+        <span>Salud del sistema</span>
+        <em>Scoreboard cuantitativo</em>
+      </header>
       <div className="analyticsSystemHealthGrid">
         <AnalyticsKpiCard
           label="Profit Factor"
@@ -14,6 +18,7 @@ export function AnalyticsKpiStrip({ readings, hasSample }) {
           hint={r.profitFactor.hint}
           state={r.profitFactor.state}
           variant="health"
+          className="analyticsKpiAnchor"
         />
         <AnalyticsKpiCard
           label="P/L neto"

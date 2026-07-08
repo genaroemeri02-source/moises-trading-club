@@ -21656,3 +21656,3103 @@ html[data-theme="light"] .analyticsPipelineItemPl.pos{color:#15803d!important}
 html[data-theme="light"] .analyticsPipelineItemPl.neg{color:#b91c1c!important}
 html[data-theme="light"] .analyticsLeakPanelItem{border-left-color:rgba(220,38,38,.35)!important}
 html[data-theme="light"] .analyticsLeakPanelItem>span.neg{color:#b91c1c!important}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS PREMIUM CANDIDATE v5 — Visual hierarchy system
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsIntelligenceCenter{
+  --ax-surface-0:rgba(255,255,255,.018);
+  --ax-surface-1:rgba(255,255,255,.028);
+  --ax-surface-2:rgba(255,255,255,.038);
+  --ax-line:rgba(255,255,255,.06);
+  --ax-line-soft:rgba(255,255,255,.04);
+  --ax-shadow-sm:0 4px 24px rgba(0,0,0,.18);
+  --ax-shadow-md:0 8px 40px rgba(0,0,0,.24);
+  --ax-shadow-lg:0 12px 48px rgba(0,0,0,.32);
+  gap:14px!important;
+}
+
+/* ── Tier spacing ── */
+.analyticsTier2{display:flex;flex-direction:column;gap:8px}
+.analyticsTier3{display:flex;flex-direction:column;gap:10px}
+.analyticsTier4{margin-top:2px}
+
+/* ── TIER 1: Executive Command ── */
+.analyticsTier1.analyticsCommand{
+  padding:16px 18px;
+  border-radius:14px;
+  background:linear-gradient(165deg,rgba(255,255,255,.045) 0%,rgba(255,255,255,.012) 48%,rgba(0,0,0,.08) 100%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:var(--ax-shadow-md);
+  position:relative;
+  overflow:hidden;
+}
+.analyticsTier1.analyticsCommand::before{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,166,58,.25),transparent);
+  pointer-events:none;
+}
+.analyticsCommandScoreRing{
+  width:76px!important;
+  height:76px!important;
+}
+.analyticsCommandScoreInner{
+  width:60px!important;
+  height:60px!important;
+  background:rgba(6,8,12,.95)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.analyticsCommandScoreInner b{font-size:22px!important;font-weight:850!important;letter-spacing:-.03em}
+.analyticsCommandHeadline{
+  font-size:16px!important;
+  font-weight:780!important;
+  line-height:1.32!important;
+  letter-spacing:-.02em;
+  color:#f1f5f9!important;
+}
+.analyticsCommandSub{
+  font-size:10px!important;
+  margin-top:6px!important;
+  opacity:.85;
+}
+.analyticsCommandSignals{gap:5px!important;min-width:148px!important}
+.analyticsCommandSignal{
+  padding:7px 9px!important;
+  border-radius:9px!important;
+  background:rgba(0,0,0,.15)!important;
+  border:1px solid var(--ax-line-soft)!important;
+}
+.analyticsCommandSignal>span{font-size:7px!important;opacity:.75}
+.analyticsCommandSignal>b{font-size:11px!important;font-weight:750!important}
+.analyticsCommandActionBand{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-top:12px;
+  padding:9px 12px;
+  border-radius:9px;
+  background:rgba(0,0,0,.2);
+  border:1px solid var(--ax-line-soft);
+  border-left:2px solid rgba(212,166,58,.32);
+}
+.analyticsCommandActionBand>span{
+  flex-shrink:0;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ax-muted);
+}
+.analyticsCommandActionBand>p{
+  margin:0;
+  font-size:11px;
+  font-weight:650;
+  line-height:1.4;
+  color:rgba(226,232,240,.92);
+}
+.analyticsCommandActionRow{display:none!important}
+.analyticsCommandFoot{
+  margin-top:10px!important;
+  padding-top:9px!important;
+  border-top:1px solid var(--ax-line-soft)!important;
+}
+
+/* ── TIER 2: Directives ── */
+.analyticsDirectivesGrid{gap:7px!important}
+.analyticsDirectiveCard{
+  padding:9px 11px!important;
+  border-radius:11px!important;
+  border:1px solid var(--ax-line-soft)!important;
+  border-left:2px solid rgba(255,255,255,.06)!important;
+  background:rgba(0,0,0,.12)!important;
+  box-shadow:none!important;
+}
+.analyticsDirectiveCard.tone-edge{border-left-color:rgba(34,197,94,.38)!important}
+.analyticsDirectiveCard.tone-leak{border-left-color:rgba(239,68,68,.38)!important}
+.analyticsDirectiveCard.tone-observe{border-left-color:rgba(251,191,36,.32)!important}
+.analyticsDirectiveHead{gap:4px!important;margin-bottom:5px!important}
+.analyticsDirectiveHead span{font-size:7px!important;letter-spacing:.11em!important}
+.analyticsDirectiveSetup{font-size:12px!important;font-weight:780!important;margin-bottom:2px}
+.analyticsDirectiveEvidence{font-size:10px!important;line-height:1.3!important;margin:0!important}
+.analyticsDirectiveVerdict{
+  margin:5px 0 0!important;
+  font-size:9px!important;
+  font-weight:650!important;
+  color:rgba(203,213,225,.75)!important;
+}
+.analyticsDirectiveAction{
+  margin:3px 0 0!important;
+  font-size:10px!important;
+  font-weight:700!important;
+  color:#e2e8f0!important;
+}
+
+/* ── TIER 2: System Health scoreboard ── */
+.analyticsSystemHealthHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+  padding:0 2px;
+}
+.analyticsSystemHealthHead>span{
+  font-size:9px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:var(--ax-muted);
+}
+.analyticsSystemHealthHead>em{
+  font-size:9px;
+  font-style:normal;
+  color:rgba(148,163,184,.65);
+}
+.analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health{
+  min-height:96px!important;
+  padding:12px 14px!important;
+  border-radius:12px!important;
+  background:rgba(0,0,0,.18)!important;
+  border:1px solid var(--ax-line)!important;
+  box-shadow:var(--ax-shadow-sm)!important;
+}
+.analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health .analyticsKpiValue{
+  font-size:clamp(26px,2.8vw,32px)!important;
+  font-weight:850!important;
+  letter-spacing:-.04em!important;
+}
+.analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact{
+  min-height:58px!important;
+  padding:8px 10px!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.015)!important;
+  border:1px solid var(--ax-line-soft)!important;
+  box-shadow:none!important;
+}
+.analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact .analyticsKpiValue{
+  font-size:clamp(15px,1.6vw,18px)!important;
+  font-weight:800!important;
+}
+.analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact .analyticsKpiSub{
+  font-size:9px!important;
+  opacity:.8;
+}
+.analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard:before{display:none!important}
+
+/* ── TIER 3: Edge Lab flagship ── */
+.analyticsTier3Flagship.analyticsEdgeLab{
+  padding:14px 16px 12px!important;
+  border-radius:16px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.06))!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:var(--ax-shadow-sm)!important;
+}
+.analyticsTier3Flagship .analyticsEdgeLabHead{
+  margin-bottom:2px!important;
+}
+.analyticsTier3Flagship .analyticsEdgeLabHead p{
+  margin-bottom:8px!important;
+}
+.analyticsTier3Flagship .analyticsEdgeLabHead h3{
+  font-size:14px!important;
+  letter-spacing:-.02em;
+}
+.analyticsEdgeThesis,
+.analyticsEdgeThesisEmpty{
+  margin-top:10px!important;
+  padding:11px 13px!important;
+  border-radius:11px!important;
+  background:rgba(0,0,0,.14)!important;
+  border:1px solid var(--ax-line-soft)!important;
+  border-left:2px solid rgba(251,191,36,.38)!important;
+  box-shadow:none!important;
+}
+.analyticsEdgeThesisName{font-size:15px!important;letter-spacing:-.02em}
+.analyticsEdgeThesisMetrics{font-size:11px!important}
+.analyticsEdgeThesisReading{
+  font-size:10px!important;
+  font-style:italic;
+  opacity:.9;
+}
+.analyticsValidationPipeline,
+.analyticsRiskPanel{
+  background:rgba(0,0,0,.1)!important;
+  border:1px solid var(--ax-line-soft)!important;
+  border-radius:11px!important;
+}
+.analyticsPipelineItem{
+  border:none!important;
+  border-bottom:1px solid var(--ax-line-soft)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  padding:6px 2px!important;
+}
+.analyticsPipelineItem:last-child{border-bottom:none!important}
+.analyticsPipelineItemName{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:unset!important;
+  overflow-wrap:anywhere;
+}
+.analyticsLeakPanelItem{
+  background:rgba(0,0,0,.08)!important;
+  border:1px solid var(--ax-line-soft)!important;
+  border-left:2px solid rgba(239,68,68,.32)!important;
+}
+
+/* ── TIER 3: Operating Profile ── */
+.analyticsTier3Block.analyticsOperatingProfile{
+  padding:12px 14px!important;
+  border-radius:14px!important;
+  background:var(--ax-surface-0)!important;
+  border:1px solid var(--ax-line-soft)!important;
+  box-shadow:none!important;
+}
+
+/* ── TIER 3: Weekly Plan strategic close ── */
+.analyticsWeeklyPlan.analyticsTier3Block{
+  padding:14px 16px!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.025),rgba(0,0,0,.08))!important;
+  border:1px solid var(--ax-line)!important;
+  border-left:3px solid rgba(212,166,58,.28)!important;
+  box-shadow:var(--ax-shadow-sm)!important;
+}
+.analyticsWeeklyPlanHead{
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:12px!important;
+}
+.analyticsWeeklyPlanIcon{
+  width:32px;
+  height:32px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:rgba(212,166,58,.08);
+  border:1px solid rgba(212,166,58,.15);
+  color:rgba(212,166,58,.75);
+  flex-shrink:0;
+}
+.analyticsWeeklyPlanEyebrow{
+  display:block;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:var(--ax-muted);
+  margin-bottom:3px;
+}
+.analyticsWeeklyPlanCopy h3{
+  margin:0!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  letter-spacing:-.02em;
+}
+.analyticsWeeklyPlanCopy p{
+  margin:3px 0 0!important;
+  font-size:10px!important;
+}
+.analyticsWeeklyPlanList{
+  margin:12px 0 0!important;
+  padding:0!important;
+  list-style:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:7px!important;
+}
+.analyticsWeeklyPlanList li{
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:10px!important;
+  padding:0!important;
+}
+.analyticsWeeklyPlanList li::before{display:none!important}
+.analyticsWeeklyPlanIndex{
+  flex-shrink:0;
+  width:20px;
+  height:20px;
+  border-radius:6px;
+  display:grid;
+  place-items:center;
+  font-size:10px;
+  font-weight:800;
+  color:rgba(212,166,58,.85);
+  background:rgba(212,166,58,.08);
+  border:1px solid rgba(212,166,58,.12);
+}
+.analyticsWeeklyPlanBullet{
+  font-size:11px!important;
+  line-height:1.45!important;
+  color:#e2e8f0!important;
+  padding-top:1px;
+}
+
+/* ── TIER 4: Performance Evidence ── */
+.analyticsTier4.analyticsPerformanceEvidence{
+  padding:12px 14px!important;
+  border-radius:12px!important;
+  background:transparent!important;
+  border:1px solid var(--ax-line-soft)!important;
+  box-shadow:none!important;
+  opacity:.98;
+}
+.analyticsTier4 .analyticsPerformanceEvidenceHead h3{
+  font-size:12px!important;
+  font-weight:750!important;
+  color:rgba(203,213,225,.85)!important;
+}
+.analyticsTier4 .analyticsPerformanceEvidenceHead p{
+  font-size:9px!important;
+  opacity:.75;
+}
+.analyticsTier4 .analyticsPerformanceEvidencePanel{
+  border-radius:11px!important;
+  background:rgba(0,0,0,.12)!important;
+  border:1px solid var(--ax-line-soft)!important;
+}
+.analyticsTier4 .analyticsPerformanceEvidencePattern,
+.analyticsTier4 .analyticsPerformanceEvidencePattern.dominant{
+  border-left:2px solid rgba(212,166,58,.22)!important;
+  background:rgba(0,0,0,.08)!important;
+}
+.analyticsTier4 .analyticsPerformanceEvidencePattern>b,
+.analyticsTier4 .analyticsPerformanceEvidencePatternName{
+  font-size:13px!important;
+  font-weight:780!important;
+}
+
+/* ── Mobile 390px tier order — superseded by analyticsCockpitFlow v11 ── */
+@media(max-width:390px){
+  .analyticsIntelligenceCenter.analyticsCockpit{display:flex;flex-direction:column;gap:10px}
+  .analyticsCockpitFlow{display:flex;flex-direction:column;gap:10px}
+  .analyticsZone--command{order:1}
+  .analyticsZone--intel{order:2;display:contents}
+  .analyticsZone--directives{order:6}
+  .analyticsZone--health{order:7}
+  .analyticsZone--evidence{order:8}
+  .analyticsTier3Flagship.analyticsEdgeLabUnified,
+  .analyticsEdgeLabUnified{order:2}
+  .analyticsInsightStack{order:3}
+  .analyticsOperatingProfile.compact-side{order:4}
+  .analyticsWeeklyPlanCompact{order:5}
+  .analyticsCommandStripBody{grid-template-columns:1fr!important}
+  .analyticsCommandChips{flex-direction:row!important;flex-wrap:wrap}
+}
+
+/* ── Light mode premium ── */
+html[data-theme="light"] .analyticsIntelligenceCenter{
+  --ax-surface-0:rgba(255,255,255,.92);
+  --ax-surface-1:rgba(248,250,252,.95);
+  --ax-surface-2:rgba(241,245,249,.98);
+  --ax-line:rgba(15,23,42,.08);
+  --ax-line-soft:rgba(15,23,42,.05);
+  --ax-shadow-sm:0 4px 20px rgba(15,23,42,.06);
+  --ax-shadow-md:0 8px 32px rgba(15,23,42,.08);
+}
+html[data-theme="light"] .analyticsTier1.analyticsCommand{
+  background:linear-gradient(165deg,#fff 0%,#f8fafc 100%)!important;
+  border-color:rgba(15,23,42,.09)!important;
+}
+html[data-theme="light"] .analyticsCommandHeadline{color:#0f172a!important}
+html[data-theme="light"] .analyticsCommandScoreInner{background:#fff!important}
+html[data-theme="light"] .analyticsCommandActionBand{
+  background:rgba(248,250,252,.9)!important;
+  border-left-color:rgba(184,132,23,.3)!important;
+}
+html[data-theme="light"] .analyticsCommandActionBand>p{color:#334155!important}
+html[data-theme="light"] .analyticsDirectiveCard{background:rgba(255,255,255,.95)!important}
+html[data-theme="light"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health,
+html[data-theme="light"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact{
+  background:rgba(255,255,255,.95)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsTier3Flagship.analyticsEdgeLab,
+html[data-theme="light"] .analyticsTier3Block.analyticsOperatingProfile{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsEdgeThesis{background:rgba(248,250,252,.9)!important}
+html[data-theme="light"] .analyticsWeeklyPlan.analyticsTier3Block{
+  background:linear-gradient(135deg,#fff,#fafafa)!important;
+  border-left-color:rgba(184,132,23,.35)!important;
+}
+html[data-theme="light"] .analyticsWeeklyPlanBullet{color:#334155!important}
+html[data-theme="light"] .analyticsTier4.analyticsPerformanceEvidence{
+  background:rgba(248,250,252,.5)!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsTier4 .analyticsPerformanceEvidencePanel{
+  background:#fff!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS DARK MODE PREMIUM v6 — Institutional surface system
+   Scoped: dark only — does NOT affect light mode
+   ═══════════════════════════════════════════════════════════════ */
+
+html:not([data-theme="light"]) .analyticsIntelligenceCenter,
+html[data-theme="dark"] .analyticsIntelligenceCenter{
+  --ax-bg-deep:#060810;
+  --ax-bg-radial:radial-gradient(ellipse 120% 80% at 50% -20%,rgba(30,38,56,.22),transparent 55%);
+  --ax-surface-card:rgba(13,17,26,.92);
+  --ax-surface-card-hover:rgba(16,21,32,.96);
+  --ax-surface-elevated:rgba(18,24,36,.94);
+  --ax-surface-flagship:linear-gradient(168deg,rgba(22,28,42,.96) 0%,rgba(12,16,24,.98) 100%);
+  --ax-surface-evidence:rgba(10,13,20,.88);
+  --ax-surface-inset:inset 0 1px 0 rgba(255,255,255,.045);
+  --ax-line:rgba(255,255,255,.075);
+  --ax-line-soft:rgba(255,255,255,.045);
+  --ax-glow-sm:0 1px 0 rgba(255,255,255,.04),0 8px 32px rgba(0,0,0,.35);
+  --ax-glow-md:0 1px 0 rgba(255,255,255,.05),0 12px 40px rgba(0,0,0,.42);
+  --ax-text-hi:#f4f7fb;
+  --ax-text-mid:#c5cedb;
+  --ax-text-lo:#8b95a8;
+  --ax-amber-line:rgba(251,191,36,.28);
+  --ax-green-line:rgba(34,197,94,.22);
+  --ax-red-line:rgba(239,68,68,.22);
+  position:relative;
+}
+
+html:not([data-theme="light"]) .analyticsIntelligenceCenter::before,
+html[data-theme="dark"] .analyticsIntelligenceCenter::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--ax-bg-radial);
+  pointer-events:none;
+  z-index:0;
+}
+
+html:not([data-theme="light"]) .analyticsIntelligenceCenter > *,
+html[data-theme="dark"] .analyticsIntelligenceCenter > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Header + filters — subtle elevation */
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsTopBar,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsTopBar{
+  background:var(--ax-surface-card)!important;
+  border-color:var(--ax-line)!important;
+  box-shadow:var(--ax-glow-sm)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsTopBarChip,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsTopBarChip{
+  background:rgba(255,255,255,.03)!important;
+  border-color:var(--ax-line-soft)!important;
+}
+
+/* ── TIER 1: Executive Command dark ── */
+html:not([data-theme="light"]) .analyticsTier1.analyticsCommand,
+html[data-theme="dark"] .analyticsTier1.analyticsCommand{
+  padding:13px 16px 11px!important;
+  background:var(--ax-surface-flagship)!important;
+  border-color:var(--ax-line)!important;
+  box-shadow:var(--ax-glow-md)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandMain,
+html[data-theme="dark"] .analyticsCommandMain{
+  gap:12px 16px!important;
+  align-items:center!important;
+}
+html:not([data-theme="light"]) .analyticsCommandHeadline,
+html[data-theme="dark"] .analyticsCommandHeadline{
+  color:var(--ax-text-hi)!important;
+  text-shadow:0 1px 12px rgba(0,0,0,.25);
+}
+html:not([data-theme="light"]) .analyticsCommandSub,
+html[data-theme="dark"] .analyticsCommandSub{
+  color:var(--ax-text-lo)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) .analyticsCommandScoreInner,
+html[data-theme="dark"] .analyticsCommandScoreInner{
+  background:rgba(8,11,18,.98)!important;
+  box-shadow:var(--ax-surface-inset),0 4px 16px rgba(0,0,0,.3)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandSignal,
+html[data-theme="dark"] .analyticsCommandSignal{
+  background:var(--ax-surface-elevated)!important;
+  border-color:var(--ax-line-soft)!important;
+  box-shadow:var(--ax-surface-inset)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandSignal.positive,
+html[data-theme="dark"] .analyticsCommandSignal.positive{
+  border-left:2px solid var(--ax-green-line)!important;
+  background:linear-gradient(90deg,rgba(34,197,94,.06),var(--ax-surface-elevated))!important;
+}
+html:not([data-theme="light"]) .analyticsCommandSignal.positive b,
+html[data-theme="dark"] .analyticsCommandSignal.positive b{color:#6ee7a0!important}
+html:not([data-theme="light"]) .analyticsCommandSignal.negative,
+html[data-theme="dark"] .analyticsCommandSignal.negative{
+  border-left:2px solid var(--ax-red-line)!important;
+  background:linear-gradient(90deg,rgba(239,68,68,.06),var(--ax-surface-elevated))!important;
+}
+html:not([data-theme="light"]) .analyticsCommandSignal.negative b,
+html[data-theme="dark"] .analyticsCommandSignal.negative b{color:#fca5a5!important}
+html:not([data-theme="light"]) .analyticsCommandSignal.neutral b,
+html[data-theme="dark"] .analyticsCommandSignal.neutral b{color:var(--ax-text-mid)!important}
+html:not([data-theme="light"]) .analyticsCommandActionBand,
+html[data-theme="dark"] .analyticsCommandActionBand{
+  margin-top:10px!important;
+  padding:8px 11px!important;
+  background:rgba(8,11,18,.65)!important;
+  border-color:var(--ax-line-soft)!important;
+  border-left-color:rgba(212,166,58,.35)!important;
+  box-shadow:var(--ax-surface-inset)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandActionBand>p,
+html[data-theme="dark"] .analyticsCommandActionBand>p{
+  color:var(--ax-text-mid)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandFoot,
+html[data-theme="dark"] .analyticsCommandFoot{
+  margin-top:8px!important;
+  padding-top:7px!important;
+}
+html:not([data-theme="light"]) .analyticsCommandProgressBar,
+html[data-theme="dark"] .analyticsCommandProgressBar{
+  height:2px!important;
+  background:rgba(255,255,255,.05)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandProgressBar>span,
+html[data-theme="dark"] .analyticsCommandProgressBar>span{
+  background:linear-gradient(90deg,rgba(212,166,58,.45),rgba(212,166,58,.15))!important;
+}
+
+/* ── TIER 2: Directives dark ── */
+html:not([data-theme="light"]) .analyticsDirectiveCard,
+html[data-theme="dark"] .analyticsDirectiveCard{
+  padding:8px 10px!important;
+  background:var(--ax-surface-card)!important;
+  border-color:var(--ax-line-soft)!important;
+  border-top:1px solid var(--ax-line-soft)!important;
+  box-shadow:var(--ax-surface-inset)!important;
+}
+html:not([data-theme="light"]) .analyticsDirectiveCard.tone-edge,
+html[data-theme="dark"] .analyticsDirectiveCard.tone-edge{
+  border-top-color:rgba(34,197,94,.35)!important;
+  background:linear-gradient(180deg,rgba(34,197,94,.04),var(--ax-surface-card))!important;
+}
+html:not([data-theme="light"]) .analyticsDirectiveCard.tone-leak,
+html[data-theme="dark"] .analyticsDirectiveCard.tone-leak{
+  border-top-color:rgba(239,68,68,.35)!important;
+  background:linear-gradient(180deg,rgba(239,68,68,.04),var(--ax-surface-card))!important;
+}
+html:not([data-theme="light"]) .analyticsDirectiveCard.tone-observe,
+html[data-theme="dark"] .analyticsDirectiveCard.tone-observe{
+  border-top-color:rgba(251,191,36,.3)!important;
+  background:linear-gradient(180deg,rgba(251,191,36,.04),var(--ax-surface-card))!important;
+}
+html:not([data-theme="light"]) .analyticsDirectiveSetup,
+html[data-theme="dark"] .analyticsDirectiveSetup{color:var(--ax-text-hi)!important}
+html:not([data-theme="light"]) .analyticsDirectiveEvidence,
+html[data-theme="dark"] .analyticsDirectiveEvidence{color:var(--ax-text-lo)!important}
+html:not([data-theme="light"]) .analyticsDirectiveVerdict,
+html[data-theme="dark"] .analyticsDirectiveVerdict{color:var(--ax-text-mid)!important}
+html:not([data-theme="light"]) .analyticsDirectiveAction,
+html[data-theme="dark"] .analyticsDirectiveAction{color:var(--ax-text-hi)!important}
+
+/* ── TIER 2: System Health scoreboard dark ── */
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health{
+  min-height:88px!important;
+  background:var(--ax-surface-elevated)!important;
+  border:1px solid var(--ax-line)!important;
+  box-shadow:var(--ax-glow-sm)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health .analyticsKpiValue,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health .analyticsKpiValue{
+  color:var(--ax-text-hi)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health.positive,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health.positive{
+  border-top:2px solid rgba(34,197,94,.4)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact{
+  min-height:54px!important;
+  background:var(--ax-surface-card)!important;
+  border-color:var(--ax-line-soft)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact .analyticsKpiValue,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact .analyticsKpiValue{
+  color:var(--ax-text-hi)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact .analyticsKpiSub,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact .analyticsKpiSub{
+  color:var(--ax-text-lo)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsKpiCard,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsKpiCard{
+  background-image:none!important;
+}
+
+/* ── TIER 3: Edge Lab dark flagship ── */
+html:not([data-theme="light"]) .analyticsTier3Flagship.analyticsEdgeLab,
+html[data-theme="dark"] .analyticsTier3Flagship.analyticsEdgeLab{
+  background:var(--ax-surface-flagship)!important;
+  border-color:var(--ax-line)!important;
+  box-shadow:var(--ax-glow-md)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeThesis,
+html[data-theme="dark"] .analyticsEdgeThesis{
+  background:var(--ax-surface-elevated)!important;
+  border-color:var(--ax-line-soft)!important;
+  border-left:2px solid var(--ax-amber-line)!important;
+  box-shadow:var(--ax-surface-inset)!important;
+  padding:10px 12px!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeThesis.validated,
+html[data-theme="dark"] .analyticsEdgeThesis.validated{
+  border-left-color:var(--ax-green-line)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeThesisName,
+html[data-theme="dark"] .analyticsEdgeThesisName{color:var(--ax-text-hi)!important}
+html:not([data-theme="light"]) .analyticsEdgeThesisProgressBar,
+html[data-theme="dark"] .analyticsEdgeThesisProgressBar{height:2px!important}
+html:not([data-theme="light"]) .analyticsValidationPipeline,
+html:not([data-theme="light"]) .analyticsRiskPanel,
+html[data-theme="dark"] .analyticsValidationPipeline,
+html[data-theme="dark"] .analyticsRiskPanel{
+  background:rgba(8,11,18,.5)!important;
+  border-color:var(--ax-line-soft)!important;
+  box-shadow:none!important;
+}
+html:not([data-theme="light"]) .analyticsPipelineItem,
+html[data-theme="dark"] .analyticsPipelineItem{
+  border-bottom-color:var(--ax-line-soft)!important;
+  padding:5px 1px!important;
+}
+html:not([data-theme="light"]) .analyticsPipelineItemName,
+html[data-theme="dark"] .analyticsPipelineItemName{color:var(--ax-text-mid)!important}
+html:not([data-theme="light"]) .analyticsPipelineOverflow,
+html[data-theme="dark"] .analyticsPipelineOverflow{
+  color:var(--ax-text-lo)!important;
+  border-top-color:var(--ax-line-soft)!important;
+}
+html:not([data-theme="light"]) .analyticsLeakPanelItem,
+html[data-theme="dark"] .analyticsLeakPanelItem{
+  background:rgba(8,11,18,.45)!important;
+  border-color:var(--ax-line-soft)!important;
+  border-left:2px solid var(--ax-red-line)!important;
+  padding:6px 8px!important;
+}
+html:not([data-theme="light"]) .analyticsValidationCriteria span,
+html[data-theme="dark"] .analyticsValidationCriteria span{
+  color:var(--ax-text-lo)!important;
+  background:transparent!important;
+  border:none!important;
+  padding:0!important;
+}
+
+/* ── TIER 3: Operating Profile dark ── */
+html:not([data-theme="light"]) .analyticsTier3Block.analyticsOperatingProfile,
+html[data-theme="dark"] .analyticsTier3Block.analyticsOperatingProfile{
+  padding:10px 12px!important;
+  background:var(--ax-surface-card)!important;
+  border-color:var(--ax-line-soft)!important;
+  box-shadow:var(--ax-surface-inset)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileHeadline,
+html[data-theme="dark"] .analyticsOperatingProfileHeadline{color:var(--ax-text-hi)!important}
+html:not([data-theme="light"]) .analyticsOperatingProfileBar,
+html[data-theme="dark"] .analyticsOperatingProfileBar{
+  height:2px!important;
+  background:rgba(255,255,255,.05)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileBar>span,
+html[data-theme="dark"] .analyticsOperatingProfileBar>span{
+  background:linear-gradient(90deg,rgba(148,163,184,.35),rgba(148,163,184,.1))!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileScore,
+html[data-theme="dark"] .analyticsOperatingProfileScore{
+  padding:6px 8px!important;
+  background:rgba(8,11,18,.45)!important;
+  border-color:var(--ax-line-soft)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileScore.positive,
+html[data-theme="dark"] .analyticsOperatingProfileScore.positive{
+  border-left:2px solid var(--ax-green-line)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileScore b,
+html[data-theme="dark"] .analyticsOperatingProfileScore b{color:var(--ax-text-hi)!important}
+html:not([data-theme="light"]) .analyticsOperatingProfileFocus>div,
+html[data-theme="dark"] .analyticsOperatingProfileFocus>div{
+  padding:4px 6px!important;
+  background:rgba(8,11,18,.35)!important;
+  border:1px solid var(--ax-line-soft)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileFocus>div.positive,
+html[data-theme="dark"] .analyticsOperatingProfileFocus>div.positive{
+  border-left:2px solid var(--ax-green-line)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileFocus>div.negative,
+html[data-theme="dark"] .analyticsOperatingProfileFocus>div.negative{
+  border-left:2px solid var(--ax-red-line)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileMetrics>div,
+html[data-theme="dark"] .analyticsOperatingProfileMetrics>div{
+  background:rgba(8,11,18,.35)!important;
+  border:1px solid var(--ax-line-soft)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfileMetrics b,
+html[data-theme="dark"] .analyticsOperatingProfileMetrics b{color:var(--ax-text-hi)!important}
+
+/* ── TIER 3: Weekly Plan dark strategic close ── */
+html:not([data-theme="light"]) .analyticsWeeklyPlan.analyticsTier3Block,
+html[data-theme="dark"] .analyticsWeeklyPlan.analyticsTier3Block{
+  padding:12px 14px!important;
+  background:var(--ax-surface-elevated)!important;
+  border-color:var(--ax-line)!important;
+  border-left:2px solid rgba(212,166,58,.32)!important;
+  box-shadow:var(--ax-glow-sm)!important;
+}
+html:not([data-theme="light"]) .analyticsWeeklyPlanCopy h3,
+html[data-theme="dark"] .analyticsWeeklyPlanCopy h3{color:var(--ax-text-hi)!important}
+html:not([data-theme="light"]) .analyticsWeeklyPlanBullet,
+html[data-theme="dark"] .analyticsWeeklyPlanBullet{color:var(--ax-text-mid)!important}
+html:not([data-theme="light"]) .analyticsWeeklyPlanIndex,
+html[data-theme="dark"] .analyticsWeeklyPlanIndex{
+  background:rgba(212,166,58,.1)!important;
+  border-color:rgba(212,166,58,.18)!important;
+  color:rgba(212,166,58,.8)!important;
+}
+
+/* ── TIER 4: Performance Evidence dark ── */
+html:not([data-theme="light"]) .analyticsTier4.analyticsPerformanceEvidence,
+html[data-theme="dark"] .analyticsTier4.analyticsPerformanceEvidence{
+  background:transparent!important;
+  border-color:var(--ax-line-soft)!important;
+}
+html:not([data-theme="light"]) .analyticsTier4 .analyticsPerformanceEvidencePanel,
+html[data-theme="dark"] .analyticsTier4 .analyticsPerformanceEvidencePanel{
+  background:var(--ax-surface-evidence)!important;
+  border-color:var(--ax-line-soft)!important;
+  box-shadow:var(--ax-surface-inset)!important;
+}
+html:not([data-theme="light"]) .analyticsTier4 .analyticsPerformanceEvidencePanel header h4,
+html[data-theme="dark"] .analyticsTier4 .analyticsPerformanceEvidencePanel header h4{
+  color:var(--ax-text-mid)!important;
+}
+html:not([data-theme="light"]) .analyticsTier4 .analyticsPerformanceEvidencePattern,
+html[data-theme="dark"] .analyticsTier4 .analyticsPerformanceEvidencePattern{
+  background:rgba(8,11,18,.5)!important;
+  border-left-color:rgba(212,166,58,.2)!important;
+}
+html:not([data-theme="light"]) .analyticsTier4 .analyticsPerformanceEvidencePattern>b,
+html[data-theme="dark"] .analyticsTier4 .analyticsPerformanceEvidencePattern>b{
+  color:var(--ax-text-hi)!important;
+}
+html:not([data-theme="light"]) .analyticsPerformanceEvidenceChart,
+html[data-theme="dark"] .analyticsPerformanceEvidenceChart{
+  background:transparent!important;
+}
+
+/* ── Mobile dark 390px ── */
+@media(max-width:390px){
+  html:not([data-theme="light"]) .analyticsTier1.analyticsCommand,
+  html[data-theme="dark"] .analyticsTier1.analyticsCommand{
+    padding:11px 12px 10px!important;
+  }
+  html:not([data-theme="light"]) .analyticsCommandScoreRing,
+  html[data-theme="dark"] .analyticsCommandScoreRing{
+    width:68px!important;
+    height:68px!important;
+  }
+  html:not([data-theme="light"]) .analyticsDirectiveCard,
+  html[data-theme="dark"] .analyticsDirectiveCard{
+    padding:7px 9px!important;
+  }
+  html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health,
+  html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.health{
+    min-height:76px!important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS FLAGSHIP LIFE v7 — Depth, hierarchy, module identity
+   Principles from Dashboard (depth/hierarchy) — NOT copied layout
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Zone rhythm (all themes, Analytics scoped) ── */
+.analyticsIntelligenceCenter .analyticsZone--control{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:10px;
+  border-radius:14px;
+  border:1px solid transparent;
+}
+.analyticsIntelligenceCenter .analyticsZone--intel{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid transparent;
+}
+.analyticsIntelligenceCenter .analyticsZone--evidence{
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid transparent;
+  margin-top:2px;
+}
+
+/* ── DARK: layered zones ── */
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsZone--control,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsZone--control{
+  background:rgba(8,11,18,.55)!important;
+  border-color:rgba(255,255,255,.04)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsZone--intel,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsZone--intel{
+  background:linear-gradient(180deg,rgba(14,18,28,.4),rgba(8,10,16,.25))!important;
+  border-color:rgba(255,255,255,.05)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsZone--evidence,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsZone--evidence{
+  background:rgba(6,8,14,.35)!important;
+  border-color:rgba(255,255,255,.03)!important;
+  opacity:.96;
+}
+
+/* ── TIER 1: Command cabin ── */
+html:not([data-theme="light"]) .analyticsCommandCabin.analyticsTier1,
+html[data-theme="dark"] .analyticsCommandCabin.analyticsTier1{
+  background:
+    radial-gradient(ellipse 70% 55% at 12% 0%,rgba(212,166,58,.055),transparent 52%),
+    radial-gradient(ellipse 50% 40% at 88% 100%,rgba(59,130,246,.04),transparent 50%),
+    linear-gradient(162deg,rgba(24,31,48,.97) 0%,rgba(11,14,22,.99) 58%,rgba(8,10,18,1) 100%)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.06),
+    0 20px 56px rgba(0,0,0,.48),
+    inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandCabin.analyticsTier1::after,
+html[data-theme="dark"] .analyticsCommandCabin.analyticsTier1::after{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:1px;
+  background:linear-gradient(90deg,transparent 5%,rgba(212,166,58,.35) 50%,transparent 95%);
+  pointer-events:none;
+}
+html:not([data-theme="light"]) .analyticsCommandHeadline,
+html[data-theme="dark"] .analyticsCommandHeadline{
+  font-size:17px!important;
+  font-weight:800!important;
+  letter-spacing:-.025em!important;
+  line-height:1.28!important;
+}
+html:not([data-theme="light"]) .analyticsCommandScoreRing,
+html[data-theme="dark"] .analyticsCommandScoreRing{
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.35));
+}
+html:not([data-theme="light"]) .analyticsCommandActionBand,
+html[data-theme="dark"] .analyticsCommandActionBand{
+  background:linear-gradient(90deg,rgba(212,166,58,.06),rgba(8,11,18,.7) 18%)!important;
+  border-left-width:2px!important;
+}
+
+/* ── TIER 2: Directives board ── */
+html:not([data-theme="light"]) .analyticsDirectivesBoard .analyticsDirectiveCard,
+html[data-theme="dark"] .analyticsDirectivesBoard .analyticsDirectiveCard{
+  position:relative;
+  overflow:hidden;
+}
+html:not([data-theme="light"]) .analyticsDirectivesBoard .analyticsDirectiveCard::before,
+html[data-theme="dark"] .analyticsDirectivesBoard .analyticsDirectiveCard::before{
+  content:'';
+  position:absolute;
+  inset:0 auto 0 0;
+  width:2px;
+  background:currentColor;
+  opacity:.35;
+}
+html:not([data-theme="light"]) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-edge::before,
+html[data-theme="dark"] .analyticsDirectivesBoard .analyticsDirectiveCard.tone-edge::before{color:#22c55e}
+html:not([data-theme="light"]) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-leak::before,
+html[data-theme="dark"] .analyticsDirectivesBoard .analyticsDirectiveCard.tone-leak::before{color:#ef4444}
+html:not([data-theme="light"]) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-observe::before,
+html[data-theme="dark"] .analyticsDirectivesBoard .analyticsDirectiveCard.tone-observe::before{color:#fbbf24}
+html:not([data-theme="light"]) .analyticsDirectiveAction,
+html[data-theme="dark"] .analyticsDirectiveAction{
+  padding-top:4px!important;
+  border-top:1px solid rgba(255,255,255,.04)!important;
+  margin-top:6px!important;
+  font-weight:750!important;
+}
+
+/* ── TIER 2: System Health scoreboard ── */
+html:not([data-theme="light"]) .analyticsControlBoard,
+html[data-theme="dark"] .analyticsControlBoard{
+  padding-top:2px;
+}
+html:not([data-theme="light"]) .analyticsKpiAnchor.analyticsKpiCard.health,
+html[data-theme="dark"] .analyticsKpiAnchor.analyticsKpiCard.health{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 80% 70% at 20% 0%,rgba(34,197,94,.08),transparent 55%),
+    var(--ax-surface-elevated)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:var(--ax-glow-sm)!important;
+}
+html:not([data-theme="light"]) .analyticsKpiAnchor.analyticsKpiCard.health::before,
+html[data-theme="dark"] .analyticsKpiAnchor.analyticsKpiCard.health::before{
+  content:'';
+  position:absolute;
+  inset:0 auto auto 0;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg,rgba(34,197,94,.5),rgba(34,197,94,.08));
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact{
+  transition:background .15s ease;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact.positive,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact.positive{
+  box-shadow:inset 0 -1px 0 rgba(34,197,94,.15)!important;
+}
+html:not([data-theme="light"]) .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact.negative,
+html[data-theme="dark"] .analyticsIntelligenceCenter .analyticsSystemHealthGrid .analyticsKpiCard.compact.negative{
+  box-shadow:inset 0 -1px 0 rgba(239,68,68,.15)!important;
+}
+
+/* ── TIER 3: Edge Lab flagship identity ── */
+html:not([data-theme="light"]) .analyticsTier3Flagship.analyticsEdgeLab,
+html[data-theme="dark"] .analyticsTier3Flagship.analyticsEdgeLab{
+  background:
+    radial-gradient(ellipse 60% 45% at 100% 0%,rgba(251,191,36,.04),transparent 50%),
+    var(--ax-surface-flagship)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:var(--ax-glow-md)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeThesis,
+html[data-theme="dark"] .analyticsEdgeThesis{
+  background:
+    linear-gradient(135deg,rgba(251,191,36,.05),rgba(18,24,36,.95))!important;
+  border-left:3px solid rgba(251,191,36,.32)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeThesisReading,
+html[data-theme="dark"] .analyticsEdgeThesisReading{
+  font-style:normal!important;
+  font-weight:650!important;
+  color:var(--ax-text-mid)!important;
+  padding:6px 8px!important;
+  margin-top:8px!important;
+  border-radius:7px!important;
+  background:rgba(0,0,0,.15)!important;
+}
+html:not([data-theme="light"]) .analyticsPipelineBlock.tone-observe h5::before,
+html[data-theme="dark"] .analyticsPipelineBlock.tone-observe h5::before{
+  content:'';
+  display:inline-block;
+  width:5px;height:5px;border-radius:50%;
+  background:#fbbf24;margin-right:5px;vertical-align:middle;
+  box-shadow:0 0 6px rgba(251,191,36,.35);
+}
+html:not([data-theme="light"]) .analyticsPipelineBlock.tone-insufficient h5::before,
+html[data-theme="dark"] .analyticsPipelineBlock.tone-insufficient h5::before{
+  content:'';
+  display:inline-block;
+  width:5px;height:5px;border-radius:50%;
+  background:#94a3b8;margin-right:5px;vertical-align:middle;
+}
+html:not([data-theme="light"]) .analyticsRiskPanel,
+html[data-theme="dark"] .analyticsRiskPanel{
+  border-top:2px solid rgba(239,68,68,.12)!important;
+}
+
+/* ── TIER 3: Operating Profile diagnostic ── */
+html:not([data-theme="light"]) .analyticsOperatingProfileScoreVal b,
+html[data-theme="dark"] .analyticsOperatingProfileScoreVal b{
+  font-size:18px!important;
+  font-weight:850!important;
+  letter-spacing:-.03em!important;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── TIER 3: Strategic close ── */
+html:not([data-theme="light"]) .analyticsStrategicClose.analyticsWeeklyPlan,
+html[data-theme="dark"] .analyticsStrategicClose.analyticsWeeklyPlan{
+  background:
+    linear-gradient(135deg,rgba(212,166,58,.04),rgba(18,24,36,.92))!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  border-left:3px solid rgba(212,166,58,.38)!important;
+  box-shadow:var(--ax-glow-sm)!important;
+}
+html:not([data-theme="light"]) .analyticsWeeklyPlanIndex,
+html[data-theme="dark"] .analyticsWeeklyPlanIndex{
+  width:26px!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  letter-spacing:.02em!important;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── TIER 4: Evidence support layer ── */
+html:not([data-theme="light"]) .analyticsZone--evidence .analyticsPerformanceEvidenceHead,
+html[data-theme="dark"] .analyticsZone--evidence .analyticsPerformanceEvidenceHead{
+  padding-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  margin-bottom:8px;
+}
+html:not([data-theme="light"]) .analyticsZone--evidence .analyticsPerformanceEvidencePanel,
+html[data-theme="dark"] .analyticsZone--evidence .analyticsPerformanceEvidencePanel{
+  background:rgba(7,9,15,.75)!important;
+}
+html:not([data-theme="light"]) .analyticsZone--evidence .analyticsPerformanceEvidencePattern,
+html[data-theme="dark"] .analyticsZone--evidence .analyticsPerformanceEvidencePattern{
+  padding:12px!important;
+  border-left-width:3px!important;
+}
+
+/* ── LIGHT mode: preserve commercial feel, add hierarchy ── */
+html[data-theme="light"] .analyticsIntelligenceCenter .analyticsZone--control{
+  background:rgba(248,250,252,.85)!important;
+  border-color:rgba(15,23,42,.06)!important;
+}
+html[data-theme="light"] .analyticsIntelligenceCenter .analyticsZone--intel{
+  background:linear-gradient(180deg,rgba(248,250,252,.9),rgba(255,255,255,.6))!important;
+  border-color:rgba(15,23,42,.06)!important;
+}
+html[data-theme="light"] .analyticsIntelligenceCenter .analyticsZone--evidence{
+  background:rgba(241,245,249,.5)!important;
+  border-color:rgba(15,23,42,.05)!important;
+}
+html[data-theme="light"] .analyticsCommandCabin.analyticsTier1{
+  background:linear-gradient(165deg,#fff 0%,#f8fafc 100%)!important;
+  border-color:rgba(15,23,42,.09)!important;
+  box-shadow:0 12px 40px rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsCommandCabin.analyticsTier1::after{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,132,23,.25),transparent);
+}
+html[data-theme="light"] .analyticsKpiAnchor.analyticsKpiCard.health{
+  background:linear-gradient(180deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:0 8px 24px rgba(15,23,42,.06)!important;
+}
+html[data-theme="light"] .analyticsStrategicClose.analyticsWeeklyPlan{
+  background:linear-gradient(135deg,#fff,#fafafa)!important;
+  border-left-color:rgba(184,132,23,.4)!important;
+}
+
+/* ── Mobile zones ── */
+@media(max-width:390px){
+  .analyticsIntelligenceCenter .analyticsZone--control,
+  .analyticsIntelligenceCenter .analyticsZone--intel,
+  .analyticsIntelligenceCenter .analyticsZone--evidence{
+    padding:8px!important;
+  }
+  html:not([data-theme="light"]) .analyticsCommandHeadline,
+  html[data-theme="dark"] .analyticsCommandHeadline{
+    font-size:15px!important;
+  }
+  .analyticsIntelligenceCenter .analyticsZone--control{display:contents}
+  .analyticsIntelligenceCenter .analyticsZone--intel{display:contents}
+  .analyticsIntelligenceCenter .analyticsZone--evidence{display:contents}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS EDGE INTELLIGENCE MAP v9 — Premium instrument
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Edge Map: flagship instrument ── */
+.analyticsEdgeMap{
+  position:relative;
+  margin-bottom:12px;
+  padding:16px 18px 14px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:
+    radial-gradient(ellipse 90% 75% at 50% 42%,rgba(34,197,94,.05),transparent 65%),
+    linear-gradient(168deg,rgba(14,20,32,.98),rgba(8,11,18,.99));
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  overflow:hidden;
+}
+.analyticsEdgeMap::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:24px 24px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 46%,#000 15%,transparent 75%);
+  pointer-events:none;
+  opacity:.5;
+}
+.analyticsEdgeMap.validated{
+  border-color:rgba(34,197,94,.22);
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.32),
+    inset 0 0 0 1px rgba(34,197,94,.08),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+.analyticsEdgeMap:not(.validated):not(.analyticsEdgeMapEmpty){
+  border-color:rgba(251,191,36,.18);
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.32),
+    inset 0 0 0 1px rgba(251,191,36,.06),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+.analyticsEdgeMapHeader{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.analyticsEdgeMapHeader>span{
+  font-size:8px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--ax-muted);
+}
+.analyticsEdgeMapHeader>em{
+  font-style:normal;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  padding:3px 9px;
+  border-radius:99px;
+  background:rgba(251,191,36,.1);
+  color:#fbbf24;
+  border:1px solid rgba(251,191,36,.2);
+}
+.analyticsEdgeMapHeader>em.validated{
+  background:rgba(34,197,94,.1);
+  color:#4ade80;
+  border-color:rgba(34,197,94,.24);
+}
+.analyticsEdgeMapStage{
+  position:relative;
+  z-index:1;
+}
+.analyticsEdgeMapGlow{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:min(280px,72%);
+  height:min(200px,55%);
+  transform:translate(-50%,-52%);
+  border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(34,197,94,.09),transparent 68%);
+  pointer-events:none;
+  filter:blur(8px);
+  opacity:.85;
+}
+.analyticsEdgeMap.validated .analyticsEdgeMapGlow{
+  background:radial-gradient(ellipse at center,rgba(34,197,94,.12),transparent 68%);
+}
+.analyticsEdgeMapCanvas{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr minmax(160px,260px) 1fr;
+  grid-template-rows:auto auto auto;
+  gap:8px 14px;
+  align-items:center;
+  min-height:188px;
+  padding:4px 0 2px;
+}
+.analyticsEdgeMapConnector{
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+  opacity:.22;
+  border:0 solid rgba(255,255,255,.12);
+}
+.analyticsEdgeMapConnector.tl{
+  top:18%;
+  left:22%;
+  width:18%;
+  height:1px;
+  border-top-width:1px;
+  transform:rotate(-18deg);
+  transform-origin:right center;
+}
+.analyticsEdgeMapConnector.tr{
+  top:18%;
+  right:22%;
+  width:18%;
+  height:1px;
+  border-top-width:1px;
+  transform:rotate(18deg);
+  transform-origin:left center;
+}
+.analyticsEdgeMapConnector.bl{
+  bottom:22%;
+  left:22%;
+  width:18%;
+  height:1px;
+  border-top-width:1px;
+  transform:rotate(18deg);
+  transform-origin:right center;
+}
+.analyticsEdgeMapConnector.br{
+  bottom:22%;
+  right:22%;
+  width:18%;
+  height:1px;
+  border-top-width:1px;
+  transform:rotate(-18deg);
+  transform-origin:left center;
+}
+.analyticsEdgeMapMetric{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:9px 11px 8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(0,0,0,.22));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.analyticsEdgeMapMetric.satellite::after{
+  content:'';
+  position:absolute;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:rgba(255,255,255,.18);
+  box-shadow:0 0 0 2px rgba(255,255,255,.04);
+}
+.analyticsEdgeMapMetric.satellite.tl::after{right:8px;top:50%;transform:translateY(-50%)}
+.analyticsEdgeMapMetric.satellite.tr::after{left:8px;top:50%;transform:translateY(-50%)}
+.analyticsEdgeMapMetric.satellite.bl::after{right:8px;top:50%;transform:translateY(-50%)}
+.analyticsEdgeMapMetric.satellite.br::after{left:8px;top:50%;transform:translateY(-50%)}
+.analyticsEdgeMapMetric small{
+  font-size:7px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:var(--ax-muted);
+}
+.analyticsEdgeMapMetric b{
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+  color:var(--ax-text-hi,var(--ax-text));
+}
+.analyticsEdgeMapMetric.pos b{color:#4ade80}
+.analyticsEdgeMapMetric.neg b{color:#f87171}
+.analyticsEdgeMapMetric.satellite.tl{grid-column:1;grid-row:1;justify-self:end;width:100%;max-width:132px}
+.analyticsEdgeMapMetric.satellite.tr{grid-column:3;grid-row:1;justify-self:start;width:100%;max-width:132px}
+.analyticsEdgeMapMetric.satellite.bl{grid-column:1;grid-row:3;justify-self:end;width:100%;max-width:132px}
+.analyticsEdgeMapMetric.satellite.br{grid-column:3;grid-row:3;justify-self:start;width:100%;max-width:132px}
+.analyticsEdgeMapCore{
+  grid-column:2;
+  grid-row:1/4;
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:5px;
+  padding:8px 10px 4px;
+}
+.analyticsEdgeMapRingWrap{
+  position:relative;
+  padding:4px;
+  margin-bottom:2px;
+}
+.analyticsEdgeMapRingWrap::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 0 24px rgba(34,197,94,.08);
+}
+.analyticsEdgeMapRing{
+  --map-pct:0;
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  background:conic-gradient(
+    rgba(34,197,94,.88) calc(var(--map-pct) * 1%),
+    rgba(255,255,255,.07) 0
+  );
+  display:grid;
+  place-items:center;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.08),
+    inset 0 0 12px rgba(0,0,0,.25);
+}
+.analyticsEdgeMap:not(.validated) .analyticsEdgeMapRing{
+  background:conic-gradient(
+    rgba(251,191,36,.82) calc(var(--map-pct) * 1%),
+    rgba(255,255,255,.07) 0
+  );
+}
+.analyticsEdgeMapRingInner{
+  width:68px;
+  height:68px;
+  border-radius:50%;
+  background:linear-gradient(165deg,rgba(12,16,26,.98),rgba(6,9,15,.99));
+  border:1px solid rgba(255,255,255,.1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.35);
+}
+.analyticsEdgeMapRingInner b{
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+  color:var(--ax-text-hi,var(--ax-text));
+}
+.analyticsEdgeMapRingInner span{
+  font-size:9px;
+  font-weight:750;
+  color:var(--ax-muted);
+  margin-top:2px;
+}
+.analyticsEdgeMapCoreLabel{
+  font-size:7px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.11em;
+  color:var(--ax-muted);
+}
+.analyticsEdgeMapCoreName{
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:-.03em;
+  line-height:1.2;
+  color:var(--ax-text-hi,var(--ax-text));
+  max-width:100%;
+  overflow-wrap:anywhere;
+  padding:0 4px;
+}
+.analyticsValidationTrack{
+  width:100%;
+  max-width:210px;
+  margin-top:4px;
+  padding:8px 10px 7px;
+  border-radius:10px;
+  background:rgba(0,0,0,.2);
+  border:1px solid rgba(255,255,255,.06);
+}
+.analyticsValidationTrackHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:5px;
+}
+.analyticsValidationTrackHead span{
+  font-size:7px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ax-muted);
+}
+.analyticsValidationTrackHead strong{
+  font-size:10px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+  color:var(--ax-text-hi,var(--ax-text));
+}
+.analyticsValidationTrackBar{
+  height:4px;
+  border-radius:99px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.2);
+}
+.analyticsValidationTrackBar>span{
+  display:block;
+  height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,rgba(34,197,94,.85),rgba(34,197,94,.4));
+  box-shadow:0 0 8px rgba(34,197,94,.25);
+}
+.analyticsEdgeMap:not(.validated) .analyticsValidationTrackBar>span{
+  background:linear-gradient(90deg,rgba(251,191,36,.85),rgba(251,191,36,.35));
+  box-shadow:0 0 6px rgba(251,191,36,.2);
+}
+.analyticsValidationTrack small{
+  display:block;
+  margin-top:4px;
+  font-size:8px;
+  color:var(--ax-muted);
+  line-height:1.35;
+}
+.analyticsEdgeMapReading{
+  position:relative;
+  z-index:2;
+  margin:12px 0 0;
+  padding:9px 12px;
+  border-radius:9px;
+  font-size:10px;
+  line-height:1.5;
+  color:var(--ax-text-mid,var(--ax-muted));
+  background:rgba(0,0,0,.18);
+  border-left:2px solid rgba(251,191,36,.38);
+}
+.analyticsEdgeMap.validated .analyticsEdgeMapReading{border-left-color:rgba(34,197,94,.45)}
+.analyticsEdgeMapEmpty .analyticsEdgeMapCoreEmpty{
+  padding:24px 12px;
+  text-align:center;
+}
+.analyticsEdgeMapEmpty .analyticsEdgeMapCoreEmpty b{
+  display:block;
+  font-size:12px;
+  color:var(--ax-text);
+}
+.analyticsEdgeMapEmpty .analyticsEdgeMapCoreEmpty p{
+  margin:4px 0 0;
+  font-size:10px;
+  color:var(--ax-muted);
+}
+
+/* ── Research / risk queues below map ── */
+.analyticsEdgePipelineCompact{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:8px;
+}
+.analyticsEdgePipelineCompactCol{
+  position:relative;
+  padding:11px 12px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(0,0,0,.14);
+  overflow:hidden;
+}
+.analyticsEdgePipelineCompactCol::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:rgba(251,191,36,.35);
+}
+.analyticsEdgePipelineCompactCol.samples::before{background:rgba(251,191,36,.35)}
+.analyticsEdgePipelineCompactCol.leaks::before{background:rgba(239,68,68,.45)}
+.analyticsEdgePipelineCompactHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+  padding-left:6px;
+}
+.analyticsEdgePipelineCompactHead h4{
+  margin:0;
+  font-size:8px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:var(--ax-muted);
+}
+.analyticsEdgePipelineCompactHead span{
+  font-size:7px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--ax-muted);
+  opacity:.65;
+}
+.analyticsEdgePipelineCompactList,
+.analyticsActiveLeaksCompactList{
+  list-style:none;
+  margin:0;
+  padding:0 0 0 6px;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.analyticsEdgePipelineCompactItem,
+.analyticsActiveLeaksCompactItem{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.analyticsEdgePipelineCompactItem:last-child,
+.analyticsActiveLeaksCompactItem:last-child{border-bottom:none;padding-bottom:0}
+.analyticsEdgePipelineCompactItemBody,
+.analyticsActiveLeaksCompactItemBody{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.analyticsEdgePipelineCompactName,
+.analyticsActiveLeaksCompactName{
+  font-size:10px;
+  font-weight:750;
+  color:var(--ax-text-hi,var(--ax-text));
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.analyticsEdgePipelineCompactPl{
+  flex-shrink:0;
+  font-size:11px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+  padding-top:1px;
+}
+.analyticsEdgePipelineCompactPl.pos{color:#4ade80}
+.analyticsEdgePipelineCompactPl.neg{color:#f87171}
+.analyticsActiveLeaksCompactPl{
+  flex-shrink:0;
+  font-size:11px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+  padding-top:1px;
+}
+.analyticsActiveLeaksCompactPl.neg{color:#f87171}
+.analyticsEdgePipelineCompactMeta,
+.analyticsActiveLeaksCompactMeta{
+  font-size:8px;
+  color:var(--ax-muted);
+  line-height:1.3;
+}
+.analyticsActiveLeaksCompactItemBody em{
+  font-style:normal;
+  font-size:8px;
+  font-weight:750;
+  color:#f87171;
+  opacity:.88;
+  margin-top:1px;
+}
+.analyticsEdgePipelineCompactEmpty{
+  margin:0 0 0 6px;
+  font-size:9px;
+  color:var(--ax-muted);
+  line-height:1.4;
+}
+.analyticsEdgePipelineCompactMore{
+  margin:7px 0 0 6px;
+  font-size:8px;
+  color:var(--ax-muted);
+  opacity:.75;
+}
+.analyticsValidationCriteriaInline{
+  margin:0;
+  padding:6px 10px;
+  font-size:8px;
+  font-weight:650;
+  letter-spacing:.02em;
+  color:var(--ax-muted);
+  text-align:center;
+  border-radius:7px;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.04);
+}
+
+/* ── Command: denser hero, inline weekly action ── */
+.analyticsCommandCabin.analyticsTier1{padding:12px 14px 10px!important}
+.analyticsCommandMain{gap:10px!important}
+.analyticsCommandNarrative{gap:4px!important}
+.analyticsCommandHeadline{margin:0!important}
+.analyticsCommandActionBand.analyticsCommandActionInline{
+  margin-top:6px!important;
+  margin-bottom:2px!important;
+  padding:7px 10px!important;
+  border-radius:8px!important;
+}
+.analyticsCommandFoot{
+  margin-top:6px!important;
+  padding-top:6px!important;
+}
+.analyticsCommandProgressBar{height:2px!important}
+
+/* ── Directives: action hierarchy micro ── */
+.analyticsDirectiveAction{
+  font-weight:750!important;
+  color:var(--ax-text-hi,var(--ax-text))!important;
+  opacity:1!important;
+}
+.analyticsDirectiveVerdict{opacity:.82!important}
+
+/* ── Operating Profile: denser grid ── */
+.analyticsOperatingProfileBody.dense{padding:8px 10px!important}
+.analyticsOperatingProfileGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileLabel{
+  font-size:7px!important;
+  margin-bottom:4px!important;
+}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileHeadline{font-size:11px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileData{font-size:9px!important;margin:2px 0!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileBar{height:3px!important;margin:4px 0!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileBadge{font-size:8px!important;padding:2px 6px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileNote{font-size:9px!important;margin:4px 0 0!important;line-height:1.35!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileScore{padding:6px 8px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileScoreVal b{font-size:16px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileScore p{font-size:9px!important;margin:2px 0 0!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileFocus{gap:4px!important;margin-top:4px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileFocus>div{padding:4px 6px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileMetrics{
+  gap:4px!important;
+  margin-top:6px!important;
+}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileMetrics>div{padding:5px 6px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileMetrics span{font-size:7px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileMetrics b{font-size:11px!important}
+.analyticsOperatingProfileBody.dense .analyticsOperatingProfileSessionRow{padding:4px 0!important}
+.analyticsOperatingProfileHead p{margin-bottom:6px!important}
+
+/* ── Operating Profile: complement + score instrument ── */
+.analyticsOperatingProfileBody.complement{
+  padding:6px 8px!important;
+  margin-top:6px!important;
+}
+.analyticsTier3Block.analyticsOperatingProfile.complement{
+  background:linear-gradient(168deg,rgba(14,20,32,.55),rgba(8,11,18,.65))!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+.analyticsOperatingProfileScore.instrument{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:7px 8px!important;
+  border-radius:10px!important;
+  background:rgba(0,0,0,.16)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+  border-left:none!important;
+}
+.analyticsOperatingProfileScore.instrument.positive{
+  background:rgba(34,197,94,.06)!important;
+  border-color:rgba(34,197,94,.12)!important;
+}
+.analyticsOperatingProfileScore.instrument.negative{
+  background:rgba(239,68,68,.06)!important;
+  border-color:rgba(239,68,68,.12)!important;
+}
+.analyticsOperatingProfileScore.instrument.neutral{
+  background:rgba(255,255,255,.03)!important;
+}
+.analyticsOperatingProfileScoreDial{
+  --score-pct:0;
+  flex-shrink:0;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:conic-gradient(
+    rgba(34,197,94,.75) calc(var(--score-pct) * 1%),
+    rgba(255,255,255,.08) 0
+  );
+  display:grid;
+  place-items:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06);
+}
+.analyticsOperatingProfileScore.instrument.negative .analyticsOperatingProfileScoreDial{
+  background:conic-gradient(
+    rgba(239,68,68,.7) calc(var(--score-pct) * 1%),
+    rgba(255,255,255,.08) 0
+  );
+}
+.analyticsOperatingProfileScore.instrument.neutral .analyticsOperatingProfileScoreDial{
+  background:conic-gradient(
+    rgba(251,191,36,.65) calc(var(--score-pct) * 1%),
+    rgba(255,255,255,.08) 0
+  );
+}
+.analyticsOperatingProfileScoreDialInner{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:rgba(8,11,18,.95);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
+.analyticsOperatingProfileScoreDialInner b{
+  font-size:13px!important;
+  font-weight:900!important;
+  letter-spacing:-.03em;
+  color:var(--ax-text-hi,var(--ax-text))!important;
+}
+.analyticsOperatingProfileScoreDialInner em{
+  font-size:7px!important;
+  color:var(--ax-muted)!important;
+  font-style:normal!important;
+  margin-top:1px;
+}
+.analyticsOperatingProfileScoreCopy{
+  flex:1;
+  min-width:0;
+}
+.analyticsOperatingProfileScoreCopy p{
+  margin:0!important;
+  font-size:9px!important;
+  line-height:1.4!important;
+  color:var(--ax-muted)!important;
+}
+.analyticsOperatingProfileBody.dense.complement .analyticsOperatingProfileFocus>div{
+  border-left:2px solid transparent;
+}
+.analyticsOperatingProfileBody.dense.complement .analyticsOperatingProfileFocus>div.positive{
+  border-left-color:rgba(34,197,94,.35)!important;
+}
+.analyticsOperatingProfileBody.dense.complement .analyticsOperatingProfileFocus>div.negative{
+  border-left-color:rgba(239,68,68,.35)!important;
+}
+.analyticsOperatingProfileBody.dense.complement .analyticsOperatingProfileMetrics>div{
+  background:rgba(0,0,0,.12)!important;
+  border:1px solid rgba(255,255,255,.05)!important;
+  border-radius:8px!important;
+}
+
+/* ── Performance Evidence: support polish ── */
+.analyticsPerformanceEvidencePanelHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 10px 0!important;
+}
+.analyticsPerformanceEvidencePanelHead h4{
+  margin:0!important;
+  font-size:10px!important;
+  font-weight:850!important;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--ax-muted)!important;
+}
+.analyticsPerformanceEvidencePanelHead span{
+  font-size:9px!important;
+  color:var(--ax-muted)!important;
+  opacity:.85;
+}
+.analyticsPerformanceEvidencePattern.dominant{
+  padding:10px 10px 8px!important;
+  border-radius:10px!important;
+  background:rgba(0,0,0,.1)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+}
+.analyticsPerformanceEvidencePatternHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+}
+.analyticsPerformanceEvidencePatternHead span{
+  font-size:7px!important;
+  font-weight:850!important;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ax-muted)!important;
+}
+.analyticsPerformanceEvidencePatternHead em{
+  font-size:7px;
+  font-style:normal;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ax-muted);
+  opacity:.65;
+}
+.analyticsPerformanceEvidencePatternName{
+  display:block;
+  font-size:14px!important;
+  font-weight:900!important;
+  letter-spacing:-.02em;
+  color:var(--ax-text-hi,var(--ax-text))!important;
+  margin-bottom:6px!important;
+  overflow-wrap:anywhere;
+}
+.analyticsPerformanceEvidencePatternStats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 10px;
+  align-items:center;
+}
+.analyticsPerformanceEvidencePatternStats strong{
+  font-size:13px!important;
+  font-weight:850!important;
+}
+.analyticsPerformanceEvidencePatternStats em{
+  font-size:9px!important;
+}
+
+/* ── Dark: Edge Map depth ── */
+html:not([data-theme="light"]) .analyticsEdgeMap,
+html[data-theme="dark"] .analyticsEdgeMap{
+  background:
+    radial-gradient(ellipse 85% 70% at 50% 40%,rgba(34,197,94,.07),transparent 58%),
+    linear-gradient(168deg,rgba(16,22,36,.98),rgba(7,10,17,.99))!important;
+  border-color:rgba(255,255,255,.09)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeMapMetric,
+html[data-theme="dark"] .analyticsEdgeMapMetric{
+  background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(0,0,0,.3))!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeMapRingInner,
+html[data-theme="dark"] .analyticsEdgeMapRingInner{
+  background:linear-gradient(165deg,rgba(10,14,24,.98),rgba(5,8,14,.99))!important;
+}
+html:not([data-theme="light"]) .analyticsEdgePipelineCompactCol,
+html[data-theme="dark"] .analyticsEdgePipelineCompactCol{
+  background:rgba(0,0,0,.24)!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+html:not([data-theme="light"]) .analyticsTier3Block.analyticsOperatingProfile.complement,
+html[data-theme="dark"] .analyticsTier3Block.analyticsOperatingProfile.complement{
+  background:linear-gradient(168deg,rgba(14,20,32,.75),rgba(7,10,17,.85))!important;
+}
+
+/* ── Light: Edge Map premium clean ── */
+html[data-theme="light"] .analyticsEdgeMap{
+  background:
+    radial-gradient(ellipse 85% 70% at 50% 42%,rgba(34,197,94,.07),transparent 62%),
+    linear-gradient(168deg,#fff,#f4f7fb)!important;
+  border-color:rgba(15,23,42,.09)!important;
+  box-shadow:0 10px 32px rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsEdgeMap::before{
+  background:
+    linear-gradient(rgba(15,23,42,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,23,42,.035) 1px,transparent 1px);
+  opacity:.45;
+}
+html[data-theme="light"] .analyticsEdgeMap:not(.validated):not(.analyticsEdgeMapEmpty){
+  border-color:rgba(217,119,6,.2)!important;
+  box-shadow:0 10px 32px rgba(15,23,42,.07),inset 0 0 0 1px rgba(217,119,6,.05)!important;
+}
+html[data-theme="light"] .analyticsEdgeMap.validated{
+  border-color:rgba(22,163,74,.22)!important;
+  box-shadow:0 10px 32px rgba(15,23,42,.07),inset 0 0 0 1px rgba(22,163,74,.06)!important;
+}
+html[data-theme="light"] .analyticsEdgeMapGlow{
+  background:radial-gradient(ellipse at center,rgba(34,197,94,.08),transparent 68%);
+  opacity:.7;
+}
+html[data-theme="light"] .analyticsEdgeMapMetric{
+  background:linear-gradient(145deg,#fff,rgba(241,245,249,.95))!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)!important;
+}
+html[data-theme="light"] .analyticsEdgeMapMetric.pos b{color:#15803d!important}
+html[data-theme="light"] .analyticsEdgeMapMetric.neg b{color:#b91c1c!important}
+html[data-theme="light"] .analyticsEdgeMapMetric.satellite::after{
+  background:rgba(15,23,42,.12);
+  box-shadow:0 0 0 2px rgba(15,23,42,.04);
+}
+html[data-theme="light"] .analyticsEdgeMapConnector{
+  opacity:.18;
+  border-color:rgba(15,23,42,.12);
+}
+html[data-theme="light"] .analyticsEdgeMapRingInner{
+  background:linear-gradient(165deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.1)!important;
+  box-shadow:inset 0 1px 4px rgba(15,23,42,.06)!important;
+}
+html[data-theme="light"] .analyticsValidationTrack{
+  background:rgba(241,245,249,.95)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsEdgeMapReading{
+  background:rgba(241,245,249,.95)!important;
+  color:#475569!important;
+  border-left-color:rgba(217,119,6,.45)!important;
+}
+html[data-theme="light"] .analyticsEdgeMap.validated .analyticsEdgeMapReading{
+  border-left-color:rgba(22,163,74,.45)!important;
+}
+html[data-theme="light"] .analyticsEdgePipelineCompactCol{
+  background:rgba(255,255,255,.95)!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:0 1px 4px rgba(15,23,42,.04)!important;
+}
+html[data-theme="light"] .analyticsEdgePipelineCompactPl.pos{color:#15803d!important}
+html[data-theme="light"] .analyticsEdgePipelineCompactPl.neg{color:#b91c1c!important}
+html[data-theme="light"] .analyticsActiveLeaksCompactItemBody em{color:#b91c1c!important}
+html[data-theme="light"] .analyticsValidationCriteriaInline{
+  background:rgba(241,245,249,.9)!important;
+  border-color:rgba(15,23,42,.06)!important;
+  color:#64748b!important;
+}
+html[data-theme="light"] .analyticsTier3Block.analyticsOperatingProfile.complement{
+  background:linear-gradient(168deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:0 4px 16px rgba(15,23,42,.04)!important;
+}
+html[data-theme="light"] .analyticsOperatingProfileScore.instrument{
+  background:rgba(241,245,249,.9)!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsOperatingProfileScore.instrument.positive{
+  background:rgba(240,253,244,.85)!important;
+  border-color:rgba(22,163,74,.15)!important;
+}
+html[data-theme="light"] .analyticsOperatingProfileScore.instrument.negative{
+  background:rgba(255,241,242,.85)!important;
+  border-color:rgba(185,28,28,.12)!important;
+}
+html[data-theme="light"] .analyticsOperatingProfileScoreDialInner{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsOperatingProfileBody.dense.complement .analyticsOperatingProfileMetrics>div{
+  background:rgba(241,245,249,.9)!important;
+  border-color:rgba(15,23,42,.06)!important;
+}
+html[data-theme="light"] .analyticsPerformanceEvidencePattern.dominant{
+  background:rgba(241,245,249,.9)!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsCommandActionBand.analyticsCommandActionInline{
+  background:rgba(241,245,249,.95)!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsCommandActionBand.analyticsCommandActionInline>p{color:#334155!important}
+
+/* ── Mobile 390: Edge Map stack ── */
+@media(max-width:390px){
+  .analyticsEdgeMap{padding:12px 14px!important;margin-bottom:8px!important}
+  .analyticsEdgeMapCanvas{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto auto auto auto;
+    min-height:unset;
+    gap:6px;
+    padding:0;
+  }
+  .analyticsEdgeMapConnector{display:none}
+  .analyticsEdgeMapCore{
+    grid-column:1/3;
+    grid-row:1;
+    padding:2px 0 10px;
+  }
+  .analyticsEdgeMapRing{width:76px;height:76px}
+  .analyticsEdgeMapRingInner{width:58px;height:58px}
+  .analyticsEdgeMapRingInner b{font-size:17px}
+  .analyticsEdgeMapCoreName{font-size:15px}
+  .analyticsValidationTrack{max-width:100%;padding:7px 9px 6px}
+  .analyticsEdgeMapMetric{
+    max-width:none!important;
+    width:100%;
+    padding:8px 9px!important;
+  }
+  .analyticsEdgeMapMetric.satellite.tl{grid-column:1;grid-row:2;justify-self:stretch}
+  .analyticsEdgeMapMetric.satellite.tr{grid-column:2;grid-row:2;justify-self:stretch}
+  .analyticsEdgeMapMetric.satellite.bl{grid-column:1;grid-row:3;justify-self:stretch}
+  .analyticsEdgeMapMetric.satellite.br{grid-column:2;grid-row:3;justify-self:stretch}
+  .analyticsEdgeMapMetric.satellite::after{display:none}
+  .analyticsEdgeMapReading{margin-top:8px!important;font-size:9px!important;padding:8px 10px!important}
+  .analyticsEdgePipelineCompact{grid-template-columns:1fr;gap:6px}
+  .analyticsOperatingProfileGrid{grid-template-columns:1fr;gap:8px}
+  .analyticsOperatingProfileScore.instrument{gap:8px!important}
+  .analyticsOperatingProfileScoreDial{width:46px;height:46px}
+  .analyticsOperatingProfileScoreDialInner{width:36px;height:36px}
+  .analyticsOperatingProfileScoreDialInner b{font-size:12px!important}
+  .analyticsCommandActionBand.analyticsCommandActionInline{padding:6px 8px!important}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRADING INTELLIGENCE CENTER v10 — Native Intelligence Grid
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsIntelligenceGrid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:12px;
+  align-items:start;
+}
+.analyticsIntelligenceMain{
+  grid-column:span 7;
+  min-width:0;
+}
+.analyticsIntelligenceSide{
+  grid-column:span 5;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* ── Insight Stack ── */
+.analyticsInsightStack{
+  padding:10px 11px 9px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(165deg,rgba(255,255,255,.03),rgba(0,0,0,.16));
+}
+.analyticsInsightStackHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.analyticsInsightStackHead h4{
+  margin:0;
+  font-size:8px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--ax-muted);
+}
+.analyticsInsightStackHead span{
+  font-size:7px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--ax-muted);
+  opacity:.65;
+}
+.analyticsInsightStackList{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.analyticsInsightNote{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.analyticsInsightNote:last-child{border-bottom:none;padding-bottom:0}
+.analyticsInsightNoteIcon{
+  flex-shrink:0;
+  width:22px;
+  height:22px;
+  border-radius:7px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(0,0,0,.18);
+}
+.analyticsInsightNote.tone-positive .analyticsInsightNoteIcon{
+  color:#4ade80;
+  border-color:rgba(34,197,94,.22);
+  background:rgba(34,197,94,.08);
+}
+.analyticsInsightNote.tone-negative .analyticsInsightNoteIcon{
+  color:#f87171;
+  border-color:rgba(239,68,68,.22);
+  background:rgba(239,68,68,.08);
+}
+.analyticsInsightNote.tone-warn .analyticsInsightNoteIcon{
+  color:#fbbf24;
+  border-color:rgba(251,191,36,.22);
+  background:rgba(251,191,36,.08);
+}
+.analyticsInsightNote.tone-neutral .analyticsInsightNoteIcon{color:var(--ax-muted)}
+.analyticsInsightNoteBody{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.analyticsInsightNoteLabel{
+  font-size:7px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ax-muted);
+}
+.analyticsInsightNotePrimary{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  color:var(--ax-text-hi,var(--ax-text));
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.analyticsInsightNoteSecondary{
+  font-size:9px;
+  line-height:1.35;
+  color:var(--ax-muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+
+/* ── Edge Lab dominant + map extension ── */
+.analyticsEdgeLabDominant.analyticsTier3Flagship{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+.analyticsEdgeLabBody{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  flex:1;
+}
+.analyticsEdgeLabDominant .analyticsEdgeMap{
+  flex:1;
+  margin-bottom:0;
+  border-radius:14px 14px 0 0;
+  min-height:220px;
+}
+.analyticsEdgeMapExtension{
+  border:1px solid rgba(255,255,255,.07);
+  border-top:none;
+  border-radius:0 0 14px 14px;
+  background:rgba(0,0,0,.12);
+  padding:10px 12px 8px;
+}
+.analyticsEdgeMapExtension .analyticsEdgePipelineCompact{margin-bottom:6px}
+.analyticsEdgeMapExtension .analyticsValidationCriteriaInline{
+  margin-top:4px;
+  background:transparent;
+  border:none;
+  padding:4px 0 0;
+}
+.analyticsEdgeLabDominant .analyticsEdgeMapCanvas{min-height:200px}
+.analyticsEdgeLabDominant .analyticsEdgeMapRing{width:96px;height:96px}
+.analyticsEdgeLabDominant .analyticsEdgeMapRingInner{width:74px;height:74px}
+.analyticsEdgeLabDominant .analyticsEdgeMapRingInner b{font-size:22px}
+.analyticsEdgeLabDominant .analyticsEdgeMapCoreName{font-size:18px}
+.analyticsEdgeLabDominant .analyticsEdgeMapReading{
+  font-size:10px;
+  font-weight:650;
+  color:var(--ax-text-mid,var(--ax-muted));
+  background:rgba(0,0,0,.22);
+}
+
+/* ── Operating Profile sidebar compact ── */
+.analyticsOperatingProfile.compact-side{
+  padding:10px 11px!important;
+}
+.analyticsOperatingProfile.compact-side .analyticsOperatingProfileHead{
+  margin-bottom:6px!important;
+}
+.analyticsOperatingProfile.compact-side .analyticsOperatingProfileHead h3{
+  font-size:11px!important;
+  margin:0!important;
+}
+.analyticsOperatingProfileBody.side-stack{
+  display:flex;
+  flex-direction:column;
+  gap:8px!important;
+  padding:0!important;
+  margin:0!important;
+}
+.analyticsOperatingProfileBody.side-stack .analyticsOperatingProfileHeadline{
+  font-size:11px!important;
+  line-height:1.3!important;
+}
+.analyticsOperatingProfileBody.side-stack .analyticsOperatingProfileData{
+  font-size:9px!important;
+  margin:2px 0 0!important;
+}
+.analyticsOperatingProfileScore.inline-score{
+  margin-top:2px!important;
+}
+.analyticsOperatingProfileFocus.compact-focus{
+  gap:4px!important;
+  margin-top:0!important;
+}
+.analyticsOperatingProfileFocus.compact-focus>div{
+  padding:5px 7px!important;
+}
+.analyticsOperatingProfileMetrics.compact-metrics{
+  margin-top:2px!important;
+  gap:4px!important;
+}
+.analyticsOperatingProfileMetrics.compact-metrics>div{
+  padding:5px 6px!important;
+}
+.analyticsOperatingProfileMetrics.compact-metrics span{font-size:7px!important}
+.analyticsOperatingProfileMetrics.compact-metrics b{font-size:10px!important}
+
+/* ── Orden semanal compact ── */
+.analyticsWeeklyPlanCompact{
+  padding:10px 11px!important;
+  border-radius:12px!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(0,0,0,.14))!important;
+  border-left:2px solid rgba(212,166,58,.28)!important;
+  box-shadow:none!important;
+}
+.analyticsWeeklyPlanCompactHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.analyticsWeeklyPlanCompactHead h4{
+  margin:0;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:-.01em;
+  color:var(--ax-text-hi,var(--ax-text));
+}
+.analyticsWeeklyPlanCompactHead p{
+  margin:2px 0 0;
+  font-size:9px;
+  line-height:1.35;
+  color:var(--ax-muted);
+}
+.analyticsWeeklyPlanCompactIcon{
+  width:24px;
+  height:24px;
+  border-radius:7px;
+  display:grid;
+  place-items:center;
+  background:rgba(212,166,58,.08);
+  border:1px solid rgba(212,166,58,.15);
+  color:rgba(212,166,58,.8);
+  flex-shrink:0;
+}
+.analyticsWeeklyPlanCompactList{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.analyticsWeeklyPlanCompactList li{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+}
+.analyticsWeeklyPlanCompactList li span{
+  flex-shrink:0;
+  font-size:8px;
+  font-weight:850;
+  color:var(--ax-muted);
+  opacity:.75;
+  padding-top:1px;
+}
+.analyticsWeeklyPlanCompactList li p{
+  margin:0;
+  font-size:9px;
+  line-height:1.4;
+  color:var(--ax-text-mid,var(--ax-muted));
+}
+
+/* ── Performance Evidence narrative ── */
+.analyticsPerformanceEvidenceNarrative .analyticsPerformanceEvidenceHead p{
+  font-size:10px;
+  opacity:.85;
+}
+.analyticsPerformanceEvidenceNarrative{
+  margin-top:4px;
+}
+.analyticsPerformanceEvidenceNarrative .analyticsPerformanceEvidencePanelHead h4{
+  font-size:9px!important;
+}
+.analyticsPerformanceEvidencePanelNarrative{
+  margin:0 0 3px;
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:-.01em;
+  color:var(--ax-text-hi,var(--ax-text));
+  line-height:1.35;
+}
+.analyticsPerformanceEvidenceNarrative .analyticsPerformanceEvidencePanelHead span{
+  font-size:8px!important;
+  opacity:.7;
+}
+
+/* ── Executive Command dense ── */
+.analyticsCommandDense.analyticsCommandCabin{
+  padding:10px 14px 8px!important;
+}
+.analyticsCommandDense .analyticsCommandMain{
+  gap:8px!important;
+}
+.analyticsCommandDense .analyticsCommandNarrative{gap:3px!important}
+.analyticsCommandDense .analyticsCommandHeadline{
+  font-size:15px!important;
+  line-height:1.26!important;
+}
+.analyticsCommandDense .analyticsCommandActionBand.analyticsCommandActionInline{
+  margin-top:4px!important;
+  padding:6px 9px!important;
+}
+.analyticsCommandDense .analyticsCommandFoot{
+  margin-top:5px!important;
+  padding-top:5px!important;
+}
+.analyticsCommandDense .analyticsCommandSignals .analyticsCommandSignal{
+  padding:7px 9px!important;
+}
+
+/* ── Dark: Intelligence Grid depth ── */
+html:not([data-theme="light"]) .analyticsIntelligenceGrid,
+html[data-theme="dark"] .analyticsIntelligenceGrid{
+  gap:12px;
+}
+html:not([data-theme="light"]) .analyticsInsightStack,
+html[data-theme="dark"] .analyticsInsightStack{
+  background:
+    linear-gradient(165deg,rgba(18,24,38,.92),rgba(8,11,18,.96))!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeLabDominant .analyticsEdgeMap,
+html[data-theme="dark"] .analyticsEdgeLabDominant .analyticsEdgeMap{
+  background:
+    radial-gradient(ellipse 95% 80% at 50% 38%,rgba(34,197,94,.1),transparent 62%),
+    linear-gradient(168deg,rgba(12,18,30,.99),rgba(5,8,14,1))!important;
+  border-color:rgba(255,255,255,.1)!important;
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.42),
+    inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeMapExtension,
+html[data-theme="dark"] .analyticsEdgeMapExtension{
+  background:rgba(0,0,0,.28)!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsOperatingProfile.compact-side,
+html[data-theme="dark"] .analyticsOperatingProfile.compact-side{
+  background:linear-gradient(168deg,rgba(14,20,32,.88),rgba(7,10,17,.94))!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsWeeklyPlanCompact,
+html[data-theme="dark"] .analyticsWeeklyPlanCompact{
+  background:linear-gradient(145deg,rgba(16,22,34,.9),rgba(7,10,17,.95))!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandDense.analyticsCommandCabin,
+html[data-theme="dark"] .analyticsCommandDense.analyticsCommandCabin{
+  padding:9px 13px 7px!important;
+}
+
+/* ── Light: Intelligence Grid polish ── */
+html[data-theme="light"] .analyticsInsightStack{
+  background:linear-gradient(165deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:0 2px 12px rgba(15,23,42,.04)!important;
+}
+html[data-theme="light"] .analyticsInsightNote{border-color:rgba(15,23,42,.06)!important}
+html[data-theme="light"] .analyticsInsightNoteIcon{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsEdgeMapExtension{
+  background:rgba(248,250,252,.95)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsWeeklyPlanCompact{
+  background:linear-gradient(145deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsOperatingProfile.compact-side{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+
+/* ── Mobile: Intelligence Grid stack ── */
+@media(max-width:900px){
+  .analyticsIntelligenceGrid{
+    grid-template-columns:1fr;
+  }
+  .analyticsIntelligenceMain,
+  .analyticsIntelligenceSide{
+    grid-column:span 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS COCKPIT v11 — Edge Map before System Health
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsCockpitFlow{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* ── Command Strip (160–210px desktop) ── */
+.analyticsCommandStrip{
+  padding:10px 14px 8px!important;
+  border-radius:12px;
+  max-height:210px;
+  overflow:hidden;
+}
+.analyticsCommandStripBody{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px 16px;
+  align-items:center;
+}
+.analyticsCommandScore.compact{
+  min-width:58px;
+  gap:3px!important;
+}
+.analyticsCommandStrip .analyticsCommandScoreRing{
+  width:56px!important;
+  height:56px!important;
+}
+.analyticsCommandStrip .analyticsCommandScoreInner{
+  width:44px!important;
+  height:44px!important;
+}
+.analyticsCommandStrip .analyticsCommandScoreInner b{
+  font-size:16px!important;
+}
+.analyticsCommandStripCore{
+  min-width:0;
+}
+.analyticsCommandStrip .analyticsCommandEyebrow{
+  margin-bottom:3px!important;
+}
+.analyticsCommandStrip .analyticsCommandHeadline{
+  font-size:13px!important;
+  line-height:1.3!important;
+  font-weight:780!important;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.analyticsCommandWeeklyInline{
+  margin:4px 0 0;
+  font-size:10px;
+  line-height:1.35;
+  color:var(--ax-text-mid,var(--ax-muted));
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.analyticsCommandWeeklyInline>span{
+  font-size:7px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:rgba(212,166,58,.85);
+  margin-right:6px;
+}
+.analyticsCommandChips{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:108px;
+}
+.analyticsCommandChip{
+  padding:4px 8px;
+  border-radius:7px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(0,0,0,.14);
+}
+.analyticsCommandChip>span{
+  display:block;
+  font-size:6px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ax-muted);
+}
+.analyticsCommandChip>b{
+  display:block;
+  font-size:10px;
+  font-weight:750;
+  color:var(--ax-text-hi,var(--ax-text));
+  margin-top:1px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:120px;
+}
+.analyticsCommandChip.positive{border-left:2px solid rgba(34,197,94,.4)}
+.analyticsCommandChip.negative{border-left:2px solid rgba(239,68,68,.4)}
+.analyticsCommandChip.neutral{border-left:2px solid rgba(148,163,184,.35)}
+.analyticsCommandStripFoot{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.analyticsCommandStripFoot small{
+  flex:1;
+  font-size:8px;
+  color:var(--ax-muted);
+}
+.analyticsCommandProgress.thin{
+  flex:0 0 80px;
+  max-width:80px;
+}
+.analyticsCommandProgress.thin .analyticsCommandProgressBar{
+  height:2px!important;
+}
+
+/* ── Intelligence Grid primary focal ── */
+.analyticsZone--primary{
+  position:relative;
+}
+.analyticsZone--primary.analyticsZone--intel{
+  padding:12px!important;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(168deg,rgba(255,255,255,.02),rgba(0,0,0,.08));
+}
+.analyticsInsightStackLinked{
+  border-left:2px solid rgba(34,197,94,.25)!important;
+}
+.analyticsInsightStackLinked .analyticsInsightStackHead span{
+  color:rgba(34,197,94,.65);
+  opacity:1;
+}
+
+/* ── Directives support rail ── */
+.analyticsDirectivesRail{
+  padding:8px 10px!important;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(0,0,0,.1);
+}
+.analyticsDirectivesRailHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:7px;
+}
+.analyticsDirectivesRailHead>span{
+  font-size:8px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:var(--ax-muted);
+}
+.analyticsDirectivesRailHead>em{
+  font-size:7px;
+  font-style:normal;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ax-muted);
+  opacity:.65;
+}
+.analyticsDirectivesRail .analyticsDirectivesGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:6px!important;
+}
+.analyticsDirectivesRail .analyticsDirectiveCard{
+  padding:8px 9px!important;
+  border-radius:9px!important;
+  background:rgba(0,0,0,.12)!important;
+}
+.analyticsDirectivesRail .analyticsDirectiveSetup{
+  font-size:11px!important;
+  margin-top:2px;
+}
+.analyticsDirectivesRail .analyticsDirectiveAction{
+  margin-top:4px!important;
+  font-size:9px!important;
+  line-height:1.35!important;
+  padding-top:0!important;
+  border-top:none!important;
+}
+
+/* ── System Health secondary scoreboard ── */
+.analyticsSystemHealthSecondary{
+  padding:8px 10px!important;
+  border-radius:12px;
+  opacity:.96;
+}
+.analyticsSystemHealthSecondary .analyticsSystemHealthHead{
+  margin-bottom:6px!important;
+}
+.analyticsSystemHealthSecondary .analyticsSystemHealthHead span{
+  font-size:8px!important;
+}
+.analyticsSystemHealthSecondary .analyticsSystemHealthHead em{
+  font-size:7px!important;
+  opacity:.65;
+}
+.analyticsSystemHealthSecondary .analyticsSystemHealthGrid{
+  gap:5px!important;
+}
+.analyticsSystemHealthSecondary .analyticsKpiCard.compact,
+.analyticsSystemHealthSecondary .analyticsKpiCard.health{
+  padding:6px 7px!important;
+  min-height:unset!important;
+}
+.analyticsSystemHealthSecondary .analyticsKpiCard .analyticsKpiVal{
+  font-size:13px!important;
+}
+.analyticsSystemHealthSecondary .analyticsKpiCard .analyticsKpiSub{
+  font-size:8px!important;
+}
+
+/* ── Dark: Cockpit hierarchy ── */
+html:not([data-theme="light"]) .analyticsZone--primary.analyticsZone--intel,
+html[data-theme="dark"] .analyticsZone--primary.analyticsZone--intel{
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%,rgba(34,197,94,.06),transparent 55%),
+    linear-gradient(168deg,rgba(14,20,32,.95),rgba(6,9,15,.98))!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:0 16px 48px rgba(0,0,0,.38)!important;
+}
+html:not([data-theme="light"]) .analyticsCommandStrip,
+html[data-theme="dark"] .analyticsCommandStrip{
+  background:linear-gradient(165deg,rgba(20,26,40,.92),rgba(10,13,20,.96))!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.28)!important;
+}
+html:not([data-theme="light"]) .analyticsDirectivesRail,
+html[data-theme="dark"] .analyticsDirectivesRail{
+  background:rgba(0,0,0,.18)!important;
+  border-color:rgba(255,255,255,.06)!important;
+}
+html:not([data-theme="light"]) .analyticsSystemHealthSecondary,
+html[data-theme="dark"] .analyticsSystemHealthSecondary{
+  background:rgba(0,0,0,.14)!important;
+  border:1px solid rgba(255,255,255,.05)!important;
+}
+
+/* ── Light: Cockpit polish ── */
+html[data-theme="light"] .analyticsCommandStrip{
+  background:linear-gradient(165deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsCommandChip{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsZone--primary.analyticsZone--intel{
+  background:linear-gradient(168deg,#fff,#f4f7fb)!important;
+  border-color:rgba(15,23,42,.08)!important;
+  box-shadow:0 8px 32px rgba(15,23,42,.06)!important;
+}
+html[data-theme="light"] .analyticsInsightStackLinked{
+  border-left-color:rgba(22,163,74,.3)!important;
+}
+html[data-theme="light"] .analyticsDirectivesRail{
+  background:rgba(248,250,252,.95)!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsSystemHealthSecondary{
+  background:rgba(248,250,252,.8)!important;
+  border:1px solid rgba(15,23,42,.06)!important;
+}
+
+@media(max-width:900px){
+  .analyticsCommandStrip{max-height:none}
+  .analyticsCommandStripBody{
+    grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto;
+  }
+  .analyticsCommandChips{
+    grid-column:1/-1;
+    flex-direction:row;
+    flex-wrap:wrap;
+  }
+  .analyticsDirectivesRail .analyticsDirectivesGrid{
+    grid-template-columns:1fr!important;
+  }
+}
+@media(max-width:390px){
+  .analyticsCockpitFlow .analyticsIntelligenceGrid{display:contents}
+  .analyticsCockpitFlow .analyticsIntelligenceMain{display:contents}
+  .analyticsCockpitFlow .analyticsIntelligenceSide{display:contents}
+  .analyticsCommandStrip .analyticsCommandHeadline{-webkit-line-clamp:3}
+  .analyticsDirectivesRail .analyticsDirectivesGrid{grid-template-columns:1fr!important}
+  .analyticsEdgeLabUnified .analyticsEdgeMapZone{min-height:unset}
+  .analyticsEdgeLabBase{border-top-color:rgba(255,255,255,.06)!important}
+  .analyticsInsightNoteSecondary{-webkit-line-clamp:3}
+  .analyticsWeeklyPlanCompactList li p{font-size:9px}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS MATERIAL SYSTEM v12 — Unified surfaces & depth
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsIntelligenceCenter{
+  --ax-mat-flagship-bg:
+    linear-gradient(152deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.01) 38%,rgba(0,0,0,.06) 100%),
+    radial-gradient(ellipse 90% 70% at 12% 0%,rgba(34,197,94,.05),transparent 58%),
+    radial-gradient(ellipse 60% 50% at 92% 88%,rgba(212,166,58,.035),transparent 55%);
+  --ax-mat-flagship-border:rgba(255,255,255,.09);
+  --ax-mat-flagship-shadow:0 14px 42px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
+  --ax-mat-support-bg:
+    linear-gradient(165deg,rgba(255,255,255,.028),rgba(0,0,0,.1));
+  --ax-mat-support-border:rgba(255,255,255,.06);
+  --ax-mat-support-shadow:0 6px 20px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.03);
+  --ax-mat-utility-bg:rgba(0,0,0,.14);
+  --ax-mat-utility-border:rgba(255,255,255,.05);
+}
+
+/* ── Surface tiers ── */
+.analyticsSurfaceFlagship{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  background:var(--ax-mat-flagship-bg)!important;
+  border:1px solid var(--ax-mat-flagship-border)!important;
+  box-shadow:var(--ax-mat-flagship-shadow)!important;
+}
+.analyticsSurfaceFlagship::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:.45;
+  background:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:22px 22px;
+  mask-image:radial-gradient(ellipse 85% 75% at 50% 40%,#000 20%,transparent 78%);
+}
+.analyticsSurfaceFlagship::after{
+  content:'';
+  position:absolute;
+  inset:-20% -10% auto -10%;
+  height:55%;
+  pointer-events:none;
+  z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.04),transparent 62%);
+  opacity:.7;
+}
+.analyticsSurfaceFlagship>*{position:relative;z-index:1}
+
+.analyticsSurfaceSupport{
+  position:relative;
+  overflow:hidden;
+  background:var(--ax-mat-support-bg)!important;
+  border:1px solid var(--ax-mat-support-border)!important;
+  box-shadow:var(--ax-mat-support-shadow)!important;
+}
+.analyticsSurfaceSupport::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.35;
+  background:linear-gradient(135deg,rgba(255,255,255,.025),transparent 55%);
+}
+
+.analyticsSurfaceUtility,
+.analyticsCommandChip{
+  background:var(--ax-mat-utility-bg)!important;
+  border:1px solid var(--ax-mat-utility-border)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+
+/* ── Intelligence zone: layout only, no extra box ── */
+.analyticsZone--canvas.analyticsZone--primary{
+  padding:0!important;
+  border:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/* ── Edge Lab: single unified instrument ── */
+.analyticsEdgeLabUnified{
+  padding:0!important;
+  border-radius:16px!important;
+  display:flex;
+  flex-direction:column;
+}
+.analyticsEdgeLabUnified .analyticsEdgeLabHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px 16px 10px;
+  margin:0!important;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.analyticsEdgeLabUnified .analyticsEdgeLabHeadCopy h3{
+  margin:0!important;
+  font-size:14px!important;
+  letter-spacing:-.02em;
+}
+.analyticsEdgeLabUnified .analyticsEdgeLabHeadCopy p{
+  margin:3px 0 0!important;
+  font-size:10px!important;
+  opacity:.85;
+}
+.analyticsEdgeLabStatus{
+  flex-shrink:0;
+  font-style:normal;
+  font-size:8px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  padding:4px 9px;
+  border-radius:99px;
+  background:rgba(251,191,36,.1);
+  color:#fbbf24;
+  border:1px solid rgba(251,191,36,.2);
+}
+.analyticsEdgeLabStatus.validated{
+  background:rgba(34,197,94,.1);
+  color:#4ade80;
+  border-color:rgba(34,197,94,.24);
+}
+.analyticsEdgeLabCanvas{
+  display:flex;
+  flex-direction:column;
+}
+
+/* Map zone = integrated canvas, NOT a nested card */
+.analyticsEdgeLabUnified .analyticsEdgeMapZone{
+  position:relative;
+  padding:12px 16px 10px;
+  margin:0;
+  border:none;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  overflow:visible;
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapZone::before{
+  content:'';
+  position:absolute;
+  inset:8px 12px 42%;
+  pointer-events:none;
+  z-index:0;
+  border-radius:12px;
+  background:
+    radial-gradient(ellipse 75% 80% at 50% 50%,rgba(34,197,94,.07),transparent 68%),
+    linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px);
+  background-size:auto,20px 20px,20px 20px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 48%,#000 15%,transparent 75%);
+  opacity:.85;
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapZone.observation::before{
+  background:
+    radial-gradient(ellipse 75% 80% at 50% 50%,rgba(251,191,36,.06),transparent 68%),
+    linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px);
+  background-size:auto,20px 20px,20px 20px;
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapZone>*{position:relative;z-index:1}
+.analyticsEdgeMapZoneLabel{
+  display:block;
+  font-size:7px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.11em;
+  color:var(--ax-muted);
+  margin-bottom:8px;
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapGlow{
+  opacity:.95;
+  filter:blur(10px);
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapMetric{
+  border:1px solid rgba(255,255,255,.05)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.03),rgba(0,0,0,.12))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+  backdrop-filter:blur(2px);
+}
+.analyticsEdgeLabUnified .analyticsValidationTrack{
+  background:rgba(0,0,0,.12)!important;
+  border:1px solid rgba(255,255,255,.04)!important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.15)!important;
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapReading.integrated{
+  margin:8px 0 0;
+  padding:8px 10px 8px 11px;
+  border-radius:0;
+  border:none;
+  border-left:2px solid rgba(251,191,36,.38);
+  background:linear-gradient(90deg,rgba(251,191,36,.04),transparent 72%)!important;
+  box-shadow:none!important;
+}
+.analyticsEdgeLabUnified .analyticsEdgeMapZone.validated .analyticsEdgeMapReading.integrated{
+  border-left-color:rgba(34,197,94,.42);
+  background:linear-gradient(90deg,rgba(34,197,94,.05),transparent 72%)!important;
+}
+
+/* Base = natural extension, not a second card */
+.analyticsEdgeLabBase{
+  padding:10px 16px 12px;
+  border-top:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.02));
+}
+.analyticsEdgePipelineCompact.integrated{
+  margin:0;
+  gap:0;
+}
+.analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol{
+  padding:0 12px 0 0;
+  border:none!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol::before{
+  width:1px;
+  opacity:.5;
+}
+.analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol.leaks{
+  padding:0 0 0 12px;
+  border-left:1px solid rgba(255,255,255,.05)!important;
+}
+.analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol.samples::before{
+  display:none;
+}
+.analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol.leaks::before{
+  display:none;
+}
+.analyticsValidationCriteriaInline.integrated{
+  margin:8px 0 0;
+  padding:0;
+  border:none!important;
+  background:transparent!important;
+  text-align:left;
+  font-size:8px;
+  opacity:.75;
+}
+
+/* Dominant map sizing inside unified lab */
+.analyticsEdgeLabUnified .analyticsEdgeMapCanvas{min-height:200px}
+.analyticsEdgeLabUnified .analyticsEdgeMapRing{width:96px;height:96px}
+.analyticsEdgeLabUnified .analyticsEdgeMapRingInner{width:74px;height:74px}
+.analyticsEdgeLabUnified .analyticsEdgeMapRingInner b{font-size:22px}
+.analyticsEdgeLabUnified .analyticsEdgeMapCoreName{font-size:18px}
+
+/* Command strip material */
+.analyticsCommandStrip.analyticsSurfaceFlagship{
+  border-radius:12px!important;
+}
+.analyticsCommandStrip.analyticsSurfaceFlagship::before{
+  mask-image:radial-gradient(ellipse 90% 80% at 20% 0%,#000 25%,transparent 80%);
+}
+
+/* Support cards material polish */
+.analyticsInsightStack.analyticsSurfaceSupport::before{
+  opacity:.25;
+}
+.analyticsDirectivesRail.analyticsSurfaceSupport,
+.analyticsSystemHealthSecondary.analyticsSurfaceSupport{
+  background:var(--ax-mat-support-bg)!important;
+}
+.analyticsOperatingProfile.analyticsSurfaceSupport.compact-side,
+.analyticsWeeklyPlanCompact.analyticsSurfaceSupport{
+  box-shadow:var(--ax-mat-support-shadow)!important;
+}
+
+/* Evidence flagship equity */
+.analyticsPerformanceEvidencePanel.analyticsSurfaceFlagship.equity{
+  border-color:rgba(255,255,255,.1)!important;
+}
+.analyticsPerformanceEvidencePanel.analyticsSurfaceSupport{
+  background:var(--ax-mat-support-bg)!important;
+  border-color:var(--ax-mat-support-border)!important;
+}
+
+/* ── Dark material depth ── */
+html:not([data-theme="light"]) .analyticsIntelligenceCenter,
+html[data-theme="dark"] .analyticsIntelligenceCenter{
+  --ax-mat-flagship-bg:
+    linear-gradient(158deg,rgba(22,30,48,.97) 0%,rgba(12,17,28,.98) 52%,rgba(8,11,18,.99) 100%),
+    radial-gradient(ellipse 85% 65% at 8% 0%,rgba(34,197,94,.07),transparent 55%),
+    radial-gradient(ellipse 55% 45% at 96% 92%,rgba(212,166,58,.04),transparent 50%);
+  --ax-mat-flagship-border:rgba(255,255,255,.1);
+  --ax-mat-flagship-shadow:0 18px 48px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.07);
+  --ax-mat-support-bg:linear-gradient(168deg,rgba(16,22,34,.88),rgba(8,11,18,.92));
+  --ax-mat-support-border:rgba(255,255,255,.07);
+  --ax-mat-utility-bg:rgba(0,0,0,.22);
+}
+html:not([data-theme="light"]) .analyticsEdgeLabUnified,
+html[data-theme="dark"] .analyticsEdgeLabUnified{
+  box-shadow:0 22px 56px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsEdgeLabBase,
+html[data-theme="dark"] .analyticsEdgeLabBase{
+  background:linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,.04))!important;
+  border-top-color:rgba(255,255,255,.07)!important;
+}
+
+/* ── Light material depth ── */
+html[data-theme="light"] .analyticsIntelligenceCenter{
+  --ax-mat-flagship-bg:
+    linear-gradient(158deg,#fff 0%,#f8fafc 48%,#f1f5f9 100%),
+    radial-gradient(ellipse 80% 60% at 10% 0%,rgba(34,197,94,.06),transparent 58%),
+    radial-gradient(ellipse 50% 40% at 95% 95%,rgba(212,166,58,.05),transparent 52%);
+  --ax-mat-flagship-border:rgba(15,23,42,.09);
+  --ax-mat-flagship-shadow:0 10px 36px rgba(15,23,42,.07),inset 0 1px 0 rgba(255,255,255,.95);
+  --ax-mat-support-bg:linear-gradient(168deg,#fff,#f8fafc);
+  --ax-mat-support-border:rgba(15,23,42,.07);
+  --ax-mat-support-shadow:0 4px 16px rgba(15,23,42,.05),inset 0 1px 0 rgba(255,255,255,.9);
+  --ax-mat-utility-bg:rgba(255,255,255,.92);
+  --ax-mat-utility-border:rgba(15,23,42,.07);
+}
+html[data-theme="light"] .analyticsEdgeLabUnified .analyticsEdgeMapZone::before{
+  background:
+    radial-gradient(ellipse 75% 80% at 50% 50%,rgba(34,197,94,.06),transparent 68%),
+    linear-gradient(rgba(15,23,42,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,23,42,.025) 1px,transparent 1px);
+  background-size:auto,20px 20px,20px 20px;
+}
+html[data-theme="light"] .analyticsEdgeLabUnified .analyticsEdgeMapMetric{
+  background:linear-gradient(145deg,#fff,rgba(248,250,252,.95))!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsEdgeLabUnified .analyticsEdgeMapReading.integrated{
+  background:linear-gradient(90deg,rgba(251,191,36,.06),transparent 72%)!important;
+  color:#475569!important;
+}
+html[data-theme="light"] .analyticsEdgeLabBase{
+  background:linear-gradient(180deg,rgba(241,245,249,.7),rgba(248,250,252,.4))!important;
+  border-top-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsCommandChip{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+
+@media(max-width:390px){
+  .analyticsEdgePipelineCompact.integrated{
+    grid-template-columns:1fr!important;
+  }
+  .analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol.leaks{
+    padding:8px 0 0!important;
+    border-left:none!important;
+    border-top:1px solid rgba(255,255,255,.05)!important;
+  }
+  .analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol.samples{
+    padding:0!important;
+  }
+}

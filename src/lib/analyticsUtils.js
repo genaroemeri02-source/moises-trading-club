@@ -812,6 +812,65 @@ export function buildHeroChips(edge, leak) {
   };
 }
 
+/** Three-row intelligence briefing from existing edge / leak / confidence data. */
+export function buildInsightStack(edgeData = {}, thesis = null, directives = {}) {
+  const edge = edgeData?.edge;
+  const leak = edgeData?.leak;
+  const confidence = edgeData?.confidence || classifySampleConfidence(edgeData?.stats?.count || 0);
+  const thesisRow = thesis?.row;
+
+  const edgeName = edge?.name
+    ? formatSetupLabel(edge.name)
+    : thesisRow?.name
+    ? formatSetupLabel(thesisRow.name)
+    : 'Sin candidato';
+  const edgePl = edge?.value ?? thesisRow?.value;
+  const edgeCount = edge?.count ?? thesisRow?.count ?? 0;
+
+  const leakName = leak?.name ? formatSetupLabel(leak.name) : 'Sin fuga activa';
+  const leakPl = leak?.value;
+  const leakCount = leak?.count ?? 0;
+
+  const confDetail =
+    directives?.repeat?.confidence ||
+    thesis?.reading ||
+    (confidence.tier === 'insufficient'
+      ? 'Muestra insuficiente para conclusión.'
+      : 'Señal útil, no conclusión.');
+
+  return [
+    {
+      id: 'edge',
+      label: 'Edge candidato',
+      tone: edge || thesisRow ? 'positive' : 'neutral',
+      primary: edgeName,
+      secondary: edge || thesisRow
+        ? `${formatMoneyClean(edgePl ?? 0)} · ${edgeCount} trade${edgeCount === 1 ? '' : 's'}`
+        : 'Sin setup con muestra suficiente'
+    },
+    {
+      id: 'leak',
+      label: 'Fuga principal',
+      tone: leak ? 'negative' : 'neutral',
+      primary: leakName,
+      secondary: leak
+        ? `${formatMoneyClean(leakPl)} · ${leakCount} trade${leakCount === 1 ? '' : 's'}`
+        : 'Sin fuga marcada en la muestra'
+    },
+    {
+      id: 'confidence',
+      label: 'Confianza',
+      tone: confidence.tier === 'solid' || confidence.tier === 'interpretable'
+        ? 'positive'
+        : confidence.tier === 'insufficient'
+        ? 'warn'
+        : 'neutral',
+      primary: confidence.label || '—',
+      secondary: confDetail
+    }
+  ];
+}
+
 export function getBehaviorReading(score = 0) {
   const s = Math.round(Number(score || 0));
   if (s >= 80) return 'Tu conducta sostiene el edge.';
@@ -1038,6 +1097,18 @@ export function prioritizeInsufficientSetups(items = [], limit = 4) {
 
 export function prioritizeLeakSetups(items = [], limit = 2) {
   return [...items].sort((a, b) => a.value - b.value).slice(0, limit);
+}
+
+export function buildUpcomingEdgeSamples(pipeline = {}, activeSetupName = '', limit = 4) {
+  const pool = [...(pipeline.observation || []), ...(pipeline.insufficient || [])]
+    .filter(item => item.name !== activeSetupName);
+  const sorted = pool.sort((a, b) => {
+    if (b.count !== a.count) return b.count - a.count;
+    return Math.abs(b.value) - Math.abs(a.value);
+  });
+  const visible = sorted.slice(0, limit);
+  const overflow = Math.max(0, sorted.length - limit);
+  return { visible, overflow };
 }
 
 export function pickActiveThesis(setupRows = [], trades = []) {

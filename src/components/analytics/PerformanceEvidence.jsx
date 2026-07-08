@@ -73,10 +73,13 @@ function PatternDominantPanel({ pattern }) {
   const label = formatSetupLabel(pattern.name);
   const plTone = pattern.value > 0 ? 'pos' : pattern.value < 0 ? 'neg' : 'neutral';
   return (
-    <div className="analyticsPerformanceEvidencePattern">
-      <span>Patrón dominante</span>
-      <b title={pattern.name}>{label}</b>
-      <div>
+    <div className="analyticsPerformanceEvidencePattern dominant">
+      <header className="analyticsPerformanceEvidencePatternHead">
+        <span>Patrón dominante</span>
+        <em>Recurrencia</em>
+      </header>
+      <b className="analyticsPerformanceEvidencePatternName" title={pattern.name}>{label}</b>
+      <div className="analyticsPerformanceEvidencePatternStats">
         <strong className={plTone}>{formatMoneyClean(pattern.value)}</strong>
         <em>{pattern.count} trade{pattern.count === 1 ? '' : 's'}</em>
         <em>{formatPercentCard(pattern.winrate)}</em>
@@ -100,12 +103,15 @@ function PatternListCompact({ patterns = [] }) {
   );
 }
 
-function EvidencePanel({ title, sub, children, size = 'large', className = '' }) {
+function EvidencePanel({ title, sub, narrative, children, size = 'large', className = '' }) {
   return (
-    <article className={`analyticsPerformanceEvidencePanel size-${size} ${className}`.trim()}>
-      <header>
-        <h4>{title}</h4>
-        {sub && <span>{sub}</span>}
+    <article className={`analyticsPerformanceEvidencePanel analyticsSurfaceSupport size-${size} ${className} ${className === 'equity' ? 'analyticsSurfaceFlagship' : ''}`.trim()}>
+      <header className="analyticsPerformanceEvidencePanelHead">
+        <div>
+          <h4>{title}</h4>
+          {narrative && <p className="analyticsPerformanceEvidencePanelNarrative">{narrative}</p>}
+          {sub && <span>{sub}</span>}
+        </div>
       </header>
       <div className="analyticsPerformanceEvidencePanelBody">{children}</div>
     </article>
@@ -135,20 +141,38 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
   const dailyDomain = chartMoneyDomain(dailyPnl);
   const rDomain = chartRDomain(rDistribution);
   const lastEquity = equityCurve[equityCurve.length - 1]?.equity || stats?.equity || 0;
+  const startEquity = equityCurve.find(p => p.time)?.equity ?? stats?.initial ?? lastEquity;
+  const equityTrend = lastEquity >= startEquity ? 'Curva ascendente' : 'Curva descendente';
+  const equityNarrative = hasEquityChart
+    ? `${equityTrend} · DD ${formatMoneyCompactCard(-Math.abs(stats?.ddMoney || 0))}`
+    : 'En formación';
+  const dailyNarrative = hasDailyChart
+    ? `${dailyPnl.length} día${dailyPnl.length === 1 ? '' : 's'} registrado${dailyPnl.length === 1 ? '' : 's'}`
+    : 'Sin jornadas';
+  const rNarrative = hasRChart
+    ? `${rDistribution.length} trades · prom. ${formatR(avgR)}`
+    : rDistribution.length === 1
+    ? `1 trade · ${formatR(rDistribution[0].r)}`
+    : 'Muestra corta';
+  const topPattern = singlePattern || (hasMultiPattern ? patternRows[0] : null);
+  const patternNarrative = topPattern
+    ? `${formatSetupLabel(topPattern.name)} · ${formatMoneyClean(topPattern.value)}`
+    : 'Sin recurrencia clara';
 
   if (!hasSample) return null;
 
   return (
-    <section className="analyticsPerformanceEvidence">
+    <section className="analyticsPerformanceEvidence analyticsTier4 analyticsPerformanceEvidenceNarrative">
       <header className="analyticsPerformanceEvidenceHead">
         <h3>Evidencia de rendimiento</h3>
-        <p>Curva, jornadas, distribución en R y patrones dominantes.</p>
+        <p>Respaldá el diagnóstico con curva, jornadas, R y patrones.</p>
       </header>
 
       <div className="analyticsPerformanceEvidenceGrid">
         <EvidencePanel
           title="Equity"
-          sub={hasEquityChart ? `${money(lastEquity)} · DD ${formatMoneyCompactCard(-Math.abs(stats?.ddMoney || 0))}` : 'En formación'}
+          narrative={equityNarrative}
+          sub={hasEquityChart ? money(lastEquity) : null}
           size="large"
           className="equity"
         >
@@ -163,7 +187,8 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
 
         <EvidencePanel
           title="P/L por jornada"
-          sub={`${dailyPnl.length} día${dailyPnl.length === 1 ? '' : 's'}`}
+          narrative={dailyNarrative}
+          sub={hasDailyChart ? formatMoneyClean(dailyPnl.reduce((s, d) => s + Number(d.value || 0), 0)) : null}
           size="large"
           className="daily"
         >
@@ -191,7 +216,7 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
 
         <EvidencePanel
           title="Distribución R"
-          sub={hasRChart ? `${rDistribution.length} trades · prom. ${formatR(avgR)}` : 'Muestra corta'}
+          narrative={rNarrative}
           size="compact"
           className="rDist"
         >
@@ -225,7 +250,8 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
 
         <EvidencePanel
           title="Patrones"
-          sub={hasMultiPattern ? `${patternRows.length} patrones` : singlePattern ? '1 patrón' : 'Sin recurrencia'}
+          narrative={patternNarrative}
+          sub={hasMultiPattern ? `${patternRows.length} patrones` : singlePattern ? 'Dominante' : null}
           size="compact"
           className="pattern"
         >

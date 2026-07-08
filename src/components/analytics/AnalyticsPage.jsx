@@ -11,7 +11,9 @@ import {
   calculateEdgeScore,
   buildActionDirectives,
   buildKpiReadings,
-  buildWeeklyPlan
+  buildWeeklyPlan,
+  pickActiveThesis,
+  buildInsightStack
 } from '../../lib/analyticsUtils.js';
 import { useAnalyticsFilters } from './useAnalyticsFilters.js';
 import { AnalyticsHeader } from './AnalyticsHeader.jsx';
@@ -24,6 +26,43 @@ import { OperatingProfile } from './OperatingProfile.jsx';
 import { PerformanceEvidence } from './PerformanceEvidence.jsx';
 import { AnalyticsWeeklyPlan } from './AnalyticsWeeklyPlan.jsx';
 import { AnalyticsEmptyState } from './AnalyticsEmptyState.jsx';
+import { TrendingUp, TrendingDown, Shield } from 'lucide-react';
+
+const INSIGHT_ICONS = {
+  edge: TrendingUp,
+  leak: TrendingDown,
+  confidence: Shield
+};
+
+function AnalyticsInsightStack({ insights = [] }) {
+  if (!insights.length) return null;
+
+  return (
+    <section className="analyticsInsightStack analyticsInsightStackLinked analyticsSurfaceSupport">
+      <header className="analyticsInsightStackHead">
+        <h4>Lectura inteligente</h4>
+        <span>Briefing del mapa</span>
+      </header>
+      <ul className="analyticsInsightStackList">
+        {insights.map((item) => {
+          const Icon = INSIGHT_ICONS[item.id] || Shield;
+          return (
+            <li key={item.id} className={`analyticsInsightNote tone-${item.tone}`}>
+              <span className="analyticsInsightNoteIcon" aria-hidden="true">
+                <Icon size={11} strokeWidth={2.25} />
+              </span>
+              <div className="analyticsInsightNoteBody">
+                <span className="analyticsInsightNoteLabel">{item.label}</span>
+                <b className="analyticsInsightNotePrimary">{item.primary}</b>
+                <small className="analyticsInsightNoteSecondary">{item.secondary}</small>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
 
 export function AnalyticsPage({ data }) {
   const filters = useAnalyticsFilters(data.trades, data.settings);
@@ -42,6 +81,10 @@ export function AnalyticsPage({ data }) {
     () => calculateEdgeScore(filters.filtered, initial),
     [filters.filtered, initial]
   );
+  const thesis = useMemo(
+    () => pickActiveThesis(setupRows, filters.filtered),
+    [setupRows, filters.filtered]
+  );
   const directives = useMemo(
     () => buildActionDirectives(filters.filtered, stats, sessionRows, behaviorData),
     [filters.filtered, stats, sessionRows, behaviorData]
@@ -50,6 +93,10 @@ export function AnalyticsPage({ data }) {
   const weeklyPlan = useMemo(
     () => buildWeeklyPlan(filters.filtered, stats, sessionRows, setupRows),
     [filters.filtered, stats, sessionRows, setupRows]
+  );
+  const insightStack = useMemo(
+    () => buildInsightStack(edgeData, thesis, directives),
+    [edgeData, thesis, directives]
   );
   const hasSample = stats.count > 0;
 
@@ -71,7 +118,7 @@ export function AnalyticsPage({ data }) {
   }
 
   return (
-    <main className="page analyticsPro analyticsPage analyticsShell analyticsIntelligenceCenter">
+    <main className="page analyticsPro analyticsPage analyticsShell analyticsIntelligenceCenter analyticsCockpit">
       <AnalyticsHeader
         tradeCount={stats.count}
         activeAccount={filters.activeAccount}
@@ -80,32 +127,49 @@ export function AnalyticsPage({ data }) {
       />
       <AnalyticsFilters {...filters} />
 
-      <div className="analyticsIntelligenceFold">
-        <AnalyticsCommandCenter edgeData={edgeData} />
-        <AnalyticsActionDirectives directives={directives} />
-        <AnalyticsKpiStrip readings={kpiReadings} hasSample={hasSample} />
+      <div className="analyticsCockpitFlow">
+        <div className="analyticsZone analyticsZone--command">
+          <AnalyticsCommandCenter edgeData={edgeData} />
+        </div>
+
+        <div className="analyticsTier3 analyticsZone analyticsZone--intel analyticsZone--primary analyticsZone--canvas">
+          <div className="analyticsIntelligenceGrid">
+            <div className="analyticsIntelligenceMain">
+              <EdgeLab setupRows={setupRows} trades={filters.filtered} hasSample={hasSample} />
+            </div>
+            <aside className="analyticsIntelligenceSide">
+              <AnalyticsInsightStack insights={insightStack} />
+              <OperatingProfile
+                sessionRows={sessionRows}
+                behaviorData={behaviorData}
+                stats={stats}
+                hasSample={hasSample}
+                totalTrades={stats.count}
+                compact
+              />
+              <AnalyticsWeeklyPlan plan={weeklyPlan} compact />
+            </aside>
+          </div>
+        </div>
+
+        <div className="analyticsZone analyticsZone--directives">
+          <AnalyticsActionDirectives directives={directives} compact />
+        </div>
+
+        <div className="analyticsZone analyticsZone--health">
+          <AnalyticsKpiStrip readings={kpiReadings} hasSample={hasSample} compact />
+        </div>
+
+        <div className="analyticsTier4 analyticsZone analyticsZone--evidence">
+          <PerformanceEvidence
+            stats={stats}
+            dailyPnl={dailyPnl}
+            patternRows={patternRows}
+            rDistribution={rDistribution}
+            hasSample={hasSample}
+          />
+        </div>
       </div>
-
-      <div className="analyticsIntelligenceModules">
-        <EdgeLab setupRows={setupRows} trades={filters.filtered} hasSample={hasSample} />
-        <OperatingProfile
-          sessionRows={sessionRows}
-          behaviorData={behaviorData}
-          stats={stats}
-          hasSample={hasSample}
-          totalTrades={stats.count}
-        />
-      </div>
-
-      <AnalyticsWeeklyPlan plan={weeklyPlan} />
-
-      <PerformanceEvidence
-        stats={stats}
-        dailyPnl={dailyPnl}
-        patternRows={patternRows}
-        rDistribution={rDistribution}
-        hasSample={hasSample}
-      />
     </main>
   );
 }

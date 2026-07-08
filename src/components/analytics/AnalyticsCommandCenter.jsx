@@ -1,12 +1,5 @@
 import { ANALYTICS_MIN_SAMPLE } from '../../lib/analyticsUtils.js';
 
-const confidenceTone = {
-  insufficient: 'warn',
-  initial: 'neutral',
-  interpretable: 'good',
-  solid: 'good'
-};
-
 function scoreRingColor(score) {
   if (score >= 70) return '#22c55e';
   if (score >= 45) return '#fbbf24';
@@ -22,18 +15,16 @@ export function AnalyticsCommandCenter({ edgeData }) {
     chips,
     sampleFootnote
   } = edgeData;
-  const tone = confidenceTone[confidence?.tier] || 'neutral';
   const progressTarget = confidence?.count < 5 ? 5 : ANALYTICS_MIN_SAMPLE;
   const progressPct = Math.min(100, Math.round((confidence?.count || 0) / progressTarget * 100));
   const showProgress = confidence?.count < ANALYTICS_MIN_SAMPLE;
   const headline = commandCopy?.headline || edgeData.diagnosis || edgeData.sentence;
   const weeklyAction = commandCopy?.weeklyAction || edgeData.weeklyAction;
-  const subline = commandCopy?.subline || edgeData.subline;
 
   return (
-    <section className="analyticsCommand">
-      <div className="analyticsCommandMain">
-        <div className="analyticsCommandScore">
+    <section className="analyticsCommand analyticsCommandStrip analyticsTier1 analyticsSurfaceFlagship">
+      <div className="analyticsCommandStripBody">
+        <div className="analyticsCommandScore compact">
           <div
             className="analyticsCommandScoreRing"
             style={{ '--score-pct': score, '--ring-color': scoreRingColor(score) }}
@@ -46,48 +37,44 @@ export function AnalyticsCommandCenter({ edgeData }) {
           <em>Score operativo</em>
         </div>
 
-        <div className="analyticsCommandNarrative">
+        <div className="analyticsCommandStripCore">
           <span className="analyticsCommandEyebrow">Diagnóstico ejecutivo</span>
           <h2 className="analyticsCommandHeadline">{headline}</h2>
           {weeklyAction && (
-            <div className="analyticsCommandActionRow">
+            <p className="analyticsCommandWeeklyInline">
               <span>Acción semanal</span>
-              <p>{weeklyAction}</p>
-            </div>
+              {weeklyAction}
+            </p>
           )}
-          {subline && <p className="analyticsCommandSub">{subline}</p>}
         </div>
 
         {chips && (
-          <div className="analyticsCommandSignals">
-            <div className="analyticsCommandSignal positive">
-              <span>Edge activo</span>
+          <div className="analyticsCommandChips" aria-label="Señales compactas">
+            <div className="analyticsCommandChip positive">
+              <span>Edge</span>
               <b>{chips.edge}</b>
-              <small>{chips.edgeValue}</small>
             </div>
-            <div className="analyticsCommandSignal negative">
-              <span>Fuga principal</span>
+            <div className="analyticsCommandChip negative">
+              <span>Fuga</span>
               <b>{chips.leak}</b>
-              <small>{chips.leakValue}</small>
             </div>
-            <div className="analyticsCommandSignal neutral">
-              <span>Confianza de lectura</span>
+            <div className="analyticsCommandChip neutral">
+              <span>Confianza</span>
               <b>{confidence?.label || '—'}</b>
             </div>
           </div>
         )}
       </div>
 
-      <div className="analyticsCommandFoot">
+      <div className="analyticsCommandStripFoot">
         {showProgress && (
-          <div className="analyticsCommandProgress">
+          <div className="analyticsCommandProgress thin">
             <div className="analyticsCommandProgressBar">
               <span style={{ width: `${progressPct}%` }} />
             </div>
           </div>
         )}
         <small>{sampleFootnote}</small>
-        <em className={`analyticsCommandConfidence ${tone}`}>{confidence?.label}</em>
       </div>
     </section>
   );

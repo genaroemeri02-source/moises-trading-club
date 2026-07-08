@@ -7,7 +7,7 @@ import {
 import { formatMoneyClean } from '../../lib/formatUtils.js';
 import { AnalyticsSectionEmpty } from './AnalyticsEmptyState.jsx';
 
-export function OperatingProfile({ sessionRows = [], behaviorData, stats, hasSample, totalTrades = 0 }) {
+export function OperatingProfile({ sessionRows = [], behaviorData, stats, hasSample, totalTrades = 0, compact = false }) {
   const visible = (sessionRows || []).filter(r => r.count > 0);
   const reading = getSessionReading(sessionRows, totalTrades);
   const singleSession = visible.length === 1;
@@ -19,17 +19,106 @@ export function OperatingProfile({ sessionRows = [], behaviorData, stats, hasSam
   const focus = pickBehaviorFocus(behaviorData, stats);
   const behaviorReading = getBehaviorReading(scoreRounded);
 
+  const sectionClass = [
+    'analyticsOperatingProfile',
+    'analyticsTier3Block',
+    'complement',
+    'analyticsSurfaceSupport',
+    compact ? 'compact-side' : ''
+  ].filter(Boolean).join(' ');
+
   return (
-    <section className="analyticsOperatingProfile">
+    <section className={sectionClass}>
       <header className="analyticsOperatingProfileHead">
         <h3>Perfil operativo</h3>
-        <p>Cobertura de sesión, conducta y sesgo de ejecución.</p>
+        {!compact && <p>Cobertura de sesión, conducta y sesgo de ejecución.</p>}
       </header>
 
       {!hasSample ? (
         <AnalyticsSectionEmpty compact title="Sin perfil" text="Registrá trades para construir perfil." />
+      ) : compact ? (
+        <div className="analyticsOperatingProfileBody compact dense complement side-stack">
+          {!visible.length ? (
+            <p className="analyticsOperatingProfileNote">Sin sesiones en la muestra.</p>
+          ) : singleSession ? (
+            <>
+              <b className="analyticsOperatingProfileHeadline">
+                {reading?.headline || `Perfil concentrado en ${session?.name}`}
+              </b>
+              <p className="analyticsOperatingProfileData">
+                {totalTrades} trade{totalTrades === 1 ? '' : 's'} · {share}% de la muestra
+              </p>
+              <div className="analyticsOperatingProfileBar inline" aria-hidden="true">
+                <span style={{ width: `${share}%` }} />
+              </div>
+            </>
+          ) : (
+            <div className="analyticsOperatingProfileSessions compact-sessions">
+              {visible.slice(0, 3).map(row => {
+                const rowShare = totalTrades ? Math.round((row.count / totalTrades) * 100) : 0;
+                return (
+                  <article key={row.name} className="analyticsOperatingProfileSessionRow">
+                    <div>
+                      <span>{row.name}</span>
+                      <small>{row.count}T · {rowShare}%</small>
+                    </div>
+                    <b className={row.value >= 0 ? 'pos' : 'neg'}>{formatMoneyClean(row.value)}</b>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          <div className={`analyticsOperatingProfileScore instrument inline-score ${scoreTone}`}>
+            <div
+              className="analyticsOperatingProfileScoreDial"
+              style={{ '--score-pct': scoreRounded }}
+              aria-hidden="true"
+            >
+              <div className="analyticsOperatingProfileScoreDialInner">
+                <b>{scoreRounded}</b>
+                <em>/100</em>
+              </div>
+            </div>
+            <div className="analyticsOperatingProfileScoreCopy">
+              <span className="analyticsOperatingProfileLabel">Conducta</span>
+              <p>{behaviorReading}</p>
+            </div>
+          </div>
+
+          {(focus.sustain || focus.correct) && (
+            <div className="analyticsOperatingProfileFocus compact-focus">
+              {focus.sustain && (
+                <div className="positive">
+                  <ThumbsUp size={9} />
+                  <div>
+                    <span>Sostiene</span>
+                    <b>{focus.sustain.name}</b>
+                  </div>
+                </div>
+              )}
+              {focus.correct && (
+                <div className="negative">
+                  <ThumbsDown size={9} />
+                  <div>
+                    <span>Amenaza</span>
+                    <b>{focus.correct.name}</b>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="analyticsOperatingProfileMetrics compact-metrics">
+            <div><span>Plan</span><b>{`${Number(stats?.planFollowedPct || stats?.discipline || 0).toFixed(0)}%`}</b></div>
+            <div><span>Impulsivos</span><b>{stats?.impulseTrades ?? 0}</b></div>
+            <div><span>Buenas pérdidas</span><b>{stats?.goodLosses ?? 0}</b></div>
+            <div><span>Malas ganancias</span><b>{stats?.badWins ?? 0}</b></div>
+          </div>
+        </div>
       ) : (
-        <div className="analyticsOperatingProfileBody compact">
+        <div className="analyticsOperatingProfileBody compact dense complement">
+          <div className="analyticsOperatingProfileGrid">
           <div className="analyticsOperatingProfileSession">
             <span className="analyticsOperatingProfileLabel">Cobertura de sesión</span>
             {!visible.length ? (
@@ -70,12 +159,20 @@ export function OperatingProfile({ sessionRows = [], behaviorData, stats, hasSam
 
           <div className="analyticsOperatingProfileBehavior">
             <span className="analyticsOperatingProfileLabel">Conducta operativa</span>
-            <div className={`analyticsOperatingProfileScore ${scoreTone}`}>
-              <div className="analyticsOperatingProfileScoreVal">
-                <b>{scoreRounded}</b>
-                <em>/100</em>
+            <div className={`analyticsOperatingProfileScore instrument ${scoreTone}`}>
+              <div
+                className="analyticsOperatingProfileScoreDial"
+                style={{ '--score-pct': scoreRounded }}
+                aria-hidden="true"
+              >
+                <div className="analyticsOperatingProfileScoreDialInner">
+                  <b>{scoreRounded}</b>
+                  <em>/100</em>
+                </div>
               </div>
-              <p>{behaviorReading}</p>
+              <div className="analyticsOperatingProfileScoreCopy">
+                <p>{behaviorReading}</p>
+              </div>
             </div>
 
             {(focus.sustain || focus.correct) && (
@@ -107,6 +204,7 @@ export function OperatingProfile({ sessionRows = [], behaviorData, stats, hasSam
               <div><span>Buenas pérdidas</span><b>{stats?.goodLosses ?? 0}</b></div>
               <div><span>Malas ganancias</span><b>{stats?.badWins ?? 0}</b></div>
             </div>
+          </div>
           </div>
         </div>
       )}
