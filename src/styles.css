@@ -29506,3 +29506,205 @@ html[data-theme="dark"] body .app .main{
     gap:12px!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE QA v26 — Sprint close: safe-area, aurora life, gold purge
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  html:not([data-theme="light"]) body::before,
+  html[data-theme="dark"] body::before{
+    display:none!important;
+  }
+
+  html:not([data-theme="light"]) body .app .top,
+  html:not([data-theme="light"]) body .app .premiumTop,
+  html[data-theme="dark"] body .app .top,
+  html[data-theme="dark"] body .app .premiumTop{
+    position:sticky!important;
+    top:0!important;
+    z-index:12!important;
+    padding-top:calc(12px + env(safe-area-inset-top,0px))!important;
+    padding-bottom:12px!important;
+    padding-left:calc(16px + env(safe-area-inset-left,0px))!important;
+    padding-right:calc(16px + env(safe-area-inset-right,0px))!important;
+  }
+
+  html:not([data-theme="light"]) body .app .topActions button.icon,
+  html[data-theme="dark"] body .app .topActions button.icon{
+    min-width:44px!important;
+    min-height:44px!important;
+    padding:10px!important;
+  }
+
+  html:not([data-theme="light"]) .auroraAmbient,
+  html[data-theme="dark"] .auroraAmbient{
+    opacity:.44!important;
+    filter:blur(58px)!important;
+  }
+
+  html:not([data-theme="light"]) .auroraOrb--safeMobile,
+  html[data-theme="dark"] .auroraOrb--safeMobile{
+    display:block!important;
+    width:340px!important;
+    height:340px!important;
+    top:auto!important;
+    bottom:-150px!important;
+    left:-90px!important;
+    opacity:.36!important;
+  }
+
+  html:not([data-theme="light"]) .auroraOrb--liftMobile.auroraOrb--cyan,
+  html[data-theme="dark"] .auroraOrb--liftMobile.auroraOrb--cyan{
+    top:28%!important;
+    right:-150px!important;
+    opacity:.5!important;
+  }
+
+  html:not([data-theme="light"]) .auroraOrb--liftMobile.auroraOrb--magenta,
+  html[data-theme="dark"] .auroraOrb--liftMobile.auroraOrb--magenta{
+    bottom:14%!important;
+    left:-110px!important;
+    opacity:.38!important;
+  }
+
+  html:not([data-theme="light"]) body .app .main,
+  html[data-theme="dark"] body .app .main{
+    background:
+      radial-gradient(ellipse 90% 55% at 10% -8%,rgba(124,92,255,.15),transparent 58%),
+      radial-gradient(ellipse 70% 45% at 92% 12%,rgba(51,230,196,.09),transparent 52%),
+      radial-gradient(ellipse 60% 40% at 50% 105%,rgba(255,79,163,.06),transparent 48%),
+      #07050D!important;
+    background-color:#07050D!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNav,
+  html[data-theme="dark"] body .app .mobileNav{
+    position:fixed!important;
+    left:12px!important;
+    right:12px!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+    width:auto!important;
+    max-width:none!important;
+    margin:0!important;
+    border-radius:24px!important;
+    box-shadow:0 16px 48px rgba(0,0,0,.42),0 0 0 1px rgba(124,92,255,.14)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .page,
+  html:not([data-theme="light"]) body .app .analyticsCockpit.analyticsPage,
+  html[data-theme="dark"] body .app .page,
+  html[data-theme="dark"] body .app .analyticsCockpit.analyticsPage{
+    padding-bottom:calc(144px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
+
+html:not([data-theme="light"]) body:has(.app) .analyticsCockpit .analyticsDirectiveCard.tone-observe,
+html[data-theme="dark"] body:has(.app) .analyticsCockpit .analyticsDirectiveCard.tone-observe{
+  border-left-color:var(--aurora-violet)!important;
+  background:rgba(124,92,255,.05)!important;
+}
+html:not([data-theme="light"]) body:has(.app) .analyticsDirectiveCard.tone-observe .analyticsDirectiveHead svg,
+html:not([data-theme="light"]) body:has(.app) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-observe::before,
+html[data-theme="dark"] body:has(.app) .analyticsDirectiveCard.tone-observe .analyticsDirectiveHead svg,
+html[data-theme="dark"] body:has(.app) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-observe::before{
+  color:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body:has(.app) .analyticsDirectiveCard.tone-edge .analyticsDirectiveHead svg,
+html:not([data-theme="light"]) body:has(.app) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-edge::before,
+html[data-theme="dark"] body:has(.app) .analyticsDirectiveCard.tone-edge .analyticsDirectiveHead svg,
+html[data-theme="dark"] body:has(.app) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-edge::before{
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body:has(.app) .analyticsDirectiveCard.tone-leak .analyticsDirectiveHead svg,
+html:not([data-theme="light"]) body:has(.app) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-leak::before,
+html[data-theme="dark"] body:has(.app) .analyticsDirectiveCard.tone-leak .analyticsDirectiveHead svg,
+html[data-theme="dark"] body:has(.app) .analyticsDirectivesBoard .analyticsDirectiveCard.tone-leak::before{
+  color:var(--aurora-magenta)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) :is(
+  .analyticsWeeklyPlanCompactIcon,
+  .analyticsWeeklyPlanIcon
+),
+html[data-theme="dark"] body:has(.app) :is(
+  .analyticsWeeklyPlanCompactIcon,
+  .analyticsWeeklyPlanIcon
+){
+  color:var(--aurora-violet)!important;
+  background:rgba(124,92,255,.10)!important;
+  border-color:rgba(124,92,255,.24)!important;
+}
+html:not([data-theme="light"]) body:has(.app) .analyticsWeeklyPlanHead svg,
+html[data-theme="dark"] body:has(.app) .analyticsWeeklyPlanHead svg{
+  color:var(--aurora-violet)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) .analyticsCommandActionBand,
+html[data-theme="dark"] body:has(.app) .analyticsCommandActionBand{
+  background:linear-gradient(90deg,rgba(124,92,255,.06),rgba(8,11,18,.7) 18%)!important;
+  border-left-color:rgba(124,92,255,.35)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) :is(.primary,.primary.full,.primary.compact),
+html[data-theme="dark"] body:has(.app) :is(.primary,.primary.full,.primary.compact){
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  background-image:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  color:#07050D!important;
+  border:none!important;
+  box-shadow:0 12px 32px rgba(124,92,255,.22)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) :is(.pill.gold,.checkHero .pill.gold,.heroSystem .pill.gold),
+html[data-theme="dark"] body:has(.app) :is(.pill.gold,.checkHero .pill.gold,.heroSystem .pill.gold){
+  color:var(--aurora-cyan)!important;
+  border-color:rgba(51,230,196,.26)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) .mobileNav,
+html[data-theme="dark"] body:has(.app) .mobileNav{
+  border:1px solid rgba(124,92,255,.18)!important;
+  background:rgba(7,5,13,.92)!important;
+}
+html:not([data-theme="light"]) body:has(.app) .mobileNav button.active,
+html[data-theme="dark"] body:has(.app) .mobileNav button.active{
+  background:rgba(124,92,255,.14)!important;
+  color:var(--aurora-cyan)!important;
+  box-shadow:inset 0 0 0 1px rgba(124,92,255,.22)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) .controlCenter,
+html[data-theme="dark"] body:has(.app) .controlCenter{
+  background:
+    radial-gradient(circle at 82% 20%,rgba(124,92,255,.14),transparent 28%),
+    radial-gradient(circle at 18% 100%,rgba(51,230,196,.08),transparent 34%),
+    linear-gradient(135deg,rgba(14,20,32,.96),rgba(7,5,13,.98))!important;
+  border-color:rgba(124,92,255,.14)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) :is(.linkedMini.gold,.warnText,.analyticsDirectiveConfidence.warn),
+html[data-theme="dark"] body:has(.app) :is(.linkedMini.gold,.warnText,.analyticsDirectiveConfidence.warn){
+  color:var(--aurora-violet)!important;
+  border-color:rgba(124,92,255,.28)!important;
+  background:rgba(124,92,255,.08)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) .premiumSide nav button.active,
+html[data-theme="dark"] body:has(.app) .premiumSide nav button.active{
+  border-left-color:var(--aurora-cyan)!important;
+  color:var(--aurora-cyan)!important;
+  background:rgba(124,92,255,.10)!important;
+  border-color:rgba(124,92,255,.18)!important;
+}
+
+html:not([data-theme="light"]) body:has(.app) .helpBubble,
+html[data-theme="dark"] body:has(.app) .helpBubble{
+  background:linear-gradient(135deg,rgba(51,230,196,.92),rgba(124,92,255,.88))!important;
+  border-color:rgba(124,92,255,.35)!important;
+  color:#07050D!important;
+}
+html:not([data-theme="light"]) body:has(.app) .helpBubble svg,
+html[data-theme="dark"] body:has(.app) .helpBubble svg{
+  color:#07050D!important;
+}

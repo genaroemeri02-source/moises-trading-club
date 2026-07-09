@@ -43,9 +43,9 @@ export function AuroraBackground() {
 
   return createPortal(
     <div className="auroraAmbient" aria-hidden="true">
-      {!isMobile && <div className="auroraOrb auroraOrb--violet" />}
-      <div className="auroraOrb auroraOrb--cyan" />
-      <div className="auroraOrb auroraOrb--magenta" />
+      <div className={`auroraOrb auroraOrb--violet${isMobile ? ' auroraOrb--safeMobile' : ''}`} />
+      <div className={`auroraOrb auroraOrb--cyan${isMobile ? ' auroraOrb--liftMobile' : ''}`} />
+      <div className={`auroraOrb auroraOrb--magenta${isMobile ? ' auroraOrb--liftMobile' : ''}`} />
     </div>,
     document.body
   );
