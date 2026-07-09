@@ -5,14 +5,14 @@
    Single file: src/styles.css (~32k lines, ~9.7k !important)
    CANONICAL SOURCE OF TRUTH (wins by cascade order):
    - Tokens:        :root L4 + AURORA DARK SYSTEM v20 ~L27066
-   - Mobile shell:  AURORA MOBILE SHELL — NO BOTTOM DOCK SOURCE OF TRUTH (true EOF)
+   - Mobile shell:  AURORA MOBILE — NATURAL DOCUMENT SCROLL + PREMIUM COMMAND SHEET (true EOF)
    - Mobile nav:    header hamburger + command sheet (bottom dock RETIRED)
-   - Mobile drawer: command sheet EOF block; v38 = visual skin only
+   - Mobile drawer: premium command sheet EOF; v38 = visual skin only
    - Dark app skin: AURORA DARK SYSTEM v20 ~L27060
    - Light patches: v43.27 / v47.12+ (scattered, consolidate in 2B)
    LEGACY — do not extend (superseded, kept for compat):
    - Floating pill .mobileNav L187, v40.2–v40.4 L456–665
-   - All bottom dock / VIEWPORT SHELL / APP SHELL ABSOLUTE blocks (retired)
+   - All bottom dock / VIEWPORT SHELL / APP SHELL ABSOLUTE / NO BOTTOM DOCK blocks
    - Gold .primary gradients L219, L419 (partially purged v47+)
    ZONE MAP (approx line ranges):
    L1–290    Tokens + base shell + early v3–v38
@@ -22,8 +22,8 @@
    L6382–18110 v47.11–v52 light mode + dashboard + share EOF guards
    L18111–26200 Analytics cockpit + charts
    L26204–29188 Aurora ambient + production tokens
-   L29189–34056 Aurora mobile dock experiments (LEGACY — dock retired)
-   EOF         AURORA MOBILE SHELL — NO BOTTOM DOCK (active)
+   L29189–34400 Aurora mobile dock experiments (LEGACY — dock retired)
+   EOF         NATURAL DOCUMENT SCROLL + PREMIUM COMMAND SHEET (active)
    See ARCHITECTURE.md § CSS Design System for full audit.
    ========================================================= */
 
@@ -34400,3 +34400,412 @@ html[data-theme="light"] .tradeReviewSheet{
     background: var(--mobile-shell-bg-light) !important;
   }
 }
+
+/* ============================================================================
+   MTC MOBILE — NATURAL DOCUMENT SCROLL + PREMIUM COMMAND SHEET (FINAL)
+   Root cause of frozen scroll: ABSOLUTE FINAL shell used overflow:hidden on
+   html/body/#root + position:fixed on body, while NO BOTTOM DOCK set
+   .main.appMain { overflow:visible }. Result: no scroll owner.
+   Model: document (body) scrolls. Shell/main overflow:visible.
+   ============================================================================ */
+@media (max-width: 768px) {
+  html:has(.appShell),
+  html:has(.appShell) body {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: auto !important;
+    touch-action: pan-y !important;
+    background: var(--aurora-bg, #07050d) !important;
+  }
+
+  html:has(.appShell) #root {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: var(--aurora-bg, #07050d) !important;
+  }
+
+  html:has(.appShell) .app.appShell {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: var(--aurora-bg, #07050d) !important;
+  }
+
+  html:has(.appShell) .main.appMain {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: max(28px, env(safe-area-inset-bottom, 0px)) !important;
+    overscroll-behavior-y: auto !important;
+    touch-action: pan-y !important;
+  }
+
+  html:has(.appShell) .page,
+  html:has(.appShell) .dashboardPage,
+  html:has(.appShell) .journalPage,
+  html:has(.appShell) .analyticsPage,
+  html:has(.appShell) .riskPage,
+  html:has(.appShell) .checklistPage {
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: max(28px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html[data-theme="light"]:has(.appShell),
+  html[data-theme="light"]:has(.appShell) body,
+  html[data-theme="light"]:has(.appShell) #root,
+  html[data-theme="light"]:has(.appShell) .app.appShell {
+    background: var(--aurora-bg, #f7f8fb) !important;
+  }
+
+  .mobileBottomNav,
+  .mobileNavDock,
+  .mobileNavMore,
+  [data-mobile-dock],
+  [data-bottom-nav] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    opacity: 0 !important;
+  }
+
+  body.mobile-command-open,
+  body.menu-open {
+    overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+
+  .mobileNav.mobileCommandOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10050 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(51, 230, 196, 0.14), transparent 34%),
+      radial-gradient(circle at 82% 16%, rgba(124, 92, 255, 0.2), transparent 38%),
+      rgba(4, 3, 10, 0.72) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandSheet {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: min(88dvh, calc(var(--app-height, 100dvh) - 22px)) !important;
+    margin: 0 !important;
+    border-radius: 30px 30px 0 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background:
+      linear-gradient(180deg, rgba(22, 18, 35, 0.98), rgba(7, 5, 13, 0.98)),
+      radial-gradient(circle at 12% 0%, rgba(51, 230, 196, 0.18), transparent 32%),
+      radial-gradient(circle at 88% 0%, rgba(124, 92, 255, 0.22), transparent 38%) !important;
+    border: 1px solid rgba(124, 92, 255, 0.26) !important;
+    border-bottom: 0 !important;
+    box-shadow:
+      0 -24px 80px rgba(0, 0, 0, 0.62),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    color: #f8f7ff !important;
+    animation: mtcCommandSheetIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandSheet::before {
+    content: "" !important;
+    display: block !important;
+    width: 64px !important;
+    height: 5px !important;
+    margin: 10px auto 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(90deg, #33e6c4, #7c5cff, #ff4fa3) !important;
+    opacity: 0.9 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandHeader {
+    position: relative !important;
+    z-index: 2 !important;
+    flex-shrink: 0 !important;
+    padding: 18px 24px 16px !important;
+    padding-right: 84px !important;
+    background: linear-gradient(180deg, rgba(18, 14, 31, 0.96), rgba(18, 14, 31, 0.84)) !important;
+    border-bottom: 1px solid rgba(124, 92, 255, 0.18) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandEyebrow {
+    display: block !important;
+    font-size: 11px !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    color: rgba(191, 184, 218, 0.76) !important;
+    font-weight: 800 !important;
+    margin: 0 0 8px !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandTitle {
+    margin: 0 !important;
+    font-size: 30px !important;
+    line-height: 0.98 !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.04em !important;
+    color: #f8f7ff !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandTitle .accent {
+    background: linear-gradient(90deg, #33e6c4, #7c5cff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandSubtitle {
+    margin: 8px 0 0 !important;
+    color: rgba(191, 184, 218, 0.82) !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandClose {
+    position: absolute !important;
+    top: 22px !important;
+    right: 22px !important;
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    border-radius: 18px !important;
+    display: grid !important;
+    place-items: center !important;
+    border: 1px solid rgba(124, 92, 255, 0.32) !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    color: #33e6c4 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    cursor: pointer !important;
+    z-index: 3 !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandContent {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: calc(min(88dvh, var(--app-height, 100dvh)) - 124px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding: 18px 24px max(28px, env(safe-area-inset-bottom, 0px)) !important;
+    scrollbar-width: none !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandContent::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandSection {
+    margin: 0 0 26px !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandSection:last-child {
+    margin-bottom: 8px !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandSectionTitle {
+    font-size: 12px !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    color: rgba(191, 184, 218, 0.68) !important;
+    font-weight: 900 !important;
+    margin: 0 0 12px !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandGrid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandCard {
+    min-height: 118px !important;
+    border-radius: 22px !important;
+    padding: 18px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+    text-decoration: none !important;
+    color: #f8f7ff !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+      radial-gradient(circle at 18% 14%, rgba(51, 230, 196, 0.1), transparent 42%),
+      radial-gradient(circle at 90% 12%, rgba(124, 92, 255, 0.12), transparent 45%) !important;
+    border: 1px solid rgba(124, 92, 255, 0.18) !important;
+    box-shadow:
+      0 14px 30px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    transition: border-color 0.18s ease, transform 0.18s ease !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandCard:active {
+    transform: scale(0.98) !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandCard.active {
+    border-color: rgba(51, 230, 196, 0.54) !important;
+    box-shadow:
+      0 18px 42px rgba(51, 230, 196, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandIcon {
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 16px !important;
+    display: grid !important;
+    place-items: center !important;
+    color: #33e6c4 !important;
+    background: rgba(51, 230, 196, 0.1) !important;
+    border: 1px solid rgba(51, 230, 196, 0.24) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandCard--violet .mobileCommandIcon {
+    color: #8f7bff !important;
+    background: rgba(124, 92, 255, 0.12) !important;
+    border-color: rgba(124, 92, 255, 0.28) !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandCard--magenta .mobileCommandIcon {
+    color: #ff4fa3 !important;
+    background: rgba(255, 79, 163, 0.1) !important;
+    border-color: rgba(255, 79, 163, 0.24) !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandLabel {
+    font-size: 18px !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.15 !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandLogout {
+    width: 100% !important;
+    min-height: 56px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 79, 163, 0.28) !important;
+    background: rgba(255, 79, 163, 0.08) !important;
+    color: #ff4fa3 !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    margin-top: 4px !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(51, 230, 196, 0.16), transparent 34%),
+      radial-gradient(circle at 82% 16%, rgba(124, 92, 255, 0.16), transparent 38%),
+      rgba(247, 248, 251, 0.76) !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandSheet {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 248, 251, 0.98)),
+      radial-gradient(circle at 12% 0%, rgba(51, 230, 196, 0.12), transparent 32%),
+      radial-gradient(circle at 88% 0%, rgba(124, 92, 255, 0.12), transparent 38%) !important;
+    border-color: rgba(124, 92, 255, 0.18) !important;
+    color: #07111f !important;
+    box-shadow: 0 -22px 70px rgba(15, 23, 42, 0.18) !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandHeader {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandTitle {
+    color: #07111f !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandSubtitle,
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandSectionTitle,
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandEyebrow {
+    color: rgba(15, 23, 42, 0.62) !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandCard {
+    color: #07111f !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 251, 0.92)),
+      radial-gradient(circle at 18% 14%, rgba(51, 230, 196, 0.08), transparent 42%) !important;
+    border-color: rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandClose {
+    background: rgba(15, 23, 42, 0.04) !important;
+    color: #0d9488 !important;
+  }
+}
+
+@keyframes mtcCommandSheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+MTC MOBILE NAVIGATION CONTRACT
+- No bottom tab bar in mobile.
+- Mobile navigation is header hamburger + command sheet.
+- Do not add fixed bottom nav, mobileBottomNav, mobileNavDock or padding reserves.
+- Do not use .mobileNav global for sheets and docks together.
+- Main content must scroll naturally after closing command sheet.
+*/

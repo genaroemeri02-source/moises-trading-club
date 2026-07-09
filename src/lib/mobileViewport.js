@@ -69,6 +69,10 @@ function applyViewportVars() {
   root.style.setProperty('--app-width', px(w));
   root.style.setProperty('--app-vh', `${h * 0.01}px`);
   root.style.setProperty('--mobile-dock-gap', '0px');
+  root.style.setProperty('--mobile-tabbar-visual-h', '0px');
+  root.style.setProperty('--mobile-tabbar-total-h', '0px');
+  root.style.setProperty('--mobile-tab-bar-h', '0px');
+  root.style.setProperty('--mobile-content-pad-bottom', '28px');
 
   if (ios && standalone && h > 300) {
     try {
