@@ -46,6 +46,15 @@ export function initMobileViewportManager() {
     root.classList.toggle('is-ios-standalone', Boolean(isIOS && isStandalone));
 
     document.body?.style.setProperty('--viewport-refresh-token', String(Date.now()));
+
+    window.dispatchEvent(new CustomEvent('mtc:viewport-sync', {
+      detail: {
+        height: viewportHeight,
+        width: viewportWidth,
+        isIOS,
+        isStandalone,
+      },
+    }));
   }
 
   function scheduleRefresh() {

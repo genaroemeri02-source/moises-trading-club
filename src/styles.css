@@ -5,12 +5,14 @@
    Single file: src/styles.css (~32k lines, ~9.7k !important)
    CANONICAL SOURCE OF TRUTH (wins by cascade order):
    - Tokens:        :root L4 + AURORA DARK SYSTEM v20 ~L27066
-   - Mobile dock:   AURORA MOBILE NATIVE DOCK — FINAL SOURCE OF TRUTH (EOF)
+   - Mobile shell:  AURORA MOBILE VIEWPORT SHELL — FINAL SOURCE OF TRUTH (true EOF)
+   - Mobile dock:   in-flow flex child (NOT fixed) — same EOF block
    - Mobile drawer: same EOF block (z-index + geometry); v38 = visual skin only
    - Dark app skin: AURORA DARK SYSTEM v20 ~L27060
    - Light patches: v43.27 / v47.12+ (scattered, consolidate in 2B)
    LEGACY — do not extend (superseded, kept for compat):
    - Floating pill .mobileNav L187, v40.2–v40.4 L456–665
+   - Fixed dock patches v32–v36 + prior NATIVE DOCK (superseded by VIEWPORT SHELL)
    - Gold .primary gradients L219, L419 (partially purged v47+)
    ZONE MAP (approx line ranges):
    L1–290    Tokens + base shell + early v3–v38
@@ -20,7 +22,8 @@
    L6382–18110 v47.11–v52 light mode + dashboard + share EOF guards
    L18111–26200 Analytics cockpit + charts
    L26204–29188 Aurora ambient + production tokens
-   L29189–32190 Aurora mobile v25–v38 (ACTIVE MOBILE LAYER)
+   L29189–32272 Aurora mobile v25–v38 (LEGACY mobile layer)
+   EOF         AURORA MOBILE VIEWPORT SHELL (active)
    See ARCHITECTURE.md § CSS Design System for full audit.
    ========================================================= */
 
@@ -55,7 +58,7 @@
   /* Mobile shell — aliases; geometry + viewport in NATIVE DOCK EOF */
   --app-vh:1vh;
   --app-height:100vh;
-  --mobile-tabbar-visual-h:76px;
+  --mobile-tabbar-visual-h:78px;
   --mobile-tabbar-safe-bottom:env(safe-area-inset-bottom,0px);
   --mobile-tabbar-total-h:calc(var(--mobile-tabbar-visual-h) + var(--mobile-tabbar-safe-bottom));
   --aurora-mobile-dock-h:var(--mobile-tabbar-visual-h);
@@ -679,8 +682,9 @@ html,body,.app,.main,.page{overflow-x:hidden!important;}
     box-sizing:border-box!important;
   }
 
-  /* Critical: previous v40.2 set overflow-x:hidden on .mobileNav. Override it. */
-  .mobileNav{
+  /* Critical: previous v40.2 set overflow-x:hidden on .mobileNav. Override it.
+     LEGACY pill only — Aurora dock (.mobileBottomNav/.mobileNavDock) is owned by EOF shell. */
+  .mobileNav:not(.mobileBottomNav):not(.mobileNavDock){
     position:fixed!important;
     left:0!important;
     right:0!important;
@@ -712,13 +716,13 @@ html,body,.app,.main,.page{overflow-x:hidden!important;}
     backdrop-filter:blur(18px)!important;
     box-shadow:0 -18px 50px rgba(0,0,0,.55)!important;
   }
-  .mobileNav::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
-  .mobileNav{
+  .mobileNav:not(.mobileBottomNav):not(.mobileNavDock)::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
+  .mobileNav:not(.mobileBottomNav):not(.mobileNavDock){
     scrollbar-width:none!important;
     -ms-overflow-style:none!important;
   }
-  .mobileNav button,
-  .mobileNav .mobileLogout{
+  .mobileNav:not(.mobileBottomNav):not(.mobileNavDock) button,
+  .mobileNav:not(.mobileBottomNav):not(.mobileNavDock) .mobileLogout{
     flex:0 0 78px!important;
     width:78px!important;
     min-width:78px!important;
@@ -727,7 +731,7 @@ html,body,.app,.main,.page{overflow-x:hidden!important;}
     scroll-snap-align:none!important;
     touch-action:manipulation!important;
   }
-  .mobileNav button span{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:64px!important;}
+  .mobileNav:not(.mobileBottomNav):not(.mobileNavDock) button span{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:64px!important;}
 
   .helpBubble{bottom:calc(98px + env(safe-area-inset-bottom))!important;}
 }
@@ -29845,12 +29849,13 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     font-size:11px!important;
   }
 
+  /* Dock geometry SUPERSEDED — VIEWPORT SHELL EOF (relative/in-flow) */
   html:not([data-theme="light"]) body .app .mobileNav.mobileNavDock,
   html[data-theme="dark"] body .app .mobileNav.mobileNavDock{
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
     top:auto!important;
     width:100%!important;
     max-width:100%!important;
@@ -29859,12 +29864,13 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     border:none!important;
     border-top:1px solid rgba(124,92,255,.18)!important;
     box-shadow:0 -10px 36px rgba(0,0,0,.38)!important;
-    padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px))!important;
+    padding:0 10px env(safe-area-inset-bottom,0px)!important;
     display:grid!important;
     grid-template-columns:repeat(5,1fr)!important;
-    gap:2px!important;
-    overflow:visible!important;
-    z-index:900!important;
+    gap:0!important;
+    overflow:hidden!important;
+    z-index:5000!important;
+    transform:none!important;
     background:rgba(7,5,13,.96)!important;
     backdrop-filter:blur(22px)!important;
     -webkit-backdrop-filter:blur(22px)!important;
@@ -30168,13 +30174,16 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     overflow-x:hidden!important;
   }
 
+  /* v29 shell geometry SUPERSEDED by VIEWPORT SHELL EOF (flex + in-flow dock) */
   html:not([data-theme="light"]) body .app.appShell,
   html[data-theme="dark"] body .app.appShell{
-    display:block!important;
+    display:flex!important;
+    flex-direction:column!important;
     width:100%!important;
     max-width:100%!important;
-    min-height:100dvh!important;
-    min-height:100svh!important;
+    height:var(--app-height,100dvh)!important;
+    min-height:var(--app-height,100dvh)!important;
+    max-height:var(--app-height,100dvh)!important;
     overflow:hidden!important;
     background:transparent!important;
   }
@@ -30183,14 +30192,14 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   html[data-theme="dark"] body .app .main.appMain{
     width:100%!important;
     max-width:100%!important;
-    min-height:100dvh!important;
-    min-height:100svh!important;
-    max-height:100dvh!important;
-    max-height:100svh!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
     overflow-x:hidden!important;
     overflow-y:auto!important;
     -webkit-overflow-scrolling:touch!important;
-    padding-bottom:var(--mobile-content-pad-bottom)!important;
+    padding-bottom:18px!important;
     background:transparent!important;
   }
 
@@ -30216,35 +30225,37 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     padding-top:max(12px,env(safe-area-inset-top,0px))!important;
   }
 
-  /* Bottom dock — opaque, full bleed, safe-area included in height */
+  /* Bottom dock — skin only; geometry owned by VIEWPORT SHELL EOF (in-flow, NOT fixed) */
   html:not([data-theme="light"]) body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html:not([data-theme="light"]) body .app .mobileBottomNav,
   html[data-theme="dark"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html[data-theme="dark"] body .app .mobileBottomNav{
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
     top:auto!important;
     margin:0!important;
     width:100%!important;
     max-width:100%!important;
-    height:var(--mobile-tab-bar-h)!important;
-    min-height:var(--mobile-tab-bar-h)!important;
+    height:var(--mobile-tabbar-total-h)!important;
+    min-height:var(--mobile-tabbar-total-h)!important;
+    max-height:var(--mobile-tabbar-total-h)!important;
+    flex:0 0 var(--mobile-tabbar-total-h)!important;
     box-sizing:border-box!important;
-    padding:0 0 env(safe-area-inset-bottom,0px)!important;
+    padding:0 10px env(safe-area-inset-bottom,0px)!important;
     border-radius:0!important;
     border:none!important;
     border-top:1px solid rgba(124,92,255,.18)!important;
     box-shadow:0 -12px 40px rgba(0,0,0,.38)!important;
-    z-index:920!important;
+    z-index:5000!important;
     display:grid!important;
     grid-template-columns:repeat(5,1fr)!important;
-    grid-template-rows:var(--mobile-tabbar-content-h)!important;
     align-content:start!important;
     align-items:stretch!important;
     gap:0!important;
-    overflow:visible!important;
+    overflow:hidden!important;
+    transform:none!important;
     background:
       linear-gradient(180deg,rgba(7,5,13,.92),rgba(7,5,13,1)),
       radial-gradient(circle at 18% 0%,rgba(51,230,196,.08),transparent 38%),
@@ -30256,15 +30267,9 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
 
   html:not([data-theme="light"]) body .app .mobileBottomNav::after,
   html[data-theme="dark"] body .app .mobileBottomNav::after{
-    content:''!important;
-    position:absolute!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    height:env(safe-area-inset-bottom,0px)!important;
-    background:var(--aurora-mobile-nav-bg)!important;
-    pointer-events:none!important;
-    z-index:-1!important;
+    content:none!important;
+    display:none!important;
+    z-index:auto!important;
   }
 
   html[data-theme="light"] body .app .mobileBottomNav{
@@ -30278,7 +30283,9 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   }
 
   html[data-theme="light"] body .app .mobileBottomNav::after{
-    background:#F0F2F5!important;
+    content:none!important;
+    display:none!important;
+    background:none!important;
   }
 
   html:not([data-theme="light"]) body .app .mobileBottomNav button,
@@ -30361,9 +30368,9 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
 
   /* Kill legacy floating-nav offsets */
   html body .app .mobileNav.mobileBottomNav{
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
     max-width:100%!important;
   }
 }
@@ -30382,7 +30389,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
 
   html:not([data-theme="light"]) body .app .main.appMain,
   html[data-theme="dark"] body .app .main.appMain{
-    padding-bottom:var(--mobile-content-pad-bottom)!important;
+    padding-bottom:18px!important;
   }
 
   html:not([data-theme="light"]) body .app .page,
@@ -30398,18 +30405,25 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     padding-bottom:8px!important;
   }
 
+  /* v30 geometry SUPERSEDED — never height:auto / min-height:0 on dock */
   html:not([data-theme="light"]) body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html:not([data-theme="light"]) body .app .mobileBottomNav,
   html[data-theme="dark"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html[data-theme="dark"] body .app .mobileBottomNav{
-    display:flex!important;
-    flex-direction:row!important;
-    align-items:flex-end!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    align-items:start!important;
     justify-content:stretch!important;
-    height:auto!important;
-    min-height:unset!important;
-    max-height:none!important;
-    padding:0!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    top:auto!important;
+    height:var(--mobile-tabbar-total-h)!important;
+    min-height:var(--mobile-tabbar-total-h)!important;
+    max-height:var(--mobile-tabbar-total-h)!important;
+    flex:0 0 var(--mobile-tabbar-total-h)!important;
+    padding:0 10px env(safe-area-inset-bottom,0px)!important;
     padding-bottom:env(safe-area-inset-bottom,0px)!important;
     grid-template-columns:unset!important;
     grid-template-rows:unset!important;
@@ -30869,15 +30883,10 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     --aurora-mobile-light-nav:#FFFFFF;
   }
 
-  /* ── Tab bar: both themes, flush bottom, no upward shadow/gap ── */
-  /* v32 dock skin only — geometry neutralized, see DOCK CONTRACT EOF */
+  /* ── Tab bar skin only — geometry owned by VIEWPORT SHELL EOF (in-flow) ── */
   html body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html body .app .mobileBottomNav{
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    top:auto!important;
+    /* position/bottom/height owned by AURORA MOBILE VIEWPORT SHELL EOF */
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
@@ -30887,7 +30896,6 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     display:flex!important;
     flex-direction:row!important;
     align-items:stretch!important;
-    padding:0!important;
     overflow:visible!important;
   }
 
@@ -30914,12 +30922,13 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     -webkit-backdrop-filter:blur(20px) saturate(1.05)!important;
   }
 
-  /* Kill legacy floating nav offsets (v26/v40) */
+  /* Kill legacy floating nav offsets (v26/v40) — in-flow, not pinned */
   html body .app .mobileNav.mobileBottomNav,
   html body .app .mobileNav.mobileNavDock.mobileBottomNav{
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    position:relative!important;
     border-radius:0!important;
     box-shadow:none!important;
   }
@@ -31187,12 +31196,14 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
    ═══════════════════════════════════════════════════════════════ */
 
 @media(max-width:860px){
+  /* v33 light dock — skin only; NEVER fixed (VIEWPORT SHELL EOF owns geometry) */
   html[data-theme="light"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
   html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app .mobileNav.mobileBottomNav{
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    top:auto!important;
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
@@ -31200,6 +31211,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     border:none!important;
     border-top:1px solid rgba(124,92,255,.10)!important;
     box-shadow:none!important;
+    transform:none!important;
     background:
       radial-gradient(ellipse 90% 55% at 50% 100%,rgba(124,92,255,.06),transparent 58%),
       linear-gradient(180deg,rgba(255,255,255,.99),#FFFFFF)!important;
@@ -31210,9 +31222,6 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   html[data-theme="dark"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav{
     box-shadow:none!important;
     border-radius:0!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
   }
 
   html body .app .mobileBottomNav button,
@@ -31466,35 +31475,35 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     padding-bottom:8px!important;
   }
 
-  /* Native dock — flush to physical bottom, safe-area inside painted surface */
+  /* Native dock — in-flow; VIEWPORT SHELL EOF is source of truth */
   html body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html body .app .mobileBottomNav{
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
     top:auto!important;
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
     border-radius:0!important;
     box-sizing:border-box!important;
-    height:var(--mobile-tabbar-total-height)!important;
-    min-height:var(--mobile-tabbar-total-height)!important;
-    max-height:none!important;
-    padding:0 0 env(safe-area-inset-bottom,0px)!important;
+    height:var(--mobile-tabbar-total-h)!important;
+    min-height:var(--mobile-tabbar-total-h)!important;
+    max-height:var(--mobile-tabbar-total-h)!important;
+    flex:0 0 var(--mobile-tabbar-total-h)!important;
+    padding:0 10px env(safe-area-inset-bottom,0px)!important;
     display:grid!important;
     grid-template-columns:repeat(5,1fr)!important;
-    grid-template-rows:var(--mobile-tabbar-content-height)!important;
     align-content:start!important;
     align-items:stretch!important;
     gap:0!important;
-    overflow:visible!important;
+    overflow:hidden!important;
     isolation:isolate!important;
-    z-index:1000!important;
+    z-index:5000!important;
     box-shadow:none!important;
-    -webkit-transform:translateZ(0)!important;
-    transform:translateZ(0)!important;
+    -webkit-transform:none!important;
+    transform:none!important;
   }
 
   html:not([data-theme="light"]) body .app .mobileBottomNav,
@@ -31522,30 +31531,16 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     -webkit-backdrop-filter:blur(20px) saturate(1.05)!important;
   }
 
-  /* Explicit safe-area paint layer (iOS backdrop-filter padding gap) */
-  html body .app .mobileBottomNav::after{
-    display:none!important;
-    content:none!important;
-  }
-
-  html body .app .mobileBottomNav::before{
-    content:''!important;
-    position:absolute!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    height:env(safe-area-inset-bottom,0px)!important;
-    pointer-events:none!important;
-    z-index:0!important;
-  }
-
+  /* Explicit safe-area paint layer — killed; in-flow dock padding covers edge */
+  html body .app .mobileBottomNav::after,
+  html body .app .mobileBottomNav::before,
   html:not([data-theme="light"]) body .app .mobileBottomNav::before,
-  html[data-theme="dark"] body .app .mobileBottomNav::before{
-    background:var(--aurora-mobile-nav-bg)!important;
-  }
-
+  html[data-theme="dark"] body .app .mobileBottomNav::before,
   html[data-theme="light"] body .app .mobileBottomNav::before{
-    background:var(--aurora-mobile-light-nav)!important;
+    content:none!important;
+    display:none!important;
+    height:0!important;
+    z-index:auto!important;
   }
 
   html body .app .mobileBottomNav button,
@@ -32270,16 +32265,16 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
 }
 
 /* =========================================================
-   AURORA MOBILE NATIVE DOCK — FINAL SOURCE OF TRUTH
-   Fix definitivo para iOS PWA safe-area + viewport resume.
-   No crear nuevos overrides del dock debajo de este bloque.
+   AURORA MOBILE NATIVE DOCK — SUPERSEDED (kept for skin refs)
+   Geometry/ownership moved to AURORA MOBILE VIEWPORT SHELL (true EOF).
+   Do not reintroduce position:fixed on .mobileBottomNav here.
 ========================================================= */
 
 :root{
   --app-vh:1vh;
   --app-height:100vh;
 
-  --mobile-tabbar-visual-h:76px;
+  --mobile-tabbar-visual-h:78px;
   --mobile-tabbar-safe-bottom:env(safe-area-inset-bottom,0px);
   --mobile-tabbar-total-h:calc(var(--mobile-tabbar-visual-h) + var(--mobile-tabbar-safe-bottom));
   --aurora-mobile-dock-h:var(--mobile-tabbar-visual-h);
@@ -32335,26 +32330,12 @@ html.is-ios #root{
     touch-action:manipulation;
   }
 
-  .appShell,
-  .appMain,
-  .main,
-  .main.appMain{
-    min-height:var(--app-height);
-    background:inherit;
-  }
-
+  /* SUPERSEDED — VIEWPORT SHELL EOF owns heights/scroll */
   .app.appShell,
   .app{
     transform:none!important;
     filter:none!important;
     perspective:none!important;
-  }
-
-  .appMain,
-  .main.appMain{
-    padding-bottom:calc(var(--mobile-tabbar-total-h) + 18px)!important;
-    box-sizing:border-box;
-    overflow-x:hidden;
   }
 
   .page,
@@ -32374,22 +32355,15 @@ html.is-ios #root{
     margin-bottom:0!important;
   }
 
+  /* SUPERSEDED geometry — VIEWPORT SHELL EOF owns position/height */
   .mobileNav.mobileNavDock.mobileBottomNav,
   .mobileBottomNav,
   nav.mobileBottomNav{
-    position:fixed!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
+    /* position/bottom/height → AURORA MOBILE VIEWPORT SHELL EOF */
 
-    width:100vw!important;
-    height:var(--mobile-tabbar-total-h)!important;
-    min-height:var(--mobile-tabbar-total-h)!important;
-    max-height:var(--mobile-tabbar-total-h)!important;
-
-    padding:0 10px var(--mobile-tabbar-safe-bottom)!important;
-    margin:0!important;
+    width:100%!important;
     box-sizing:border-box!important;
+    margin:0!important;
 
     display:grid!important;
     grid-template-columns:repeat(5,minmax(0,1fr))!important;
@@ -32397,11 +32371,11 @@ html.is-ios #root{
 
     border-radius:0!important;
     overflow:hidden!important;
-    z-index:9999!important;
+    z-index:5000!important;
 
-    transform:translate3d(0,0,0)!important;
+    transform:none!important;
     translate:none!important;
-    will-change:transform;
+    will-change:auto;
 
     background:
       linear-gradient(180deg,rgba(10,7,18,.96),rgba(5,3,10,1)),
@@ -32433,33 +32407,15 @@ html.is-ios #root{
       inset 0 1px 0 rgba(255,255,255,.9)!important;
   }
 
+  /* Pseudo fillers removed — in-flow dock covers safe-area via padding */
   .mobileNav.mobileNavDock.mobileBottomNav::before,
   .mobileBottomNav::before,
-  nav.mobileBottomNav::before{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
-    height:var(--mobile-tabbar-safe-bottom);
-    min-height:var(--mobile-tabbar-safe-bottom);
-    background:inherit;
-    pointer-events:none;
-    z-index:0;
-  }
-
+  nav.mobileBottomNav::before,
   .mobileNav.mobileNavDock.mobileBottomNav::after,
   .mobileBottomNav::after,
   nav.mobileBottomNav::after{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    top:0;
-    height:1px;
-    background:linear-gradient(90deg,transparent,rgba(51,230,196,.36),rgba(124,92,255,.34),transparent);
-    pointer-events:none;
-    z-index:1;
+    content:none!important;
+    display:none!important;
   }
 
   .mobileBottomNav a,
@@ -33201,5 +33157,470 @@ html[data-theme="light"] .tradeReviewSheet{
   .tradeDetailOverlay .tradeReviewSheet.tradeDetailModal>.tradeReviewHeader.modalHead{
     margin:0 -28px!important;
     padding:22px 28px 18px!important;
+  }
+}
+
+/* ==========================================================================
+   AURORA MOBILE VIEWPORT SHELL — FINAL SOURCE OF TRUTH
+   Closed native shell for iOS PWA: one viewport owner, in-flow tab bar,
+   single scroll root (.main.appMain). Neutralizes legacy fixed-dock +
+   100dvh/min-height fights that caused the black dead strip on resume.
+   Do NOT add mobile dock/viewport overrides below this block.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-tabbar-visual-h: 78px;
+    --mobile-tabbar-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-tabbar-total-h: calc(var(--mobile-tabbar-visual-h) + env(safe-area-inset-bottom, 0px));
+    --mobile-top-safe: env(safe-area-inset-top, 0px);
+    --aurora-mobile-dock-h: var(--mobile-tabbar-visual-h);
+    --aurora-safe-bottom: var(--mobile-tabbar-safe-bottom);
+    --aurora-dock-total-h: var(--mobile-tabbar-total-h);
+    --mobile-tabbar-content-height: var(--mobile-tabbar-visual-h);
+    --mobile-tabbar-total-height: var(--mobile-tabbar-total-h);
+    --mobile-tab-bar-h: var(--mobile-tabbar-total-h);
+    --mobile-content-pad-bottom: 18px;
+  }
+
+  /* Logged-in app owns the viewport. Auth/landing keep legacy scroll. */
+  html:has(.appShell),
+  html:has(.appShell) body,
+  html:has(.appShell) #root {
+    width: 100% !important;
+    height: var(--app-height, 100dvh) !important;
+    min-height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: var(--aurora-bg, #07050D) !important;
+    -webkit-text-size-adjust: 100%;
+    position: static !important;
+    inset: auto !important;
+    touch-action: manipulation;
+  }
+
+  html:has(.appShell)[data-theme="light"],
+  html:has(.appShell)[data-theme="light"] body,
+  html:has(.appShell)[data-theme="light"] #root {
+    background: #F7F8FB !important;
+  }
+
+  html:has(.appShell) body {
+    position: relative !important;
+  }
+
+  .app.appShell,
+  .appShell {
+    width: 100% !important;
+    height: var(--app-height, 100dvh) !important;
+    min-height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    background:
+      radial-gradient(circle at 50% -8%, rgba(124, 92, 255, .13), transparent 34%),
+      radial-gradient(circle at 16% 24%, rgba(51, 230, 196, .07), transparent 30%),
+      var(--aurora-bg, #07050D) !important;
+  }
+
+  html[data-theme="light"] .app.appShell,
+  html[data-theme="light"] .appShell {
+    background:
+      radial-gradient(circle at 50% -8%, rgba(124, 92, 255, .08), transparent 34%),
+      radial-gradient(circle at 16% 24%, rgba(51, 230, 196, .06), transparent 30%),
+      #F7F8FB !important;
+  }
+
+  /* Only scroll owner */
+  html body .app.appShell > .main.appMain,
+  html body .app .main.appMain,
+  html:has(.appShell) body .app .main.appMain,
+  .appShell > .main.appMain,
+  .app .main.appMain,
+  .main.appMain {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding-bottom: 18px !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+  }
+
+  .main.appMain > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .appShell .page,
+  .appShell .dashboardPage,
+  .appShell .journalPage,
+  .appShell .analyticsPage,
+  .appShell .analyticsShell,
+  .appShell .analyticsCockpit,
+  .appShell .riskPage,
+  .appShell .checklistPage,
+  .appShell .emotionalPage,
+  .appShell .emotionalJournalPage,
+  .appShell .resultsPage,
+  .appShell .ideasPage,
+  .appShell .guidePage,
+  .page,
+  .dashboardPage,
+  .journalPage,
+  .analyticsPage,
+  .riskPage,
+  .checklistPage {
+    min-height: auto !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* In-flow native dock — NEVER fixed on mobile PWA */
+  html body .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileNavDock.mobileBottomNav,
+  html body .app .mobileBottomNav,
+  .mobileNav.mobileNavDock.mobileBottomNav,
+  .mobileNavDock.mobileBottomNav,
+  .mobileBottomNav,
+  nav.mobileBottomNav {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+
+    flex: 0 0 var(--mobile-tabbar-total-h) !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    align-self: stretch !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    height: var(--mobile-tabbar-total-h) !important;
+    min-height: var(--mobile-tabbar-total-h) !important;
+    max-height: var(--mobile-tabbar-total-h) !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    gap: 0 !important;
+
+    padding: 0 10px env(safe-area-inset-bottom, 0px) 10px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+
+    border-radius: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-top: 1px solid rgba(124, 92, 255, .26) !important;
+
+    background:
+      linear-gradient(180deg, rgba(9, 7, 15, .98), rgba(5, 4, 10, 1)) !important;
+    background-color: #05040A !important;
+    box-shadow:
+      0 -18px 40px rgba(0, 0, 0, .44),
+      0 -1px 0 rgba(255, 255, 255, .04) inset !important;
+
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+
+    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+
+    z-index: 5000 !important;
+    transform: none !important;
+    translate: none !important;
+    will-change: auto !important;
+    touch-action: manipulation !important;
+  }
+
+  html[data-theme="light"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body .app .mobileBottomNav,
+  html[data-theme="light"] .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] .mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] .mobileBottomNav {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.98), rgba(247,248,251,1)) !important;
+    background-color: #F7F8FB !important;
+    border-top: 1px solid rgba(124,92,255,.14) !important;
+    box-shadow:
+      0 -18px 34px rgba(15, 23, 42, .10),
+      0 -1px 0 rgba(255, 255, 255, .80) inset !important;
+  }
+
+  /* Kill legacy pseudo fillers that painted under/over the dock */
+  html body .app .mobileBottomNav::before,
+  html body .app .mobileBottomNav::after,
+  html body .app .mobileNavDock.mobileBottomNav::before,
+  html body .app .mobileNavDock.mobileBottomNav::after,
+  .mobileBottomNav::before,
+  .mobileBottomNav::after,
+  .mobileNavDock.mobileBottomNav::before,
+  .mobileNavDock.mobileBottomNav::after,
+  nav.mobileBottomNav::before,
+  nav.mobileBottomNav::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    z-index: auto !important;
+    height: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+  }
+
+  html body .app .mobileBottomNav button,
+  html body .app .mobileBottomNav .mobileNavMore,
+  .mobileBottomNav button,
+  .mobileBottomNav .mobileNavMore {
+    height: var(--mobile-tabbar-visual-h) !important;
+    min-height: var(--mobile-tabbar-visual-h) !important;
+    max-height: var(--mobile-tabbar-visual-h) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: none !important;
+    padding: 8px 2px 6px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    overflow: hidden !important;
+    color: rgba(226, 232, 240, .72) !important;
+  }
+
+  html[data-theme="light"] .mobileBottomNav button,
+  html[data-theme="light"] .mobileBottomNav .mobileNavMore {
+    color: rgba(51, 65, 85, .72) !important;
+  }
+
+  .mobileBottomNav svg {
+    width: 22px !important;
+    height: 22px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .mobileBottomNav span,
+  .mobileBottomNav .mobileNavLabel {
+    display: block !important;
+    font-size: 11px !important;
+    line-height: 1.05 !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .mobileBottomNav .active,
+  .mobileBottomNav button.active,
+  .mobileBottomNav .mobileNavMore.active {
+    color: #33E6C4 !important;
+  }
+
+  .mobileBottomNav .active svg,
+  .mobileBottomNav button.active svg,
+  .mobileBottomNav .mobileNavMore.active svg {
+    color: #33E6C4 !important;
+    filter: drop-shadow(0 0 10px rgba(51,230,196,.28));
+  }
+
+  .mobileBottomNav button[data-nav="analytics"].active {
+    color: #7C5CFF !important;
+  }
+
+  .mobileBottomNav button[data-nav="emotional"].active {
+    color: #FF4FA3 !important;
+  }
+
+  /* Sheets/drawers against real in-flow dock */
+  .mobileCommandOverlay,
+  .mobileNavSheetOverlay,
+  .mobileNavSheetBackdrop,
+  .mobileCommandOverlay.mobileNavSheetBackdrop {
+    position: fixed !important;
+    inset: 0 auto auto 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+    z-index: 10050 !important;
+  }
+
+  .mobileCommandSheet,
+  .mobileNavSheet,
+  .mobileCommandSheet.mobileNavSheet,
+  html body .app .mobileCommandSheet.mobileNavSheet,
+  html body .app .mobileNavSheet {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: var(--mobile-tabbar-total-h) !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(var(--app-height, 100dvh) - var(--mobile-tabbar-total-h) - env(safe-area-inset-top, 0px) - 10px) !important;
+    margin: 0 0 0 0 !important;
+    margin-bottom: 0 !important;
+    z-index: 10051 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobileCommandContent.mobileNavSheetNav,
+  .mobileNavSheetNav {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding-bottom: 20px !important;
+  }
+
+  .mobileCommandContent.mobileNavSheetNav::-webkit-scrollbar,
+  .mobileNavSheetNav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  html body.menu-open:has(.appShell) {
+    overflow: hidden !important;
+  }
+
+  .mobileNewTradeFab,
+  .helpBubble {
+    bottom: calc(var(--mobile-tabbar-total-h) + 12px) !important;
+    z-index: 4990 !important;
+  }
+
+  /* Explicit legacy kill-list — beat high-specificity v29–v36 selectors */
+  html:not([data-theme="light"]) body .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body .app.appShell .mobileBottomNav,
+  html[data-theme="dark"] body .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body .app.appShell .mobileBottomNav,
+  html[data-theme="light"] body:has(.app) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body:has(.app) .app.appShell .mobileBottomNav,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app.appShell .mobileBottomNav,
+  html:not([data-theme="light"]) body:has(.app) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body:has(.app) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileBottomNav[style],
+  html body .app .mobileNavDock[style] {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    height: var(--mobile-tabbar-total-h) !important;
+    min-height: var(--mobile-tabbar-total-h) !important;
+    max-height: var(--mobile-tabbar-total-h) !important;
+    flex: 0 0 var(--mobile-tabbar-total-h) !important;
+    transform: none !important;
+    translate: none !important;
+  }
+
+  html:not([data-theme="light"]) body .app.appShell .main.appMain,
+  html[data-theme="dark"] body .app.appShell .main.appMain,
+  html[data-theme="light"] body:has(.app) .app.appShell .main.appMain {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 18px !important;
+  }
+
+  html:not([data-theme="light"]) body .app.appShell,
+  html[data-theme="dark"] body .app.appShell,
+  html[data-theme="light"] body:has(.app) .app.appShell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: var(--app-height, 100dvh) !important;
+    min-height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+  }
+
+  /* Non-dock flex siblings must not steal column space */
+  .appShell > .side,
+  .appShell > .toastHost,
+  .appShell > .cmdOverlay {
+    flex: 0 0 auto !important;
+  }
+
+  .appShell > .mobileNavSheetBackdrop,
+  .appShell > .mobileNavSheet,
+  .appShell > .mobileCommandOverlay,
+  .appShell > .mobileCommandSheet {
+    flex: 0 0 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: visible !important;
+  }
+}
+
+/* iOS standalone: keep shell locked to visualViewport height after resume */
+@media (max-width: 768px) {
+  html.is-ios-standalone:has(.appShell),
+  html.is-ios-standalone:has(.appShell) body,
+  html.is-ios-standalone:has(.appShell) #root,
+  html.is-standalone-pwa:has(.appShell),
+  html.is-standalone-pwa:has(.appShell) body,
+  html.is-standalone-pwa:has(.appShell) #root {
+    height: var(--app-height, 100dvh) !important;
+    min-height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+    background: var(--aurora-bg, #07050D) !important;
+  }
+
+  html.is-ios-standalone[data-theme="light"]:has(.appShell),
+  html.is-ios-standalone[data-theme="light"]:has(.appShell) body,
+  html.is-ios-standalone[data-theme="light"]:has(.appShell) #root,
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell),
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell) body,
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell) #root {
+    background: #F7F8FB !important;
   }
 }
