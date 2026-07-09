@@ -1,24 +1,12 @@
 import { useMemo } from 'react';
 import {
-  calc,
-  breakdownBySetup,
-  breakdownBySession,
-  behaviorInsightsFromTrades,
-  buildDailyPnlForChart,
-  buildPatternBreakdown,
-  buildRDistributionForChart,
   accountInitialForAnalytics,
-  calculateEdgeScore,
-  buildActionDirectives,
-  buildKpiReadings,
-  buildWeeklyPlan,
-  pickActiveThesis,
-  buildInsightStack
+  buildAnalyticsIntelligence
 } from '../../lib/analyticsUtils.js';
 import { useAnalyticsFilters } from './useAnalyticsFilters.js';
 import { AnalyticsHeader } from './AnalyticsHeader.jsx';
 import { AnalyticsFilters } from './AnalyticsFilters.jsx';
-import { AnalyticsCommandCenter } from './AnalyticsCommandCenter.jsx';
+import { AnalyticsExecutiveDiagnosis } from './AnalyticsExecutiveDiagnosis.jsx';
 import { AnalyticsActionDirectives } from './AnalyticsActionDirectives.jsx';
 import { AnalyticsKpiStrip } from './AnalyticsKpiStrip.jsx';
 import { EdgeLab } from './EdgeLab.jsx';
@@ -70,36 +58,29 @@ export function AnalyticsPage({ data }) {
     () => accountInitialForAnalytics(data.settings, filters.activeAccount),
     [data.settings, filters.activeAccount]
   );
-  const stats = useMemo(() => calc(filters.filtered, initial), [filters.filtered, initial]);
-  const setupRows = useMemo(() => breakdownBySetup(filters.filtered), [filters.filtered]);
-  const sessionRows = useMemo(() => breakdownBySession(filters.filtered), [filters.filtered]);
-  const behaviorData = useMemo(() => behaviorInsightsFromTrades(filters.filtered), [filters.filtered]);
-  const dailyPnl = useMemo(() => buildDailyPnlForChart(filters.filtered), [filters.filtered]);
-  const patternRows = useMemo(() => buildPatternBreakdown(filters.filtered), [filters.filtered]);
-  const rDistribution = useMemo(() => buildRDistributionForChart(filters.filtered), [filters.filtered]);
-  const edgeData = useMemo(
-    () => calculateEdgeScore(filters.filtered, initial),
+
+  const intelligence = useMemo(
+    () => buildAnalyticsIntelligence(filters.filtered, { initial }),
     [filters.filtered, initial]
   );
-  const thesis = useMemo(
-    () => pickActiveThesis(setupRows, filters.filtered),
-    [setupRows, filters.filtered]
-  );
-  const directives = useMemo(
-    () => buildActionDirectives(filters.filtered, stats, sessionRows, behaviorData),
-    [filters.filtered, stats, sessionRows, behaviorData]
-  );
-  const kpiReadings = useMemo(() => buildKpiReadings(stats), [stats]);
-  const weeklyPlan = useMemo(
-    () => buildWeeklyPlan(filters.filtered, stats, sessionRows, setupRows),
-    [filters.filtered, stats, sessionRows, setupRows]
-  );
-  const insightStack = useMemo(
-    () => buildInsightStack(edgeData, thesis, directives),
-    [edgeData, thesis, directives]
-  );
-  const hasSample = stats.count > 0;
 
+  const {
+    sample,
+    diagnosis,
+    stats,
+    setupRows,
+    sessionRows,
+    behaviorData,
+    weeklyPlan,
+    insightStack,
+    kpiReadings,
+    directivesFlat,
+    evidence
+  } = intelligence;
+
+  const tradeCount = stats.count;
+  const hasSample = tradeCount > 0;
+  const isForming = sample.quality === 'insufficient';
   const goJournal = () => window.dispatchEvent(new CustomEvent('mtc-tab', { detail: 'journal' }));
 
   if (!hasSample) {
@@ -110,9 +91,11 @@ export function AnalyticsPage({ data }) {
           activeAccount={filters.activeAccount}
           dateFrom={filters.dateFrom}
           dateTo={filters.dateTo}
+          sample={sample}
+          subtitle="Decision Intelligence · diagnóstico operativo"
         />
         <AnalyticsFilters {...filters} tradeCount={0} />
-        <AnalyticsEmptyState onGoJournal={goJournal} count={0} />
+        <AnalyticsEmptyState onGoJournal={goJournal} count={0} sample={sample} />
       </main>
     );
   }
@@ -120,55 +103,69 @@ export function AnalyticsPage({ data }) {
   return (
     <main className="page analyticsPro analyticsPage analyticsShell analyticsIntelligenceCenter analyticsCockpit">
       <AnalyticsHeader
-        tradeCount={stats.count}
+        tradeCount={tradeCount}
         activeAccount={filters.activeAccount}
         dateFrom={filters.dateFrom}
         dateTo={filters.dateTo}
+        sample={sample}
+        subtitle="Decision Intelligence · diagnóstico operativo"
       />
-      <AnalyticsFilters {...filters} tradeCount={stats.count} />
+      <AnalyticsFilters {...filters} tradeCount={tradeCount} />
 
       <div className="analyticsCockpitFlow">
         <div className="analyticsZone analyticsZone--command">
-          <AnalyticsCommandCenter edgeData={edgeData} />
-        </div>
-
-        <div className="analyticsTier3 analyticsZone analyticsZone--intel analyticsZone--primary analyticsZone--canvas">
-          <div className="analyticsIntelligenceGrid">
-            <div className="analyticsIntelligenceMain">
-              <EdgeLab setupRows={setupRows} trades={filters.filtered} hasSample={hasSample} />
-            </div>
-            <aside className="analyticsIntelligenceSide">
-              <AnalyticsInsightStack insights={insightStack} />
-              <OperatingProfile
-                sessionRows={sessionRows}
-                behaviorData={behaviorData}
-                stats={stats}
-                hasSample={hasSample}
-                totalTrades={stats.count}
-                compact
-              />
-              <AnalyticsWeeklyPlan plan={weeklyPlan} compact />
-            </aside>
-          </div>
-        </div>
-
-        <div className="analyticsZone analyticsZone--directives">
-          <AnalyticsActionDirectives directives={directives} compact />
-        </div>
-
-        <div className="analyticsZone analyticsZone--health">
-          <AnalyticsKpiStrip readings={kpiReadings} hasSample={hasSample} compact />
-        </div>
-
-        <div className="analyticsTier4 analyticsZone analyticsZone--evidence">
-          <PerformanceEvidence
-            stats={stats}
-            dailyPnl={dailyPnl}
-            patternRows={patternRows}
-            rDistribution={rDistribution}
-            hasSample={hasSample}
+          <AnalyticsExecutiveDiagnosis
+            diagnosis={diagnosis}
+            sample={sample}
+            onGoJournal={goJournal}
           />
         </div>
+
+        {isForming ? (
+          <div className="analyticsZone analyticsZone--formation">
+            <AnalyticsEmptyState onGoJournal={goJournal} count={tradeCount} sample={sample} compact />
+          </div>
+        ) : (
+          <>
+            <div className="analyticsTier3 analyticsZone analyticsZone--intel analyticsZone--primary analyticsZone--canvas">
+              <div className="analyticsIntelligenceGrid">
+                <div className="analyticsIntelligenceMain">
+                  <EdgeLab setupRows={setupRows} trades={filters.filtered} hasSample={hasSample} />
+                </div>
+                <aside className="analyticsIntelligenceSide">
+                  <AnalyticsInsightStack insights={insightStack} />
+                  <OperatingProfile
+                    sessionRows={sessionRows}
+                    behaviorData={behaviorData}
+                    stats={stats}
+                    hasSample={hasSample}
+                    totalTrades={tradeCount}
+                    compact
+                  />
+                  <AnalyticsWeeklyPlan plan={weeklyPlan} compact />
+                </aside>
+              </div>
+            </div>
+
+            <div className="analyticsZone analyticsZone--directives">
+              <AnalyticsActionDirectives directives={directivesFlat} compact />
+            </div>
+
+            <div className="analyticsZone analyticsZone--health">
+              <AnalyticsKpiStrip readings={kpiReadings} hasSample={hasSample} compact />
+            </div>
+
+            <div className="analyticsTier4 analyticsZone analyticsZone--evidence">
+              <PerformanceEvidence
+                stats={stats}
+                dailyPnl={evidence.dailyPnl}
+                patternRows={evidence.patternRows}
+                rDistribution={evidence.rDistribution}
+                hasSample={hasSample}
+              />
+            </div>
+          </>
+        )}
       </div>
     </main>
   );

@@ -26029,6 +26029,308 @@ html[data-theme="light"] .analyticsCommandHeroV14 .analyticsCommandChip{
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   ANALYTICS SPRINT 02 — Executive Diagnosis (4 cards)
+   Scoped under .analyticsCockpit / .analyticsPage — not EOF
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsCockpit .analyticsTopBarSubtitle{
+  display:inline-block;
+  margin-left:2px;
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:.01em;
+  color:var(--ax-muted,var(--analytics-text-muted,#9C97B8));
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:min(280px,42vw);
+}
+
+.analyticsExecutiveDiagnosis{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding:16px 16px 14px;
+  border-radius:14px;
+  border:1px solid var(--ax-mat-flagship-border,rgba(124,92,255,.16));
+  background:var(--ax-mat-flagship-bg,rgba(255,255,255,.035));
+  min-width:0;
+}
+
+.analyticsExecutiveDiagnosisHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.analyticsExecutiveDiagnosisHeadMain{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.analyticsExecutiveDiagnosisEyebrow{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ax-muted,#9C97B8);
+}
+
+.analyticsExecutiveDiagnosisTitle{
+  margin:0;
+  font-size:clamp(17px,2.1vw,22px);
+  font-weight:800;
+  letter-spacing:-.03em;
+  line-height:1.25;
+  color:var(--ax-text,var(--analytics-text,#F5F3FF));
+}
+
+.analyticsExecutiveDiagnosisBadge{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid rgba(124,92,255,.22);
+  background:rgba(124,92,255,.1);
+  color:var(--ax-violet,#7C5CFF);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.analyticsExecutiveDiagnosisBadge.tone-good{
+  border-color:rgba(51,230,196,.28);
+  background:rgba(51,230,196,.1);
+  color:var(--ax-cyan,#33E6C4);
+}
+
+.analyticsExecutiveDiagnosisBadge.tone-warn{
+  border-color:rgba(255,79,163,.28);
+  background:rgba(255,79,163,.1);
+  color:var(--ax-magenta,#FF4FA3);
+}
+
+.analyticsExecutiveDiagnosisBadge.tone-neutral{
+  border-color:rgba(124,92,255,.24);
+  background:rgba(124,92,255,.1);
+  color:var(--ax-violet,#7C5CFF);
+}
+
+.analyticsDiagnosisGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  min-width:0;
+}
+
+.analyticsDiagnosisCard{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+  padding:12px 12px 11px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  border-top:2px solid rgba(124,92,255,.35);
+}
+
+.analyticsDiagnosisCard.tone-edge{border-top-color:rgba(51,230,196,.55)}
+.analyticsDiagnosisCard.tone-leak{border-top-color:rgba(255,79,163,.55)}
+.analyticsDiagnosisCard.tone-action{border-top-color:rgba(124,92,255,.55)}
+.analyticsDiagnosisCard.tone-confidence,
+.analyticsDiagnosisCard.tone-good{border-top-color:rgba(51,230,196,.45)}
+.analyticsDiagnosisCard.tone-warn{border-top-color:rgba(255,79,163,.45)}
+.analyticsDiagnosisCard.tone-neutral{border-top-color:rgba(124,92,255,.4)}
+
+.analyticsDiagnosisCardHead{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.analyticsDiagnosisCardIcon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  border-radius:7px;
+  background:rgba(124,92,255,.12);
+  color:var(--ax-violet,#7C5CFF);
+}
+
+.analyticsDiagnosisCard.tone-edge .analyticsDiagnosisCardIcon{
+  background:rgba(51,230,196,.12);
+  color:var(--ax-cyan,#33E6C4);
+}
+
+.analyticsDiagnosisCard.tone-leak .analyticsDiagnosisCardIcon,
+.analyticsDiagnosisCard.tone-warn .analyticsDiagnosisCardIcon{
+  background:rgba(255,79,163,.12);
+  color:var(--ax-magenta,#FF4FA3);
+}
+
+.analyticsDiagnosisCard.tone-action .analyticsDiagnosisCardIcon,
+.analyticsDiagnosisCard.tone-neutral .analyticsDiagnosisCardIcon{
+  background:rgba(124,92,255,.12);
+  color:var(--ax-violet,#7C5CFF);
+}
+
+.analyticsDiagnosisCard.tone-good .analyticsDiagnosisCardIcon{
+  background:rgba(51,230,196,.12);
+  color:var(--ax-cyan,#33E6C4);
+}
+
+.analyticsDiagnosisCardLabel{
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ax-muted,#9C97B8);
+}
+
+.analyticsDiagnosisCardTitle{
+  display:block;
+  margin:0;
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1.3;
+  color:var(--ax-text,#F5F3FF);
+  overflow-wrap:anywhere;
+}
+
+.analyticsDiagnosisCardDetail{
+  margin:0;
+  font-size:11px;
+  line-height:1.4;
+  color:var(--ax-text-mid,#C8C3E0);
+}
+
+.analyticsExecutiveDiagnosisFoot{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding-top:2px;
+}
+
+.analyticsExecutiveDiagnosisFoot small{
+  flex:1 1 160px;
+  font-size:10px;
+  color:var(--ax-muted,#9C97B8);
+  line-height:1.35;
+}
+
+.analyticsDiagnosisProgress{
+  flex:1 1 120px;
+  max-width:180px;
+}
+
+.analyticsDiagnosisProgressBar{
+  height:3px;
+  border-radius:99px;
+  background:rgba(255,255,255,.06);
+  overflow:hidden;
+}
+
+.analyticsDiagnosisProgressBar>span{
+  display:block;
+  height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,rgba(51,230,196,.65),rgba(124,92,255,.55));
+}
+
+.analyticsCockpit .analyticsZone--formation{
+  min-width:0;
+}
+
+.analyticsEmptyPremium.compact{
+  padding:16px 14px;
+  gap:5px;
+}
+
+.analyticsEmptyPremium.compact>span{
+  width:40px;
+  height:40px;
+  border-radius:11px;
+}
+
+.analyticsEmptyPremium.compact b{font-size:14px}
+.analyticsEmptyPremium.compact p{font-size:11px}
+
+.analyticsCockpit .analyticsEmptyPremium>span{
+  border-color:rgba(124,92,255,.28);
+  background:rgba(124,92,255,.1);
+  color:var(--ax-violet,#7C5CFF);
+}
+.analyticsCockpit .analyticsEmptyPremium.tone-good>span{
+  border-color:rgba(51,230,196,.28);
+  background:rgba(51,230,196,.1);
+  color:var(--ax-cyan,#33E6C4);
+}
+.analyticsCockpit .analyticsEmptyPremium.tone-warn>span{
+  border-color:rgba(255,79,163,.24);
+  background:rgba(255,79,163,.1);
+  color:var(--ax-magenta,#FF4FA3);
+}
+.analyticsCockpit .analyticsEmptyPremium .analyticsEdgeProgressBar>span{
+  background:linear-gradient(90deg,rgba(51,230,196,.6),rgba(124,92,255,.5));
+}
+
+html[data-theme="light"] .analyticsExecutiveDiagnosis{
+  background:linear-gradient(168deg,#fff,#f8fafc);
+  border-color:rgba(15,23,42,.08);
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+
+html[data-theme="light"] .analyticsExecutiveDiagnosisTitle{color:#0f172a}
+html[data-theme="light"] .analyticsExecutiveDiagnosisEyebrow{color:#64748b}
+html[data-theme="light"] .analyticsDiagnosisCard{
+  background:#fff;
+  border-color:rgba(15,23,42,.08);
+}
+html[data-theme="light"] .analyticsDiagnosisCardTitle{color:#0f172a}
+html[data-theme="light"] .analyticsDiagnosisCardDetail{color:#475569}
+html[data-theme="light"] .analyticsDiagnosisCardLabel{color:#64748b}
+html[data-theme="light"] .analyticsCockpit .analyticsTopBarSubtitle{color:#64748b}
+html[data-theme="light"] .analyticsDiagnosisProgressBar{background:rgba(15,23,42,.08)}
+
+html:not([data-theme="light"]) .analyticsCockpit .analyticsExecutiveDiagnosis,
+html[data-theme="dark"] .analyticsCockpit .analyticsExecutiveDiagnosis{
+  border-color:var(--ax-panel-border,rgba(124,92,255,.16));
+}
+
+html:not([data-theme="light"]) .analyticsCockpit .analyticsDiagnosisCard,
+html[data-theme="dark"] .analyticsCockpit .analyticsDiagnosisCard{
+  background:rgba(255,255,255,.028);
+  border-color:rgba(255,255,255,.07);
+}
+
+@media (max-width:1100px){
+  .analyticsDiagnosisGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (max-width:640px){
+  .analyticsCockpit .analyticsTopBarSubtitle{
+    display:none;
+  }
+  .analyticsExecutiveDiagnosis{padding:14px 12px 12px;gap:12px}
+  .analyticsExecutiveDiagnosisHead{flex-direction:column;align-items:flex-start;gap:8px}
+  .analyticsDiagnosisGrid{grid-template-columns:1fr;gap:8px}
+  .analyticsExecutiveDiagnosisTitle{font-size:17px}
+  .analyticsExecutiveDiagnosisFoot{flex-direction:column;align-items:stretch}
+  .analyticsDiagnosisProgress{max-width:none}
+}
+
+/* ═══════════════════════════════════════════════════════════════
    ANALYTICS AURORA v15 — Dark-only palette, glow fix, glass depth
    Scoped: html:not([data-theme="light"]) .analyticsCockpit
    ═══════════════════════════════════════════════════════════════ */

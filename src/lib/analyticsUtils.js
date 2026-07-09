@@ -195,7 +195,17 @@ export function calculateDailyTradeStats(trades = []) {
 }
 
 export const ANALYTICS_MIN_SAMPLE = 20;
+export const ANALYTICS_USABLE_SAMPLE = 10;
+export const ANALYTICS_OBSERVE_SAMPLE = 5;
 export const ANALYTICS_MIN_CHART_POINTS = 2;
+
+/** Fase 3 sample quality bands for the intelligence layer. */
+export const SAMPLE_QUALITY = {
+  insufficient: { quality: 'insufficient', label: 'Muestra insuficiente', short: 'Insuficiente', tone: 'warn', minRequired: ANALYTICS_OBSERVE_SAMPLE },
+  observing: { quality: 'observing', label: 'Muestra en observación', short: 'Observación', tone: 'neutral', minRequired: ANALYTICS_USABLE_SAMPLE },
+  usable: { quality: 'usable', label: 'Muestra usable', short: 'Usable', tone: 'good', minRequired: ANALYTICS_MIN_SAMPLE },
+  reliable: { quality: 'reliable', label: 'Muestra confiable', short: 'Confiable', tone: 'good', minRequired: ANALYTICS_MIN_SAMPLE }
+};
 
 export function normalizeAnalyticsSession(value = '') {
   const raw = String(value || '').toLowerCase();
@@ -645,26 +655,122 @@ function sampleSizeComponentScore(n) {
   return 100;
 }
 
+/**
+ * Fase 3 sample bands:
+ * 0–4 insufficient · 5–9 observing · 10–19 usable · 20+ reliable
+ * Legacy `tier` aliases kept for older consumers (initial/interpretable/solid).
+ */
 export function classifySampleConfidence(n = 0) {
   const count = Number(n || 0);
-  if (count < 5) return { label: 'Muestra insuficiente', tier: 'insufficient', tone: 'warn', count };
-  if (count < 20) return { label: 'Muestra inicial', tier: 'initial', tone: 'neutral', count };
-  if (count < 50) return { label: 'Muestra interpretable', tier: 'interpretable', tone: 'good', count };
-  return { label: 'Muestra sólida', tier: 'solid', tone: 'good', count };
+  if (count < ANALYTICS_OBSERVE_SAMPLE) {
+    return {
+      label: SAMPLE_QUALITY.insufficient.label,
+      tier: 'insufficient',
+      quality: 'insufficient',
+      tone: 'warn',
+      count,
+      minRequired: SAMPLE_QUALITY.insufficient.minRequired
+    };
+  }
+  if (count < ANALYTICS_USABLE_SAMPLE) {
+    return {
+      label: SAMPLE_QUALITY.observing.label,
+      tier: 'initial',
+      quality: 'observing',
+      tone: 'neutral',
+      count,
+      minRequired: SAMPLE_QUALITY.observing.minRequired
+    };
+  }
+  if (count < ANALYTICS_MIN_SAMPLE) {
+    return {
+      label: SAMPLE_QUALITY.usable.label,
+      tier: 'interpretable',
+      quality: 'usable',
+      tone: 'good',
+      count,
+      minRequired: SAMPLE_QUALITY.usable.minRequired
+    };
+  }
+  return {
+    label: SAMPLE_QUALITY.reliable.label,
+    tier: 'solid',
+    quality: 'reliable',
+    tone: 'good',
+    count,
+    minRequired: SAMPLE_QUALITY.reliable.minRequired
+  };
 }
+
+export function buildSampleQuality(count = 0) {
+  const conf = classifySampleConfidence(count);
+  const n = Number(count || 0);
+  const minRequired = conf.minRequired || ANALYTICS_USABLE_SAMPLE;
+  const progressPct = Math.min(100, Math.round((n / minRequired) * 100));
+  let message;
+  if (n === 0) {
+    message = 'Cargá tus primeros 10 trades para activar tu diagnóstico operativo.';
+  } else if (conf.quality === 'insufficient') {
+    message = `${n} trade${n === 1 ? '' : 's'} · faltan ${Math.max(0, ANALYTICS_OBSERVE_SAMPLE - n)} para observación.`;
+  } else if (conf.quality === 'observing') {
+    message = `${n} trades · faltan ${Math.max(0, ANALYTICS_USABLE_SAMPLE - n)} para lectura usable.`;
+  } else if (conf.quality === 'usable') {
+    message = `${n} trades · lectura usable · ${Math.max(0, ANALYTICS_MIN_SAMPLE - n)} más para confiabilidad alta.`;
+  } else {
+    message = `${n} trades · muestra confiable para directivas operativas.`;
+  }
+  return {
+    totalTrades: n,
+    quality: conf.quality,
+    label: conf.label,
+    short: SAMPLE_QUALITY[conf.quality]?.short || conf.label,
+    tone: conf.tone,
+    message,
+    minRequired,
+    progressPct,
+    tier: conf.tier
+  };
+}
+
+export const SETUP_VALIDATION_TARGET = 10;
 
 export function classifySetupConfidence(n = 0) {
   const count = Number(n || 0);
   if (count < 3) {
-    return { label: 'Muestra insuficiente', shortLabel: 'Insuficiente', tier: 'insufficient', rank: 0 };
+    return { label: 'Muestra insuficiente', shortLabel: 'Insuficiente', tier: 'insufficient', status: 'insufficient', rank: 0 };
   }
-  if (count < 10) {
-    return { label: 'En observación', shortLabel: 'Observación', tier: 'observation', rank: 1 };
+  if (count < SETUP_VALIDATION_TARGET) {
+    return { label: 'En observación', shortLabel: 'Observación', tier: 'observation', status: 'observing', rank: 1 };
   }
-  return { label: 'Validado', shortLabel: 'Validado', tier: 'validated', rank: 2 };
+  return { label: 'Validado', shortLabel: 'Validado', tier: 'validated', status: 'validated', rank: 2 };
 }
 
-export const SETUP_VALIDATION_TARGET = 10;
+/** Research-desk status for a setup row (includes risky when leaking with N≥2). */
+export function classifyEdgeLabStatus(row = {}) {
+  const count = Number(row.count || 0);
+  const value = Number(row.value || 0);
+  const avgR = Number(row.avgR || 0);
+  const conf = classifySetupConfidence(count);
+  const isLeak = value < 0 || (count >= 3 && avgR < 0);
+  if (isLeak && count >= 2) {
+    return {
+      status: 'risky',
+      label: 'Riesgoso',
+      shortLabel: 'Riesgoso',
+      tier: 'risky',
+      rank: conf.rank,
+      confidence: conf
+    };
+  }
+  return {
+    status: conf.status,
+    label: conf.shortLabel,
+    shortLabel: conf.shortLabel,
+    tier: conf.tier,
+    rank: conf.rank,
+    confidence: conf
+  };
+}
 
 export function groupSetupsForValidation(rows = []) {
   const visible = (rows || []).filter(r => r.count > 0);
@@ -754,31 +860,26 @@ export function generateExecutiveHeadline(edge, leak, sessionRows = [], count = 
 }
 
 export function buildSampleFootnote(count = 0) {
-  const n = Number(count || 0);
-  if (n < 5) return `${n} trade${n === 1 ? '' : 's'} · faltan ${5 - n} para lectura inicial`;
-  if (n < ANALYTICS_MIN_SAMPLE) return `${n} trades · faltan ${ANALYTICS_MIN_SAMPLE - n} para lectura interpretable`;
-  if (n < 50) return `${n} trades · muestra interpretable`;
-  return `${n} trades · muestra sólida`;
+  return buildSampleQuality(count).message;
 }
 
 export function buildHeroSubline(count = 0, confidence = {}) {
   const n = Number(count || 0);
-  const tier = confidence?.tier || classifySampleConfidence(n).tier;
-  if (n < 5) return 'Muestra en formación; cada trade suma claridad operativa.';
-  if (tier === 'solid') return 'Muestra robusta; las lecturas tienen mayor confiabilidad estadística.';
-  if (tier === 'interpretable') return 'Muestra interpretable; validá edge y fuga antes de escalar riesgo.';
-  return 'Señal útil con muestra inicial; priorizá consistencia antes de aumentar riesgo.';
+  const quality = confidence?.quality || classifySampleConfidence(n).quality;
+  if (n < ANALYTICS_OBSERVE_SAMPLE) return 'Muestra insuficiente; cada trade suma claridad operativa.';
+  if (quality === 'reliable') return 'Muestra confiable; las lecturas sostienen directivas operativas.';
+  if (quality === 'usable') return 'Muestra usable; validá edge y fuga antes de escalar riesgo.';
+  return 'Muestra en observación; priorizá consistencia antes de aumentar riesgo.';
 }
 
 export function getTopBarSampleState(count = 0) {
-  const c = classifySampleConfidence(count);
-  const labelMap = {
-    insufficient: 'Inicial',
-    initial: 'Inicial',
-    interpretable: 'Interpretable',
-    solid: 'Robusta'
+  const sample = buildSampleQuality(count);
+  return {
+    label: sample.short,
+    tier: sample.tier,
+    quality: sample.quality,
+    tone: sample.tone
   };
-  return { label: labelMap[c.tier] || 'Inicial', tier: c.tier, tone: c.tone };
 }
 
 export function formatAnalyticsAccountLabel(active = '__all__') {
@@ -1139,8 +1240,11 @@ export function pickActiveThesis(setupRows = [], trades = []) {
 export function buildActionDirectives(trades = [], stats = {}, sessionRows = [], behaviorData = {}) {
   const cards = buildInsightCards(trades, stats, sessionRows, behaviorData);
   const edge = identifyEdgeSetup(trades);
+  const leak = identifyLeakSetup(trades);
   const edgeRow = edge ? breakdownBySetup(trades).find(r => r.name === edge.name) : null;
   const avgRLine = edgeRow?.avgR ? ` · ${formatR(edgeRow.avgR)} promedio` : '';
+  const count = Number(stats?.count || 0);
+  const sample = buildSampleQuality(count);
 
   const repeatConfidence = cards.repeat.status === 'Validado'
     ? 'Señal validada en la muestra.'
@@ -1148,30 +1252,166 @@ export function buildActionDirectives(trades = [], stats = {}, sessionRows = [],
     ? 'Señal útil, aún no validada.'
     : 'Muestra insuficiente para conclusión.';
 
+  const remaining = edge
+    ? Math.max(0, SETUP_VALIDATION_TARGET - Number(edge.count || 0))
+    : Math.max(0, ANALYTICS_USABLE_SAMPLE - count);
+
+  const repeat = {
+    type: 'repeat',
+    label: 'Repetir',
+    title: cards.repeat.setup !== 'Sin edge validado'
+      ? `Repetir ${cards.repeat.setup}`
+      : 'Sin patrón para repetir',
+    setup: cards.repeat.setup,
+    reason: cards.repeat.setup !== 'Sin edge validado'
+      ? 'Es tu bloque con mejor retorno neto en la muestra.'
+      : 'Todavía no hay setup positivo con muestra mínima.',
+    metric: cards.repeat.setup !== 'Sin edge validado'
+      ? `${cards.repeat.line}${avgRLine}`
+      : sample.message,
+    action: cards.repeat.setup !== 'Sin edge validado'
+      ? (remaining > 0
+        ? `Buscar ${Math.min(3, remaining)} ejecuciones más antes de sumar otro setup.`
+        : 'Sostener el setup con disciplina de registro.')
+      : `Registrar ${Math.max(3, remaining)} trades etiquetados por setup.`,
+    motive: cards.repeat.setup !== 'Sin edge validado' ? 'Edge con retorno positivo' : 'Sin candidato activo',
+    evidence: `${cards.repeat.line}${avgRLine}`,
+    confidence: repeatConfidence,
+    tone: cards.repeat.tone,
+    status: cards.repeat.status,
+    line: cards.repeat.line
+  };
+
+  const reduce = {
+    type: 'reduce',
+    label: 'Recortar',
+    title: cards.cut.setup !== 'Sin fuga marcada'
+      ? `Recortar ${cards.cut.setup}`
+      : 'Sin fuga marcada',
+    setup: cards.cut.setup,
+    reason: cards.cut.setup !== 'Sin fuga marcada'
+      ? 'Este patrón concentra pérdidas o baja el R promedio.'
+      : 'No hay setup negativo con muestra mínima.',
+    metric: cards.cut.line,
+    action: cards.cut.setup !== 'Sin fuga marcada'
+      ? 'Reducir exposición hasta nueva evidencia.'
+      : 'Mantener vigilancia de setups negativos.',
+    motive: cards.cut.setup !== 'Sin fuga marcada' ? 'Pérdida neta en muestra' : 'Sin fuga activa',
+    evidence: cards.cut.line,
+    confidence: cards.cut.setup !== 'Sin fuga marcada' ? 'Reducir exposición hasta nueva evidencia.' : 'Sin alerta de fuga.',
+    tone: cards.cut.tone,
+    line: cards.cut.line,
+    reading: cards.cut.reading
+  };
+
+  const investigate = {
+    type: 'investigate',
+    label: 'Investigar',
+    title: cards.watch.setup,
+    setup: cards.watch.setup,
+    reason: cards.watch.reading,
+    metric: cards.watch.line,
+    action: cards.watch.action,
+    motive: cards.watch.action,
+    evidence: cards.watch.line,
+    confidence: cards.watch.reading,
+    reading: cards.watch.reading,
+    line: cards.watch.line,
+    tone: cards.watch.tone
+  };
+
+  const protect = buildProtectDirective(stats, behaviorData, sample, leak);
+
   return {
-    repeat: {
-      ...cards.repeat,
-      motive: cards.repeat.setup !== 'Sin edge validado' ? 'Edge con retorno positivo' : 'Sin candidato activo',
-      evidence: `${cards.repeat.line}${avgRLine}`,
-      confidence: repeatConfidence
-    },
-    cut: {
-      ...cards.cut,
-      motive: cards.cut.setup !== 'Sin fuga marcada' ? 'Pérdida neta en muestra' : 'Sin fuga activa',
-      evidence: cards.cut.line,
-      confidence: cards.cut.setup !== 'Sin fuga marcada' ? 'Reducir exposición hasta nueva evidencia.' : 'Sin alerta de fuga.'
-    },
-    investigate: {
-      label: 'Investigar',
-      setup: cards.watch.setup,
-      line: cards.watch.line,
-      evidence: cards.watch.line,
-      reading: cards.watch.reading,
-      action: cards.watch.action,
-      motive: cards.watch.action,
-      confidence: cards.watch.reading,
-      tone: cards.watch.tone
-    }
+    repeat,
+    reduce,
+    cut: reduce,
+    investigate,
+    protect
+  };
+}
+
+function buildProtectDirective(stats = {}, behaviorData = {}, sample = {}, leak = null) {
+  const disc = Number(stats?.discipline || 0);
+  const behaviorAvg = Number(behaviorData?.behaviorAvg || stats?.behaviorAvg || 0);
+  const dd = Number(stats?.maxDD || 0);
+  const impulse = Number(stats?.impulseTrades || 0);
+  const count = Number(stats?.count || sample.totalTrades || 0);
+
+  if (dd > 10) {
+    return {
+      type: 'protect',
+      label: 'Proteger',
+      title: 'Proteger capital ante drawdown',
+      reason: 'El drawdown de la muestra está elevado.',
+      metric: `DD ${pct(dd)} · ${formatMoneyClean(stats.ddMoney || 0)}`,
+      action: 'No escalar riesgo hasta nueva evidencia positiva.',
+      tone: 'warn'
+    };
+  }
+  if (behaviorAvg > 0 && behaviorAvg < 50) {
+    return {
+      type: 'protect',
+      label: 'Proteger',
+      title: 'Proteger disciplina de ejecución',
+      reason: 'La conducta está erosionando el edge.',
+      metric: `Conducta ${Math.round(behaviorAvg)}/100`,
+      action: 'Revisar checklist antes de aumentar tamaño.',
+      tone: 'warn'
+    };
+  }
+  if (disc > 0 && disc < 60) {
+    return {
+      type: 'protect',
+      label: 'Proteger',
+      title: 'Proteger adherencia al plan',
+      reason: 'La disciplina de plan está por debajo del umbral operativo.',
+      metric: `Plan seguido ${formatPercentCard(disc)}`,
+      action: 'Operar solo setups con checklist completo.',
+      tone: 'warn'
+    };
+  }
+  if (impulse >= 2) {
+    return {
+      type: 'protect',
+      label: 'Proteger',
+      title: 'Proteger contra impulsividad',
+      reason: 'Hay trades impulsivos recurrentes en la muestra.',
+      metric: `${impulse} trades impulsivos`,
+      action: 'Pausar si aparece impulso o sobreoperación.',
+      tone: 'warn'
+    };
+  }
+  if (leak?.name) {
+    return {
+      type: 'protect',
+      label: 'Proteger',
+      title: `Proteger exposición en ${formatSetupLabel(leak.name)}`,
+      reason: 'La fuga activa puede amplificar pérdidas si se escala.',
+      metric: `${formatMoneyClean(leak.value)} · ${leak.count} trades`,
+      action: 'Mantener tamaño base hasta cortar la fuga.',
+      tone: 'warn'
+    };
+  }
+  if (sample.quality === 'insufficient' || sample.quality === 'observing') {
+    return {
+      type: 'protect',
+      label: 'Proteger',
+      title: 'Proteger lectura prematura',
+      reason: 'La muestra todavía no sostiene conclusiones fuertes.',
+      metric: sample.message,
+      action: 'No escalar riesgo; priorizar registro limpio.',
+      tone: 'neutral'
+    };
+  }
+  return {
+    type: 'protect',
+    label: 'Proteger',
+    title: 'Proteger el proceso de registro',
+    reason: 'Sin alerta crítica; el riesgo es perder calidad de muestra.',
+    metric: `${count} trades · disciplina ${formatPercentCard(disc || 0)}`,
+    action: 'Mantener etiquetado de setup, sesión y conducta.',
+    tone: 'neutral'
   };
 }
 
@@ -1606,5 +1846,262 @@ export function buildFinalSampleReading(stats = {}, setupRows = [], sessionRows 
   return {
     line: `Lectura: ${edgePart}; ${leakPart}; ${brief.decision.text.replace(/\.$/, '')}.`,
     confidence: brief.confidence.short
+  };
+}
+
+const WEEKDAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+export function breakdownByWeekday(trades = []) {
+  const closed = (trades || []).filter(isClosedEvaluableTrade);
+  const groups = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+  closed.forEach((t) => {
+    const key = getTradeOperationalDateKey(t);
+    if (!key) return;
+    const d = new Date(`${key}T12:00:00`);
+    if (Number.isNaN(d.getTime())) return;
+    groups[d.getDay()].push(t);
+  });
+  return [1, 2, 3, 4, 5, 6, 0].map((day) => ({
+    name: WEEKDAY_LABELS[day],
+    day,
+    ...buildGroupMetrics(groups[day])
+  }));
+}
+
+export function buildRBucketDistribution(trades = []) {
+  const buckets = [
+    { key: 'lt-1', name: '< -1R', count: 0, tone: 'neg' },
+    { key: 'n1-0', name: '-1R a 0', count: 0, tone: 'neg' },
+    { key: 'be', name: 'BE', count: 0, tone: 'neutral' },
+    { key: '0-1', name: '0 a +1R', count: 0, tone: 'pos' },
+    { key: 'gt1', name: '+1R+', count: 0, tone: 'pos' }
+  ];
+  (trades || []).filter(isClosedEvaluableTrade).forEach((t) => {
+    const r = Number(realizedRValue(t) || 0);
+    if (!Number.isFinite(r)) return;
+    if (r === 0) buckets[2].count += 1;
+    else if (r < -1) buckets[0].count += 1;
+    else if (r < 0) buckets[1].count += 1;
+    else if (r <= 1) buckets[3].count += 1;
+    else buckets[4].count += 1;
+  });
+  return buckets.map(({ key, name, count, tone }) => ({ key, name, count, tone, value: count }));
+}
+
+export function buildSessionWeekdayHeatmap(trades = []) {
+  const sessions = ['Asia', 'Londres', 'NY', 'Otro'];
+  const weekdays = [1, 2, 3, 4, 5];
+  const closed = (trades || []).filter(isClosedEvaluableTrade);
+  const cells = [];
+  sessions.forEach((session) => {
+    weekdays.forEach((day) => {
+      const rows = closed.filter((t) => {
+        const key = getTradeOperationalDateKey(t);
+        if (!key) return false;
+        const d = new Date(`${key}T12:00:00`);
+        if (Number.isNaN(d.getTime()) || d.getDay() !== day) return false;
+        return normalizeAnalyticsSession(t.session) === session;
+      });
+      const metrics = buildGroupMetrics(rows);
+      cells.push({
+        session,
+        weekday: WEEKDAY_LABELS[day],
+        day,
+        count: metrics.count,
+        pnl: metrics.value,
+        avgR: metrics.avgR
+      });
+    });
+  });
+  return { sessions, weekdays: weekdays.map((d) => WEEKDAY_LABELS[d]), cells };
+}
+
+function edgeLabActionForStatus(status, row = {}, leakName = '') {
+  const remaining = Math.max(0, SETUP_VALIDATION_TARGET - Number(row.count || 0));
+  if (status === 'risky') {
+    return leakName === row.name
+      ? 'Recortar exposición hasta nueva evidencia.'
+      : 'Reducir tamaño y revisar condiciones de entrada.';
+  }
+  if (status === 'validated') {
+    return 'Repetir con disciplina; no diluir con setups nuevos.';
+  }
+  if (status === 'observing') {
+    return remaining
+      ? `Tomar ${Math.min(3, remaining)} muestras más esta semana.`
+      : 'Completar validación con registro limpio.';
+  }
+  return 'Acumular muestra antes de concluir.';
+}
+
+export function buildEdgeLabRows(setupRows = [], leak = null) {
+  const leakName = leak?.name || '';
+  const rows = sortSetupRows(setupRows || []).filter((r) => Number(r.count || 0) > 0);
+  return rows.map((row) => {
+    const statusInfo = classifyEdgeLabStatus(row);
+    const progress = buildValidationProgress(row.count);
+    const weight = Math.min(1, Number(row.count || 0) / SETUP_VALIDATION_TARGET);
+    return {
+      setup: row.name,
+      label: formatSetupLabel(row.name),
+      status: statusInfo.status,
+      statusLabel: statusInfo.label,
+      trades: row.count,
+      minTrades: SETUP_VALIDATION_TARGET,
+      pnl: row.value,
+      avgR: row.avgR,
+      winrate: row.winrate,
+      leak: statusInfo.status === 'risky' ? (leakName === row.name ? 'Fuga principal' : 'Fuga asociada') : null,
+      action: edgeLabActionForStatus(statusInfo.status, row, leakName),
+      confidence: statusInfo.confidence?.label || statusInfo.label,
+      progressPct: progress.pct,
+      evidenceWeight: weight,
+      sampleBar: `${row.count}/${SETUP_VALIDATION_TARGET}`
+    };
+  });
+}
+
+export function buildExecutiveDiagnosis(edge, leak, sessionRows = [], count = 0, weeklyPlan = null) {
+  const sample = buildSampleQuality(count);
+  const sessions = (sessionRows || []).filter((s) => s.count > 0).sort((a, b) => b.value - a.value);
+  const bestSession = sessions[0];
+
+  let edgeTitle = 'Todavía no hay edge confirmado';
+  let edgeDetail = 'Cargá 10 trades para activar directivas operativas.';
+  if (edge?.name) {
+    edgeTitle = formatSetupLabel(edge.name);
+    edgeDetail = bestSession
+      ? `Tu mejor comportamiento aparece cuando operás ${bestSession.name} con este setup.`
+      : `Mejor retorno neto · ${edge.count} trade${edge.count === 1 ? '' : 's'}.`;
+  } else if (sample.quality === 'observing') {
+    edgeTitle = 'Hipótesis en formación';
+    edgeDetail = 'Hay señal débil; todavía no hay edge confirmado.';
+  }
+
+  let leakTitle = 'Sin fuga principal';
+  let leakDetail = 'No hay patrón negativo con muestra mínima.';
+  if (leak?.name) {
+    leakTitle = formatSetupLabel(leak.name);
+    leakDetail = 'Este patrón concentra tus pérdidas o baja tu R promedio.';
+  }
+
+  let weeklyAction = weeklyPlan?.bullets?.[0] || buildWeeklyActionLine(edge, leak, sessionRows, count);
+  if (sample.quality === 'insufficient') {
+    weeklyAction = `Registrar ${Math.max(0, ANALYTICS_USABLE_SAMPLE - count)} trades más con setup y sesión.`;
+  }
+
+  const confidenceLabel = sample.label;
+  const confidenceDetail = `${count} trade${count === 1 ? '' : 's'} registrados · ${sample.minRequired} mínimos para ${
+    sample.quality === 'reliable' || sample.quality === 'usable' ? 'confiabilidad alta' : 'lectura usable'
+  }`;
+
+  return {
+    edgeTitle,
+    edgeDetail,
+    leakTitle,
+    leakDetail,
+    weeklyAction,
+    confidenceLabel,
+    confidenceDetail,
+    sampleQuality: sample.quality,
+    sample
+  };
+}
+
+export function buildOperatingProfileSummary(sessionRows = [], weekdayRows = [], stats = {}, setupRows = [], behaviorData = {}) {
+  const sessions = (sessionRows || []).filter((s) => s.count > 0).sort((a, b) => b.value - a.value);
+  const weekdays = (weekdayRows || []).filter((d) => d.count > 0).sort((a, b) => b.value - a.value);
+  const bestSetup = (setupRows || []).filter((s) => s.count > 0 && s.value > 0).sort((a, b) => b.value - a.value)[0];
+  return {
+    bestSession: sessions[0] ? { name: sessions[0].name, value: sessions[0].value, count: sessions[0].count } : null,
+    worstSession: sessions.length > 1
+      ? { name: sessions[sessions.length - 1].name, value: sessions[sessions.length - 1].value, count: sessions[sessions.length - 1].count }
+      : null,
+    bestWeekday: weekdays[0] ? { name: weekdays[0].name, value: weekdays[0].value, count: weekdays[0].count } : null,
+    avgR: Number(stats?.avgR || 0),
+    expectancy: Number(stats?.expectancy || 0),
+    winrate: Number(stats?.winrate || 0),
+    profitFactor: Number(stats?.profitFactor || 0),
+    dominantPattern: bestSetup ? formatSetupLabel(bestSetup.name) : null,
+    behaviorAvg: Number(behaviorData?.behaviorAvg || stats?.behaviorAvg || 0),
+    checklistAvg: Number(behaviorData?.checklistAvg || 0),
+    discipline: Number(stats?.discipline || 0)
+  };
+}
+
+/**
+ * Fase 3R Sprint 01 — single derived intelligence layer for Analytics.
+ * Pure helper: no UI deps. Reuses existing calc / breakdown / directive builders.
+ */
+export function buildAnalyticsIntelligence(trades = [], options = {}) {
+  const initial = Number(options.initial ?? 10000);
+  const closed = (trades || []).filter(isClosedEvaluableTrade);
+  const stats = options.stats || calc(closed, initial);
+  const setupRows = options.setupRows || breakdownBySetup(closed);
+  const sessionRows = options.sessionRows || breakdownBySession(closed);
+  const weekdayRows = options.weekdayRows || breakdownByWeekday(closed);
+  const behaviorData = options.behaviorData || behaviorInsightsFromTrades(closed);
+  const dailyPnl = options.dailyPnl || buildDailyPnlForChart(closed);
+  const patternRows = options.patternRows || buildPatternBreakdown(closed);
+  const rSeries = options.rDistribution || buildRDistributionForChart(closed);
+  const edgeData = options.edgeData || calculateEdgeScore(closed, initial);
+  const edge = edgeData.edge || identifyEdgeSetup(closed);
+  const leak = edgeData.leak || identifyLeakSetup(closed);
+  const sample = buildSampleQuality(stats.count);
+  const thesis = pickActiveThesis(setupRows, closed);
+  const directivesRaw = buildActionDirectives(closed, stats, sessionRows, behaviorData);
+  const weeklyPlan = buildWeeklyPlan(closed, stats, sessionRows, setupRows);
+  const diagnosis = buildExecutiveDiagnosis(edge, leak, sessionRows, stats.count, weeklyPlan);
+  const edgeLab = buildEdgeLabRows(setupRows, leak);
+  const operatingProfile = buildOperatingProfileSummary(sessionRows, weekdayRows, stats, setupRows, behaviorData);
+  const insightStack = buildInsightStack(edgeData, thesis, directivesRaw);
+  const kpiReadings = buildKpiReadings(stats);
+  const rBuckets = buildRBucketDistribution(closed);
+  const heatmap = buildSessionWeekdayHeatmap(closed);
+
+  const directives = {
+    repeat: directivesRaw.repeat ? [directivesRaw.repeat] : [],
+    reduce: directivesRaw.reduce ? [directivesRaw.reduce] : [],
+    investigate: directivesRaw.investigate ? [directivesRaw.investigate] : [],
+    protect: directivesRaw.protect ? [directivesRaw.protect] : []
+  };
+
+  return {
+    sample,
+    diagnosis,
+    edgeLab,
+    directives,
+    directivesFlat: directivesRaw,
+    operatingProfile,
+    weeklyPlan,
+    insightStack,
+    kpiReadings,
+    thesis,
+    edgeData,
+    stats,
+    setupRows,
+    sessionRows,
+    weekdayRows,
+    behaviorData,
+    evidence: {
+      equityCurve: stats.curve || [],
+      dailyPnl,
+      rDistribution: rSeries,
+      rBuckets,
+      sessionHeatmap: heatmap,
+      weekdayPnl: weekdayRows,
+      patternRows
+    },
+    meta: {
+      totalTrades: stats.count,
+      averageR: stats.avgR,
+      expectancy: stats.expectancy,
+      winrate: stats.winrate,
+      profitFactor: stats.profitFactor,
+      bestSetup: edge,
+      worstSetup: leak,
+      mostLeakingPattern: leak,
+      dominantSession: operatingProfile.bestSession
+    }
   };
 }

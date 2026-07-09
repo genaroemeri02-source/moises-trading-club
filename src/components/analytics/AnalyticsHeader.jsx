@@ -9,9 +9,17 @@ export function AnalyticsHeader({
   tradeCount = 0,
   activeAccount = '__all__',
   dateFrom = '',
-  dateTo = ''
+  dateTo = '',
+  sample: sampleProp = null,
+  subtitle = 'Decision Intelligence · diagnóstico operativo'
 }) {
-  const sample = getTopBarSampleState(tradeCount);
+  const sample = sampleProp
+    ? {
+        label: sampleProp.short || sampleProp.label,
+        tone: sampleProp.tone,
+        quality: sampleProp.quality
+      }
+    : getTopBarSampleState(tradeCount);
   const accountLabel = formatAnalyticsAccountLabel(activeAccount);
   const rangeLabel = formatAnalyticsDateRange(dateFrom, dateTo);
 
@@ -23,6 +31,9 @@ export function AnalyticsHeader({
             <BarChart3 size={14} />
             Analytics
           </span>
+          {subtitle && (
+            <span className="analyticsTopBarSubtitle">{subtitle}</span>
+          )}
           <span className="analyticsTopBarDivider" aria-hidden="true" />
           <span className="analyticsTopBarCount">
             {tradeCount} trade{tradeCount === 1 ? '' : 's'} evaluable{tradeCount === 1 ? '' : 's'}
