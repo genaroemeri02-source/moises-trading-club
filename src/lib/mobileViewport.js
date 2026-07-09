@@ -1,6 +1,7 @@
 /**
- * Native mobile viewport owner for iOS PWA.
- * Prefer Math.max on standalone resume — visualViewport can return a stale short height.
+ * Mobile viewport sync for iOS PWA.
+ * Bottom dock retired — no --mobile-dock-gap.
+ * Keeps --app-height stable on standalone resume.
  */
 
 let initialized = false;
@@ -34,8 +35,6 @@ function getStableViewportHeight() {
 
   if (!values.length) return window.innerHeight || 0;
 
-  // iOS standalone: visualViewport often returns a stale short height on re-open.
-  // Prefer the largest credible value so the shell never paints short.
   if (isIOS() && isStandalonePWA()) {
     const stored = Number(sessionStorage.getItem('mtc:last-app-height') || 0);
     if (Number.isFinite(stored) && stored > 300) values.push(stored);
@@ -55,32 +54,6 @@ function getStableViewportWidth() {
   return values.length ? Math.max(...values) : window.innerWidth || 0;
 }
 
-function measureDockGap(appHeight) {
-  const root = document.documentElement;
-  const nav = document.querySelector('.mobileBottomNav');
-
-  if (!nav) {
-    root.style.setProperty('--mobile-dock-gap', '0px');
-    return 0;
-  }
-
-  const rect = nav.getBoundingClientRect();
-  const shell = document.querySelector('.appShell');
-  const shellRect = shell?.getBoundingClientRect();
-  const frameBottom = Math.max(
-    shellRect?.bottom || 0,
-    window.innerHeight || 0,
-    document.documentElement?.clientHeight || 0,
-    appHeight || 0
-  );
-  const gap = Math.max(0, Math.round(frameBottom - rect.bottom));
-
-  // Ignore tiny sub-pixel noise; cap absurd gaps from mid-layout frames
-  const safeGap = gap < 2 ? 0 : Math.min(gap, 120);
-  root.style.setProperty('--mobile-dock-gap', px(safeGap));
-  return safeGap;
-}
-
 function applyViewportVars() {
   const root = document.documentElement;
   const ios = isIOS();
@@ -95,6 +68,7 @@ function applyViewportVars() {
   root.style.setProperty('--app-height', px(h));
   root.style.setProperty('--app-width', px(w));
   root.style.setProperty('--app-vh', `${h * 0.01}px`);
+  root.style.setProperty('--mobile-dock-gap', '0px');
 
   if (ios && standalone && h > 300) {
     try {
@@ -106,20 +80,11 @@ function applyViewportVars() {
 
   document.body?.style.setProperty('--viewport-refresh-token', String(Date.now()));
 
-  const runMeasure = () => {
-    const gap = measureDockGap(h);
-    window.dispatchEvent(
-      new CustomEvent('mtc:viewport-sync', {
-        detail: { height: h, width: w, gap, isIOS: ios, isStandalone: standalone },
-      })
-    );
-  };
-
-  if (rafId) window.cancelAnimationFrame(rafId);
-  rafId = window.requestAnimationFrame(() => {
-    rafId = null;
-    runMeasure();
-  });
+  window.dispatchEvent(
+    new CustomEvent('mtc:viewport-sync', {
+      detail: { height: h, width: w, gap: 0, isIOS: ios, isStandalone: standalone },
+    })
+  );
 }
 
 function clearTimers() {

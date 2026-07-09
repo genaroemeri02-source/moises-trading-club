@@ -912,13 +912,18 @@ function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPER
   }
 </button><div className="user"><div className="avatar">{profile.avatar||profile.name?.slice(0,2)||'MT'}</div><div><b>{profile.name}</b><span>{displayRoleLabel(profile)}</span></div><button onClick={()=>signOut(auth)} title="Salir"><LogOut size={16}/></button></div></aside>}
 
-const MOBILE_TAB_PRIMARY=new Set(['dashboard','analytics','journal','emotional']);
-const MOBILE_TAB_DOCK=[['dashboard','Dash',Home],['analytics','Analytics',BarChart3],['journal','Journal',LineChart],['emotional','Emocional',Heart]];
-const MOBILE_SHEET_LABELS={checklist:'Checklist',ideas:'Ideas',risk:'Riesgo',results:'Resultados',brokers:'Integraciones',ecosystem:'Guía',system:'Sistema',reading:'Biblioteca',news:'Novedades',community:'Mi espacio',announcements:'Anuncios',chat:'Chat',online:'Online',notifications:'Avisos',settings:'Perfil',admin:'Admin'};
-const MOBILE_SHEET_GROUPS=[{key:'operativa',label:'OPERATIVA',ids:['checklist','risk','results','brokers']},{key:'workspace',label:'WORKSPACE',ids:['ideas','ecosystem','reading','community']},{key:'comunidad',label:'COMUNIDAD',ids:['announcements','chat','online']},{key:'sistema',label:'SISTEMA',ids:['system','news','notifications','settings','admin']}];
-const MOBILE_SHEET_PRIMARY=new Set(['checklist','risk','results','community']);
-const MOBILE_SHEET_SECTION_CLASS={operativa:'mobileCommandSection--operativa',workspace:'mobileCommandSection--workspace',comunidad:'mobileCommandSection--community',sistema:'mobileCommandSection--system'};
-const MOBILE_SHEET_TONE={checklist:'cyan',risk:'magenta',results:'cyan',brokers:'cyan',ideas:'violet',ecosystem:'violet',reading:'violet',community:'violet',announcements:'violet',chat:'violet',online:'muted',system:'muted',news:'muted',notifications:'muted',settings:'muted',admin:'cyan'};
+/* Bottom dock retired — mobile navigation lives in header hamburger + command sheet. */
+const MOBILE_SHEET_LABELS={dashboard:'Dashboard',analytics:'Analytics',journal:'Journal',emotional:'Emocional',checklist:'Checklist',ideas:'Ideas',risk:'Riesgo',results:'Resultados',brokers:'Integraciones',ecosystem:'Guía',system:'Sistema',reading:'Biblioteca',news:'Novedades',community:'Mi espacio',announcements:'Anuncios',chat:'Chat',online:'Online',notifications:'Avisos',settings:'Perfil',admin:'Admin'};
+const MOBILE_SHEET_GROUPS=[
+  {key:'principal',label:'PRINCIPAL',ids:['dashboard','analytics','journal','emotional']},
+  {key:'operativa',label:'OPERATIVA',ids:['checklist','risk','results','brokers']},
+  {key:'workspace',label:'WORKSPACE',ids:['ideas','ecosystem','reading','community']},
+  {key:'comunidad',label:'COMUNIDAD',ids:['announcements','chat','online']},
+  {key:'sistema',label:'SISTEMA',ids:['system','news','notifications','settings','admin']},
+];
+const MOBILE_SHEET_PRIMARY=new Set(['dashboard','analytics','journal','emotional','checklist','risk','results','community']);
+const MOBILE_SHEET_SECTION_CLASS={principal:'mobileCommandSection--principal',operativa:'mobileCommandSection--operativa',workspace:'mobileCommandSection--workspace',comunidad:'mobileCommandSection--community',sistema:'mobileCommandSection--system'};
+const MOBILE_SHEET_TONE={dashboard:'cyan',analytics:'violet',journal:'cyan',emotional:'magenta',checklist:'cyan',risk:'magenta',results:'cyan',brokers:'cyan',ideas:'violet',ecosystem:'violet',reading:'violet',community:'violet',announcements:'violet',chat:'violet',online:'muted',system:'muted',news:'muted',notifications:'muted',settings:'muted',admin:'cyan'};
 function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
   useEffect(()=>{
     if(menuOpen)document.body.classList.add('menu-open');
@@ -928,16 +933,15 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
   const items=[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['brokers','Integraciones',Activity],['ecosystem','Guía',Sparkles],['emotional','Emocional',Heart],['system','Sistema',Shield],['reading','Biblioteca',BookOpen],['news','Noticias',Newspaper],['community','Mi espacio',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['notifications','Avisos',Bell],['settings','Perfil',Settings]];
   if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]);
   const itemMap=Object.fromEntries(items.map(([id,label,Icon])=>[id,{id,label,Icon}]));
-  const overflowIds=new Set(items.filter(([id])=>!MOBILE_TAB_PRIMARY.has(id)).map(([id])=>id));
-  const overflowActive=[...overflowIds].some(id=>id===tab);
   const pickTab=(id)=>{markNotificationsForTarget(data.notifications,id); setMenuOpen(false); setTab(id);};
-  const sheetGroups=MOBILE_SHEET_GROUPS.map(group=>({...group,entries:group.ids.map(id=>itemMap[id]).filter(item=>item&&overflowIds.has(item.id))})).filter(group=>group.entries.length);
+  const sheetGroups=MOBILE_SHEET_GROUPS.map(group=>({...group,entries:group.ids.map(id=>itemMap[id]).filter(Boolean)})).filter(group=>group.entries.length);
+  if(!menuOpen)return null;
   return <>
-    {menuOpen&&<button type="button" className="mobileNavSheetBackdrop mobileCommandOverlay" aria-label="Cerrar menú" onClick={()=>setMenuOpen(false)}/>}
-    {menuOpen&&<div className="mobileNavSheet mobileCommandSheet" role="dialog" aria-label="Navegación">
+    <button type="button" className="mobileNavSheetBackdrop mobileCommandOverlay" aria-label="Cerrar menú" onClick={()=>setMenuOpen(false)}/>
+    <div className="mobileNavSheet mobileCommandSheet" role="dialog" aria-label="Navegación">
       <div className="mobileNavSheetHandle mobileCommandHandle" aria-hidden="true"/>
       <header className="mobileNavSheetHead mobileCommandHeader">
-        <div className="mobileNavSheetHeadMain"><span className="mobileNavSheetEyebrow">CENTRO DE ACCESO</span><b>Explorar <span className="mobileNavSheetAccent">MTC</span></b><small>Herramientas, workspace y configuración</small></div>
+        <div className="mobileNavSheetHeadMain"><span className="mobileNavSheetEyebrow">CENTRO DE ACCESO</span><b>Explorar <span className="mobileNavSheetAccent">MTC</span></b><small>Navegación principal y herramientas</small></div>
         <button type="button" className="icon mobileNavSheetClose mobileCommandClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={18}/></button>
       </header>
       <nav className="mobileNavSheetNav mobileCommandContent">
@@ -946,10 +950,7 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
         <button type="button" className="mobileLogout mobileNavSheetCard mobileNavSheetLogout mobileCommandCard mobileCommandCard--system" onClick={()=>signOut(auth)}><span className="mobileNavSheetIcon tone-magenta"><LogOut size={18}/></span><span className="mobileNavSheetLabel">Salir</span></button>
         <div className="mobileCommandFadeBottom" aria-hidden="true"/>
       </nav>
-    </div>}
-    <nav className="mobileNav mobileNavDock mobileBottomNav" aria-label="Navegación principal">{MOBILE_TAB_DOCK.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} type="button" data-nav={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
-      <button type="button" data-nav="more" className={`mobileNavMore ${menuOpen||overflowActive?'active':''} ${overflowActive?'hasActivity':''}`} onClick={()=>setMenuOpen(v=>!v)} aria-expanded={menuOpen} aria-label="Más opciones"><Menu size={18}/><span>Más</span></button>
-    </nav>
+    </div>
   </>;
 }
 

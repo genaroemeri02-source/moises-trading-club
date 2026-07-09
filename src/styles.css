@@ -5,14 +5,14 @@
    Single file: src/styles.css (~32k lines, ~9.7k !important)
    CANONICAL SOURCE OF TRUTH (wins by cascade order):
    - Tokens:        :root L4 + AURORA DARK SYSTEM v20 ~L27066
-   - Mobile shell:  AURORA MOBILE APP SHELL — ABSOLUTE FINAL SOURCE OF TRUTH (true EOF)
-   - Mobile dock:   in-flow flex + --mobile-dock-gap (measured) — same EOF block
-   - Mobile drawer: same EOF block (z-index + geometry); v38 = visual skin only
+   - Mobile shell:  AURORA MOBILE SHELL — NO BOTTOM DOCK SOURCE OF TRUTH (true EOF)
+   - Mobile nav:    header hamburger + command sheet (bottom dock RETIRED)
+   - Mobile drawer: command sheet EOF block; v38 = visual skin only
    - Dark app skin: AURORA DARK SYSTEM v20 ~L27060
    - Light patches: v43.27 / v47.12+ (scattered, consolidate in 2B)
    LEGACY — do not extend (superseded, kept for compat):
    - Floating pill .mobileNav L187, v40.2–v40.4 L456–665
-   - Fixed dock patches v32–v36 + prior NATIVE DOCK / VIEWPORT SHELL
+   - All bottom dock / VIEWPORT SHELL / APP SHELL ABSOLUTE blocks (retired)
    - Gold .primary gradients L219, L419 (partially purged v47+)
    ZONE MAP (approx line ranges):
    L1–290    Tokens + base shell + early v3–v38
@@ -22,8 +22,8 @@
    L6382–18110 v47.11–v52 light mode + dashboard + share EOF guards
    L18111–26200 Analytics cockpit + charts
    L26204–29188 Aurora ambient + production tokens
-   L29189–33165 Aurora mobile v25–v38 + prior VIEWPORT SHELL (LEGACY)
-   EOF         AURORA MOBILE APP SHELL ABSOLUTE FINAL (active)
+   L29189–34056 Aurora mobile dock experiments (LEGACY — dock retired)
+   EOF         AURORA MOBILE SHELL — NO BOTTOM DOCK (active)
    See ARCHITECTURE.md § CSS Design System for full audit.
    ========================================================= */
 
@@ -55,19 +55,20 @@
   --aurora-semantic-red-alt:#FF5C7A;
   --font-display:'Space Grotesk','Manrope',system-ui,sans-serif;
   --font-ui:'Inter','Manrope',system-ui,sans-serif;
-  /* Mobile shell — aliases; geometry + viewport in NATIVE DOCK EOF */
+  /* Mobile shell — dock retired; aliases at 0 so legacy padding collapses */
   --app-vh:1vh;
   --app-height:100vh;
-  --mobile-tabbar-visual-h:78px;
-  --mobile-tabbar-safe-bottom:env(safe-area-inset-bottom,0px);
-  --mobile-tabbar-total-h:calc(var(--mobile-tabbar-visual-h) + var(--mobile-tabbar-safe-bottom));
-  --aurora-mobile-dock-h:var(--mobile-tabbar-visual-h);
-  --aurora-safe-bottom:var(--mobile-tabbar-safe-bottom);
-  --aurora-dock-total-h:var(--mobile-tabbar-total-h);
-  --mobile-tabbar-content-height:var(--mobile-tabbar-visual-h);
-  --mobile-tabbar-total-height:var(--mobile-tabbar-total-h);
-  --mobile-tab-bar-h:var(--mobile-tabbar-total-h);
-  --mobile-content-pad-bottom:calc(var(--mobile-tabbar-total-h) + 18px);
+  --mobile-tabbar-visual-h:0px;
+  --mobile-tabbar-safe-bottom:0px;
+  --mobile-tabbar-total-h:0px;
+  --aurora-mobile-dock-h:0px;
+  --aurora-safe-bottom:env(safe-area-inset-bottom,0px);
+  --aurora-dock-total-h:0px;
+  --mobile-tabbar-content-height:0px;
+  --mobile-tabbar-total-height:0px;
+  --mobile-tab-bar-h:0px;
+  --mobile-dock-gap:0px;
+  --mobile-content-pad-bottom:24px;
   /* Legacy aliases → Aurora */
   --bg:var(--aurora-bg);
   --panel:var(--aurora-panel);
@@ -34052,5 +34053,350 @@ html[data-theme="light"] .tradeReviewSheet{
   html.is-standalone-pwa[data-theme="light"]:has(.appShell) body,
   html.is-standalone-pwa[data-theme="light"]:has(.appShell) #root {
     background: #F7F8FB !important;
+  }
+}
+
+/* ==========================================================================
+   AURORA MOBILE SHELL — NO BOTTOM DOCK SOURCE OF TRUTH
+   Bottom tab bar RETIRED. Navigation = header hamburger + command sheet.
+   Do NOT resurrect .mobileBottomNav / dock geometry below this block.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  :root {
+    --mobile-shell-bg-dark: #07050D;
+    --mobile-shell-bg-light: #F7F8FB;
+    --mobile-tabbar-visual-h: 0px;
+    --mobile-tabbar-safe-bottom: 0px;
+    --mobile-tabbar-total-h: 0px;
+    --mobile-tab-bar-h: 0px;
+    --mobile-tabbar-total-height: 0px;
+    --mobile-tabbar-content-height: 0px;
+    --aurora-mobile-dock-h: 0px;
+    --aurora-dock-total-h: 0px;
+    --mobile-dock-gap: 0px;
+    --mobile-content-pad-bottom: 24px;
+  }
+
+  html:has(.appShell),
+  html:has(.appShell) body,
+  html:has(.appShell) #root {
+    width: 100% !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    background: var(--mobile-shell-bg-dark) !important;
+  }
+
+  html:has(.appShell)[data-theme="light"],
+  html:has(.appShell)[data-theme="light"] body,
+  html:has(.appShell)[data-theme="light"] #root {
+    background: var(--mobile-shell-bg-light) !important;
+  }
+
+  html:has(.appShell) body {
+    position: static !important;
+    inset: auto !important;
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-height: 100svh !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  html:has(.appShell) #root {
+    position: relative !important;
+    inset: auto !important;
+    min-height: 100svh !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .app.appShell,
+  html body .app.appShell,
+  html:not([data-theme="light"]) body .app.appShell,
+  html[data-theme="dark"] body .app.appShell,
+  html[data-theme="light"] body:has(.app) .app.appShell {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    min-height: 100svh !important;
+    height: auto !important;
+    max-height: none !important;
+    display: block !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    background:
+      radial-gradient(circle at 14% 0%, rgba(51, 230, 196, .08), transparent 34%),
+      radial-gradient(circle at 90% 12%, rgba(124, 92, 255, .10), transparent 38%),
+      var(--mobile-shell-bg-dark) !important;
+  }
+
+  html[data-theme="light"] .app.appShell,
+  html[data-theme="light"] body .app.appShell {
+    background:
+      radial-gradient(circle at 14% 0%, rgba(51, 230, 196, .06), transparent 34%),
+      radial-gradient(circle at 90% 12%, rgba(124, 92, 255, .06), transparent 38%),
+      var(--mobile-shell-bg-light) !important;
+  }
+
+  html body .app.appShell .main.appMain,
+  html body .app .main.appMain,
+  html:not([data-theme="light"]) body .app.appShell .main.appMain,
+  html[data-theme="dark"] body .app.appShell .main.appMain,
+  html[data-theme="light"] body:has(.app) .app.appShell .main.appMain,
+  .main.appMain {
+    flex: none !important;
+    width: 100% !important;
+    min-height: 100svh !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+  }
+
+  .page,
+  .dashboardPage,
+  .journalPage,
+  .analyticsPage,
+  .analyticsShell,
+  .analyticsCockpit,
+  .riskPage,
+  .checklistPage,
+  .emotionalPage,
+  .emotionalJournalPage,
+  .resultsPage,
+  .ideasPage,
+  .guidePage,
+  html body .app .page,
+  html body .app .main.appMain .page {
+    overflow-x: hidden !important;
+    padding-bottom: 24px !important;
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+  }
+
+  html body .app .main,
+  html body .app .main.appMain,
+  html:not([data-theme="light"]) body .app .main,
+  html[data-theme="dark"] body .app .main {
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .mobileBottomNav,
+  .mobileNavDock,
+  .mobileNav.mobileNavDock,
+  .mobileNav.mobileNavDock.mobileBottomNav,
+  nav.mobileBottomNav,
+  html body .app .mobileBottomNav,
+  html body .app .mobileNavDock,
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body .app .mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileBottomNav,
+  html[data-theme="light"] body .app .mobileBottomNav,
+  html[data-theme="light"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    position: static !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    flex: 0 0 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    z-index: -1 !important;
+  }
+
+  .mobileBottomNav::before,
+  .mobileBottomNav::after,
+  .mobileNavDock::before,
+  .mobileNavDock::after,
+  html body .app .mobileBottomNav::before,
+  html body .app .mobileBottomNav::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .mobileTopMenu {
+    display: inline-grid !important;
+    place-items: center !important;
+  }
+
+  .mobileCommandOverlay,
+  .mobileNavSheetBackdrop,
+  .mobileCommandOverlay.mobileNavSheetBackdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10050 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: rgba(3, 2, 8, .58) !important;
+    backdrop-filter: blur(18px) saturate(1.1) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.1) !important;
+    overflow: hidden !important;
+  }
+
+  html[data-theme="light"] .mobileCommandOverlay,
+  html[data-theme="light"] .mobileNavSheetBackdrop,
+  html[data-theme="light"] .mobileCommandOverlay.mobileNavSheetBackdrop {
+    background: rgba(15, 23, 42, .24) !important;
+  }
+
+  .mobileCommandSheet,
+  .mobileNavSheet,
+  .mobileCommandSheet.mobileNavSheet,
+  html body .app .mobileCommandSheet.mobileNavSheet,
+  html body .app .mobileNavSheet {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100svh - 18px) !important;
+    margin: 0 !important;
+    border-radius: 28px 28px 0 0 !important;
+    overflow: hidden !important;
+    z-index: 10051 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(51, 230, 196, .14), transparent 32%),
+      radial-gradient(circle at 92% 6%, rgba(124, 92, 255, .20), transparent 38%),
+      linear-gradient(180deg, rgba(18, 15, 31, .98), rgba(7, 5, 13, .995)) !important;
+    border: 1px solid rgba(124, 92, 255, .26) !important;
+    border-bottom: 0 !important;
+    box-shadow:
+      0 -28px 80px rgba(0, 0, 0, .58),
+      0 1px 0 rgba(255, 255, 255, .06) inset !important;
+  }
+
+  html[data-theme="light"] .mobileCommandSheet,
+  html[data-theme="light"] .mobileNavSheet,
+  html[data-theme="light"] .mobileCommandSheet.mobileNavSheet {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(51, 230, 196, .08), transparent 32%),
+      radial-gradient(circle at 92% 6%, rgba(124, 92, 255, .08), transparent 38%),
+      linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(247, 248, 251, .995)) !important;
+    border: 1px solid rgba(15, 23, 42, .10) !important;
+    border-bottom: 0 !important;
+    box-shadow:
+      0 -28px 80px rgba(15, 23, 42, .18),
+      0 1px 0 rgba(255, 255, 255, .90) inset !important;
+  }
+
+  .mobileCommandContent,
+  .mobileNavSheetNav,
+  .mobileCommandContent.mobileNavSheetNav {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: calc(100svh - 180px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .mobileCommandContent::-webkit-scrollbar,
+  .mobileNavSheetNav::-webkit-scrollbar,
+  .mobileCommandContent.mobileNavSheetNav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .mobileCommandSection--principal .mobileCommandSectionTitle {
+    color: rgba(51, 230, 196, .88) !important;
+  }
+
+  .tradeDetailOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  .tradeReviewSheet,
+  .tradeReviewSheet.tradeDetailModal {
+    max-height: min(92svh, 860px) !important;
+    overflow-x: hidden !important;
+  }
+
+  .mobileNewTradeFab,
+  .helpBubble {
+    bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px)) !important;
+  }
+
+  html.is-ios-standalone:has(.appShell),
+  html.is-ios-standalone:has(.appShell) body,
+  html.is-ios-standalone:has(.appShell) #root,
+  html.is-standalone-pwa:has(.appShell),
+  html.is-standalone-pwa:has(.appShell) body,
+  html.is-standalone-pwa:has(.appShell) #root {
+    position: static !important;
+    inset: auto !important;
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+  }
+
+  html.is-ios-standalone:has(.appShell) .app.appShell,
+  html.is-standalone-pwa:has(.appShell) .app.appShell {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+  }
+
+  html.is-ios-standalone[data-theme="light"]:has(.appShell),
+  html.is-ios-standalone[data-theme="light"]:has(.appShell) body,
+  html.is-ios-standalone[data-theme="light"]:has(.appShell) #root,
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell),
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell) body,
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell) #root {
+    background: var(--mobile-shell-bg-light) !important;
   }
 }
