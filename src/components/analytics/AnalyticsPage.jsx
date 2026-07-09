@@ -104,14 +104,14 @@ export function AnalyticsPage({ data }) {
 
   if (!hasSample) {
     return (
-      <main className="page analyticsPro analyticsPage analyticsShell analyticsIntelligenceCenter">
+      <main className="page analyticsPro analyticsPage analyticsShell analyticsIntelligenceCenter analyticsCockpit">
         <AnalyticsHeader
           tradeCount={0}
           activeAccount={filters.activeAccount}
           dateFrom={filters.dateFrom}
           dateTo={filters.dateTo}
         />
-        <AnalyticsFilters {...filters} />
+        <AnalyticsFilters {...filters} tradeCount={0} />
         <AnalyticsEmptyState onGoJournal={goJournal} count={0} />
       </main>
     );
@@ -125,7 +125,7 @@ export function AnalyticsPage({ data }) {
         dateFrom={filters.dateFrom}
         dateTo={filters.dateTo}
       />
-      <AnalyticsFilters {...filters} />
+      <AnalyticsFilters {...filters} tradeCount={stats.count} />
 
       <div className="analyticsCockpitFlow">
         <div className="analyticsZone analyticsZone--command">

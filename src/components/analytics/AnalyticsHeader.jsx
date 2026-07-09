@@ -20,7 +20,7 @@ export function AnalyticsHeader({
       <div className="analyticsTopBar">
         <div className="analyticsTopBarMain">
           <span className="analyticsTopBarBrand">
-            <BarChart3 size={13} />
+            <BarChart3 size={14} />
             Analytics
           </span>
           <span className="analyticsTopBarDivider" aria-hidden="true" />
@@ -28,7 +28,7 @@ export function AnalyticsHeader({
             {tradeCount} trade{tradeCount === 1 ? '' : 's'} evaluable{tradeCount === 1 ? '' : 's'}
           </span>
         </div>
-        <div className="analyticsTopBarMeta">
+        <div className="analyticsTopBarMeta analyticsTopBarMetaRail">
           <span className="analyticsTopBarChip">
             <em>Cuenta</em>
             <b>{accountLabel}</b>

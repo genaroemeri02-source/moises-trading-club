@@ -2,11 +2,53 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGri
 import { money, formatMoneyCompactCard, formatMoneyClean, formatPercentCard, formatR, formatCompactNumber } from '../../lib/formatUtils.js';
 import { formatSetupLabel } from '../../lib/analyticsUtils.js';
 import { MtcLightweightLineChart } from '../dashboard/MtcLightweightLineChart.jsx';
+import { useAnalyticsViewport } from './useAnalyticsViewport.js';
 
-const CHART_AXIS = { fill: '#c5cedb', fontSize: 10 };
-const CHART_GRID = 'rgba(255,255,255,.06)';
-const CHART_H_PRIMARY = 300;
-const CHART_H_SECONDARY = 220;
+const CHART_GRID = 'rgba(255,255,255,.05)';
+
+const AURORA_CHART = {
+  cyan: '#33E6C4',
+  violet: '#7C5CFF',
+  violetDeep: '#5B3FD1',
+  magenta: '#FF4FA3',
+  magentaDeep: '#C23B7A',
+  dim: '#9C97B8',
+  axis: '#9C97B8'
+};
+
+const EQUITY_PALETTE = {
+  positive: AURORA_CHART.cyan,
+  negative: AURORA_CHART.magenta,
+  areaPositive: 'rgba(51,230,196,0.14)',
+  areaNegative: 'rgba(255,79,163,0.12)',
+  axis: AURORA_CHART.dim
+};
+
+function RoundedDailyBar(props) {
+  const { x, y, width, height, payload, fill } = props;
+  if (!width || !height) return null;
+  const isPos = Number(payload?.value || 0) >= 0;
+  const r = Math.min(6, Math.abs(width) / 2, Math.abs(height) / 2);
+  if (isPos) {
+    const path = `M${x},${y + height} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + width - r},${y} Q${x + width},${y} ${x + width},${y + r} L${x + width},${y + height} Z`;
+    return <path d={path} fill={fill} fillOpacity={0.82} />;
+  }
+  const path = `M${x},${y} L${x + width},${y} L${x + width},${y + height - r} Q${x + width},${y + height} ${x + width - r},${y + height} L${x + r},${y + height} Q${x},${y + height} ${x},${y + height - r} Z`;
+  return <path d={path} fill={fill} fillOpacity={0.82} />;
+}
+
+function RoundedRBar(props) {
+  const { x, y, width, height, payload, fill } = props;
+  if (!width || !height) return null;
+  const isPos = Number(payload?.r || 0) >= 0;
+  const r = Math.min(5, Math.abs(width) / 2, Math.abs(height) / 2);
+  if (isPos) {
+    const path = `M${x},${y + height} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + width - r},${y} Q${x + width},${y} ${x + width},${y + r} L${x + width},${y + height} Z`;
+    return <path d={path} fill={fill} fillOpacity={0.82} />;
+  }
+  const path = `M${x},${y} L${x + width},${y} L${x + width},${y + height - r} Q${x + width},${y + height} ${x + width - r},${y + height} L${x + r},${y + height} Q${x},${y + height} ${x},${y + height - r} Z`;
+  return <path d={path} fill={fill} fillOpacity={0.82} />;
+}
 
 function formatAxisMoney(v) {
   const n = Number(v || 0);
@@ -123,6 +165,12 @@ function EvidenceFallback({ text }) {
 }
 
 export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rDistribution = [], hasSample }) {
+  const { mobile, narrow } = useAnalyticsViewport();
+  const chartAxis = { fill: AURORA_CHART.dim, fontSize: mobile ? 12 : 12, fontWeight: 600 };
+  const chartHPrimary = mobile ? 236 : narrow ? 272 : 304;
+  const chartHSecondary = mobile ? 204 : narrow ? 216 : 228;
+  const yAxisWidth = mobile ? 56 : narrow ? 52 : 48;
+  const rAxisWidth = mobile ? 52 : 46;
   const equityCurve = (stats?.curve || []).map(p => ({
     name: p.name,
     equity: p.equity,
@@ -146,11 +194,18 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
   const equityNarrative = hasEquityChart
     ? `${equityTrend} · DD ${formatMoneyCompactCard(-Math.abs(stats?.ddMoney || 0))}`
     : 'En formación';
+  const positiveDays = hasDailyChart ? dailyPnl.filter(d => Number(d.value || 0) > 0).length : 0;
+  const bestDay = hasDailyChart
+    ? dailyPnl.reduce((best, d) => (!best || Number(d.value) > Number(best.value)) ? d : best, null)
+    : null;
   const dailyNarrative = hasDailyChart
-    ? `${dailyPnl.length} día${dailyPnl.length === 1 ? '' : 's'} registrado${dailyPnl.length === 1 ? '' : 's'}`
+    ? `${positiveDays} de ${dailyPnl.length} jornada${dailyPnl.length === 1 ? '' : 's'} positiva${positiveDays === 1 ? '' : 's'}${bestDay && bestDay.value > 0 ? ` · mejor ${formatMoneyClean(bestDay.value)}` : ''}`
     : 'Sin jornadas';
+  const maxR = hasRChart
+    ? Math.max(...rDistribution.map(d => Number(d.r || 0)))
+    : rDistribution[0]?.r || 0;
   const rNarrative = hasRChart
-    ? `${rDistribution.length} trades · prom. ${formatR(avgR)}`
+    ? `Promedio ${formatR(avgR)} · mayor trade ${formatR(maxR)}`
     : rDistribution.length === 1
     ? `1 trade · ${formatR(rDistribution[0].r)}`
     : 'Muestra corta';
@@ -177,8 +232,16 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
           className="equity"
         >
           {hasEquityChart ? (
-            <div className="analyticsPerformanceEvidenceChart equity" style={{ height: CHART_H_PRIMARY }}>
-              <MtcLightweightLineChart data={lwCurve} mode="equity" height={CHART_H_PRIMARY} currency={money} />
+            <div className="analyticsPerformanceEvidenceChart equity analyticsChartFrame" style={{ height: chartHPrimary }}>
+              <MtcLightweightLineChart
+                data={lwCurve}
+                mode="equity"
+                height={chartHPrimary}
+                compact={narrow}
+                mobileOptimized={mobile}
+                currency={money}
+                palette={EQUITY_PALETTE}
+              />
             </div>
           ) : (
             <EvidenceFallback text="Sin curva suficiente. Registrá más trades cerrados." />
@@ -193,17 +256,42 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
           className="daily"
         >
           {hasDailyChart ? (
-            <div className="analyticsPerformanceEvidenceChart daily" style={{ height: CHART_H_PRIMARY }}>
+            <div className="analyticsPerformanceEvidenceChart daily analyticsChartFrame" style={{ height: chartHPrimary }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dailyPnl} margin={{ top: 4, right: 4, left: 0, bottom: 0 }} barCategoryGap="18%">
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} vertical={false} />
-                  <XAxis dataKey="name" tick={CHART_AXIS} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-                  <YAxis tick={CHART_AXIS} axisLine={false} tickLine={false} width={48} domain={dailyDomain} tickCount={5} tickFormatter={formatAxisMoney} />
-                  <ReferenceLine y={0} stroke="rgba(255,255,255,.22)" strokeWidth={1} />
-                  <Tooltip content={<ChartTooltipPremium mode="daily" />} cursor={{ fill: 'rgba(255,255,255,.03)' }} />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={28}>
+                <BarChart data={dailyPnl} margin={{ top: 8, right: 8, left: 0, bottom: mobile ? 2 : 0 }} barCategoryGap="20%">
+                  <defs>
+                    <linearGradient id="dailyPosGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.cyan} />
+                      <stop offset="100%" stopColor={AURORA_CHART.violetDeep} />
+                    </linearGradient>
+                    <linearGradient id="dailyNegGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.magenta} />
+                      <stop offset="100%" stopColor={AURORA_CHART.magentaDeep} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke={CHART_GRID} vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    tick={chartAxis}
+                    axisLine={false}
+                    tickLine={false}
+                    interval={mobile ? 'preserveStartEnd' : 0}
+                    tickMargin={6}
+                  />
+                  <YAxis
+                    tick={chartAxis}
+                    axisLine={false}
+                    tickLine={false}
+                    width={yAxisWidth}
+                    domain={dailyDomain}
+                    tickCount={mobile ? 4 : 5}
+                    tickFormatter={formatAxisMoney}
+                  />
+                  <ReferenceLine y={0} stroke="rgba(255,255,255,.28)" strokeWidth={1.5} />
+                  <Tooltip content={<ChartTooltipPremium mode="daily" />} cursor={{ fill: 'rgba(255,255,255,.04)' }} />
+                  <Bar dataKey="value" shape={<RoundedDailyBar />} maxBarSize={mobile ? 26 : 34}>
                     {dailyPnl.map((entry, i) => (
-                      <Cell key={i} fill={entry.value >= 0 ? '#22c55e' : '#ef4444'} fillOpacity={0.82} />
+                      <Cell key={i} fill={entry.value >= 0 ? 'url(#dailyPosGrad)' : 'url(#dailyNegGrad)'} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -221,18 +309,36 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
           className="rDist"
         >
           {hasRChart ? (
-            <div className="analyticsPerformanceEvidenceChart compact" style={{ height: CHART_H_SECONDARY }}>
+            <div className="analyticsPerformanceEvidenceChart compact analyticsChartFrame rDist" style={{ height: chartHSecondary }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={rDistribution} margin={{ top: 2, right: 4, left: 0, bottom: 0 }} barCategoryGap="8%">
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} vertical={false} />
+                <BarChart data={rDistribution} margin={{ top: 6, right: 8, left: 0, bottom: 0 }} barCategoryGap="12%">
+                  <defs>
+                    <linearGradient id="rPosGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.cyan} />
+                      <stop offset="100%" stopColor={AURORA_CHART.violet} />
+                    </linearGradient>
+                    <linearGradient id="rNegGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.magenta} />
+                      <stop offset="100%" stopColor={AURORA_CHART.magentaDeep} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke={CHART_GRID} vertical={false} />
                   <XAxis dataKey="name" hide />
-                  <YAxis tick={CHART_AXIS} axisLine={false} tickLine={false} width={44} domain={rDomain} tickCount={4} tickFormatter={formatAxisR} />
-                  <ReferenceLine y={0} stroke="rgba(255,255,255,.28)" strokeWidth={1} />
-                  <ReferenceLine y={avgR} stroke="rgba(96,165,250,.55)" strokeDasharray="4 4" strokeWidth={1} />
-                  <Tooltip content={<ChartTooltipPremium mode="r" />} cursor={{ fill: 'rgba(255,255,255,.03)' }} />
-                  <Bar dataKey="r" radius={[3, 3, 0, 0]} maxBarSize={16}>
+                  <YAxis
+                    tick={chartAxis}
+                    axisLine={false}
+                    tickLine={false}
+                    width={rAxisWidth}
+                    domain={rDomain}
+                    tickCount={mobile ? 4 : 5}
+                    tickFormatter={formatAxisR}
+                  />
+                  <ReferenceLine y={0} stroke="rgba(255,255,255,.32)" strokeWidth={1.5} />
+                  <ReferenceLine y={avgR} stroke="rgba(124,92,255,.65)" strokeDasharray="5 4" strokeWidth={1.5} label={mobile ? undefined : { value: `Ø ${formatR(avgR)}`, position: 'right', fill: AURORA_CHART.violet, fontSize: 11 }} />
+                  <Tooltip content={<ChartTooltipPremium mode="r" />} cursor={{ fill: 'rgba(255,255,255,.04)' }} />
+                  <Bar dataKey="r" shape={<RoundedRBar />} maxBarSize={mobile ? 18 : 22}>
                     {rDistribution.map((entry, i) => (
-                      <Cell key={i} fill={entry.r >= 0 ? '#3b82f6' : '#ef4444'} fillOpacity={0.82} />
+                      <Cell key={i} fill={entry.r >= 0 ? 'url(#rPosGrad)' : 'url(#rNegGrad)'} />
                     ))}
                   </Bar>
                 </BarChart>

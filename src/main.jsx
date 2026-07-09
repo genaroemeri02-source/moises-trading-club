@@ -36,6 +36,7 @@ import {
   buildTradeExportFilename, buildTradesExportFilename
 } from './lib/importExportUtils.js';
 import { Card } from './components/ui/Card.jsx';
+import { AuroraBackground } from './components/ui/AuroraBackground.jsx';
 import { DashboardHero } from './components/dashboard/DashboardHero.jsx';
 import { DashboardKpiStrip } from './components/dashboard/DashboardKpiStrip.jsx';
 import { CalendarHeatmapPreview, TradingMonthCalendar } from './components/dashboard/TradingCalendarPanel.jsx';
@@ -2478,4 +2479,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-createRoot(document.getElementById('root')).render(<ErrorBoundary><App/></ErrorBoundary>);
+createRoot(document.getElementById('root')).render(<ErrorBoundary><AuroraBackground/><App/></ErrorBoundary>);

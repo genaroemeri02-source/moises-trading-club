@@ -7,7 +7,7 @@ export function AnalyticsKpiCard({ label, value, sub, state = 'neutral', meta, h
         <span>{label}</span>
         {meta && <em>{meta}</em>}
       </div>
-      <b className="analyticsKpiValue">{value}</b>
+      <b className="analyticsKpiValue" title={String(value)}>{value}</b>
       {sub && <small className="analyticsKpiSub">{sub}</small>}
       {hint && <small className="analyticsKpiHint">{hint}</small>}
     </article>

@@ -8,8 +8,8 @@ const confidenceTone = {
 };
 
 function scoreRingColor(score) {
-  if (score >= 70) return '#22c55e';
-  if (score >= 45) return '#fbbf24';
+  if (score >= 70) return '#33E6C4';
+  if (score >= 45) return '#7C5CFF';
   return '#94a3b8';
 }
 

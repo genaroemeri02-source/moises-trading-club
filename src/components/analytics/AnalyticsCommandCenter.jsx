@@ -1,9 +1,9 @@
 import { ANALYTICS_MIN_SAMPLE } from '../../lib/analyticsUtils.js';
 
 function scoreRingColor(score) {
-  if (score >= 70) return '#22c55e';
-  if (score >= 45) return '#fbbf24';
-  return '#94a3b8';
+  if (score >= 70) return '#33E6C4';
+  if (score >= 45) return '#7C5CFF';
+  return '#9C97B8';
 }
 
 export function AnalyticsCommandCenter({ edgeData }) {
@@ -22,7 +22,7 @@ export function AnalyticsCommandCenter({ edgeData }) {
   const weeklyAction = commandCopy?.weeklyAction || edgeData.weeklyAction;
 
   return (
-    <section className="analyticsCommand analyticsCommandStrip analyticsTier1 analyticsSurfaceFlagship">
+    <section className="analyticsCommand analyticsCommandStrip analyticsCommandHeroV14 analyticsTier1 analyticsSurfaceFlagship">
       <div className="analyticsCommandStripBody">
         <div className="analyticsCommandScore compact">
           <div
@@ -41,10 +41,10 @@ export function AnalyticsCommandCenter({ edgeData }) {
           <span className="analyticsCommandEyebrow">Diagnóstico ejecutivo</span>
           <h2 className="analyticsCommandHeadline">{headline}</h2>
           {weeklyAction && (
-            <p className="analyticsCommandWeeklyInline">
-              <span>Acción semanal</span>
-              {weeklyAction}
-            </p>
+            <div className="analyticsCommandWeeklyBlock">
+              <span className="analyticsCommandWeeklyLabel">Acción semanal</span>
+              <p className="analyticsCommandWeeklyInline">{weeklyAction}</p>
+            </div>
           )}
         </div>
 
@@ -52,15 +52,15 @@ export function AnalyticsCommandCenter({ edgeData }) {
           <div className="analyticsCommandChips" aria-label="Señales compactas">
             <div className="analyticsCommandChip positive">
               <span>Edge</span>
-              <b>{chips.edge}</b>
+              <b title={chips.edge}>{chips.edge}</b>
             </div>
             <div className="analyticsCommandChip negative">
               <span>Fuga</span>
-              <b>{chips.leak}</b>
+              <b title={chips.leak}>{chips.leak}</b>
             </div>
             <div className="analyticsCommandChip neutral">
               <span>Confianza</span>
-              <b>{confidence?.label || '—'}</b>
+              <b title={confidence?.label || '—'}>{confidence?.label || '—'}</b>
             </div>
           </div>
         )}

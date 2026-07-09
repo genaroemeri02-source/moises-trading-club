@@ -5,10 +5,54 @@ import { Card } from '../ui/Card.jsx';
 import { DashboardChartFallback, MtcLightweightLineChart } from '../dashboard/MtcLightweightLineChart.jsx';
 import { AnalyticsSectionEmpty } from './AnalyticsEmptyState.jsx';
 
-const CHART_AXIS = { fill: '#c5cedb', fontSize: 10 };
-const CHART_GRID = 'rgba(255,255,255,.06)';
+const CHART_GRID = 'rgba(124,92,255,.08)';
+
+const AURORA_CHART = {
+  cyan: '#33E6C4',
+  violet: '#7C5CFF',
+  violetDeep: '#5B3FD1',
+  magenta: '#FF4FA3',
+  magentaDeep: '#C23B7A',
+  dim: '#9C97B8'
+};
+
+const CHART_AXIS = { fill: AURORA_CHART.dim, fontSize: 12, fontWeight: 600 };
 const CHART_H_PRIMARY = 220;
 const CHART_H_SECONDARY = 180;
+
+const EQUITY_PALETTE = {
+  positive: AURORA_CHART.cyan,
+  negative: AURORA_CHART.magenta,
+  areaPositive: 'rgba(51,230,196,0.14)',
+  areaNegative: 'rgba(255,79,163,0.12)',
+  axis: AURORA_CHART.dim
+};
+
+function RoundedDailyBar(props) {
+  const { x, y, width, height, payload, fill } = props;
+  if (!width || !height) return null;
+  const isPos = Number(payload?.value || 0) >= 0;
+  const r = Math.min(6, Math.abs(width) / 2, Math.abs(height) / 2);
+  if (isPos) {
+    const path = `M${x},${y + height} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + width - r},${y} Q${x + width},${y} ${x + width},${y + r} L${x + width},${y + height} Z`;
+    return <path d={path} fill={fill} fillOpacity={0.82} />;
+  }
+  const path = `M${x},${y} L${x + width},${y} L${x + width},${y + height - r} Q${x + width},${y + height} ${x + width - r},${y + height} L${x + r},${y + height} Q${x},${y + height} ${x},${y + height - r} Z`;
+  return <path d={path} fill={fill} fillOpacity={0.82} />;
+}
+
+function RoundedRBar(props) {
+  const { x, y, width, height, payload, fill } = props;
+  if (!width || !height) return null;
+  const isPos = Number(payload?.r || 0) >= 0;
+  const r = Math.min(5, Math.abs(width) / 2, Math.abs(height) / 2);
+  if (isPos) {
+    const path = `M${x},${y + height} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + width - r},${y} Q${x + width},${y} ${x + width},${y + r} L${x + width},${y + height} Z`;
+    return <path d={path} fill={fill} fillOpacity={0.82} />;
+  }
+  const path = `M${x},${y} L${x + width},${y} L${x + width},${y + height - r} Q${x + width},${y + height} ${x + width - r},${y + height} L${x + r},${y + height} Q${x},${y + height} ${x},${y + height - r} Z`;
+  return <path d={path} fill={fill} fillOpacity={0.82} />;
+}
 
 function formatAxisMoney(v) {
   const n = Number(v || 0);
@@ -106,33 +150,6 @@ function PatternListCompact({ patterns = [] }) {
   );
 }
 
-function PatternCompactCard({ pattern, horizontal = false }) {
-  if (!pattern) return null;
-  const label = formatSetupLabel(pattern.name);
-  if (horizontal) {
-    return (
-      <div className="analyticsPatternCompact horizontal">
-        <b title={pattern.name}>{label}</b>
-        <strong className={pattern.value >= 0 ? 'pos' : 'neg'}>{formatMoneyClean(pattern.value)}</strong>
-        <span>{pattern.count} trade{pattern.count === 1 ? '' : 's'}</span>
-        <span>{formatPercentCard(pattern.winrate)}</span>
-        <span>{formatR(pattern.avgR)} prom.</span>
-      </div>
-    );
-  }
-  return (
-    <div className="analyticsPatternCompact">
-      <b title={pattern.name}>{label}</b>
-      <div className="analyticsPatternCompactMeta">
-        <strong className={pattern.value >= 0 ? 'pos' : 'neg'}>{formatMoneyClean(pattern.value)}</strong>
-        <span>{pattern.count} trade{pattern.count === 1 ? '' : 's'}</span>
-        <span>{formatPercentCard(pattern.winrate)}</span>
-        <span>{formatR(pattern.avgR)} prom.</span>
-      </div>
-    </div>
-  );
-}
-
 export function AnalyticsCharts({ stats, dailyPnl = [], patternRows = [], rDistribution = [], hasSample }) {
   const equityCurve = (stats?.curve || []).map(p => ({
     name: p.name,
@@ -168,8 +185,8 @@ export function AnalyticsCharts({ stats, dailyPnl = [], patternRows = [], rDistr
           className="analyticsChartCard primary"
         >
           {hasEquityChart ? (
-            <div className="analyticsChartCardBody fill" style={{ height: CHART_H_PRIMARY }}>
-              <MtcLightweightLineChart data={lwCurve} mode="equity" height={CHART_H_PRIMARY} currency={money} />
+            <div className="analyticsChartCardBody fill analyticsChartFrame" style={{ height: CHART_H_PRIMARY }}>
+              <MtcLightweightLineChart data={lwCurve} mode="equity" height={CHART_H_PRIMARY} currency={money} palette={EQUITY_PALETTE} />
             </div>
           ) : (
             <div className="analyticsChartCardFallback">
@@ -180,25 +197,35 @@ export function AnalyticsCharts({ stats, dailyPnl = [], patternRows = [], rDistr
 
         <Card title="P/L jornada" sub={`${dailyPnl.length} día${dailyPnl.length === 1 ? '' : 's'}`} className="analyticsChartCard primary">
           {hasDailyChart ? (
-            <div className="analyticsChartCardBody fill" style={{ height: CHART_H_PRIMARY }}>
+            <div className="analyticsChartCardBody fill analyticsChartFrame" style={{ height: CHART_H_PRIMARY }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dailyPnl} margin={{ top: 4, right: 4, left: 0, bottom: 0 }} barCategoryGap="18%">
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} vertical={false} />
-                  <XAxis dataKey="name" tick={CHART_AXIS} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <BarChart data={dailyPnl} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="20%">
+                  <defs>
+                    <linearGradient id="auditDailyPosGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.cyan} />
+                      <stop offset="100%" stopColor={AURORA_CHART.violetDeep} />
+                    </linearGradient>
+                    <linearGradient id="auditDailyNegGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.magenta} />
+                      <stop offset="100%" stopColor={AURORA_CHART.magentaDeep} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke={CHART_GRID} vertical={false} />
+                  <XAxis dataKey="name" tick={CHART_AXIS} axisLine={false} tickLine={false} interval="preserveStartEnd" tickMargin={6} />
                   <YAxis
                     tick={CHART_AXIS}
                     axisLine={false}
                     tickLine={false}
-                    width={48}
+                    width={52}
                     domain={dailyDomain}
                     tickCount={5}
                     tickFormatter={formatAxisMoney}
                   />
-                  <ReferenceLine y={0} stroke="rgba(255,255,255,.22)" strokeWidth={1} />
-                  <Tooltip content={<ChartTooltipPremium mode="daily" />} cursor={{ fill: 'rgba(255,255,255,.03)' }} />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={28}>
+                  <ReferenceLine y={0} stroke="rgba(255,255,255,.28)" strokeWidth={1.5} />
+                  <Tooltip content={<ChartTooltipPremium mode="daily" />} cursor={{ fill: 'rgba(255,255,255,.04)' }} />
+                  <Bar dataKey="value" shape={<RoundedDailyBar />} maxBarSize={32}>
                     {dailyPnl.map((entry, i) => (
-                      <Cell key={i} fill={entry.value >= 0 ? '#22c55e' : '#ef4444'} fillOpacity={0.82} />
+                      <Cell key={i} fill={entry.value >= 0 ? 'url(#auditDailyPosGrad)' : 'url(#auditDailyNegGrad)'} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -217,26 +244,36 @@ export function AnalyticsCharts({ stats, dailyPnl = [], patternRows = [], rDistr
           className="analyticsChartCard secondary"
         >
           {hasRChart ? (
-            <div className="analyticsChartCardBody fill compact" style={{ height: CHART_H_SECONDARY }}>
+            <div className="analyticsChartCardBody fill compact analyticsChartFrame rDist" style={{ height: CHART_H_SECONDARY }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={rDistribution} margin={{ top: 2, right: 4, left: 0, bottom: 0 }} barCategoryGap="8%">
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} vertical={false} />
+                <BarChart data={rDistribution} margin={{ top: 6, right: 8, left: 0, bottom: 0 }} barCategoryGap="12%">
+                  <defs>
+                    <linearGradient id="auditRPosGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.cyan} />
+                      <stop offset="100%" stopColor={AURORA_CHART.violet} />
+                    </linearGradient>
+                    <linearGradient id="auditRNegGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={AURORA_CHART.magenta} />
+                      <stop offset="100%" stopColor={AURORA_CHART.magentaDeep} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke={CHART_GRID} vertical={false} />
                   <XAxis dataKey="name" hide />
                   <YAxis
                     tick={CHART_AXIS}
                     axisLine={false}
                     tickLine={false}
-                    width={44}
+                    width={46}
                     domain={rDomain}
-                    tickCount={4}
+                    tickCount={5}
                     tickFormatter={formatAxisR}
                   />
-                  <ReferenceLine y={0} stroke="rgba(255,255,255,.28)" strokeWidth={1} />
-                  <ReferenceLine y={avgR} stroke="rgba(96,165,250,.55)" strokeDasharray="4 4" strokeWidth={1} />
-                  <Tooltip content={<ChartTooltipPremium mode="r" />} cursor={{ fill: 'rgba(255,255,255,.03)' }} />
-                  <Bar dataKey="r" radius={[3, 3, 0, 0]} maxBarSize={16}>
+                  <ReferenceLine y={0} stroke="rgba(255,255,255,.32)" strokeWidth={1.5} />
+                  <ReferenceLine y={avgR} stroke="rgba(124,92,255,.65)" strokeDasharray="5 4" strokeWidth={1.5} />
+                  <Tooltip content={<ChartTooltipPremium mode="r" />} cursor={{ fill: 'rgba(255,255,255,.04)' }} />
+                  <Bar dataKey="r" shape={<RoundedRBar />} maxBarSize={22}>
                     {rDistribution.map((entry, i) => (
-                      <Cell key={i} fill={entry.r >= 0 ? '#3b82f6' : '#ef4444'} fillOpacity={0.82} />
+                      <Cell key={i} fill={entry.r >= 0 ? 'url(#auditRPosGrad)' : 'url(#auditRNegGrad)'} />
                     ))}
                   </Bar>
                 </BarChart>

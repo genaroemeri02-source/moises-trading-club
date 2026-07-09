@@ -1,25 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box}
-/* ── TEMA OSCURO (default) ─────────────────────────────────── */
+/* ── TEMA OSCURO (default) — Aurora palette ─────────────────── */
 :root {
-  --bg:#07080b;
-  --panel:#10131a;
-  --panel2:#161b25;
-  --panel3:#202636;
-  --line:rgba(255,255,255,.08);
-  --line2:rgba(255,255,255,.14);
-  --text:#eef1f6;
-  --muted:#8b94a7;
-  --muted2:#5c6578;
-  --gold:#d4a843;
-  --gold2:#f0c96a;
-  --green:#22c55e;
-  --red:#f43f5e;
-  --blue:#3b82f6;
-  --purple:#7c3aed;
-  --cyan:#06b6d4;
-  --radius:18px;
-  --shadow:0 18px 60px rgba(0,0,0,.35);
+  /* Aurora canonical tokens */
+  --aurora-bg:#07050D;
+  --aurora-panel:rgba(255,255,255,.035);
+  --aurora-panel-strong:rgba(255,255,255,.055);
+  --aurora-panel-soft:rgba(255,255,255,.025);
+  --aurora-border:rgba(124,92,255,.16);
+  --aurora-border-strong:rgba(124,92,255,.28);
+  --aurora-violet:#7C5CFF;
+  --aurora-violet-deep:#5B3FD1;
+  --aurora-cyan:#33E6C4;
+  --aurora-magenta:#FF4FA3;
+  --aurora-magenta-deep:#C23B7A;
+  --aurora-text:#F5F3FF;
+  --aurora-dim:#9C97B8;
+  /* Legacy aliases → Aurora */
+  --bg:var(--aurora-bg);
+  --panel:var(--aurora-panel);
+  --panel2:var(--aurora-panel-strong);
+  --panel3:rgba(255,255,255,.07);
+  --line:var(--aurora-border);
+  --line2:var(--aurora-border-strong);
+  --text:var(--aurora-text);
+  --muted:var(--aurora-dim);
+  --muted2:#7B7694;
+  --gold:var(--aurora-violet);
+  --gold2:var(--aurora-cyan);
+  --green:var(--aurora-cyan);
+  --red:var(--aurora-magenta);
+  --blue:var(--aurora-violet);
+  --purple:var(--aurora-violet);
+  --cyan:var(--aurora-cyan);
+  --magenta:var(--aurora-magenta);
+  --violet:var(--aurora-violet);
+  --violet-deep:var(--aurora-violet-deep);
+  --magenta-deep:var(--aurora-magenta-deep);
+  --radius:20px;
+  --shadow:0 18px 60px rgba(0,0,0,.38);
 }
 
 /* Trade export controls */
@@ -371,25 +390,31 @@ html,body,#root{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-
 /* v35 checklist logic polish */
 .checkBlockHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);border-radius:14px;padding:12px 14px;margin:16px 0 10px}.checkBlockHeader b{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#dbe3ef}.checkBlockHeader span{font-size:11px;font-weight:900;padding:5px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.1);color:var(--muted)}.checkBlockHeader.validado{border-color:rgba(0,200,150,.26);background:rgba(0,200,150,.06)}.checkBlockHeader.validado span{color:var(--green);border-color:rgba(0,200,150,.25);background:rgba(0,200,150,.08)}.checkBlockHeader.en-progreso{border-color:rgba(250,204,21,.25);background:rgba(250,204,21,.04)}.checkBlockHeader.en-progreso span{color:#facc15;border-color:rgba(250,204,21,.22);background:rgba(250,204,21,.07)}.checkBlockHeader.rechazado{border-color:rgba(255,77,106,.28);background:rgba(255,77,106,.06)}.checkBlockHeader.rechazado span{color:var(--red);border-color:rgba(255,77,106,.25);background:rgba(255,77,106,.08)}.checkResult.ok{border-color:rgba(0,200,150,.28);background:rgba(0,200,150,.08)}.checkResult.bad{border-color:rgba(255,77,106,.28);background:rgba(255,77,106,.08)}.checkResult small{display:block;color:var(--muted2);font-weight:800;margin-top:5px;text-transform:uppercase;letter-spacing:.05em}.answerList{display:grid;gap:8px}.answerList div{display:grid;grid-template-columns:160px 1fr;gap:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px}.answerList b{color:var(--muted2);font-size:11px;text-transform:uppercase;letter-spacing:.06em}.answerList span{color:var(--text);font-size:13px}.mentorComment{margin:10px 0}.checklistModal .detailGrid{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:860px){.answerList div{grid-template-columns:1fr}.checklistModal .detailGrid{grid-template-columns:1fr}.checkBlockHeader{align-items:flex-start;flex-direction:column}.checkBlockHeader span{align-self:flex-start}}
 
-/* v37 — Premium SaaS restyle inspired by leading trading journals */
-:root{
-  --bg:#07090D!important;
-  --panel:#0B0F17!important;
-  --panel2:#0C111B!important;
-  --panel3:#121826!important;
-  --line:rgba(255,255,255,.08)!important;
-  --line2:rgba(255,255,255,.14)!important;
-  --text:#F4F1E8!important;
-  --muted:#9AA3B2!important;
-  --muted2:#606A7C!important;
-  --gold:#D4A63A!important;
-  --gold2:#F0C55A!important;
-  --blue:#3DA5FF!important;
-  --purple:#7C5CFF!important;
-  --green:#16C784!important;
-  --red:#EF4D5D!important;
-  --radius:16px!important;
-  --shadow:0 24px 80px rgba(0,0,0,.36)!important;
+/* v37 — Premium SaaS restyle — Aurora dark foundation */
+:root:not([data-theme="light"]){
+  --bg:var(--aurora-bg)!important;
+  --panel:var(--aurora-panel)!important;
+  --panel2:var(--aurora-panel-strong)!important;
+  --panel3:rgba(255,255,255,.07)!important;
+  --line:var(--aurora-border)!important;
+  --line2:var(--aurora-border-strong)!important;
+  --text:var(--aurora-text)!important;
+  --muted:var(--aurora-dim)!important;
+  --muted2:#7B7694!important;
+  --gold:var(--aurora-violet)!important;
+  --gold2:var(--aurora-cyan)!important;
+  --blue:var(--aurora-violet)!important;
+  --purple:var(--aurora-violet)!important;
+  --green:var(--aurora-cyan)!important;
+  --red:var(--aurora-magenta)!important;
+  --cyan:var(--aurora-cyan)!important;
+  --magenta:var(--aurora-magenta)!important;
+  --violet:var(--aurora-violet)!important;
+  --violet-deep:var(--aurora-violet-deep)!important;
+  --magenta-deep:var(--aurora-magenta-deep)!important;
+  --radius:20px!important;
+  --shadow:0 24px 80px rgba(0,0,0,.42)!important;
+  --app-bg:var(--aurora-bg)!important;
 }
 html,body,#root{background:#07090D!important;font-family:'Inter','Manrope',system-ui,sans-serif!important;overflow-x:hidden!important}.app{grid-template-columns:244px minmax(0,1fr)!important;background:#07090D!important}.main{background:linear-gradient(180deg,#07090D,#080B11 42%,#07090D)!important;overflow-x:hidden!important}.page{padding:28px 32px 72px!important;max-width:1520px;width:100%;margin:0 auto}.card,.metric,.post,.idea,.trade,.bookCard,.lessonCard{background:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.026))!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:18px!important;box-shadow:0 18px 70px rgba(0,0,0,.18)!important}.card:hover,.metric:hover,.post:hover,.idea:hover,.bookCard:hover,.lessonCard:hover{border-color:rgba(255,255,255,.145)!important;transform:translateY(-1px)!important}.card h2,.card h3,.top h1{letter-spacing:-.025em!important}.primary,.primary.full{background:#D4A63A!important;background-image:none!important;border:1px solid #D4A63A!important;color:#090B10!important;border-radius:12px!important;font-weight:800!important;box-shadow:0 14px 38px rgba(212,166,58,.14)!important}.primary:hover{filter:brightness(1.08)!important;transform:translateY(-1px)}.ghost,.googleBtn,.topCta.ghost{background:rgba(255,255,255,.045)!important;border:1px solid rgba(255,255,255,.09)!important;color:#DCE3EF!important;border-radius:12px!important}.input,select,textarea{background:rgba(255,255,255,.045)!important;border:1px solid rgba(255,255,255,.10)!important;color:var(--text)!important;border-radius:12px!important}.input:focus,select:focus,textarea:focus{outline:none!important;border-color:rgba(212,166,58,.56)!important;box-shadow:0 0 0 4px rgba(212,166,58,.12)!important}
 /* premium login split */
@@ -24754,5 +24779,4404 @@ html[data-theme="light"] .analyticsCommandChip{
   }
   .analyticsEdgePipelineCompact.integrated .analyticsEdgePipelineCompactCol.samples{
     padding:0!important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS FINAL POLISH v13 — Mobile-first typography & depth
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsCockpit{
+  --ax-type-label:10px;
+  --ax-type-secondary:11px;
+  --ax-type-body:12px;
+  --ax-type-title:14px;
+  --ax-rhythm:14px;
+  --ax-touch:40px;
+  gap:var(--ax-rhythm)!important;
+}
+
+/* ── A. Header + filters ── */
+.analyticsFiltersPanel{
+  width:100%;
+  min-width:0;
+}
+.analyticsCockpit .analyticsFiltersCompact{
+  padding:10px 12px;
+  gap:10px;
+  border-radius:12px;
+}
+.analyticsCockpit .analyticsFiltersCompactLabel{
+  font-size:11px;
+  letter-spacing:.08em;
+  padding-right:10px;
+}
+.analyticsCockpit .analyticsFilterField>span{
+  font-size:var(--ax-type-label);
+  line-height:1.3;
+  letter-spacing:.05em;
+}
+.analyticsCockpit .analyticsFilterField .input.small{
+  min-height:36px;
+  padding:6px 9px;
+  font-size:var(--ax-type-body);
+  line-height:1.25;
+  width:100%;
+  min-width:0;
+}
+.analyticsTopBarMetaRail{
+  min-width:0;
+}
+@media(max-width:860px){
+  .analyticsCockpit .analyticsTopBarMetaRail{
+    display:flex;
+    flex-wrap:nowrap;
+    gap:8px;
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:2px;
+  }
+  .analyticsCockpit .analyticsTopBarMetaRail::-webkit-scrollbar{display:none}
+  .analyticsCockpit .analyticsTopBarChip{
+    flex:0 0 auto;
+    min-width:88px;
+    padding:6px 10px;
+  }
+  .analyticsCockpit .analyticsTopBarChip em{font-size:10px!important}
+  .analyticsCockpit .analyticsTopBarChip b{font-size:12px!important;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+  .analyticsCockpit .analyticsFiltersCompact{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .analyticsCockpit .analyticsFiltersCompactLabel{
+    border-right:none;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    padding:0 0 8px;
+  }
+  .analyticsCockpit .analyticsFiltersCompactGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px;
+  }
+}
+@media(max-width:390px){
+  .analyticsCockpit{
+    --ax-type-label:11px;
+    --ax-type-secondary:12px;
+    --ax-type-body:13px;
+    --ax-touch:42px;
+    --ax-rhythm:12px;
+  }
+  .analyticsCockpit .analyticsFilterField .input.small{
+    min-height:var(--ax-touch);
+    font-size:13px;
+  }
+  .analyticsCockpit .analyticsFiltersCompactGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px 12px;
+  }
+  .analyticsCockpit .analyticsTopBarBrand{font-size:12px}
+  .analyticsCockpit .analyticsTopBarCount{font-size:12px}
+}
+
+/* ── B. Command strip / hero ── */
+@media(max-width:860px){
+  .analyticsCockpit .analyticsCommandStrip{
+    max-height:none;
+    padding:12px 14px 10px!important;
+  }
+  .analyticsCockpit .analyticsCommandStripBody{
+    grid-template-columns:64px minmax(0,1fr);
+    gap:10px 12px;
+    align-items:flex-start;
+  }
+  .analyticsCockpit .analyticsCommandChips{
+    grid-column:1/-1;
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:6px;
+    min-width:0;
+  }
+  .analyticsCockpit .analyticsCommandChip{
+    flex:1 1 calc(33.33% - 6px);
+    min-width:96px;
+    padding:6px 8px;
+  }
+  .analyticsCockpit .analyticsCommandChip b{
+    font-size:11px;
+    max-width:none;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .analyticsCockpit .analyticsCommandHeadline{
+    font-size:14px!important;
+    line-height:1.35!important;
+    -webkit-line-clamp:4;
+  }
+  .analyticsCockpit .analyticsCommandWeeklyInline{
+    white-space:normal;
+    overflow:visible;
+    font-size:11px;
+    line-height:1.4;
+  }
+}
+
+/* ── C. Typography + metric overflow ── */
+.analyticsCockpit .analyticsKpiCard{
+  min-width:0;
+  overflow:hidden;
+}
+.analyticsCockpit .analyticsKpiValue{
+  display:block;
+  max-width:100%;
+  font-variant-numeric:tabular-nums;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  line-height:1.1;
+}
+.analyticsCockpit .analyticsKpiSub,
+.analyticsCockpit .analyticsKpiHint{
+  display:block;
+  font-size:var(--ax-type-secondary)!important;
+  line-height:1.35!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.analyticsCockpit .analyticsInsightNoteLabel{font-size:10px!important}
+.analyticsCockpit .analyticsInsightNotePrimary{font-size:12px!important}
+.analyticsCockpit .analyticsInsightNoteSecondary{font-size:10px!important;line-height:1.4!important}
+.analyticsCockpit .analyticsDirectiveSetup{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.analyticsCockpit .analyticsEdgeMapCoreName,
+.analyticsCockpit .analyticsEdgePipelineCompactName,
+.analyticsCockpit .analyticsActiveLeaksCompactName{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  white-space:normal;
+}
+@media(max-width:390px){
+  .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard .analyticsKpiValue{
+    font-size:15px!important;
+  }
+  .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiValue{
+    font-size:18px!important;
+  }
+  .analyticsCockpit .analyticsInsightNotePrimary{font-size:11px!important}
+  .analyticsCockpit .analyticsPerformanceEvidencePanelNarrative{font-size:11px!important}
+}
+
+/* ── D. Charts — equity sharp mobile ── */
+.analyticsCockpit .analyticsChartFrame{
+  width:100%;
+  min-width:0;
+  overflow:hidden;
+  padding:2px 0;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceChart .mtcLwChart{
+  border-radius:12px;
+  min-height:0;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceChart .mtcLwChart.mobile-sharp{
+  border-radius:12px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+.analyticsCockpit .analyticsPerformanceEvidencePanel.size-large .analyticsPerformanceEvidencePanelBody{
+  padding:8px 10px 10px;
+}
+.analyticsCockpit .recharts-cartesian-axis-tick text{
+  font-family:'Manrope','Inter',system-ui,sans-serif;
+  font-weight:600;
+}
+
+/* ── E. Depth / rhythm between zones ── */
+.analyticsCockpit .analyticsZone--command,
+.analyticsCockpit .analyticsZone--directives,
+.analyticsCockpit .analyticsZone--health,
+.analyticsCockpit .analyticsZone--evidence{
+  min-width:0;
+}
+.analyticsCockpit .analyticsZone--primary{
+  margin-top:2px;
+}
+.analyticsCockpit .analyticsSurfaceFlagship,
+.analyticsCockpit .analyticsSurfaceSupport{
+  box-shadow:
+    var(--ax-mat-flagship-shadow,0 10px 32px rgba(0,0,0,.22)),
+    inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+.analyticsCockpit .analyticsSurfaceSupport{
+  box-shadow:var(--ax-mat-support-shadow,0 6px 18px rgba(0,0,0,.14)),inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+
+/* Light mode polish */
+html[data-theme="light"] .analyticsCockpit .analyticsFiltersCompact{
+  background:linear-gradient(168deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsCockpit .analyticsTopBarChip{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsCockpit .analyticsFilterField .input.small{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.1)!important;
+  color:#0f172a!important;
+}
+
+/* Dark depth */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersPanel .analyticsFiltersCompact,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersPanel .analyticsFiltersCompact{
+  background:linear-gradient(168deg,rgba(18,24,36,.9),rgba(10,13,20,.95))!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS REFINEMENT v14 — Collapsible filters, hero hierarchy,
+   typography, edge lab, KPIs, charts, mobile-first, depth
+   ═══════════════════════════════════════════════════════════════ */
+
+.analyticsCockpit{
+  --ax-type-label:11px;
+  --ax-type-secondary:12px;
+  --ax-type-body:14px;
+  --ax-type-subtitle:15px;
+  --ax-type-section:20px;
+  --ax-type-kpi:28px;
+  --ax-type-kpi-hero:32px;
+  --ax-rhythm:16px;
+  --ax-touch:44px;
+}
+
+/* ── 1. Collapsible filters panel ── */
+.analyticsFiltersPanel{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  min-width:0;
+}
+.analyticsFiltersToggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  min-height:var(--ax-touch);
+  padding:8px 12px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;
+  background:linear-gradient(168deg,rgba(18,24,36,.88),rgba(10,13,20,.94));
+  color:inherit;
+  cursor:pointer;
+  text-align:left;
+  transition:border-color .18s ease,background .18s ease;
+}
+.analyticsFiltersToggle:hover{
+  border-color:rgba(255,255,255,.12);
+  background:linear-gradient(168deg,rgba(22,28,42,.92),rgba(12,16,24,.96));
+}
+.analyticsFiltersToggleLead{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:1;
+}
+.analyticsFiltersToggleLabel{
+  flex-shrink:0;
+  font-size:11px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ax-muted,var(--muted2));
+}
+.analyticsFiltersToggleSummary{
+  font-size:13px;
+  font-weight:600;
+  color:var(--ax-text-hi,var(--ax-text));
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0;
+  line-height:1.35;
+}
+.analyticsFiltersToggleChevron{
+  flex-shrink:0;
+  color:var(--ax-muted);
+  opacity:.75;
+  transition:transform .22s ease;
+}
+.analyticsFiltersPanel.is-expanded .analyticsFiltersToggleChevron{
+  transform:rotate(180deg);
+}
+.analyticsFiltersPanel.is-expanded .analyticsFiltersToggle{
+  border-radius:12px 12px 0 0;
+  border-bottom-color:rgba(255,255,255,.04);
+}
+.analyticsFiltersActiveChips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  padding:6px 12px 8px;
+  border:1px solid rgba(255,255,255,.06);
+  border-top:none;
+  border-radius:0 0 12px 12px;
+  background:rgba(0,0,0,.12);
+}
+.analyticsFiltersActiveChip{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 9px;
+  border-radius:99px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  max-width:100%;
+  min-width:0;
+}
+.analyticsFiltersActiveChip em{
+  font-style:normal;
+  font-size:10px;
+  font-weight:750;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ax-muted);
+  flex-shrink:0;
+}
+.analyticsFiltersActiveChip b{
+  font-size:12px;
+  font-weight:700;
+  color:var(--ax-text-hi,var(--ax-text));
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0;
+}
+.analyticsFiltersBody{
+  padding:12px 12px 14px;
+  border:1px solid rgba(255,255,255,.06);
+  border-top:none;
+  border-radius:0 0 12px 12px;
+  background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.16));
+}
+.analyticsFiltersBody .analyticsFiltersCompactGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px 12px;
+}
+.analyticsFiltersPanel.is-expanded .analyticsFiltersBody{
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.analyticsCockpit .analyticsFiltersCompactGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px 12px;
+}
+.analyticsCockpit .analyticsFilterField>span{
+  font-size:var(--ax-type-label)!important;
+  line-height:1.35;
+  letter-spacing:.05em;
+}
+.analyticsCockpit .analyticsFilterField .input.small{
+  min-height:var(--ax-touch);
+  padding:8px 10px;
+  font-size:14px!important;
+  line-height:1.3;
+  width:100%;
+  min-width:0;
+  border-radius:10px;
+}
+.analyticsCockpit .analyticsFilterField input[type="date"].input.small{
+  -webkit-appearance:none;
+  appearance:none;
+  min-width:0;
+}
+
+/* ── 2. Hero Score Operativo — flagship hierarchy ── */
+.analyticsCommandHeroV14.analyticsCommandStrip{
+  padding:16px 18px 12px!important;
+  max-height:none!important;
+  overflow:visible!important;
+  border-radius:14px!important;
+}
+.analyticsCommandHeroV14.analyticsSurfaceFlagship::before{
+  opacity:.55;
+  background-size:24px 24px;
+  mask-image:radial-gradient(ellipse 90% 85% at 18% 12%,#000 18%,transparent 72%);
+}
+.analyticsCommandHeroV14.analyticsSurfaceFlagship::after{
+  height:65%;
+  background:
+    radial-gradient(ellipse 70% 55% at 8% 0%,rgba(34,197,94,.08),transparent 62%),
+    radial-gradient(ellipse 50% 40% at 92% 20%,rgba(212,166,58,.05),transparent 55%);
+  opacity:.9;
+}
+.analyticsCommandHeroV14 .analyticsCommandStripBody{
+  grid-template-columns:88px minmax(0,1fr) auto;
+  gap:14px 20px;
+  align-items:flex-start;
+}
+.analyticsCommandHeroV14 .analyticsCommandScoreRing{
+  width:72px!important;
+  height:72px!important;
+}
+.analyticsCommandHeroV14 .analyticsCommandScoreInner{
+  width:56px!important;
+  height:56px!important;
+}
+.analyticsCommandHeroV14 .analyticsCommandScoreInner b{
+  font-size:22px!important;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.analyticsCommandHeroV14 .analyticsCommandScoreInner span{
+  font-size:10px;
+  font-weight:700;
+  opacity:.7;
+}
+.analyticsCommandHeroV14 .analyticsCommandScore.compact em{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--ax-muted);
+  margin-top:4px;
+}
+.analyticsCommandHeroV14 .analyticsCommandEyebrow{
+  font-size:11px!important;
+  font-weight:800;
+  letter-spacing:.09em;
+  margin-bottom:6px!important;
+}
+.analyticsCommandHeroV14 .analyticsCommandHeadline{
+  font-size:18px!important;
+  line-height:1.38!important;
+  font-weight:780!important;
+  letter-spacing:-.02em;
+  display:block;
+  -webkit-line-clamp:unset;
+  -webkit-box-orient:unset;
+  overflow:visible;
+  color:var(--ax-text-hi,var(--ax-text));
+}
+.analyticsCommandWeeklyBlock{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(212,166,58,.14);
+  background:linear-gradient(135deg,rgba(212,166,58,.06),rgba(0,0,0,.12));
+}
+.analyticsCommandWeeklyLabel{
+  display:block;
+  font-size:10px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  color:rgba(212,166,58,.9);
+  margin-bottom:4px;
+}
+.analyticsCommandHeroV14 .analyticsCommandWeeklyInline{
+  margin:0;
+  font-size:13px!important;
+  line-height:1.45!important;
+  font-weight:600;
+  color:var(--ax-text-hi,var(--ax-text));
+  white-space:normal;
+  overflow:visible;
+  overflow-wrap:anywhere;
+}
+.analyticsCommandHeroV14 .analyticsCommandChips{
+  flex-direction:column;
+  gap:6px;
+  min-width:124px;
+  max-width:148px;
+}
+.analyticsCommandHeroV14 .analyticsCommandChip{
+  padding:8px 10px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(0,0,0,.16))!important;
+}
+.analyticsCommandHeroV14 .analyticsCommandChip>span{
+  font-size:9px!important;
+  font-weight:850;
+  letter-spacing:.08em;
+}
+.analyticsCommandHeroV14 .analyticsCommandChip>b{
+  font-size:12px!important;
+  font-weight:750;
+  margin-top:3px;
+  max-width:none;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  line-height:1.3;
+}
+.analyticsCommandHeroV14 .analyticsCommandChip.positive{
+  border-left:3px solid rgba(34,197,94,.55);
+  background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(0,0,0,.14))!important;
+}
+.analyticsCommandHeroV14 .analyticsCommandChip.negative{
+  border-left:3px solid rgba(239,68,68,.5);
+  background:linear-gradient(135deg,rgba(239,68,68,.05),rgba(0,0,0,.14))!important;
+}
+.analyticsCommandHeroV14 .analyticsCommandChip.neutral{
+  border-left:3px solid rgba(148,163,184,.4);
+}
+.analyticsCommandHeroV14 .analyticsCommandStripFoot{
+  margin-top:10px;
+  padding-top:8px;
+}
+.analyticsCommandHeroV14 .analyticsCommandStripFoot small{
+  font-size:11px!important;
+  line-height:1.4;
+}
+
+/* ── 3. Global typography scale ── */
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeLabHeadCopy h3{
+  font-size:var(--ax-type-section)!important;
+  font-weight:800;
+  letter-spacing:-.025em;
+}
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeLabHeadCopy p{
+  font-size:var(--ax-type-body)!important;
+  line-height:1.45;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceHead h3{
+  font-size:var(--ax-type-section)!important;
+  font-weight:800;
+  letter-spacing:-.025em;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceHead p{
+  font-size:var(--ax-type-body)!important;
+  line-height:1.45;
+}
+.analyticsCockpit .analyticsPerformanceEvidencePanel header h4{
+  font-size:var(--ax-type-subtitle)!important;
+  font-weight:800;
+}
+.analyticsCockpit .analyticsPerformanceEvidencePanelNarrative{
+  font-size:var(--ax-type-secondary)!important;
+  line-height:1.4!important;
+  font-weight:600;
+  color:var(--ax-text-mid,var(--ax-muted))!important;
+}
+.analyticsCockpit .analyticsSystemHealthHead span{
+  font-size:var(--ax-type-label)!important;
+  font-weight:850;
+  letter-spacing:.09em;
+}
+.analyticsCockpit .analyticsSystemHealthHead em{
+  font-size:var(--ax-type-secondary)!important;
+}
+.analyticsCockpit .analyticsInsightNoteLabel{font-size:11px!important}
+.analyticsCockpit .analyticsInsightNotePrimary{font-size:var(--ax-type-body)!important;line-height:1.4!important}
+.analyticsCockpit .analyticsInsightNoteSecondary{font-size:var(--ax-type-secondary)!important;line-height:1.45!important}
+
+/* ── 4. Edge Lab — presence & overflow shield ── */
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCanvas{
+  min-height:220px;
+  padding:8px 4px;
+}
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRing{
+  width:108px;
+  height:108px;
+}
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRingInner{
+  width:82px;
+  height:82px;
+}
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRingInner b{
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCoreName{
+  font-size:19px;
+  line-height:1.25;
+  max-width:100%;
+}
+.analyticsCockpit .analyticsEdgeMapMetric{
+  padding:8px 10px;
+  border-radius:10px;
+  min-width:0;
+  overflow:hidden;
+}
+.analyticsCockpit .analyticsEdgeMapMetric small{
+  font-size:10px!important;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.analyticsCockpit .analyticsEdgeMapMetric b{
+  font-size:15px!important;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:100%;
+  display:block;
+}
+.analyticsCockpit .analyticsEdgeMapReading.integrated{
+  font-size:13px!important;
+  line-height:1.5!important;
+  font-weight:600;
+  color:var(--ax-text-hi,var(--ax-text))!important;
+  opacity:1!important;
+}
+.analyticsCockpit .analyticsValidationTrackHead span,
+.analyticsCockpit .analyticsValidationTrackHead strong{
+  font-size:11px!important;
+}
+.analyticsCockpit .analyticsValidationTrack small{
+  font-size:11px!important;
+  line-height:1.35;
+}
+
+/* ── 5. KPI row — PF flagship accent ── */
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsSystemHealthGrid .analyticsKpiCard.health{
+  min-height:120px;
+  padding:14px 16px!important;
+  border-radius:14px!important;
+  background:
+    radial-gradient(ellipse 80% 70% at 20% 0%,rgba(212,166,58,.08),transparent 55%),
+    linear-gradient(158deg,rgba(14,18,28,.98),rgba(8,11,18,.96))!important;
+  border:1px solid rgba(212,166,58,.22)!important;
+  box-shadow:
+    0 10px 32px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(212,166,58,.08),
+    inset 0 0 0 1px rgba(212,166,58,.04)!important;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiCardTop span{
+  font-size:11px!important;
+  color:rgba(212,166,58,.85)!important;
+  letter-spacing:.1em;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiValue{
+  font-size:var(--ax-type-kpi-hero)!important;
+  font-weight:800;
+  letter-spacing:-.035em;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiSub{
+  font-size:13px!important;
+  font-weight:650;
+  line-height:1.35;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiHint{
+  font-size:11px!important;
+  line-height:1.35;
+  margin-top:3px;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact{
+  padding:10px 11px!important;
+  min-height:72px;
+  border-radius:12px!important;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact .analyticsKpiCardTop span{
+  font-size:11px!important;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact .analyticsKpiValue{
+  font-size:var(--ax-type-kpi)!important;
+  font-weight:800;
+}
+.analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact .analyticsKpiSub{
+  font-size:12px!important;
+  line-height:1.35;
+}
+
+/* ── 6. Charts — distinctive presentation ── */
+.analyticsCockpit .analyticsPerformanceEvidencePanel.size-large .analyticsPerformanceEvidencePanelBody{
+  padding:10px 12px 12px;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceChart .recharts-cartesian-axis-tick text{
+  font-size:12px!important;
+  font-weight:600;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceChart.equity .mtcLwChart{
+  border-radius:12px;
+  min-height:0;
+}
+.analyticsCockpit .analyticsPerformanceEvidenceChart.daily .recharts-reference-line line,
+.analyticsCockpit .analyticsPerformanceEvidenceChart.rDist .recharts-reference-line line{
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.08));
+}
+.analyticsCockpit .analyticsPerformanceEvidencePanel.equity.analyticsSurfaceFlagship{
+  border-color:rgba(255,255,255,.11)!important;
+}
+
+/* ── 7. Mobile-first 390px ── */
+@media(max-width:860px){
+  .analyticsCockpit .analyticsFiltersCompactGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandStripBody{
+    grid-template-columns:72px minmax(0,1fr);
+    gap:12px 14px;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandChips{
+    grid-column:1/-1;
+    flex-direction:row;
+    flex-wrap:wrap;
+    max-width:none;
+    min-width:0;
+    gap:8px;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandChip{
+    flex:1 1 calc(33.33% - 8px);
+    min-width:100px;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandHeadline{
+    font-size:16px!important;
+    line-height:1.4!important;
+  }
+  .analyticsCockpit .analyticsSystemHealthSecondary .analyticsSystemHealthGrid{
+    grid-template-columns:repeat(2,1fr)!important;
+  }
+  .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health{
+    grid-column:1/-1;
+    min-height:100px;
+  }
+}
+@media(max-width:390px){
+  .analyticsCockpit{
+    --ax-type-body:13px;
+    --ax-type-subtitle:14px;
+    --ax-type-section:18px;
+    --ax-type-kpi:22px;
+    --ax-type-kpi-hero:26px;
+    --ax-rhythm:14px;
+    padding-bottom:calc(140px + env(safe-area-inset-bottom))!important;
+  }
+  .analyticsFiltersToggle{
+    min-height:44px;
+    padding:10px 12px;
+  }
+  .analyticsFiltersToggleSummary{
+    font-size:12px;
+  }
+  .analyticsFiltersBody{
+    padding:12px;
+  }
+  .analyticsCockpit .analyticsFiltersCompactGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px;
+  }
+  .analyticsCockpit .analyticsFilterField .input.small{
+    min-height:44px;
+    font-size:14px!important;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandStripBody{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandScore.compact{
+    flex-direction:row;
+    align-items:center;
+    gap:12px;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandScore.compact em{
+    margin-top:0;
+    text-align:left;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandHeadline{
+    font-size:15px!important;
+    line-height:1.42!important;
+  }
+  .analyticsCommandWeeklyBlock{
+    padding:10px;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandWeeklyInline{
+    font-size:12px!important;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandChip{
+    flex:1 1 calc(50% - 6px);
+    min-width:0;
+  }
+  .analyticsCommandHeroV14 .analyticsCommandChip:last-child{
+    flex:1 1 100%;
+  }
+  .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCanvas{
+    min-height:unset;
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:auto auto auto;
+    gap:10px;
+    padding:4px 0;
+  }
+  .analyticsCockpit .analyticsEdgeMapConnector{display:none!important}
+  .analyticsCockpit .analyticsEdgeMapCore{
+    grid-row:1;
+    padding:12px 8px;
+  }
+  .analyticsCockpit .analyticsEdgeMapMetric.satellite{
+    position:static!important;
+    max-width:none!important;
+    width:100%!important;
+    justify-self:stretch!important;
+  }
+  .analyticsCockpit .analyticsEdgeMapMetric.satellite.tl{grid-column:1;grid-row:2}
+  .analyticsCockpit .analyticsEdgeMapMetric.satellite.tr{grid-column:2;grid-row:2}
+  .analyticsCockpit .analyticsEdgeMapMetric.satellite.bl{grid-column:1;grid-row:3}
+  .analyticsCockpit .analyticsEdgeMapMetric.satellite.br{grid-column:2;grid-row:3}
+  .analyticsCockpit .analyticsEdgeMapStage .analyticsEdgeMapCanvas{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:auto auto auto;
+    gap:8px;
+  }
+  .analyticsCockpit .analyticsEdgeMapCore{
+    grid-column:1/-1;
+  }
+  .analyticsCockpit .analyticsEdgeMapMetric b{
+    font-size:14px!important;
+  }
+  .analyticsCockpit .analyticsEdgeMapReading.integrated{
+    font-size:12px!important;
+    margin-top:10px;
+  }
+  .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiValue{
+    font-size:26px!important;
+  }
+  .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact .analyticsKpiValue{
+    font-size:22px!important;
+  }
+  .analyticsCockpit .analyticsPerformanceEvidenceChart .recharts-cartesian-axis-tick text{
+    font-size:11px!important;
+  }
+  .analyticsCockpit .analyticsPerformanceEvidencePanel.size-large .analyticsPerformanceEvidencePanelBody{
+    padding:8px 8px 10px;
+  }
+  .analyticsCockpit .analyticsCockpitFlow{
+    gap:14px;
+  }
+}
+
+/* ── 8. Visual depth — surface differentiation ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship{
+  background:
+    radial-gradient(ellipse 85% 70% at 12% 0%,rgba(34,197,94,.07),transparent 58%),
+    radial-gradient(ellipse 55% 45% at 95% 85%,rgba(212,166,58,.04),transparent 52%),
+    linear-gradient(158deg,rgba(20,28,44,.98) 0%,rgba(12,17,28,.99) 52%,rgba(8,11,18,1) 100%)!important;
+  border-color:rgba(255,255,255,.1)!important;
+  box-shadow:0 20px 52px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabUnified,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabUnified{
+  box-shadow:0 24px 60px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggle,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggle{
+  background:linear-gradient(168deg,rgba(16,22,34,.9),rgba(8,11,18,.95))!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 4px 16px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersBody,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersBody{
+  background:linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,.22))!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact{
+  background:linear-gradient(168deg,rgba(16,22,34,.85),rgba(8,11,18,.9))!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+
+/* ── Light theme v14 ── */
+html[data-theme="light"] .analyticsCockpit .analyticsFiltersToggle{
+  background:linear-gradient(168deg,#fff,#f8fafc)!important;
+  border-color:rgba(15,23,42,.09)!important;
+}
+html[data-theme="light"] .analyticsCockpit .analyticsFiltersBody{
+  background:linear-gradient(180deg,#f8fafc,#f1f5f9)!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsCockpit .analyticsFiltersActiveChips{
+  background:rgba(241,245,249,.9)!important;
+  border-color:rgba(15,23,42,.07)!important;
+}
+html[data-theme="light"] .analyticsCockpit .analyticsFiltersActiveChip{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+html[data-theme="light"] .analyticsCommandWeeklyBlock{
+  background:linear-gradient(135deg,rgba(212,166,58,.08),rgba(248,250,252,.95))!important;
+  border-color:rgba(212,166,58,.2)!important;
+}
+html[data-theme="light"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health{
+  background:
+    radial-gradient(ellipse 80% 70% at 20% 0%,rgba(212,166,58,.1),transparent 55%),
+    linear-gradient(158deg,#fff,#f8fafc)!important;
+  border-color:rgba(212,166,58,.28)!important;
+  box-shadow:0 8px 28px rgba(15,23,42,.06),inset 0 1px 0 rgba(212,166,58,.1)!important;
+}
+html[data-theme="light"] .analyticsCommandHeroV14 .analyticsCommandChip{
+  background:#fff!important;
+  border-color:rgba(15,23,42,.08)!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANALYTICS AURORA v15 — Dark-only palette, glow fix, glass depth
+   Scoped: html:not([data-theme="light"]) .analyticsCockpit
+   ═══════════════════════════════════════════════════════════════ */
+
+html:not([data-theme="light"]) .analyticsCockpit.analyticsPage,
+html[data-theme="dark"] .analyticsCockpit.analyticsPage{
+  --ax-bg:#07050D;
+  --ax-panel:rgba(255,255,255,.035);
+  --ax-panel-border:rgba(124,92,255,.16);
+  --ax-cyan:#33E6C4;
+  --ax-violet:#7C5CFF;
+  --ax-violet-deep:#5B3FD1;
+  --ax-magenta:#FF4FA3;
+  --ax-magenta-deep:#C23B7A;
+  --ax-text:#F5F3FF;
+  --ax-text-hi:#F5F3FF;
+  --ax-text-mid:#C8C3E0;
+  --ax-dim:#9C97B8;
+  --ax-muted:#9C97B8;
+  --ax-green:var(--ax-cyan);
+  --ax-red:var(--ax-magenta);
+  --ax-gold:rgba(124,92,255,.55);
+  --analytics-text:var(--ax-text);
+  --analytics-text-body:var(--ax-text-mid);
+  --analytics-text-muted:var(--ax-dim);
+  --analytics-text-label:var(--ax-dim);
+  --analytics-chart-axis:var(--ax-dim);
+  --ax-type-label:10.5px;
+  --ax-type-secondary:12px;
+  --ax-type-body:14px;
+  --ax-type-subtitle:15px;
+  --ax-type-section:22px;
+  --ax-type-kpi:28px;
+  --ax-type-kpi-hero:32px;
+  --ax-type-headline:24px;
+  --ax-mat-flagship-bg:var(--ax-panel);
+  --ax-mat-flagship-border:var(--ax-panel-border);
+  --ax-mat-flagship-shadow:0 18px 48px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.05);
+  --ax-mat-support-bg:var(--ax-panel);
+  --ax-mat-support-border:rgba(124,92,255,.12);
+  --ax-mat-support-shadow:0 8px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.04);
+  --ax-mat-utility-bg:rgba(255,255,255,.03);
+  --ax-mat-utility-border:rgba(124,92,255,.1);
+  background:transparent;
+  color:var(--ax-text);
+  overflow-x:hidden;
+}
+
+/* ── BUG FIX: remove escaping green film between header & filters ── */
+html:not([data-theme="light"]) .analyticsCockpit.analyticsIntelligenceCenter::before,
+html[data-theme="dark"] .analyticsCockpit.analyticsIntelligenceCenter::before{
+  display:none!important;
+  content:none!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit.analyticsIntelligenceCenter,
+html[data-theme="dark"] .analyticsCockpit.analyticsIntelligenceCenter{
+  --ax-bg-radial:none;
+  overflow:hidden;
+  isolation:isolate;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSurfaceFlagship,
+html[data-theme="dark"] .analyticsCockpit .analyticsSurfaceFlagship{
+  --ax-mat-flagship-bg:var(--ax-panel);
+  overflow:hidden;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSurfaceFlagship::before,
+html[data-theme="dark"] .analyticsCockpit .analyticsSurfaceFlagship::before{
+  inset:0;
+  opacity:.28;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 45%,#000 15%,transparent 75%);
+  background:
+    linear-gradient(rgba(124,92,255,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,92,255,.02) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSurfaceFlagship::after,
+html[data-theme="dark"] .analyticsCockpit .analyticsSurfaceFlagship::after{
+  inset:0;
+  height:100%;
+  opacity:.55;
+  background:
+    radial-gradient(ellipse 55% 40% at 88% 8%,rgba(124,92,255,.07),transparent 62%),
+    radial-gradient(ellipse 45% 35% at 6% 92%,rgba(51,230,196,.04),transparent 58%);
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship::after,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship::after{
+  inset:0;
+  height:100%;
+  background:
+    radial-gradient(ellipse 50% 42% at 78% 12%,rgba(124,92,255,.08),transparent 62%),
+    radial-gradient(ellipse 40% 32% at 14% 88%,rgba(51,230,196,.05),transparent 58%);
+  opacity:.7;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone{
+  overflow:hidden;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone::before,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone::before{
+  inset:8px 12px 8px;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 50%,rgba(124,92,255,.06),transparent 68%),
+    linear-gradient(rgba(124,92,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,92,255,.018) 1px,transparent 1px);
+  background-size:auto,20px 20px,20px 20px;
+}
+
+/* ── Glass cards ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSurfaceFlagship,
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSurfaceSupport,
+html[data-theme="dark"] .analyticsCockpit .analyticsSurfaceFlagship,
+html[data-theme="dark"] .analyticsCockpit .analyticsSurfaceSupport{
+  background:var(--ax-panel)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:22px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBar,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBar{
+  background:var(--ax-panel)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  backdrop-filter:blur(18px);
+  border-radius:14px!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBarBrand,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBarBrand{
+  color:var(--ax-cyan)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBarChip,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBarChip{
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBarReliability.good b,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBarReliability.good b{color:var(--ax-cyan)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBarReliability.warn b,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBarReliability.warn b{color:var(--ax-violet)!important}
+
+/* ── Semantic colors: cyan positive, magenta negative ── */
+html:not([data-theme="light"]) .analyticsCockpit .pos,
+html:not([data-theme="light"]) .analyticsCockpit .positive,
+html[data-theme="dark"] .analyticsCockpit .pos,
+html[data-theme="dark"] .analyticsCockpit .positive{color:var(--ax-cyan)!important}
+html:not([data-theme="light"]) .analyticsCockpit .neg,
+html:not([data-theme="light"]) .analyticsCockpit .negative,
+html[data-theme="dark"] .analyticsCockpit .neg,
+html[data-theme="dark"] .analyticsCockpit .negative{color:var(--ax-magenta)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePattern strong.pos,
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePatternRow b.pos,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePattern strong.pos,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePatternRow b.pos{color:var(--ax-cyan)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePattern strong.neg,
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePatternRow b.neg,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePattern strong.neg,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePatternRow b.neg{color:var(--ax-magenta)!important}
+
+/* ── Filters accordion ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggle,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggle{
+  background:var(--ax-panel)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  backdrop-filter:blur(18px);
+  border-radius:14px!important;
+  box-shadow:0 4px 16px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggleLabel,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggleLabel{color:var(--ax-dim)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggleSummary,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggleSummary{
+  color:var(--ax-text)!important;
+  font-size:13px;
+  font-weight:600;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersBody,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersBody{
+  background:rgba(7,5,13,.65)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  border-top:none!important;
+  backdrop-filter:blur(18px);
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFilterField>span,
+html[data-theme="dark"] .analyticsCockpit .analyticsFilterField>span{
+  font-size:11px!important;
+  color:var(--ax-dim)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFilterField .input.small,
+html[data-theme="dark"] .analyticsCockpit .analyticsFilterField .input.small{
+  background:rgba(255,255,255,.04)!important;
+  border-color:rgba(124,92,255,.18)!important;
+  color:var(--ax-text)!important;
+}
+
+/* ── Diagnóstico ejecutivo / command hero ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship{
+  background:var(--ax-panel)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  box-shadow:0 20px 52px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandHeadline,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandHeadline{
+  font-size:var(--ax-type-headline)!important;
+  font-weight:700!important;
+  line-height:1.32!important;
+  color:var(--ax-text)!important;
+  letter-spacing:-.025em;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandEyebrow,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandEyebrow{
+  color:var(--ax-dim)!important;
+  font-size:11px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandScoreRing,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandScoreRing{
+  box-shadow:0 0 20px rgba(51,230,196,.18),0 0 36px rgba(124,92,255,.12);
+  filter:drop-shadow(0 0 6px rgba(51,230,196,.25));
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandScoreInner,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandScoreInner{
+  background:rgba(7,5,13,.96)!important;
+  border:1px solid rgba(124,92,255,.2)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandScoreInner b,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandScoreInner b{
+  color:var(--ax-text)!important;
+  font-size:26px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandWeeklyBlock,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandWeeklyBlock{
+  border:1px solid rgba(124,92,255,.18)!important;
+  border-left:3px solid var(--ax-cyan)!important;
+  background:rgba(255,255,255,.03)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandWeeklyLabel,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandWeeklyLabel{
+  color:var(--ax-cyan)!important;
+  font-size:10.5px!important;
+  font-weight:800;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandWeeklyInline,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandWeeklyInline{
+  font-size:14px!important;
+  font-weight:600;
+  color:var(--ax-text)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip{
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip.positive,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip.positive{
+  border-left:3px solid var(--ax-cyan)!important;
+  background:linear-gradient(135deg,rgba(51,230,196,.06),rgba(0,0,0,.12))!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip.negative,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip.negative{
+  border-left:3px solid var(--ax-magenta)!important;
+  background:linear-gradient(135deg,rgba(255,79,163,.05),rgba(0,0,0,.12))!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip>b,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandChip>b{
+  font-size:13px!important;
+  color:var(--ax-text)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandProgressBar>span,
+html[data-theme="dark"] .analyticsCockpit .analyticsCommandProgressBar>span{
+  background:linear-gradient(90deg,var(--ax-cyan),var(--ax-violet))!important;
+}
+
+/* ── Typography scale ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsKpiValue,
+html[data-theme="dark"] .analyticsCockpit .analyticsKpiValue{color:var(--ax-text)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsKpiSub,
+html:not([data-theme="light"]) .analyticsCockpit .analyticsKpiHint,
+html[data-theme="dark"] .analyticsCockpit .analyticsKpiSub,
+html[data-theme="dark"] .analyticsCockpit .analyticsKpiHint{color:var(--ax-text-mid)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiValue,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiValue{
+  font-size:var(--ax-type-kpi-hero)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact .analyticsKpiValue,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact .analyticsKpiValue{
+  font-size:var(--ax-type-kpi)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeLabHeadCopy h3,
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidenceHead h3,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeLabHeadCopy h3,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidenceHead h3{
+  font-size:var(--ax-type-section)!important;
+  color:var(--ax-text)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePanel header h4,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePanel header h4{
+  font-size:20px!important;
+  color:var(--ax-text)!important;
+}
+
+/* ── KPI cockpit instruments ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard{
+  background:var(--ax-panel)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  backdrop-filter:blur(18px);
+  border-radius:16px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health{
+  background:
+    radial-gradient(ellipse 70% 60% at 18% 0%,rgba(124,92,255,.1),transparent 58%),
+    var(--ax-panel)!important;
+  border:1px solid rgba(124,92,255,.22)!important;
+  box-shadow:0 12px 36px rgba(0,0,0,.3),inset 0 1px 0 rgba(124,92,255,.08)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiCardTop span,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health .analyticsKpiCardTop span{
+  color:var(--ax-violet)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health.positive,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health.positive{
+  border-top:2px solid var(--ax-cyan)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health.negative,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.health.negative{
+  border-top:2px solid var(--ax-magenta)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact.positive,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact.positive{
+  border-left:2px solid rgba(51,230,196,.45)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact.negative,
+html[data-theme="dark"] .analyticsCockpit .analyticsSystemHealthSecondary .analyticsKpiCard.compact.negative{
+  border-left:2px solid rgba(255,79,163,.4)!important;
+}
+
+/* ── Edge Lab ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMapGlow,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMapGlow{
+  background:radial-gradient(ellipse at center,rgba(124,92,255,.1),transparent 68%)!important;
+  filter:blur(12px);
+  opacity:.65;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMap.validated .analyticsEdgeMapGlow,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMap.validated .analyticsEdgeMapGlow{
+  background:radial-gradient(ellipse at center,rgba(51,230,196,.1),transparent 68%)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMapRing,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMapRing{
+  background:conic-gradient(var(--ax-cyan) calc(var(--map-pct,0)*1%),rgba(124,92,255,.12) 0)!important;
+  box-shadow:0 0 24px rgba(51,230,196,.15),0 0 40px rgba(124,92,255,.1);
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMapRingInner b,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMapRingInner b{color:var(--ax-text)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMapMetric b,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMapMetric b{color:var(--ax-text)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMapMetric.pos b,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMapMetric.pos b{color:var(--ax-cyan)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeMapMetric,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeMapMetric{
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  border-radius:14px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabStatus,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabStatus{
+  background:rgba(124,92,255,.12)!important;
+  color:#C4B5FD!important;
+  border:1px solid rgba(124,92,255,.28)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabStatus.validated,
+html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabStatus.validated{
+  background:rgba(51,230,196,.1)!important;
+  color:var(--ax-cyan)!important;
+  border-color:rgba(51,230,196,.28)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsValidationTrackBar>span,
+html[data-theme="dark"] .analyticsCockpit .analyticsValidationTrackBar>span{
+  background:linear-gradient(90deg,var(--ax-cyan),var(--ax-violet))!important;
+}
+
+/* ── Charts & evidence panels ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePanel,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePanel{
+  background:var(--ax-panel)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  backdrop-filter:blur(18px);
+  border-radius:20px!important;
+  overflow:hidden;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidencePattern.dominant,
+html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidencePattern.dominant{
+  background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(91,63,209,.08))!important;
+  border:1px solid rgba(124,92,255,.22)!important;
+  border-radius:18px!important;
+  padding:16px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .chartTooltipPremium,
+html[data-theme="dark"] .analyticsCockpit .chartTooltipPremium{
+  background:rgba(7,5,13,.94)!important;
+  border:1px solid var(--ax-panel-border)!important;
+  backdrop-filter:blur(12px);
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .mtcLwChart.positive .tv-lightweight-charts,
+html[data-theme="dark"] .analyticsCockpit .mtcLwChart.positive{
+  filter:drop-shadow(0 0 4px rgba(51,230,196,.2));
+}
+
+/* ── Directives & insight chips ── */
+html:not([data-theme="light"]) .analyticsCockpit .analyticsDirectiveCard.tone-edge,
+html[data-theme="dark"] .analyticsCockpit .analyticsDirectiveCard.tone-edge{
+  border-top-color:rgba(51,230,196,.4)!important;
+  background:linear-gradient(180deg,rgba(51,230,196,.05),var(--ax-panel))!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsDirectiveCard.tone-leak,
+html[data-theme="dark"] .analyticsCockpit .analyticsDirectiveCard.tone-leak{
+  border-top-color:rgba(255,79,163,.4)!important;
+  background:linear-gradient(180deg,rgba(255,79,163,.05),var(--ax-panel))!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsInsightNote.tone-edge .analyticsInsightNotePrimary,
+html[data-theme="dark"] .analyticsCockpit .analyticsInsightNote.tone-edge .analyticsInsightNotePrimary{color:var(--ax-cyan)!important}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsInsightNote.tone-leak .analyticsInsightNotePrimary,
+html[data-theme="dark"] .analyticsCockpit .analyticsInsightNote.tone-leak .analyticsInsightNotePrimary{color:var(--ax-magenta)!important}
+
+/* ── Mobile 390px ── */
+@media(max-width:390px){
+  html:not([data-theme="light"]) .analyticsCockpit.analyticsPage,
+  html[data-theme="dark"] .analyticsCockpit.analyticsPage{
+    --ax-type-body:13.5px;
+    --ax-type-section:18px;
+    --ax-type-kpi:24px;
+    --ax-type-kpi-hero:26px;
+    --ax-type-headline:20px;
+    padding-bottom:calc(140px + env(safe-area-inset-bottom))!important;
+  }
+  html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandHeadline,
+  html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandHeadline{
+    font-size:20px!important;
+    -webkit-line-clamp:unset;
+    overflow:visible;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggleSummary,
+  html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggleSummary{
+    font-size:12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  html:not([data-theme="light"]) .analyticsCockpit .analyticsPerformanceEvidenceChart .recharts-cartesian-axis-tick text,
+  html[data-theme="dark"] .analyticsCockpit .analyticsPerformanceEvidenceChart .recharts-cartesian-axis-tick text{
+    font-size:12px!important;
+  }
+}
+
+@media(max-width:860px){
+  html:not([data-theme="light"]) .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandHeadline,
+  html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandHeadline{
+    font-size:22px!important;
+    -webkit-line-clamp:unset;
+    overflow:visible;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA GLOBAL DARK THEME v16
+   New dark mode for the entire app — light mode untouched
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Aurora ambient background layer ── */
+html:not([data-theme="light"]),
+html[data-theme="dark"]{
+  background-color:var(--bg)!important;
+}
+html:not([data-theme="light"]) body,
+html[data-theme="dark"] body{
+  background:var(--bg)!important;
+  background-color:var(--bg)!important;
+  position:relative;
+}
+html:not([data-theme="light"]) body::before,
+html[data-theme="dark"] body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  filter:blur(80px);
+  opacity:.38;
+  background:
+    radial-gradient(ellipse 560px 560px at -8% -12%,rgba(124,92,255,.55),transparent 68%),
+    radial-gradient(ellipse 460px 460px at 108% 18%,rgba(255,79,163,.42),transparent 68%),
+    radial-gradient(ellipse 420px 420px at 32% 108%,rgba(51,230,196,.32),transparent 68%);
+}
+@media (prefers-reduced-motion: reduce){
+  html:not([data-theme="light"]) body::before,
+  html[data-theme="dark"] body::before{filter:blur(60px);opacity:.28}
+}
+
+/* ── 2. Shell surfaces — transparent so aurora bleeds through ── */
+html:not([data-theme="light"]) :is(html,body,#root),
+html[data-theme="dark"] :is(html,body,#root){
+  background-color:var(--bg)!important;
+}
+html:not([data-theme="light"]) .app,
+html[data-theme="dark"] .app{
+  background:transparent!important;
+  position:relative;
+  z-index:1;
+}
+html:not([data-theme="light"]) .main,
+html[data-theme="dark"] .main{
+  background:transparent!important;
+  position:relative;
+  z-index:1;
+}
+html:not([data-theme="light"]) .page,
+html[data-theme="dark"] .page{
+  position:relative;
+  z-index:1;
+}
+
+/* ── 3. Override legacy hardcoded dark backgrounds ── */
+html:not([data-theme="light"]) :is(
+  .premiumLogin,.loginPanel,.premiumSide,.side,.authPage,
+  .publicLanding,.paywallFunnel,.errorBoundary,.checkPre
+){
+  background-color:var(--bg)!important;
+}
+html:not([data-theme="light"]) .side,
+html:not([data-theme="light"]) .premiumSide,
+html[data-theme="dark"] .side,
+html[data-theme="dark"] .premiumSide{
+  background:linear-gradient(180deg,rgba(7,5,13,.92),rgba(7,5,13,.88))!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-right:1px solid var(--line)!important;
+}
+html:not([data-theme="light"]) .premiumTop,
+html:not([data-theme="light"]) .top,
+html[data-theme="dark"] .premiumTop,
+html[data-theme="dark"] .top{
+  background:rgba(7,5,13,.78)!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .mobileNav,
+html[data-theme="dark"] .mobileNav{
+  background:rgba(7,5,13,.88)!important;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(124,92,255,.16)!important;
+}
+html:not([data-theme="light"]) .mobileNav button.active,
+html[data-theme="dark"] .mobileNav button.active{
+  background:rgba(124,92,255,.14)!important;
+  color:var(--cyan)!important;
+}
+
+/* ── 4. Glass cards — global dark ── */
+html:not([data-theme="light"]) :is(
+  .card,.metric,.metricPremium,.post,.idea,.trade,.bookCard,.lessonCard,
+  .rank,.adminRow,.notif,.modalCard,.loginCard,.paywallCard,
+  .libraryBook,.academyLesson,.libraryBookPro,.insightPro,.heatCell,
+  .mandamiento,.ruleBox,.heroSystem,.homeHero,.riskHero,.controlCenter,
+  .checkHero,.checkItem,.linkedValidationCard,.linkedTradeCard,
+  .analyticsEdgeLab,.analyticsOperatingProfile,.brokerHero,.arenaHero
+){
+  background:var(--panel)!important;
+  border:1px solid var(--line)!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:20px!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .card:hover,
+html:not([data-theme="light"]) .metric:hover,
+html:not([data-theme="light"]) .metricPremium:hover,
+html:not([data-theme="light"]) .post:hover,
+html:not([data-theme="light"]) .idea:hover,
+html[data-theme="dark"] .card:hover,
+html[data-theme="dark"] .metric:hover,
+html[data-theme="dark"] .metricPremium:hover,
+html[data-theme="dark"] .post:hover,
+html[data-theme="dark"] .idea:hover{
+  border-color:rgba(124,92,255,.28)!important;
+}
+
+/* ── 5. Semantic colors — cyan positive, magenta negative ── */
+html:not([data-theme="light"]) .pos,
+html:not([data-theme="light"]) .positive,
+html[data-theme="dark"] .pos,
+html[data-theme="dark"] .positive{color:var(--cyan)!important}
+html:not([data-theme="light"]) .neg,
+html:not([data-theme="light"]) .negative,
+html[data-theme="dark"] .neg,
+html[data-theme="dark"] .negative{color:var(--magenta)!important}
+html:not([data-theme="light"]) .controlStats .pos b,
+html:not([data-theme="light"]) .pulseGrid .pos b,
+html:not([data-theme="light"]) .metricPremium.positive:after,
+html[data-theme="dark"] .controlStats .pos b,
+html[data-theme="dark"] .pulseGrid .pos b,
+html[data-theme="dark"] .metricPremium.positive:after{background:var(--cyan)!important;color:var(--cyan)!important}
+html:not([data-theme="light"]) .controlStats .neg b,
+html:not([data-theme="light"]) .pulseGrid .neg b,
+html:not([data-theme="light"]) .metricPremium.negative:after,
+html[data-theme="dark"] .controlStats .neg b,
+html[data-theme="dark"] .pulseGrid .neg b,
+html[data-theme="dark"] .metricPremium.negative:after{background:var(--magenta)!important;color:var(--magenta)!important}
+html:not([data-theme="light"]) .lightOrb.green,
+html[data-theme="dark"] .lightOrb.green{background:rgba(51,230,196,.1)!important;color:var(--cyan)!important;box-shadow:inset 0 0 40px rgba(51,230,196,.08)!important}
+html:not([data-theme="light"]) .lightOrb.red,
+html[data-theme="dark"] .lightOrb.red{background:rgba(255,79,163,.1)!important;color:var(--magenta)!important;box-shadow:inset 0 0 40px rgba(255,79,163,.08)!important}
+html:not([data-theme="light"]) .calendarMiniGrid button.win,
+html[data-theme="dark"] .calendarMiniGrid button.win{background:rgba(51,230,196,.12)!important;border-color:rgba(51,230,196,.28)!important;color:var(--cyan)!important}
+html:not([data-theme="light"]) .calendarMiniGrid button.loss,
+html[data-theme="dark"] .calendarMiniGrid button.loss{background:rgba(255,79,163,.1)!important;border-color:rgba(255,79,163,.24)!important;color:var(--magenta)!important}
+html:not([data-theme="light"]) .heatCell.win,
+html[data-theme="dark"] .heatCell.win{background:rgba(51,230,196,.08)!important;border-color:rgba(51,230,196,.22)!important}
+html:not([data-theme="light"]) .heatCell.loss,
+html[data-theme="dark"] .heatCell.loss{background:rgba(255,79,163,.08)!important;border-color:rgba(255,79,163,.2)!important}
+html:not([data-theme="light"]) .linkedMini.ok,
+html[data-theme="dark"] .linkedMini.ok{color:var(--cyan)!important;border-color:rgba(51,230,196,.28)!important;background:rgba(51,230,196,.08)!important}
+html:not([data-theme="light"]) .insightPro.good,
+html[data-theme="dark"] .insightPro.good{border-color:rgba(51,230,196,.26)!important;background:linear-gradient(135deg,rgba(51,230,196,.08),rgba(255,255,255,.02))!important}
+html:not([data-theme="light"]) .insightPro.bad,
+html[data-theme="dark"] .insightPro.bad{border-color:rgba(255,79,163,.24)!important;background:linear-gradient(135deg,rgba(255,79,163,.07),rgba(255,255,255,.02))!important}
+html:not([data-theme="light"]) .sparklineMini span.pos,
+html:not([data-theme="light"]) .metricPremium.positive .sparklineMini span,
+html[data-theme="dark"] .sparklineMini span.pos,
+html[data-theme="dark"] .metricPremium.positive .sparklineMini span{background:rgba(51,230,196,.65)!important}
+html:not([data-theme="light"]) .sparklineMini span.neg,
+html:not([data-theme="light"]) .metricPremium.negative .sparklineMini span,
+html[data-theme="dark"] .sparklineMini span.neg,
+html[data-theme="dark"] .metricPremium.negative .sparklineMini span{background:rgba(255,79,163,.6)!important}
+
+/* ── 6. Sidebar nav — aurora accents ── */
+html:not([data-theme="light"]) .premiumSide nav button.active,
+html:not([data-theme="light"]) nav button.active,
+html[data-theme="dark"] .premiumSide nav button.active,
+html[data-theme="dark"] nav button.active{
+  background:rgba(124,92,255,.12)!important;
+  border-color:rgba(124,92,255,.22)!important;
+  border-left-color:var(--cyan)!important;
+  color:var(--cyan)!important;
+}
+html:not([data-theme="light"]) .premiumSide .brand b,
+html:not([data-theme="light"]) .brand b,
+html[data-theme="dark"] .premiumSide .brand b,
+html[data-theme="dark"] .brand b{color:var(--text)!important}
+html:not([data-theme="light"]) .premiumSide nav button:hover,
+html[data-theme="dark"] .premiumSide nav button:hover{color:var(--text)!important}
+
+/* ── 7. Inputs & buttons — aurora focus ── */
+html:not([data-theme="light"]) :is(.input,select,textarea),
+html[data-theme="dark"] :is(.input,select,textarea){
+  background:rgba(255,255,255,.04)!important;
+  border-color:rgba(124,92,255,.18)!important;
+  color:var(--text)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) :is(.input,select,textarea):focus,
+html[data-theme="dark"] :is(.input,select,textarea):focus{
+  border-color:rgba(51,230,196,.45)!important;
+  box-shadow:0 0 0 4px rgba(51,230,196,.1)!important;
+}
+html:not([data-theme="light"]) .ghost,
+html:not([data-theme="light"]) .googleBtn,
+html:not([data-theme="light"]) .topCta.ghost,
+html[data-theme="dark"] .ghost,
+html[data-theme="dark"] .googleBtn,
+html[data-theme="dark"] .topCta.ghost{
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  color:var(--text)!important;
+}
+html:not([data-theme="light"]) .primary,
+html:not([data-theme="light"]) .primary.full,
+html[data-theme="dark"] .primary,
+html[data-theme="dark"] .primary.full{
+  background:linear-gradient(135deg,var(--cyan),var(--violet))!important;
+  border:none!important;
+  color:#07050D!important;
+  box-shadow:0 12px 32px rgba(124,92,255,.22)!important;
+}
+
+/* ── 8. Auth / Login / Landing — aurora dark ── */
+html:not([data-theme="light"]) .premiumLogin,
+html[data-theme="dark"] .premiumLogin{
+  background:var(--bg)!important;
+}
+html:not([data-theme="light"]) .loginHero,
+html[data-theme="dark"] .loginHero{
+  background:
+    radial-gradient(circle at 22% 18%,rgba(124,92,255,.14),transparent 32%),
+    radial-gradient(circle at 78% 75%,rgba(51,230,196,.1),transparent 34%),
+    linear-gradient(135deg,var(--bg),#0B0818 60%,var(--bg))!important;
+}
+html:not([data-theme="light"]) .loginPanel,
+html[data-theme="dark"] .loginPanel{
+  background:rgba(7,5,13,.65)!important;
+  backdrop-filter:blur(12px);
+}
+html:not([data-theme="light"]) .premiumAuth,
+html:not([data-theme="light"]) .loginCard,
+html[data-theme="dark"] .premiumAuth,
+html[data-theme="dark"] .loginCard{
+  background:var(--panel)!important;
+  border:1px solid var(--line)!important;
+  backdrop-filter:blur(18px);
+}
+html:not([data-theme="light"]) .loginBadge,
+html[data-theme="dark"] .loginBadge{
+  color:var(--cyan)!important;
+  border-color:rgba(51,230,196,.24)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) .loginHero h1,
+html[data-theme="dark"] .loginHero h1{color:var(--text)!important}
+html:not([data-theme="light"]) .publicLanding,
+html[data-theme="dark"] .publicLanding{
+  background:
+    radial-gradient(circle at 18% 8%,rgba(124,92,255,.14),transparent 30%),
+    radial-gradient(circle at 84% 22%,rgba(51,230,196,.08),transparent 32%),
+    linear-gradient(180deg,var(--bg) 0%,#0B0818 48%,var(--bg) 100%)!important;
+}
+
+/* ── 9. Dashboard heroes — aurora depth ── */
+html:not([data-theme="light"]) .homeHero.premiumHero,
+html:not([data-theme="light"]) .controlCenter,
+html[data-theme="dark"] .homeHero.premiumHero,
+html[data-theme="dark"] .controlCenter{
+  background:
+    radial-gradient(circle at 78% 18%,rgba(124,92,255,.1),transparent 30%),
+    radial-gradient(circle at 14% 88%,rgba(51,230,196,.07),transparent 34%),
+    var(--panel)!important;
+  border:1px solid var(--line)!important;
+  overflow:hidden;
+}
+html:not([data-theme="light"]) .homeHero h2,
+html:not([data-theme="light"]) .controlCenter h2,
+html[data-theme="dark"] .homeHero h2,
+html[data-theme="dark"] .controlCenter h2{color:var(--text)!important}
+html:not([data-theme="light"]) .heroEyebrow,
+html:not([data-theme="light"]) .controlBadge,
+html[data-theme="dark"] .heroEyebrow,
+html[data-theme="dark"] .controlBadge{
+  color:var(--cyan)!important;
+  border-color:rgba(51,230,196,.2)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) .metric b,
+html:not([data-theme="light"]) .metricPremium b,
+html[data-theme="dark"] .metric b,
+html[data-theme="dark"] .metricPremium b{color:var(--text)!important}
+html:not([data-theme="light"]) .metric span,
+html:not([data-theme="light"]) .metricPremiumTop span,
+html[data-theme="dark"] .metric span,
+html[data-theme="dark"] .metricPremiumTop span{color:var(--dim,var(--muted))!important}
+
+/* ── 10. Toast, modal, scrollbar ── */
+html:not([data-theme="light"]) .toast,
+html[data-theme="dark"] .toast{
+  background:rgba(7,5,13,.94)!important;
+  border-color:rgba(51,230,196,.24)!important;
+  backdrop-filter:blur(14px);
+}
+html:not([data-theme="light"]) .toast svg,
+html[data-theme="dark"] .toast svg{color:var(--cyan)!important}
+html:not([data-theme="light"]) .toast.error,
+html[data-theme="dark"] .toast.error{border-color:rgba(255,79,163,.28)!important}
+html:not([data-theme="light"]) .toast.error svg,
+html[data-theme="dark"] .toast.error svg{color:var(--magenta)!important}
+html:not([data-theme="light"]) .modalCard,
+html:not([data-theme="light"]) .helpPanel,
+html[data-theme="dark"] .modalCard,
+html[data-theme="dark"] .helpPanel{
+  background:rgba(7,5,13,.94)!important;
+  border:1px solid var(--line)!important;
+  backdrop-filter:blur(18px);
+}
+html:not([data-theme="light"]) ::-webkit-scrollbar-thumb,
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{
+  background:rgba(124,92,255,.35)!important;
+  border-radius:20px;
+}
+
+/* ── 11. Analytics inherits global — simplify duplicate vars ── */
+html:not([data-theme="light"]) .analyticsCockpit.analyticsPage,
+html[data-theme="dark"] .analyticsCockpit.analyticsPage{
+  background:transparent!important;
+}
+
+/* ── 12. Light mode safety — disable aurora layer, restore surfaces ── */
+html[data-theme="light"] body::before,
+:root[data-theme="light"] body::before{
+  display:none!important;
+  content:none!important;
+}
+html[data-theme="light"] :is(html,body,#root){
+  background-color:var(--bg)!important;
+}
+html[data-theme="light"] .app{
+  background:var(--bg)!important;
+}
+html[data-theme="light"] .main{
+  background:radial-gradient(circle at top right,rgba(212,168,67,.06),transparent 400px),var(--bg)!important;
+}
+html[data-theme="light"] :is(.card,.metric,.post,.idea){
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+html[data-theme="light"] .primary,
+html[data-theme="light"] .primary.full{
+  background:#D4A63A!important;
+  color:#090B10!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA AMBIENT LAYER v17 — HTML mockup parity
+   .auroraAmbient + orbs (aurora-v3 / laboratorio-edge)
+   ═══════════════════════════════════════════════════════════════ */
+
+.auroraAmbient{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  filter:blur(80px);
+  opacity:.42;
+  overflow:hidden;
+}
+.auroraOrb{
+  position:absolute;
+  border-radius:50%;
+}
+.auroraOrb--violet{
+  width:560px;
+  height:560px;
+  background:var(--violet,#7C5CFF);
+  top:-160px;
+  left:-120px;
+  animation:auroraFloat1 24s ease-in-out infinite;
+}
+.auroraOrb--cyan{
+  width:460px;
+  height:460px;
+  background:var(--cyan,#33E6C4);
+  top:30%;
+  right:-180px;
+  animation:auroraFloat2 28s ease-in-out infinite;
+}
+.auroraOrb--magenta{
+  width:420px;
+  height:420px;
+  background:var(--magenta,#FF4FA3);
+  bottom:-160px;
+  left:30%;
+  opacity:.5;
+  animation:auroraFloat3 26s ease-in-out infinite;
+}
+@keyframes auroraFloat1{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(60px,40px)}
+}
+@keyframes auroraFloat2{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(-50px,60px)}
+}
+@keyframes auroraFloat3{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(40px,-50px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .auroraOrb--violet,.auroraOrb--magenta,.auroraOrb--cyan{animation:none}
+}
+
+/* Kill pseudo-layer — use real DOM orbs */
+html:not([data-theme="light"]) body::before,
+html[data-theme="dark"] body::before{
+  display:none!important;
+  content:none!important;
+}
+
+/* Base canvas — only html/body solid; everything else transparent */
+html:not([data-theme="light"]),
+html[data-theme="dark"]{
+  background-color:var(--bg)!important;
+}
+html:not([data-theme="light"]) body,
+html[data-theme="dark"] body{
+  background-color:var(--bg)!important;
+}
+html:not([data-theme="light"]) #root,
+html[data-theme="dark"] #root{
+  background:transparent!important;
+  background-color:transparent!important;
+  position:relative;
+  z-index:1;
+}
+html:not([data-theme="light"]) .app,
+html[data-theme="dark"] .app{
+  background:transparent!important;
+  position:relative;
+  z-index:1;
+}
+html:not([data-theme="light"]) .main,
+html[data-theme="dark"] .main{
+  background:transparent!important;
+  position:relative;
+  z-index:1;
+}
+html:not([data-theme="light"]) .page,
+html[data-theme="dark"] .page{
+  background:transparent!important;
+}
+html:not([data-theme="light"]) .pullWrap,
+html:not([data-theme="light"]) .pullWrap.noPullRefresh,
+html[data-theme="dark"] .pullWrap,
+html[data-theme="dark"] .pullWrap.noPullRefresh{
+  background:transparent!important;
+}
+
+/* Override v37/v40 hardcoded #07090D shell backgrounds */
+html:not([data-theme="light"]) :is(#root,.app,.main,.page,.pullWrap),
+html[data-theme="dark"] :is(#root,.app,.main,.page,.pullWrap){
+  background-color:transparent!important;
+}
+
+/* Glass shell — sidebar & topbar let aurora bleed */
+html:not([data-theme="light"]) .side,
+html:not([data-theme="light"]) .premiumSide,
+html[data-theme="dark"] .side,
+html[data-theme="dark"] .premiumSide{
+  background:rgba(7,5,13,.55)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  border-right:1px solid rgba(124,92,255,.14)!important;
+  position:relative;
+  z-index:2;
+}
+html:not([data-theme="light"]) .top,
+html:not([data-theme="light"]) .premiumTop,
+html[data-theme="dark"] .top,
+html[data-theme="dark"] .premiumTop{
+  background:rgba(7,5,13,.45)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  border-bottom:1px solid rgba(124,92,255,.1)!important;
+  position:relative;
+  z-index:2;
+}
+
+/* Cards = glass panels like mockup .card */
+html:not([data-theme="light"]) :is(
+  .card,.metric,.metricPremium,.analyticsSurfaceFlagship,.analyticsSurfaceSupport,
+  .analyticsCommandStrip,.analyticsEdgeLabUnified,.analyticsFiltersToggle,
+  .analyticsTopBar,.analyticsPerformanceEvidencePanel,.analyticsFiltersBody
+){
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+
+/* Auth / landing keep aurora visible */
+html:not([data-theme="light"]) :is(.authPage,.premiumLogin,.publicLanding),
+html[data-theme="dark"] :is(.authPage,.premiumLogin,.publicLanding){
+  background:transparent!important;
+  position:relative;
+  z-index:1;
+}
+
+html[data-theme="light"] .auroraAmbient{
+  display:none!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA SHELL FIX v18 — kill opaque layers blocking ambient orbs
+   ═══════════════════════════════════════════════════════════════ */
+
+html:not([data-theme="light"]) :is(.app,.main,.page,.pullWrap,.pullWrap.noPullRefresh),
+html[data-theme="dark"] :is(.app,.main,.page,.pullWrap,.pullWrap.noPullRefresh){
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+}
+
+html:not([data-theme="light"]) :is(
+  .analyticsCockpit.analyticsPage,
+  .analyticsCockpit.analyticsIntelligenceCenter,
+  .analyticsCockpitFlow
+),
+html[data-theme="dark"] :is(
+  .analyticsCockpit.analyticsPage,
+  .analyticsCockpit.analyticsIntelligenceCenter,
+  .analyticsCockpitFlow
+){
+  background:transparent!important;
+  background-color:transparent!important;
+}
+
+@media (max-width:920px){
+  html:not([data-theme="light"]) :is(.app,.main,#root),
+  html[data-theme="dark"] :is(.app,.main,#root){
+    background:transparent!important;
+    background-color:transparent!important;
+  }
+}
+
+/* Login / auth — let ambient orbs show through hero panels */
+html:not([data-theme="light"]) :is(.premiumLogin,.loginHero,.authPage),
+html[data-theme="dark"] :is(.premiumLogin,.loginHero,.authPage){
+  background:transparent!important;
+  background-image:none!important;
+}
+html:not([data-theme="light"]) .authPage::before,
+html:not([data-theme="light"]) .authPage::after,
+html[data-theme="dark"] .authPage::before,
+html[data-theme="dark"] .authPage::after{
+  display:none!important;
+  content:none!important;
+}
+html:not([data-theme="light"]) .authPage .loginCard.premiumAuth,
+html[data-theme="dark"] .authPage .loginCard.premiumAuth{
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.38)!important;
+}
+html:not([data-theme="light"]) .loginPanel,
+html[data-theme="dark"] .loginPanel{
+  background:rgba(7,5,13,.58)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA SURFACE SYSTEM v19 — sidebar, cards, dropdowns, shells
+   Friendly glass native to laboratorio-edge / aurora-v3 mockups
+   Dark only — light mode untouched
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Sidebar — translucent glass, aurora nav ── */
+html:not([data-theme="light"]) :is(.side,.premiumSide),
+html[data-theme="dark"] :is(.side,.premiumSide){
+  background:rgba(7,5,13,.38)!important;
+  background-image:none!important;
+  backdrop-filter:blur(24px) saturate(1.15)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(1.15)!important;
+  border-right:1px solid rgba(124,92,255,.18)!important;
+  box-shadow:inset -1px 0 0 rgba(51,230,196,.04)!important;
+}
+html:not([data-theme="light"]) .premiumSide .brand,
+html:not([data-theme="light"]) .side .brand,
+html[data-theme="dark"] .premiumSide .brand,
+html[data-theme="dark"] .side .brand{
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .brandLogo,
+html[data-theme="dark"] .brandLogo{
+  border-color:rgba(124,92,255,.28)!important;
+  box-shadow:0 10px 28px rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .navGroup small,
+html[data-theme="dark"] .navGroup small{
+  color:var(--muted)!important;
+}
+html:not([data-theme="light"]) .premiumSide nav button,
+html:not([data-theme="light"]) .side nav button,
+html[data-theme="dark"] .premiumSide nav button,
+html[data-theme="dark"] .side nav button{
+  color:var(--muted)!important;
+  border:1px solid transparent!important;
+  border-radius:10px!important;
+}
+html:not([data-theme="light"]) .premiumSide nav button:hover,
+html:not([data-theme="light"]) .side nav button:hover,
+html[data-theme="dark"] .premiumSide nav button:hover,
+html[data-theme="dark"] .side nav button:hover{
+  background:rgba(124,92,255,.08)!important;
+  color:var(--text)!important;
+}
+html:not([data-theme="light"]) .premiumSide nav button.active,
+html:not([data-theme="light"]) .side nav button.active,
+html[data-theme="dark"] .premiumSide nav button.active,
+html[data-theme="dark"] .side nav button.active{
+  background:rgba(124,92,255,.14)!important;
+  border:1px solid rgba(124,92,255,.24)!important;
+  border-left:3px solid var(--cyan)!important;
+  color:var(--cyan)!important;
+  border-radius:0 12px 12px 0!important;
+  box-shadow:0 0 20px rgba(51,230,196,.06)!important;
+}
+html:not([data-theme="light"]) .premiumSide nav button.active svg,
+html:not([data-theme="light"]) .side nav button.active svg,
+html[data-theme="dark"] .premiumSide nav button.active svg,
+html[data-theme="dark"] .side nav button.active svg{
+  color:var(--cyan)!important;
+}
+html:not([data-theme="light"]) .premiumSide .user,
+html:not([data-theme="light"]) .side .user,
+html[data-theme="dark"] .premiumSide .user,
+html[data-theme="dark"] .side .user{
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  border-radius:14px!important;
+  margin:12px 14px 16px!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+}
+html:not([data-theme="light"]) .premiumSide .avatar,
+html[data-theme="dark"] .premiumSide .avatar{
+  border:1px solid rgba(124,92,255,.22)!important;
+  background:linear-gradient(135deg,rgba(51,230,196,.12),rgba(124,92,255,.16))!important;
+}
+
+/* ── 2. Topbar + mobile nav — glass chips ── */
+html:not([data-theme="light"]) :is(.top,.premiumTop),
+html[data-theme="dark"] :is(.top,.premiumTop){
+  background:rgba(7,5,13,.34)!important;
+  background-image:none!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .mobileNav,
+html[data-theme="dark"] .mobileNav{
+  background:rgba(7,5,13,.42)!important;
+  background-image:none!important;
+  backdrop-filter:blur(22px)!important;
+  -webkit-backdrop-filter:blur(22px)!important;
+  border-top:1px solid rgba(124,92,255,.18)!important;
+  border-left:none!important;
+  border-right:none!important;
+  box-shadow:0 -8px 32px rgba(124,92,255,.08)!important;
+}
+html:not([data-theme="light"]) .mobileNav button.active,
+html[data-theme="dark"] .mobileNav button.active{
+  background:rgba(124,92,255,.16)!important;
+  color:var(--cyan)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .cmdHint,
+html[data-theme="dark"] .cmdHint{
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  color:var(--muted)!important;
+}
+
+/* ── 3. Cards & panels — kill legacy dark gradients ── */
+html:not([data-theme="light"]) .app :is(
+  .card,.metric,.metricPremium,.post,.idea,.trade,.bookCard,.lessonCard,
+  .rank,.adminRow,.notif,.modalCard,.loginCard,.paywallCard,
+  .libraryBook,.academyLesson,.libraryBookPro,.insightPro,.heatCell,
+  .mandamiento,.ruleBox,.heroSystem,.homeHero,.riskHero,.controlCenter,
+  .checkHero,.checkItem,.linkedValidationCard,.linkedTradeCard,
+  .brokerHero,.arenaHero,.dashboardFocus,.gamePlan,.premiumControl,
+  .statusCard,.finalCard,.mentorReviewRequest,.accountManager,
+  .analyticsSurfaceFlagship,.analyticsSurfaceSupport,.analyticsCommandStrip,
+  .analyticsEdgeLabUnified,.analyticsFiltersToggle,.analyticsFiltersBody,
+  .analyticsTopBar,.analyticsPerformanceEvidencePanel,.analyticsKpiCard,
+  .analyticsDirectiveCard,.analyticsCommandChip,.analyticsEdgeMapMetric,
+  .analyticsEdgeMapReading,.analyticsValidationTrack,.analyticsInsightNote,
+  .dayPlanSummary,.proTable>div,.detailBlock,.emotionPanel,.reviewBox
+){
+  background:var(--panel)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .app :is(.card,.metric,.metricPremium,.post,.idea):hover,
+html[data-theme="dark"] .app :is(.card,.metric,.metricPremium,.post,.idea):hover{
+  border-color:rgba(124,92,255,.32)!important;
+  transform:translateY(-1px)!important;
+}
+
+/* ── 4. Inputs, selects, dropdowns, chip pickers ── */
+html:not([data-theme="light"]) .app :is(.input,select,textarea,.search input),
+html[data-theme="dark"] .app :is(.input,select,textarea,.search input){
+  background:rgba(255,255,255,.04)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.18)!important;
+  color:var(--text)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .app :is(.input,select,textarea):focus,
+html[data-theme="dark"] .app :is(.input,select,textarea):focus{
+  border-color:rgba(51,230,196,.42)!important;
+  box-shadow:0 0 0 4px rgba(51,230,196,.1)!important;
+  outline:none!important;
+}
+html:not([data-theme="light"]) .app select option,
+html[data-theme="dark"] .app select option{
+  background:#0B0818!important;
+  color:var(--text)!important;
+}
+html:not([data-theme="light"]) .app :is(.chipSelect,.seg,.filterPills,.checks,.detailChips),
+html[data-theme="dark"] .app :is(.chipSelect,.seg,.filterPills,.checks,.detailChips){
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  border-radius:14px!important;
+}
+html:not([data-theme="light"]) .app :is(.chipSelect button,.checks button,.filterPills button,.seg button,.dayCalendar button,.optionGrid button),
+html[data-theme="dark"] .app :is(.chipSelect button,.checks button,.filterPills button,.seg button,.dayCalendar button,.optionGrid button){
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  color:var(--muted)!important;
+}
+html:not([data-theme="light"]) .app :is(.chipSelect button.on,.checks button.on,.filterPills button.active,.seg button.on,.dayCalendar button.on),
+html[data-theme="dark"] .app :is(.chipSelect button.on,.checks button.on,.filterPills button.active,.seg button.on,.dayCalendar button.on){
+  background:rgba(51,230,196,.1)!important;
+  border-color:rgba(51,230,196,.32)!important;
+  color:var(--cyan)!important;
+}
+html:not([data-theme="light"]) .app .ghost,
+html:not([data-theme="light"]) .app .topCta.ghost,
+html[data-theme="dark"] .app .ghost,
+html[data-theme="dark"] .app .topCta.ghost{
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  color:var(--text)!important;
+}
+html:not([data-theme="light"]) .app .ghost:hover,
+html[data-theme="dark"] .app .ghost:hover{
+  border-color:rgba(124,92,255,.28)!important;
+  color:var(--cyan)!important;
+}
+html:not([data-theme="light"]) .app .primary,
+html:not([data-theme="light"]) .app .topCta.primary,
+html:not([data-theme="light"]) .app .topCta.primaryMini,
+html[data-theme="dark"] .app .primary,
+html[data-theme="dark"] .app .topCta.primary,
+html[data-theme="dark"] .app .topCta.primaryMini{
+  background:linear-gradient(90deg,var(--cyan),var(--violet))!important;
+  border:none!important;
+  color:#07050D!important;
+  box-shadow:0 10px 28px rgba(124,92,255,.24)!important;
+}
+
+/* ── 5. Modals, command palette, overlays ── */
+html:not([data-theme="light"]) :is(.modalCard,.tradeDetailModal,.checklistModal,.resultDetailModal,.cmdPalette,.helpPanel),
+html[data-theme="dark"] :is(.modalCard,.tradeDetailModal,.checklistModal,.resultDetailModal,.cmdPalette,.helpPanel){
+  background:rgba(7,5,13,.72)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.2)!important;
+  backdrop-filter:blur(22px)!important;
+  -webkit-backdrop-filter:blur(22px)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.45)!important;
+}
+html:not([data-theme="light"]) .modalHead,
+html[data-theme="dark"] .modalHead{
+  background:rgba(7,5,13,.55)!important;
+  background-image:none!important;
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .cmdOverlay,
+html[data-theme="dark"] .cmdOverlay{
+  background:rgba(7,5,13,.55)!important;
+  backdrop-filter:blur(10px)!important;
+}
+html:not([data-theme="light"]) .cmdList button,
+html[data-theme="dark"] .cmdList button{
+  background:transparent!important;
+  border:1px solid transparent!important;
+  color:var(--text)!important;
+}
+html:not([data-theme="light"]) .cmdList button:hover,
+html[data-theme="dark"] .cmdList button:hover{
+  background:rgba(124,92,255,.1)!important;
+  border-color:rgba(124,92,255,.18)!important;
+}
+
+/* ── 6. Analytics chips & filters (mockup .chip / .filters) ── */
+html:not([data-theme="light"]) .analyticsCockpit :is(
+  .analyticsTopBarChip,.analyticsFiltersToggle,.analyticsFiltersBody,
+  .analyticsFiltersCompact,.analyticsCommandChip,.analyticsEdgeMapMetric,
+  .analyticsSystemHealthSecondary .analyticsKpiCard
+){
+  background:var(--panel)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBarChip em,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBarChip em{
+  color:var(--muted)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsTopBarChip b,
+html[data-theme="dark"] .analyticsCockpit .analyticsTopBarChip b{
+  color:var(--text)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggle,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggle{
+  color:var(--muted)!important;
+}
+html:not([data-theme="light"]) .analyticsCockpit .analyticsFiltersToggle b,
+html[data-theme="dark"] .analyticsCockpit .analyticsFiltersToggle b{
+  color:var(--text)!important;
+}
+
+/* ── 7. Scrollbar + misc pills ── */
+html:not([data-theme="light"]) ::-webkit-scrollbar-thumb,
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{
+  background:rgba(124,92,255,.35)!important;
+  border-radius:20px!important;
+}
+html:not([data-theme="light"]) .app :is(.pill,.marketClocks span,.heroChips span,.brokerHeroStats span),
+html[data-theme="dark"] .app :is(.pill,.marketClocks span,.heroChips span,.brokerHeroStats span){
+  background:var(--panel)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  color:var(--muted)!important;
+}
+html:not([data-theme="light"]) .app .marketClocks b,
+html[data-theme="dark"] .app .marketClocks b{
+  color:var(--cyan)!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA DARK SYSTEM v20
+   Native dark theme for authenticated app (.app scope)
+   Tokens + utilities + calendar + forms + journal + legacy purge
+   Light mode / landing / checkout untouched
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── TOKENS (dark scope) ── */
+html:not([data-theme="light"]),
+html[data-theme="dark"]{
+  --aurora-bg:#07050D;
+  --aurora-panel:rgba(255,255,255,.035);
+  --aurora-panel-strong:rgba(255,255,255,.055);
+  --aurora-panel-soft:rgba(255,255,255,.025);
+  --aurora-border:rgba(124,92,255,.16);
+  --aurora-border-strong:rgba(124,92,255,.28);
+  --aurora-violet:#7C5CFF;
+  --aurora-violet-deep:#5B3FD1;
+  --aurora-cyan:#33E6C4;
+  --aurora-magenta:#FF4FA3;
+  --aurora-magenta-deep:#C23B7A;
+  --aurora-text:#F5F3FF;
+  --aurora-dim:#9C97B8;
+  --bg:var(--aurora-bg);
+  --panel:var(--aurora-panel);
+  --panel2:var(--aurora-panel-strong);
+  --line:var(--aurora-border);
+  --line2:var(--aurora-border-strong);
+  --text:var(--aurora-text);
+  --muted:var(--aurora-dim);
+  --green:var(--aurora-cyan);
+  --red:var(--aurora-magenta);
+  --gold:var(--aurora-violet);
+  --gold2:var(--aurora-cyan);
+  --cyan:var(--aurora-cyan);
+  --magenta:var(--aurora-magenta);
+  --violet:var(--aurora-violet);
+}
+
+/* ── UTILITY CLASSES ── */
+html:not([data-theme="light"]) .auroraSurface,
+html[data-theme="dark"] .auroraSurface{
+  background:var(--aurora-panel);
+  border:1px solid var(--aurora-border);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 22px 70px rgba(0,0,0,.28);
+  border-radius:20px;
+}
+html:not([data-theme="light"]) .auroraSurfaceStrong,
+html[data-theme="dark"] .auroraSurfaceStrong{
+  background:var(--aurora-panel-strong);
+  border:1px solid var(--aurora-border);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 22px 70px rgba(0,0,0,.32);
+  border-radius:20px;
+}
+html:not([data-theme="light"]) .auroraSurfaceSoft,
+html[data-theme="dark"] .auroraSurfaceSoft{
+  background:var(--aurora-panel-soft);
+  border:1px solid rgba(124,92,255,.12);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-radius:14px;
+}
+html:not([data-theme="light"]) .auroraBorder,
+html[data-theme="dark"] .auroraBorder{border:1px solid var(--aurora-border)!important}
+html:not([data-theme="light"]) .auroraPositive,
+html[data-theme="dark"] .auroraPositive{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) .auroraNegative,
+html[data-theme="dark"] .auroraNegative{color:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) .auroraNeutral,
+html[data-theme="dark"] .auroraNeutral{color:var(--aurora-violet)!important}
+html:not([data-theme="light"]) .auroraPrimaryButton,
+html[data-theme="dark"] .auroraPrimaryButton{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  border:none!important;
+  color:var(--aurora-bg)!important;
+  box-shadow:0 12px 32px rgba(124,92,255,.22)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .auroraInput,
+html[data-theme="dark"] .auroraInput{
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid var(--aurora-border)!important;
+  color:var(--aurora-text)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .auroraInput:focus,
+html[data-theme="dark"] .auroraInput:focus{
+  border-color:rgba(51,230,196,.45)!important;
+  box-shadow:0 0 0 4px rgba(51,230,196,.1)!important;
+  outline:none!important;
+}
+html:not([data-theme="light"]) .auroraBadgePositive,
+html[data-theme="dark"] .auroraBadgePositive{
+  color:var(--aurora-cyan)!important;
+  border:1px solid rgba(51,230,196,.32)!important;
+  background:rgba(51,230,196,.1)!important;
+}
+html:not([data-theme="light"]) .auroraBadgeNegative,
+html[data-theme="dark"] .auroraBadgeNegative{
+  color:var(--aurora-magenta)!important;
+  border:1px solid rgba(255,79,163,.32)!important;
+  background:rgba(255,79,163,.1)!important;
+}
+html:not([data-theme="light"]) .auroraBadgeNeutral,
+html[data-theme="dark"] .auroraBadgeNeutral{
+  color:var(--aurora-violet)!important;
+  border:1px solid rgba(124,92,255,.28)!important;
+  background:rgba(124,92,255,.1)!important;
+}
+html:not([data-theme="light"]) .auroraBadgeWarning,
+html[data-theme="dark"] .auroraBadgeWarning{
+  color:var(--aurora-violet)!important;
+  border:1px solid rgba(124,92,255,.24)!important;
+  background:rgba(124,92,255,.08)!important;
+}
+
+/* ── APP SHELL: map legacy surfaces → Aurora glass ── */
+html:not([data-theme="light"]) .app :is(
+  .card,.metric,.metricPremium,.post,.idea,.trade,.bookCard,.lessonCard,
+  .modalCard,.tradeDetailModal,.checklistModal,.resultDetailModal,
+  .checkHero,.checkItem,.checkBlock,.statusCard,.finalCard,
+  .riskHero,.brokerHero,.heroSystem,.homeHero,.controlCenter,.premiumControl,
+  .linkedValidationCard,.linkedTradeCard,.accountManager,.emptyState,.microInsight,
+  .monthCalendar,.dashboardFocus,.pulseGrid,.podiumGrid,.insightPro,.heatCell,
+  .mandamiento,.ruleBox,.libraryBookPro,.notif,.rank,.adminRow,.arenaHero,
+  .checklistBlocks,.emotionalPanel,.processSummaryGrid,.onboardingSteps,
+  .analyticsSurfaceFlagship,.analyticsSurfaceSupport,.analyticsKpiCard
+){
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) .app :is(.card,.metric,.trade,.monthCell):hover,
+html[data-theme="dark"] .app :is(.card,.metric,.trade,.monthCell):hover{
+  border-color:var(--aurora-border-strong)!important;
+  transform:translateY(-1px)!important;
+}
+
+/* ── SIDEBAR + TOPBAR + MOBILE NAV ── */
+html:not([data-theme="light"]) .app :is(.side,.premiumSide){
+  background:rgba(7,5,13,.40)!important;
+  background-image:none!important;
+  backdrop-filter:blur(24px) saturate(1.12)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(1.12)!important;
+  border-right:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) .app :is(.top,.premiumTop){
+  background:rgba(7,5,13,.36)!important;
+  background-image:none!important;
+  backdrop-filter:blur(20px)!important;
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .app .mobileNav{
+  background:rgba(7,5,13,.48)!important;
+  backdrop-filter:blur(24px)!important;
+  border-top:1px solid var(--aurora-border)!important;
+  padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
+}
+html:not([data-theme="light"]) .app .mobileNav button.active{
+  background:rgba(124,92,255,.16)!important;
+  border:1px solid rgba(124,92,255,.28)!important;
+  color:var(--aurora-cyan)!important;
+  box-shadow:0 0 16px rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) .app .premiumSide nav button.active,
+html:not([data-theme="light"]) .app .side nav button.active{
+  background:rgba(124,92,255,.14)!important;
+  border:1px solid rgba(124,92,255,.24)!important;
+  border-left:3px solid var(--aurora-cyan)!important;
+  color:var(--aurora-cyan)!important;
+}
+
+/* ── CALENDARIO P/L ── */
+html:not([data-theme="light"]) body .app .monthCalendar,
+html[data-theme="dark"] body .app .monthCalendar{
+  background:var(--aurora-panel)!important;
+  border:1px solid var(--aurora-border)!important;
+  border-radius:20px!important;
+  padding:16px!important;
+}
+html:not([data-theme="light"]) body .app .monthCell,
+html[data-theme="dark"] body .app .monthCell{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) body .app .monthCell:hover,
+html[data-theme="dark"] body .app .monthCell:hover{
+  border-color:rgba(124,92,255,.32)!important;
+  background:rgba(124,92,255,.06)!important;
+}
+html:not([data-theme="light"]) body .app .monthCell.none,
+html:not([data-theme="light"]) body .app .monthCell:empty,
+html[data-theme="dark"] body .app .monthCell.none,
+html[data-theme="dark"] body .app .monthCell:empty{
+  background:var(--aurora-panel-soft)!important;
+  opacity:.85;
+}
+html:not([data-theme="light"]) body .app .monthCell.win,
+html:not([data-theme="light"]) body .app .calendarMiniGrid button.win,
+html[data-theme="dark"] body .app .monthCell.win,
+html[data-theme="dark"] body .app .calendarMiniGrid button.win{
+  background:rgba(51,230,196,.14)!important;
+  border-color:rgba(51,230,196,.36)!important;
+}
+html:not([data-theme="light"]) body .app .monthCell.win :is(small,.monthCellResult,.monthCellMoney,i),
+html:not([data-theme="light"]) body .app .calendarMiniGrid button.win,
+html[data-theme="dark"] body .app .monthCell.win :is(small,.monthCellResult,.monthCellMoney,i),
+html[data-theme="dark"] body .app .calendarMiniGrid button.win{
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .monthCell.loss,
+html:not([data-theme="light"]) body .app .calendarMiniGrid button.loss,
+html[data-theme="dark"] body .app .monthCell.loss,
+html[data-theme="dark"] body .app .calendarMiniGrid button.loss{
+  background:rgba(255,79,163,.14)!important;
+  border-color:rgba(255,79,163,.36)!important;
+}
+html:not([data-theme="light"]) body .app .monthCell.loss :is(small,.monthCellResult,.monthCellMoney,i),
+html:not([data-theme="light"]) body .app .calendarMiniGrid button.loss,
+html[data-theme="dark"] body .app .monthCell.loss :is(small,.monthCellResult,.monthCellMoney,i),
+html[data-theme="dark"] body .app .calendarMiniGrid button.loss{
+  color:var(--aurora-magenta)!important;
+}
+html:not([data-theme="light"]) body .app .monthCell.be,
+html:not([data-theme="light"]) body .app .calendarMiniGrid button.be,
+html[data-theme="dark"] body .app .monthCell.be,
+html[data-theme="dark"] body .app .calendarMiniGrid button.be{
+  background:rgba(124,92,255,.12)!important;
+  border-color:rgba(124,92,255,.32)!important;
+}
+html:not([data-theme="light"]) body .app .monthCell.be :is(small,.monthCellResult,.monthCellMoney,i),
+html:not([data-theme="light"]) body .app .calendarMiniGrid button.be,
+html[data-theme="dark"] body .app .monthCell.be :is(small,.monthCellResult,.monthCellMoney,i),
+html[data-theme="dark"] body .app .calendarMiniGrid button.be,
+html[data-theme="dark"] body .app .monthCell.be .monthCellResult{
+  color:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body .app .monthLegend .win,
+html:not([data-theme="light"]) body .app .monthLegend i.win,
+html[data-theme="dark"] body .app .monthLegend .win,
+html[data-theme="dark"] body .app .monthLegend i.win{background:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app .monthLegend .loss,
+html:not([data-theme="light"]) body .app .monthLegend i.loss,
+html[data-theme="dark"] body .app .monthLegend .loss,
+html[data-theme="dark"] body .app .monthLegend i.loss{background:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) body .app .monthLegend .be,
+html:not([data-theme="light"]) body .app .monthLegend i.be,
+html[data-theme="dark"] body .app .monthLegend .be,
+html[data-theme="dark"] body .app .monthLegend i.be{background:var(--aurora-violet)!important}
+
+/* ── FORMULARIO REGISTRAR TRADE + INPUTS ── */
+html:not([data-theme="light"]) .app .field>span,
+html:not([data-theme="light"]) .app .field label{
+  color:var(--aurora-dim)!important;
+  font-size:11px!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+}
+html:not([data-theme="light"]) .app :is(.input,select,textarea,.search input){
+  background:rgba(255,255,255,.04)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  color:var(--aurora-text)!important;
+  font-size:14px!important;
+  border-radius:12px!important;
+}
+html:not([data-theme="light"]) .app :is(.input,select,textarea):focus{
+  border-color:rgba(51,230,196,.45)!important;
+  box-shadow:0 0 0 4px rgba(51,230,196,.1)!important;
+}
+html:not([data-theme="light"]) .app .err,
+html:not([data-theme="light"]) .app .errorSection{color:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) .app .ok,
+html:not([data-theme="light"]) .app .hint.ok{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) .app .primary,
+html:not([data-theme="light"]) .app .topCta.primaryMini{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  border:none!important;
+  color:var(--aurora-bg)!important;
+}
+html:not([data-theme="light"]) .app .ghost,
+html:not([data-theme="light"]) .app .topCta.ghost{
+  background:var(--aurora-panel)!important;
+  border:1px solid var(--aurora-border)!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) .app .ghost.danger,
+html:not([data-theme="light"]) .app .danger{
+  color:var(--aurora-magenta)!important;
+  border-color:rgba(255,79,163,.32)!important;
+  background:rgba(255,79,163,.08)!important;
+}
+html:not([data-theme="light"]) .app :is(.chipSelect,.seg,.checks,.filterPills,.detailChips){
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) .app :is(.chipSelect button.on,.checks button.on,.seg button.on,.filterPills button.active){
+  background:rgba(51,230,196,.1)!important;
+  border-color:rgba(51,230,196,.32)!important;
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) .app .tradeGuide{
+  background:rgba(51,230,196,.06)!important;
+  border:1px solid rgba(51,230,196,.2)!important;
+  background-image:none!important;
+}
+html:not([data-theme="light"]) .app .resultInput{
+  border-color:rgba(51,230,196,.28)!important;
+  background:rgba(51,230,196,.06)!important;
+  background-image:none!important;
+}
+
+/* ── JOURNAL + TRADE DETAIL MODAL ── */
+html:not([data-theme="light"]) .app .modal{
+  background:rgba(7,5,13,.55)!important;
+  backdrop-filter:blur(8px)!important;
+}
+html:not([data-theme="light"]) .app :is(.modalCard,.tradeDetailModal){
+  background:rgba(7,5,13,.72)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(22px)!important;
+}
+html:not([data-theme="light"]) .app .modalHead{
+  background:rgba(7,5,13,.5)!important;
+  background-image:none!important;
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) .app .trade.win,
+html:not([data-theme="light"]) .app .clickableTrade.win,
+html:not([data-theme="light"]) .app .linkedTradeCard.ok,
+html:not([data-theme="light"]) .app .linkedValidationCard.ok{
+  border-color:rgba(51,230,196,.28)!important;
+  background:linear-gradient(135deg,rgba(51,230,196,.08),var(--aurora-panel-soft))!important;
+}
+html:not([data-theme="light"]) .app .trade.loss,
+html:not([data-theme="light"]) .app .clickableTrade.loss{
+  border-color:rgba(255,79,163,.28)!important;
+  background:linear-gradient(135deg,rgba(255,79,163,.07),var(--aurora-panel-soft))!important;
+}
+html:not([data-theme="light"]) .app .clickableTrade:hover{
+  border-color:rgba(124,92,255,.28)!important;
+  background:rgba(124,92,255,.06)!important;
+}
+html:not([data-theme="light"]) .app .buy,
+html:not([data-theme="light"]) .app .tradeResult.positive{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) .app .sell,
+html:not([data-theme="light"]) .app .tradeResult.negative{color:var(--aurora-magenta)!important}
+
+/* ── CHECKLIST / RIESGO / RESULTADOS ── */
+html:not([data-theme="light"]) .app .checkHero.ok,
+html:not([data-theme="light"]) .app .checkBlockHeader.validado,
+html:not([data-theme="light"]) .app .checkResult.ok{
+  border-color:rgba(51,230,196,.28)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) .app .checkHero.bad,
+html:not([data-theme="light"]) .app .checkBlockHeader.rechazado,
+html:not([data-theme="light"]) .app .checkResult.bad{
+  border-color:rgba(255,79,163,.28)!important;
+  background:rgba(255,79,163,.08)!important;
+}
+html:not([data-theme="light"]) .app .checkBlockHeader.en-progreso{
+  border-color:rgba(124,92,255,.24)!important;
+  background:rgba(124,92,255,.08)!important;
+}
+html:not([data-theme="light"]) .app .checkBlockHeader.en-progreso span{color:var(--aurora-violet)!important}
+html:not([data-theme="light"]) .app .checkScore span{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) .app .heatCell.win{background:rgba(51,230,196,.08)!important;border-color:rgba(51,230,196,.24)!important}
+html:not([data-theme="light"]) .app .heatCell.loss{background:rgba(255,79,163,.08)!important;border-color:rgba(255,79,163,.22)!important}
+html:not([data-theme="light"]) .app .insightPro.good{border-color:rgba(51,230,196,.26)!important;background:rgba(51,230,196,.07)!important}
+html:not([data-theme="light"]) .app .insightPro.bad{border-color:rgba(255,79,163,.24)!important;background:rgba(255,79,163,.07)!important}
+html:not([data-theme="light"]) .app .linkedMini.ok{color:var(--aurora-cyan)!important;border-color:rgba(51,230,196,.28)!important;background:rgba(51,230,196,.08)!important}
+html:not([data-theme="light"]) .app .linkedMini.gold{color:var(--aurora-violet)!important;border-color:rgba(124,92,255,.28)!important;background:rgba(124,92,255,.08)!important}
+
+/* ── ANALYTICS: normalizar residuos ── */
+html:not([data-theme="light"]) .app .analyticsCockpit .recharts-cartesian-axis-tick text{
+  fill:var(--aurora-dim)!important;
+  font-size:12px!important;
+}
+html:not([data-theme="light"]) .app .analyticsCockpit .analyticsKpiCard.health.positive .analyticsKpiSub,
+html:not([data-theme="light"]) .app .analyticsCockpit .analyticsEdgeMapMetric.pos b{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) .app .analyticsCockpit .analyticsEdgeMapMetric.neg b{color:var(--aurora-magenta)!important}
+
+/* ── LEGACY COLOR PURGE (authenticated app) ── */
+html:not([data-theme="light"]) .app :is(
+  .pos,.positive,.win,.buy,.metric.red,.metricPremium.positive
+){color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) .app :is(
+  .neg,.negative,.loss,.sell,.red,.metric.red b
+){color:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) .app .pos,
+html:not([data-theme="light"]) .app .positive{background-image:none!important}
+
+/* ── CMD PALETTE + TOOLTIPS ── */
+html:not([data-theme="light"]) .app~.cmdOverlay,
+html:not([data-theme="light"]) .cmdOverlay{
+  background:rgba(7,5,13,.58)!important;
+  backdrop-filter:blur(10px)!important;
+}
+html:not([data-theme="light"]) .cmdPalette{
+  background:rgba(7,5,13,.78)!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(22px)!important;
+}
+html:not([data-theme="light"]) .app .toast{
+  background:var(--aurora-panel-strong)!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(16px)!important;
+  color:var(--aurora-text)!important;
+}
+
+/* ── MOBILE PADDING (bottom nav clearance) ── */
+@media(max-width:860px){
+  html:not([data-theme="light"]) .app .main,
+  html[data-theme="dark"] .app .main{
+    padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+  }
+  html:not([data-theme="light"]) .app .page,
+  html[data-theme="dark"] .app .page{
+    padding-bottom:calc(128px + env(safe-area-inset-bottom))!important;
+  }
+  html:not([data-theme="light"]) body .app .monthCell,
+html[data-theme="dark"] body .app .monthCell{
+    min-height:58px!important;
+  }
+  html:not([data-theme="light"]) body .app .monthCellMoney,
+  html:not([data-theme="light"]) body .app .monthCellR,
+  html[data-theme="dark"] body .app .monthCellMoney,
+  html[data-theme="dark"] body .app .monthCellR{
+    font-size:9px!important;
+    overflow:visible!important;
+    white-space:nowrap!important;
+  }
+}
+
+/* ── v20 EOF: beat legacy specificity + misc authenticated surfaces ── */
+html:not([data-theme="light"]) body .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active),
+html[data-theme="dark"] body .app :is(.checks button.on,.chipSelect button.on,.filterPills button.active){
+  color:var(--aurora-cyan)!important;
+  background:rgba(51,230,196,.1)!important;
+  border-color:rgba(51,230,196,.32)!important;
+}
+html:not([data-theme="light"]) body .app .marketClocks em{
+  border-color:rgba(51,230,196,.24)!important;
+  background:rgba(51,230,196,.08)!important;
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .ddBar i{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet),var(--aurora-magenta))!important;
+}
+html:not([data-theme="light"]) body .app .riskAlert{
+  border-color:rgba(255,79,163,.24)!important;
+  background:rgba(255,79,163,.08)!important;
+}
+html:not([data-theme="light"]) body .app :is(.lotResult div,.limitCards div,.ddTracker div,.scenarioBox){
+  background:var(--aurora-panel)!important;
+  border:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) body:not(:has(.publicLanding)):not(:has(.paywallFunnel)) .helpPanel{
+  background:rgba(7,5,13,.78)!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(22px)!important;
+}
+html:not([data-theme="light"]) body:not(:has(.publicLanding)):not(:has(.paywallFunnel)) .helpBubble{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  border:none!important;
+  color:var(--aurora-bg)!important;
+}
+html:not([data-theme="light"]) body .app .emptyState,
+html:not([data-theme="light"]) body .app .microInsight{
+  color:var(--aurora-dim)!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA DARK SYSTEM v21
+   Native polish: trading calendars, dashboard KPIs, sidebar,
+   checklist form, selects — beats v47 gold blocks after v20
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Purge gold card overlays (premium surface v47) ── */
+html:not([data-theme="light"]) body .app :is(
+  .card,.metric,.metricPremium,.post,.idea,.modalCard,.controlCenter,
+  .dashboardCommandHeader,.dashboardProKpi,.dashboardCalendarHero,
+  .journalCalendarCard,.calendarPreviewCard
+):after,
+html:not([data-theme="light"]) body .app :is(
+  .card,.metric,.metricPremium,.post,.idea,.modalCard
+):before{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+}
+html:not([data-theme="light"]) body .app .dashboardClean .dashboardProKpi:before{
+  display:none!important;
+}
+
+/* ── SIDEBAR: kill gold dividers + active rail ── */
+html:not([data-theme="light"]) body .app :is(.side,.premiumSide) .brand{
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) body .app .navGroup+ .navGroup,
+html[data-theme="dark"] body .app .navGroup+ .navGroup{
+  border-top:1px solid rgba(124,92,255,.10)!important;
+  padding-top:10px!important;
+  margin-top:10px!important;
+}
+html:not([data-theme="light"]) body .app .navGroup small,
+html[data-theme="dark"] body .app .navGroup small{
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app :is(.side,.premiumSide) nav button.active:before,
+html[data-theme="dark"] body .app :is(.side,.premiumSide) nav button.active:before{
+  display:none!important;
+}
+html:not([data-theme="light"]) body .app :is(.side,.premiumSide) nav button.active,
+html[data-theme="dark"] body .app :is(.side,.premiumSide) nav button.active{
+  background:rgba(124,92,255,.14)!important;
+  border:1px solid rgba(124,92,255,.24)!important;
+  border-left:3px solid var(--aurora-cyan)!important;
+  color:var(--aurora-cyan)!important;
+  box-shadow:0 0 20px rgba(51,230,196,.06)!important;
+}
+
+/* ── DASHBOARD HERO + KPI CARDS (dashboardClean / dashboardProKpi) ── */
+html:not([data-theme="light"]) body .app .dashboardCommandHeader,
+html[data-theme="dark"] body .app .dashboardCommandHeader{
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardCommandHeader h2,
+html[data-theme="dark"] body .app .dashboardCommandHeader h2{
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardCommandHeader p,
+html[data-theme="dark"] body .app .dashboardCommandHeader p{
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app .controlBadge,
+html[data-theme="dark"] body .app .controlBadge{
+  color:var(--aurora-cyan)!important;
+  border:1px solid rgba(51,230,196,.28)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) body .app .controlBadge svg,
+html[data-theme="dark"] body .app .controlBadge svg{
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardClean :is(
+  .dashboardKpiStrip .metricPremium,
+  .dashboardProKpi,
+  .dashboardRightRail .card
+),
+html[data-theme="dark"] body .app .dashboardClean :is(
+  .dashboardKpiStrip .metricPremium,
+  .dashboardProKpi,
+  .dashboardRightRail .card
+){
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardClean .dashboardKpiStrip .metricPremium.positive,
+html:not([data-theme="light"]) body .app .dashboardClean .dashboardProKpi.positive,
+html[data-theme="dark"] body .app .dashboardClean .dashboardKpiStrip .metricPremium.positive,
+html[data-theme="dark"] body .app .dashboardClean .dashboardProKpi.positive{
+  border-color:rgba(51,230,196,.22)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardClean .dashboardKpiStrip .metricPremium.negative,
+html:not([data-theme="light"]) body .app .dashboardClean .dashboardProKpi.negative,
+html[data-theme="dark"] body .app .dashboardClean .dashboardKpiStrip .metricPremium.negative,
+html[data-theme="dark"] body .app .dashboardClean .dashboardProKpi.negative{
+  border-color:rgba(255,79,163,.22)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpiTop span,
+html[data-theme="dark"] body .app .dashboardProKpiTop span{
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpiTop em,
+html[data-theme="dark"] body .app .dashboardProKpiTop em{
+  color:var(--aurora-violet)!important;
+  background:rgba(124,92,255,.10)!important;
+  border:1px solid rgba(124,92,255,.22)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi b,
+html[data-theme="dark"] body .app .dashboardProKpi b{
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi small,
+html[data-theme="dark"] body .app .dashboardProKpi small{
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app .metricPremium:after,
+html:not([data-theme="light"]) body .app .dashboardProKpi:after,
+html[data-theme="dark"] body .app .metricPremium:after,
+html[data-theme="dark"] body .app .dashboardProKpi:after{
+  display:none!important;
+}
+html:not([data-theme="light"]) body .app .kpiSegmentBar i.positive,
+html[data-theme="dark"] body .app .kpiSegmentBar i.positive{
+  background:linear-gradient(90deg,rgba(51,230,196,.75),rgba(51,230,196,.45))!important;
+}
+html:not([data-theme="light"]) body .app .kpiSegmentBar i.negative,
+html[data-theme="dark"] body .app .kpiSegmentBar i.negative{
+  background:linear-gradient(90deg,rgba(255,79,163,.75),rgba(255,79,163,.45))!important;
+}
+html:not([data-theme="light"]) body .app .kpiSegmentBar i.neutral,
+html[data-theme="dark"] body .app .kpiSegmentBar i.neutral{
+  background:linear-gradient(90deg,rgba(124,92,255,.55),rgba(124,92,255,.32))!important;
+}
+html:not([data-theme="light"]) body .app .kpiMicroSpark polyline,
+html[data-theme="dark"] body .app .kpiMicroSpark polyline{
+  stroke:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body .app .kpiMicroSpark.positive polyline,
+html[data-theme="dark"] body .app .kpiMicroSpark.positive polyline{
+  stroke:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .kpiMicroSpark.negative polyline,
+html[data-theme="dark"] body .app .kpiMicroSpark.negative polyline{
+  stroke:var(--aurora-magenta)!important;
+}
+html:not([data-theme="light"]) body .app .kpiMiniGauge.positive,
+html[data-theme="dark"] body .app .kpiMiniGauge.positive{
+  background:conic-gradient(from 270deg at 50% 100%,rgba(51,230,196,.85) calc(var(--value)*.5%),rgba(255,255,255,.08) 0 50%,transparent 0)!important;
+}
+html:not([data-theme="light"]) body .app .kpiStreakDots.positive i.on,
+html[data-theme="dark"] body .app .kpiStreakDots.positive i.on{
+  background:linear-gradient(90deg,rgba(51,230,196,.75),rgba(51,230,196,.45))!important;
+  border-color:rgba(51,230,196,.30)!important;
+}
+html:not([data-theme="light"]) body .app .kpiStreakDots.negative i.on,
+html[data-theme="dark"] body .app .kpiStreakDots.negative i.on{
+  background:linear-gradient(90deg,rgba(255,79,163,.75),rgba(255,79,163,.45))!important;
+  border-color:rgba(255,79,163,.30)!important;
+}
+html:not([data-theme="light"]) body .app .kpiStreakDots.neutral i.on,
+html[data-theme="dark"] body .app .kpiStreakDots.neutral i.on{
+  background:linear-gradient(90deg,rgba(124,92,255,.55),rgba(124,92,255,.35))!important;
+  border-color:rgba(124,92,255,.28)!important;
+}
+
+/* ── TRADING CALENDAR (tradingDayCell — real component) ── */
+html:not([data-theme="light"]) body .app .tradingCalendar,
+html[data-theme="dark"] body .app .tradingCalendar{
+  --tc-border:rgba(124,92,255,.14);
+  --tc-surface:rgba(255,255,255,.025);
+  --tc-surface-strong:rgba(255,255,255,.04);
+  --tc-text:var(--aurora-text);
+  --tc-muted:var(--aurora-dim);
+}
+html:not([data-theme="light"]) body .app :is(
+  .dashboardCalendarHero,
+  .journalPage .journalCalendarCard,
+  .journalPage .journalControlGrid>.card:nth-child(2),
+  .calendarPreviewCard
+),
+html[data-theme="dark"] body .app :is(
+  .dashboardCalendarHero,
+  .journalPage .journalCalendarCard,
+  .journalPage .journalControlGrid>.card:nth-child(2),
+  .calendarPreviewCard
+){
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .dashboardCalendarHero,
+  .journalPage .journalCalendarCard,
+  .journalPage .journalControlGrid>.card:nth-child(2)
+):before,
+html[data-theme="dark"] body .app :is(
+  .dashboardCalendarHero,
+  .journalPage .journalCalendarCard,
+  .journalPage .journalControlGrid>.card:nth-child(2)
+):before{
+  display:none!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell,
+html:not([data-theme="light"]) body .app .tradingWeekSummary,
+html[data-theme="dark"] body .app .tradingDayCell,
+html[data-theme="dark"] body .app .tradingWeekSummary{
+  background:var(--aurora-panel-soft)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell:not(:disabled):hover,
+html[data-theme="dark"] body .app .tradingDayCell:not(:disabled):hover{
+  border-color:rgba(124,92,255,.32)!important;
+  background:rgba(124,92,255,.06)!important;
+  transform:translateY(-1px)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell.win,
+html:not([data-theme="light"]) body .app .tradingWeekSummary.win,
+html[data-theme="dark"] body .app .tradingDayCell.win,
+html[data-theme="dark"] body .app .tradingWeekSummary.win{
+  background:rgba(51,230,196,.14)!important;
+  background-image:none!important;
+  border-color:rgba(51,230,196,.36)!important;
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell.loss,
+html:not([data-theme="light"]) body .app .tradingWeekSummary.loss,
+html[data-theme="dark"] body .app .tradingDayCell.loss,
+html[data-theme="dark"] body .app .tradingWeekSummary.loss{
+  background:rgba(255,79,163,.14)!important;
+  background-image:none!important;
+  border-color:rgba(255,79,163,.36)!important;
+  color:var(--aurora-magenta)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell.be,
+html:not([data-theme="light"]) body .app .tradingWeekSummary.be,
+html[data-theme="dark"] body .app .tradingDayCell.be,
+html[data-theme="dark"] body .app .tradingWeekSummary.be{
+  background:rgba(124,92,255,.12)!important;
+  background-image:none!important;
+  border-color:rgba(124,92,255,.32)!important;
+  color:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell :is(.tradingDayResult strong,.tradingDayResult small),
+html:not([data-theme="light"]) body .app .tradingWeekSummary :is(strong,small,em),
+html[data-theme="dark"] body .app .tradingDayCell :is(.tradingDayResult strong,.tradingDayResult small),
+html[data-theme="dark"] body .app .tradingWeekSummary :is(strong,small,em){
+  color:inherit!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell.selected,
+html[data-theme="dark"] body .app .tradingDayCell.selected{
+  outline:2px solid rgba(51,230,196,.42)!important;
+  border-color:rgba(51,230,196,.48)!important;
+  box-shadow:0 0 0 4px rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) body .app .tradingCalendarLegend i.win,
+html[data-theme="dark"] body .app .tradingCalendarLegend i.win{background:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app .tradingCalendarLegend i.loss,
+html[data-theme="dark"] body .app .tradingCalendarLegend i.loss{background:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) body .app .tradingCalendarLegend i.be,
+html[data-theme="dark"] body .app .tradingCalendarLegend i.be{background:var(--aurora-violet)!important}
+
+/* ── CHECKLIST FORM ── */
+html:not([data-theme="light"]) body .app .checklistPage .checkHero,
+html[data-theme="dark"] body .app .checklistPage .checkHero{
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader,
+html[data-theme="dark"] body .app .checkBlockHeader{
+  background:var(--aurora-panel-soft)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader b,
+html[data-theme="dark"] body .app .checkBlockHeader b{
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader span,
+html[data-theme="dark"] body .app .checkBlockHeader span{
+  color:var(--aurora-dim)!important;
+  border-color:rgba(124,92,255,.18)!important;
+  background:rgba(124,92,255,.06)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader.en-progreso,
+html[data-theme="dark"] body .app .checkBlockHeader.en-progreso{
+  border-color:rgba(124,92,255,.24)!important;
+  background:rgba(124,92,255,.08)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader.en-progreso span,
+html[data-theme="dark"] body .app .checkBlockHeader.en-progreso span{
+  color:var(--aurora-violet)!important;
+  border-color:rgba(124,92,255,.24)!important;
+  background:rgba(124,92,255,.10)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader.validado span,
+html[data-theme="dark"] body .app .checkBlockHeader.validado span{
+  color:var(--aurora-cyan)!important;
+  border-color:rgba(51,230,196,.28)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) body .app .checkBlockHeader.rechazado span,
+html[data-theme="dark"] body .app .checkBlockHeader.rechazado span{
+  color:var(--aurora-magenta)!important;
+  border-color:rgba(255,79,163,.28)!important;
+  background:rgba(255,79,163,.08)!important;
+}
+html:not([data-theme="light"]) body .app .unlockNotice.ok,
+html[data-theme="dark"] body .app .unlockNotice.ok{
+  border-color:rgba(51,230,196,.28)!important;
+  background:rgba(51,230,196,.08)!important;
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .unlockNotice.locked,
+html[data-theme="dark"] body .app .unlockNotice.locked{
+  border-color:rgba(255,79,163,.24)!important;
+  background:rgba(255,79,163,.08)!important;
+  color:var(--aurora-magenta)!important;
+}
+html:not([data-theme="light"]) body .app .checklistPage .checkBlocks .field>span,
+html[data-theme="dark"] body .app .checklistPage .checkBlocks .field>span{
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app .checklistPage .field small,
+html[data-theme="dark"] body .app .checklistPage .field small{
+  color:rgba(255,79,163,.82)!important;
+}
+
+/* ── SELECTS / DROPDOWNS (global authenticated) ── */
+html:not([data-theme="light"]) body .app :is(
+  .input,select,textarea,.search input,.accountSwitcher select,.toolbar select
+),
+html[data-theme="dark"] body .app :is(
+  .input,select,textarea,.search input,.accountSwitcher select,.toolbar select
+){
+  background:rgba(255,255,255,.04)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  color:var(--aurora-text)!important;
+  border-radius:12px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+html:not([data-theme="light"]) body .app select,
+html[data-theme="dark"] body .app select{
+  padding-right:36px!important;
+  background-image:
+    linear-gradient(45deg,transparent 50%,var(--aurora-dim) 50%),
+    linear-gradient(135deg,var(--aurora-dim) 50%,transparent 50%)!important;
+  background-position:
+    calc(100% - 18px) calc(50% + 2px),
+    calc(100% - 12px) calc(50% + 2px)!important;
+  background-size:6px 6px,6px 6px!important;
+  background-repeat:no-repeat!important;
+  background-color:rgba(255,255,255,.04)!important;
+}
+html:not([data-theme="light"]) body .app :is(.input,select,textarea):focus,
+html[data-theme="dark"] body .app :is(.input,select,textarea):focus{
+  border-color:rgba(51,230,196,.45)!important;
+  box-shadow:0 0 0 4px rgba(51,230,196,.1)!important;
+  outline:none!important;
+}
+html:not([data-theme="light"]) body .app .accountSwitcher,
+html[data-theme="dark"] body .app .accountSwitcher{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) body .app .accountSwitcher span,
+html[data-theme="dark"] body .app .accountSwitcher span{
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app select:disabled,
+html[data-theme="dark"] body .app select:disabled{
+  opacity:.55!important;
+  cursor:not-allowed!important;
+}
+
+/* ── Misc gold residue in authenticated shell ── */
+html:not([data-theme="light"]) body .app .topActions .crownBadge,
+html[data-theme="dark"] body .app .topActions .crownBadge{
+  border-color:rgba(124,92,255,.24)!important;
+  background:rgba(124,92,255,.08)!important;
+  color:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body .app .activityFeed span,
+html[data-theme="dark"] body .app .activityFeed span{
+  color:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body .app{
+  --mtc-text-accent-label:var(--aurora-violet);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA NATIVE v22 — Design System (authenticated dark)
+   Tokens · surfaces · typography · modules · mobile
+   Beats v47 legacy blocks; complements v15–v21
+   Light / landing / checkout untouched
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── A) Extended tokens ── */
+html:not([data-theme="light"]) body .app,
+html[data-theme="dark"] body .app{
+  --aurora-radius-shell:24px;
+  --aurora-radius-flagship:22px;
+  --aurora-radius-elevated:20px;
+  --aurora-radius-compact:14px;
+  --aurora-radius-input:12px;
+  --aurora-type-label:10.5px;
+  --aurora-type-body:13px;
+  --aurora-type-body-lg:14px;
+  --aurora-type-kpi:clamp(28px,2.2vw,40px);
+  --aurora-type-kpi-md:clamp(22px,1.8vw,32px);
+  --aurora-type-kpi-sm:clamp(18px,1.4vw,22px);
+  --aurora-shadow-elevated:0 22px 70px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.04);
+  --aurora-shadow-flagship:0 28px 90px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.05);
+  --aurora-shadow-compact:0 12px 36px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.03);
+  --aurora-glow-cyan:0 0 24px rgba(51,230,196,.08);
+  --aurora-glow-violet:0 0 24px rgba(124,92,255,.10);
+  --aurora-glow-magenta:0 0 24px rgba(255,79,163,.08);
+}
+
+/* ── B) Reusable surface utilities ── */
+html:not([data-theme="light"]) .auroraShell,
+html[data-theme="dark"] .auroraShell{background:transparent!important}
+html:not([data-theme="light"]) .auroraFlagship,
+html[data-theme="dark"] .auroraFlagship{
+  background:var(--aurora-panel-strong)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border-strong)!important;
+  border-radius:var(--aurora-radius-flagship)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  box-shadow:var(--aurora-shadow-flagship)!important;
+}
+html:not([data-theme="light"]) .auroraElevated,
+html[data-theme="dark"] .auroraElevated{
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  border-radius:var(--aurora-radius-elevated)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:var(--aurora-shadow-elevated)!important;
+}
+html:not([data-theme="light"]) .auroraCompact,
+html[data-theme="dark"] .auroraCompact{
+  background:var(--aurora-panel-soft)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  box-shadow:var(--aurora-shadow-compact)!important;
+}
+html:not([data-theme="light"]) .auroraInputSurface,
+html[data-theme="dark"] .auroraInputSurface{
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid var(--aurora-border)!important;
+  border-radius:var(--aurora-radius-input)!important;
+  min-height:42px!important;
+  font-size:var(--aurora-type-body-lg)!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) .auroraTintSuccess,
+html[data-theme="dark"] .auroraTintSuccess{
+  border-color:rgba(51,230,196,.24)!important;
+  background:rgba(51,230,196,.07)!important;
+}
+html:not([data-theme="light"]) .auroraTintDanger,
+html[data-theme="dark"] .auroraTintDanger{
+  border-color:rgba(255,79,163,.24)!important;
+  background:rgba(255,79,163,.07)!important;
+}
+html:not([data-theme="light"]) .auroraTintWarning,
+html[data-theme="dark"] .auroraTintWarning{
+  border-color:rgba(124,92,255,.22)!important;
+  background:rgba(124,92,255,.06)!important;
+}
+
+/* ── C) Typography scale (authenticated) ── */
+html:not([data-theme="light"]) body .app :is(
+  .field>span,.metric span,.metricPremiumTop span,.dashboardProKpiTop span,
+  .detailBlock>span,.navGroup small,.controlStats span,.analyticsCommandEyebrow,
+  .analyticsPerformanceEvidencePanelHead span,.dashboardRiskList span
+){
+  font-size:max(var(--aurora-type-label),10.5px)!important;
+  letter-spacing:.10em!important;
+  color:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .card p,.field,.input,select,textarea,.checkHero p,.unlockNotice,
+  .analyticsCommandWeeklyInline,.trade p,.answerList span
+){
+  font-size:max(var(--aurora-type-body),13px)!important;
+  line-height:1.45!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .metricPremium b,.dashboardProKpi b,.metric b,.controlStats b,
+  .analyticsKpiCardValue,.dashboardDisciplineBadge b
+){
+  font-variant-numeric:tabular-nums!important;
+  font-size:var(--aurora-type-kpi-md)!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardCommandHeader h2,
+html[data-theme="dark"] body .app .dashboardCommandHeader h2{
+  font-size:var(--aurora-type-kpi)!important;
+}
+
+/* ── D) Global purge — gold pseudo-layers & opaque card skins ── */
+html:not([data-theme="light"]) body .app :is(
+  .card,.metric,.metricPremium,.post,.idea,.modalCard,.trade,.tradePro,
+  .dashboardProKpi,.dashboardCommandHeader,.dashboardRightRail .card,
+  .checkItem,.resultPreview,.linkedValidationCard,.linkedTradeCard,
+  .analyticsSurfaceFlagship,.analyticsSurfaceSupport,.analyticsPerformanceEvidencePanel
+):after,
+html:not([data-theme="light"]) body .app :is(
+  .card,.metric,.metricPremium,.post,.idea,.trade,.dashboardProKpi
+):before{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  opacity:0!important;
+}
+html:not([data-theme="light"]) body .app :is(.trade:hover,.activityFeed button:hover,.clickableTrade:hover){
+  border-color:rgba(124,92,255,.24)!important;
+  background:rgba(124,92,255,.06)!important;
+  background-image:none!important;
+}
+
+/* ── E) Dashboard ── */
+html:not([data-theme="light"]) body .app .dashboardRightRail,
+html[data-theme="dark"] body .app .dashboardRightRail{
+  display:grid!important;
+  gap:12px!important;
+  padding:14px!important;
+  border-radius:var(--aurora-radius-flagship)!important;
+  background:rgba(7,5,13,.22)!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  box-shadow:var(--aurora-shadow-elevated)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardRightRail .card,
+html[data-theme="dark"] body .app .dashboardRightRail .card{
+  margin:0!important;
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  border-radius:var(--aurora-radius-elevated)!important;
+  box-shadow:var(--aurora-shadow-compact)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardRightRail .nextActionCard span svg,
+html[data-theme="dark"] body .app .dashboardRightRail .nextActionCard span svg{
+  color:var(--aurora-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi,
+html[data-theme="dark"] body .app .dashboardProKpi{
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  box-shadow:var(--aurora-shadow-elevated)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi.positive,
+html[data-theme="dark"] body .app .dashboardProKpi.positive{
+  box-shadow:var(--aurora-shadow-elevated),var(--aurora-glow-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi.negative,
+html[data-theme="dark"] body .app .dashboardProKpi.negative{
+  box-shadow:var(--aurora-shadow-elevated),var(--aurora-glow-magenta)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell,
+html:not([data-theme="light"]) body .app .tradingWeekSummary,
+html[data-theme="dark"] body .app .tradingDayCell,
+html[data-theme="dark"] body .app .tradingWeekSummary{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 20px rgba(0,0,0,.12)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell.win,
+html:not([data-theme="light"]) body .app .tradingWeekSummary.win,
+html[data-theme="dark"] body .app .tradingDayCell.win,
+html[data-theme="dark"] body .app .tradingWeekSummary.win{
+  box-shadow:inset 0 1px 0 rgba(51,230,196,.12),0 8px 22px rgba(51,230,196,.06)!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell.loss,
+html:not([data-theme="light"]) body .app .tradingWeekSummary.loss,
+html[data-theme="dark"] body .app .tradingDayCell.loss,
+html[data-theme="dark"] body .app .tradingWeekSummary.loss{
+  box-shadow:inset 0 1px 0 rgba(255,79,163,.10),0 8px 22px rgba(255,79,163,.05)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardMtcScoreRing,
+html[data-theme="dark"] body .app .dashboardMtcScoreRing{
+  background:
+    conic-gradient(from -90deg,var(--aurora-cyan) calc(var(--score)*1%),rgba(124,92,255,.12) 0),
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),var(--aurora-glow-cyan)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>i.positive,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>i.positive{
+  border-color:rgba(51,230,196,.30)!important;
+  background:linear-gradient(180deg,rgba(51,230,196,.18),rgba(51,230,196,.06))!important;
+  color:var(--aurora-cyan)!important;
+  box-shadow:inset 0 1px 0 rgba(51,230,196,.14)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>i.negative,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>i.negative{
+  border-color:rgba(255,79,163,.30)!important;
+  background:linear-gradient(180deg,rgba(255,79,163,.18),rgba(255,79,163,.06))!important;
+  color:var(--aurora-magenta)!important;
+  box-shadow:inset 0 1px 0 rgba(255,79,163,.12)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>i.neutral,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>i.neutral{
+  border-color:rgba(124,92,255,.22)!important;
+  background:linear-gradient(180deg,rgba(124,92,255,.12),rgba(124,92,255,.04))!important;
+  color:var(--aurora-violet)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>i:not(.positive):not(.negative):not(.neutral),
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>i:not(.positive):not(.negative):not(.neutral){
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015)),
+    repeating-linear-gradient(135deg,rgba(124,92,255,.03) 0 2px,transparent 2px 6px)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapLegend i.positive,
+html[data-theme="dark"] body .app .dashboardHeatmapLegend i.positive{background:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app .dashboardHeatmapLegend i.negative,
+html[data-theme="dark"] body .app .dashboardHeatmapLegend i.negative{background:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) body .app .dashboardHeatmapRows .positive,
+html[data-theme="dark"] body .app .dashboardHeatmapRows .positive{
+  border-color:rgba(51,230,196,.22)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapRows .negative,
+html[data-theme="dark"] body .app .dashboardHeatmapRows .negative{
+  border-color:rgba(255,79,163,.22)!important;
+  background:rgba(255,79,163,.08)!important;
+}
+
+/* ── F) Analytics cockpit ── */
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeadline,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeadline{
+  font-size:clamp(20px,2.4vw,26px)!important;
+  line-height:1.28!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandWeeklyBlock,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandWeeklyBlock{
+  background:rgba(51,230,196,.06)!important;
+  border:1px solid rgba(51,230,196,.20)!important;
+  border-left:3px solid var(--aurora-cyan)!important;
+  border-radius:12px!important;
+  padding:12px 14px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandWeeklyLabel,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandWeeklyLabel{
+  color:var(--aurora-cyan)!important;
+  font-size:var(--aurora-type-label)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChip.positive b,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChip.positive b{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChip.negative b,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChip.negative b{color:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChip.neutral b,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChip.neutral b{color:var(--aurora-violet)!important}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandProgressBar span,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandProgressBar span{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLab,
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsOperatingProfile,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLab,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsOperatingProfile{
+  background:var(--aurora-panel)!important;
+  border:1px solid var(--aurora-border)!important;
+  border-radius:var(--aurora-radius-elevated)!important;
+  backdrop-filter:blur(18px)!important;
+  padding:16px 18px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabThesis,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabThesis{
+  border-left-color:var(--aurora-violet)!important;
+  background:rgba(124,92,255,.05)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabThesis.validated,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabThesis.validated{
+  border-left-color:var(--aurora-cyan)!important;
+  background:rgba(51,230,196,.06)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabThesisHead>em,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabThesisHead>em{
+  color:var(--aurora-violet)!important;
+  background:rgba(124,92,255,.10)!important;
+  border:1px solid rgba(124,92,255,.20)!important;
+  font-size:9px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabThesisHead>em.validated,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabThesisHead>em.validated{
+  color:var(--aurora-cyan)!important;
+  background:rgba(51,230,196,.10)!important;
+  border-color:rgba(51,230,196,.24)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit :is(
+  .analyticsEdgeLabThesisMetrics .pos,.analyticsEdgeLabPipelineItem span.pos
+){color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app .analyticsCockpit :is(
+  .analyticsEdgeLabThesisMetrics .neg,.analyticsEdgeLabPipelineItem span.neg
+){color:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabThesisProgressBar>span,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabThesisProgressBar>span{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabPipelineCol.warn,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabPipelineCol.warn{
+  border-top-color:rgba(124,92,255,.40)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabPipelineCol.negative,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabPipelineCol.negative{
+  border-top-color:rgba(255,79,163,.40)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabPipelineCol,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabPipelineCol{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+}
+
+/* ── G) Charts & tooltips (Recharts + LW) ── */
+html:not([data-theme="light"]) body .app :is(
+  .analyticsCockpit,.dashboardV38,.riskPage,.journalPage
+) .recharts-cartesian-axis-tick text,
+html[data-theme="dark"] body .app :is(
+  .analyticsCockpit,.dashboardV38,.riskPage,.journalPage
+) .recharts-cartesian-axis-tick text{
+  fill:var(--aurora-dim)!important;
+  font-size:12px!important;
+  font-weight:600!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .analyticsCockpit,.dashboardV38,.riskPage
+) .recharts-cartesian-grid line,
+html[data-theme="dark"] body .app :is(
+  .analyticsCockpit,.dashboardV38,.riskPage
+) .recharts-cartesian-grid line{
+  stroke:rgba(124,92,255,.08)!important;
+}
+html:not([data-theme="light"]) body .app .chartTooltipPremium,
+html:not([data-theme="light"]) body .app .analyticsChartTooltip,
+html:not([data-theme="light"]) body .app .analyticsPerformanceEvidenceTooltip,
+html[data-theme="dark"] body .app .chartTooltipPremium,
+html[data-theme="dark"] body .app .analyticsChartTooltip,
+html[data-theme="dark"] body .app .analyticsPerformanceEvidenceTooltip{
+  background:rgba(7,5,13,.78)!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+  border-radius:12px!important;
+  padding:10px 12px!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.32)!important;
+}
+html:not([data-theme="light"]) body .app .chartTooltipPremium .pos,
+html[data-theme="dark"] body .app .chartTooltipPremium .pos{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app .chartTooltipPremium .neg,
+html[data-theme="dark"] body .app .chartTooltipPremium .neg{color:var(--aurora-magenta)!important}
+html:not([data-theme="light"]) body .app .analyticsChartFrame,
+html[data-theme="dark"] body .app .analyticsChartFrame{
+  border:1px solid rgba(124,92,255,.10)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+  background:rgba(255,255,255,.02)!important;
+  padding:8px!important;
+}
+
+/* ── H) Journal · TradeForm · Modal · Results ── */
+html:not([data-theme="light"]) body .app :is(
+  .journalPage .card,.tradeFormCard,.formShell,.resultComposer,.tradeDetailModal
+),
+html[data-theme="dark"] body .app :is(
+  .journalPage .card,.tradeFormCard,.formShell,.resultComposer,.tradeDetailModal
+){
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  backdrop-filter:blur(18px)!important;
+  border-radius:var(--aurora-radius-elevated)!important;
+}
+html:not([data-theme="light"]) body .app .tradeDetailModal .modalHead,
+html[data-theme="dark"] body .app .tradeDetailModal .modalHead{
+  background:rgba(7,5,13,.45)!important;
+  border-bottom:1px solid rgba(124,92,255,.12)!important;
+}
+html:not([data-theme="light"]) body .app .dailyPlan .input,
+html:not([data-theme="light"]) body .app .dailyPlan textarea,
+html[data-theme="dark"] body .app .dailyPlan .input,
+html[data-theme="dark"] body .app .dailyPlan textarea{
+  min-height:42px!important;
+}
+html:not([data-theme="light"]) body .app .trade,
+html[data-theme="dark"] body .app .trade{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+  transition:border-color .15s ease,background .15s ease!important;
+}
+html:not([data-theme="light"]) body .app .proTable>div,
+html[data-theme="dark"] body .app .proTable>div{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid rgba(124,92,255,.10)!important;
+  border-radius:10px!important;
+}
+html:not([data-theme="light"]) body .app .proTable>div:hover,
+html[data-theme="dark"] body .app .proTable>div:hover{
+  background:rgba(124,92,255,.06)!important;
+  border-color:rgba(124,92,255,.20)!important;
+}
+
+/* ── I) Checklist · Riesgo ── */
+html:not([data-theme="light"]) body .app :is(.checklistPage,.riskPage) .card,
+html[data-theme="dark"] body .app :is(.checklistPage,.riskPage) .card{
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+}
+html:not([data-theme="light"]) body .app .riskHero,
+html[data-theme="dark"] body .app .riskHero{
+  background:var(--aurora-panel-strong)!important;
+  background-image:none!important;
+  border:1px solid var(--aurora-border)!important;
+  box-shadow:var(--aurora-shadow-flagship)!important;
+}
+html:not([data-theme="light"]) body .app .riskHero span,
+html[data-theme="dark"] body .app .riskHero span{color:var(--aurora-cyan)!important}
+html:not([data-theme="light"]) body .app :is(.limitCards div,.lotResult div,.ddTracker div,.scenarioBox),
+html[data-theme="dark"] body .app :is(.limitCards div,.lotResult div,.ddTracker div,.scenarioBox){
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid var(--aurora-border)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+}
+html:not([data-theme="light"]) body .app .ddBar i,
+html[data-theme="dark"] body .app .ddBar i{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet),var(--aurora-magenta))!important;
+}
+html:not([data-theme="light"]) body .app .heatCell.win,
+html[data-theme="dark"] body .app .heatCell.win{
+  border-color:rgba(51,230,196,.24)!important;
+  background:rgba(51,230,196,.08)!important;
+}
+html:not([data-theme="light"]) body .app .heatCell.loss,
+html[data-theme="dark"] body .app .heatCell.loss{
+  border-color:rgba(255,79,163,.22)!important;
+  background:rgba(255,79,163,.08)!important;
+}
+
+/* ── J) Inputs reinforcement (42px, 13–14px) ── */
+html:not([data-theme="light"]) body .app :is(.input,select,textarea),
+html[data-theme="dark"] body .app :is(.input,select,textarea){
+  min-height:42px!important;
+  font-size:var(--aurora-type-body-lg)!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app :is(.input,select,textarea)::placeholder,
+html[data-theme="dark"] body .app :is(.input,select,textarea)::placeholder{
+  color:rgba(156,151,184,.72)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app select option,
+html[data-theme="dark"] body .app select option{
+  background:#0B0818!important;
+  color:var(--aurora-text)!important;
+}
+
+/* ── K) Mobile 390px ── */
+@media(max-width:430px){
+  html:not([data-theme="light"]) body .app .main,
+  html[data-theme="dark"] body .app .main{
+    padding-bottom:calc(118px + env(safe-area-inset-bottom))!important;
+  }
+  html:not([data-theme="light"]) body .app .page,
+  html[data-theme="dark"] body .app .page{
+    padding-left:12px!important;
+    padding-right:12px!important;
+    padding-bottom:calc(132px + env(safe-area-inset-bottom))!important;
+  }
+  html:not([data-theme="light"]) body .app .dashboardKpiStrip,
+  html[data-theme="dark"] body .app .dashboardKpiStrip{
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+  }
+  html:not([data-theme="light"]) body .app .dashboardProKpi,
+  html[data-theme="dark"] body .app .dashboardProKpi{
+    min-height:124px!important;
+    padding:12px!important;
+  }
+  html:not([data-theme="light"]) body .app .dashboardProKpi b,
+  html[data-theme="dark"] body .app .dashboardProKpi b{
+    font-size:clamp(20px,6.5vw,26px)!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFiltersBar,
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsToolbar,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsFiltersBar,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsToolbar{
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:8px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit :is(.input,select),
+  html[data-theme="dark"] body .app .analyticsCockpit :is(.input,select){
+    width:100%!important;
+    min-width:0!important;
+  }
+  html:not([data-theme="light"]) body .app .tradingCalendarGrid,
+  html[data-theme="dark"] body .app .tradingCalendarGrid{
+    gap:4px!important;
+  }
+  html:not([data-theme="light"]) body .app .tradingDayCell,
+  html[data-theme="dark"] body .app .tradingDayCell{
+    min-height:52px!important;
+    padding:6px 4px!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileNav,
+  html[data-theme="dark"] body .app .mobileNav{
+    border-color:var(--aurora-border)!important;
+    background:rgba(7,5,13,.72)!important;
+    backdrop-filter:blur(22px)!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsPerformanceEvidenceGrid,
+  html[data-theme="dark"] body .app .analyticsPerformanceEvidenceGrid{
+    gap:12px!important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA PRODUCTION v23 — Cockpit refinement (not rebranding)
+   Typography scale · controlled glow · enterprise legibility
+   Overrides v22 excess; complements v15–v22. Light untouched.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── A) Consolidated production tokens ── */
+html:not([data-theme="light"]) body .app,
+html[data-theme="dark"] body .app{
+  --aurora-font-label:11px;
+  --aurora-font-body:14px;
+  --aurora-font-body-lg:14px;
+  --aurora-font-subtitle:14.5px;
+  --aurora-font-kpi:clamp(22px,1.9vw,26px);
+  --aurora-font-kpi-hero:clamp(28px,2.6vw,40px);
+  --aurora-font-hero:clamp(28px,3vw,40px);
+  --aurora-space-xs:6px;
+  --aurora-space-s:10px;
+  --aurora-space-m:14px;
+  --aurora-space-l:18px;
+  --aurora-space-xl:24px;
+  --aurora-radius-card:18px;
+  --aurora-radius-panel:22px;
+  --aurora-blur-card:18px;
+  --aurora-glow-soft:0 0 16px rgba(124,92,255,.05);
+  --aurora-glow-strong:0 0 28px rgba(51,230,196,.07);
+  --aurora-type-label:var(--aurora-font-label);
+  --aurora-type-body:var(--aurora-font-body);
+  --aurora-type-body-lg:var(--aurora-font-body-lg);
+  --aurora-type-kpi:var(--aurora-font-kpi-hero);
+  --aurora-type-kpi-md:var(--aurora-font-kpi);
+  --aurora-glow-cyan:var(--aurora-glow-soft);
+  --aurora-glow-violet:var(--aurora-glow-soft);
+  --aurora-glow-magenta:0 0 16px rgba(255,79,163,.05);
+  --aurora-shadow-elevated:0 14px 42px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035);
+  --aurora-shadow-flagship:0 18px 52px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.04);
+  --aurora-shadow-compact:0 8px 24px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.025);
+}
+html:not([data-theme="light"]) .analyticsCockpit.analyticsPage,
+html[data-theme="dark"] .analyticsCockpit.analyticsPage{
+  --ax-type-label:11px;
+  --ax-type-secondary:13px;
+  --ax-type-body:14px;
+  --ax-type-subtitle:15px;
+  --ax-type-section:22px;
+  --ax-type-kpi:var(--aurora-font-kpi);
+  --ax-type-kpi-hero:var(--aurora-font-kpi-hero);
+  --ax-type-headline:clamp(20px,2.2vw,26px);
+}
+
+/* ── B) Ambient orbs — softer, less competition ── */
+html:not([data-theme="light"]) .auroraAmbient,
+html[data-theme="dark"] .auroraAmbient{
+  opacity:.26!important;
+  filter:blur(92px)!important;
+}
+html:not([data-theme="light"]) .auroraOrb--magenta,
+html[data-theme="dark"] .auroraOrb--magenta{opacity:.38!important}
+
+/* ── C) Glow utility classes ── */
+html:not([data-theme="light"]) .auroraGlowFlagship,
+html[data-theme="dark"] .auroraGlowFlagship{box-shadow:var(--aurora-shadow-flagship),var(--aurora-glow-soft)!important}
+html:not([data-theme="light"]) .auroraGlowSoft,
+html[data-theme="dark"] .auroraGlowSoft{box-shadow:var(--aurora-shadow-elevated)!important}
+html:not([data-theme="light"]) .auroraNoGlow,
+html[data-theme="dark"] .auroraNoGlow{
+  box-shadow:var(--aurora-shadow-compact)!important;
+  filter:none!important;
+}
+
+/* ── D) Typography — legibility first ── */
+html:not([data-theme="light"]) body .app :is(
+  .card p,.field,.checkHero p,.unlockNotice,.trade p,.answerList span,
+  .analyticsCommandWeeklyInline,.dashboardRightRail p,.nextActionBody p
+){
+  font-size:var(--aurora-font-body)!important;
+  line-height:1.5!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .cardHead p,.metricPremium small,.dashboardProKpi small,.analyticsKpiSub,
+  .analyticsPerformanceEvidencePanelHead span,.controlCenter p,.dashboardCommandHeader p
+){
+  font-size:var(--aurora-font-subtitle)!important;
+  color:var(--aurora-dim)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .metricPremium b,.dashboardProKpi b,.analyticsKpiValue,.controlStats b
+){
+  font-size:var(--aurora-font-kpi)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardCommandHeader h2,
+html[data-theme="dark"] body .app .dashboardCommandHeader h2{
+  font-size:var(--aurora-font-hero)!important;
+}
+
+/* ── E) Dashboard — sober cockpit ── */
+html:not([data-theme="light"]) body .app .dashboardProKpi.positive,
+html:not([data-theme="light"]) body .app .dashboardProKpi.negative,
+html[data-theme="dark"] body .app .dashboardProKpi.positive,
+html[data-theme="dark"] body .app .dashboardProKpi.negative{
+  box-shadow:var(--aurora-shadow-elevated)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi.positive{
+  border-color:rgba(51,230,196,.18)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardProKpi.negative{
+  border-color:rgba(255,79,163,.18)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardRightRail,
+html[data-theme="dark"] body .app .dashboardRightRail{
+  padding:var(--aurora-space-m)!important;
+  background:rgba(7,5,13,.18)!important;
+  box-shadow:var(--aurora-shadow-compact)!important;
+  gap:var(--aurora-space-s)!important;
+}
+html:not([data-theme="light"]) body .app .dashboardRightRail .card,
+html[data-theme="dark"] body .app .dashboardRightRail .card{
+  box-shadow:none!important;
+  border-radius:var(--aurora-radius-card)!important;
+}
+html:not([data-theme="light"]) body .app .tradingWeekSummary,
+html[data-theme="dark"] body .app .tradingWeekSummary{
+  font-size:var(--aurora-font-label)!important;
+}
+html:not([data-theme="light"]) body .app .tradingWeekSummary strong,
+html[data-theme="dark"] body .app .tradingWeekSummary strong{
+  font-size:12px!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayCell b,
+html[data-theme="dark"] body .app .tradingDayCell b{
+  font-size:13px!important;
+}
+html:not([data-theme="light"]) body .app .tradingDayResult strong,
+html[data-theme="dark"] body .app .tradingDayResult strong{
+  font-size:11.5px!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html:not([data-theme="light"]) body .app .dashboardStatsGrid>div,
+html[data-theme="dark"] body .app .dashboardStatsGrid>div{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid rgba(124,92,255,.10)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+  padding:var(--aurora-space-s) var(--aurora-space-m)!important;
+}
+
+/* ── F) Analytics enterprise finish ── */
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsSurfaceFlagship::after,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsSurfaceFlagship::after{
+  opacity:.32!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeroV14,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeroV14{
+  box-shadow:var(--aurora-shadow-flagship),var(--aurora-glow-soft)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeadline,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeadline{
+  font-size:var(--ax-type-headline)!important;
+  line-height:1.32!important;
+  font-weight:700!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandScoreRing,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandScoreRing{
+  filter:none!important;
+  box-shadow:none!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChip,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChip{
+  background:rgba(255,255,255,.035)!important;
+  border:1px solid rgba(124,92,255,.14)!important;
+  border-radius:12px!important;
+  padding:10px 12px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChip span,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChip span{
+  font-size:var(--aurora-font-label)!important;
+  color:var(--aurora-dim)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChip b,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChip b{
+  font-size:var(--aurora-font-body)!important;
+  line-height:1.35!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFiltersPanel,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsFiltersPanel{
+  border:1px solid var(--aurora-border)!important;
+  border-radius:var(--aurora-radius-card)!important;
+  background:var(--aurora-panel-soft)!important;
+  overflow:hidden;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFiltersToggle,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsFiltersToggle{
+  width:100%!important;
+  min-height:44px!important;
+  padding:10px 14px!important;
+  font-size:var(--aurora-font-body)!important;
+  background:transparent!important;
+  border:none!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFiltersToggleSummary,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsFiltersToggleSummary{
+  font-size:13px!important;
+  color:var(--aurora-dim)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFilterField .input.small,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsFilterField .input.small{
+  min-height:42px!important;
+  padding:10px 12px!important;
+  font-size:var(--aurora-font-body)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFilterField>span,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsFilterField>span{
+  font-size:var(--aurora-font-label)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsDirectiveCard,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsDirectiveCard{
+  background:var(--aurora-panel-soft)!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  border-left:3px solid rgba(124,92,255,.35)!important;
+  border-radius:var(--aurora-radius-compact)!important;
+  padding:var(--aurora-space-m)!important;
+  box-shadow:none!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsDirectiveCard.tone-edge,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsDirectiveCard.tone-edge{
+  border-left-color:var(--aurora-cyan)!important;
+  background:rgba(51,230,196,.04)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsDirectiveCard.tone-leak,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsDirectiveCard.tone-leak{
+  border-left-color:var(--aurora-magenta)!important;
+  background:rgba(255,79,163,.04)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsDirectiveSetup,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsDirectiveSetup{
+  font-size:var(--aurora-font-body)!important;
+  line-height:1.35!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsDirectiveAction,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsDirectiveAction{
+  font-size:var(--aurora-font-subtitle)!important;
+  color:var(--aurora-text)!important;
+  opacity:1!important;
+  margin-top:6px!important;
+  font-weight:600!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsDirectiveEvidence,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsDirectiveEvidence{
+  font-size:13px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsKpiCard:before,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsKpiCard:before{
+  display:none!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsKpiCard,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsKpiCard{
+  background:var(--aurora-panel)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  box-shadow:var(--aurora-shadow-compact)!important;
+  min-height:108px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsKpiCard.positive,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsKpiCard.positive{
+  border-top:2px solid rgba(51,230,196,.45)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsKpiCard.negative,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsKpiCard.negative{
+  border-top:2px solid rgba(255,79,163,.42)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsKpiValue,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsKpiValue{
+  font-size:var(--aurora-font-kpi-hero)!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsInsightLayer,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsInsightLayer{
+  background:var(--aurora-panel-soft)!important;
+  background-image:none!important;
+  border:1px solid rgba(124,92,255,.12)!important;
+  box-shadow:none!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsInsightCardItem,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsInsightCardItem{
+  border-bottom:1px solid rgba(124,92,255,.08)!important;
+  padding:var(--aurora-space-s) 0!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsPerformanceEvidencePanel,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsPerformanceEvidencePanel{
+  box-shadow:var(--aurora-shadow-compact)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsPerformanceEvidencePanel.equity,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsPerformanceEvidencePanel.equity{
+  box-shadow:var(--aurora-shadow-elevated),var(--aurora-glow-soft)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsPerformanceEvidencePanelHead h4,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsPerformanceEvidencePanelHead h4{
+  font-size:16px!important;
+  font-weight:700!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsPerformanceEvidencePanelNarrative,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsPerformanceEvidencePanelNarrative{
+  font-size:var(--aurora-font-subtitle)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsChartFrame,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsChartFrame{
+  background:rgba(255,255,255,.015)!important;
+  border:1px solid rgba(124,92,255,.08)!important;
+  box-shadow:none!important;
+  padding:var(--aurora-space-s)!important;
+}
+
+/* ── G) Heatmap operativo ── */
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>b,
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>strong,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>b,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>strong{
+  font-size:11px!important;
+  color:var(--aurora-dim)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>i,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>i{
+  min-height:42px!important;
+  border-radius:11px!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix>i em,
+html[data-theme="dark"] body .app .dashboardHeatmapMatrix>i em{
+  font-size:11px!important;
+}
+html:not([data-theme="light"]) body .app .dashboardHeatmapLegend,
+html[data-theme="dark"] body .app .dashboardHeatmapLegend{
+  font-size:12px!important;
+  gap:var(--aurora-space-m)!important;
+}
+
+/* ── H) Forms global (Checklist · Risk · TradeForm · Journal) ── */
+html:not([data-theme="light"]) body .app .field,
+html[data-theme="dark"] body .app .field{gap:var(--aurora-space-xs)!important}
+html:not([data-theme="light"]) body .app .field>span,
+html[data-theme="dark"] body .app .field>span{
+  font-size:var(--aurora-font-label)!important;
+  letter-spacing:.10em!important;
+  color:var(--aurora-dim)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app :is(.input,select,textarea),
+html[data-theme="dark"] body .app :is(.input,select,textarea){
+  min-height:42px!important;
+  padding:10px 14px!important;
+  font-size:var(--aurora-font-body)!important;
+  line-height:1.4!important;
+}
+html:not([data-theme="light"]) body .app textarea,
+html[data-theme="dark"] body .app textarea{
+  min-height:88px!important;
+  padding:12px 14px!important;
+}
+html:not([data-theme="light"]) body .app :is(.input,select,textarea):disabled,
+html[data-theme="dark"] body .app :is(.input,select,textarea):disabled{
+  opacity:.58!important;
+  cursor:not-allowed!important;
+}
+
+/* ── I) Charts — subtle, legible ── */
+html:not([data-theme="light"]) body .app :is(
+  .analyticsCockpit,.dashboardV38,.riskPage,.journalPage
+) .recharts-cartesian-axis-tick text,
+html[data-theme="dark"] body .app :is(
+  .analyticsCockpit,.dashboardV38,.riskPage,.journalPage
+) .recharts-cartesian-axis-tick text{
+  font-size:12px!important;
+  fill:var(--aurora-dim)!important;
+}
+html:not([data-theme="light"]) body .app .chartTooltipPremium,
+html:not([data-theme="light"]) body .app .analyticsChartTooltip,
+html:not([data-theme="light"]) body .app .analyticsPerformanceEvidenceTooltip,
+html[data-theme="dark"] body .app .chartTooltipPremium,
+html[data-theme="dark"] body .app .analyticsChartTooltip,
+html[data-theme="dark"] body .app .analyticsPerformanceEvidenceTooltip{
+  font-size:13px!important;
+  line-height:1.45!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.28)!important;
+}
+html:not([data-theme="light"]) body .app .chartTooltipPremium span,
+html[data-theme="dark"] body .app .chartTooltipPremium span{
+  font-size:11px!important;
+  color:var(--aurora-dim)!important;
+  opacity:1!important;
+}
+
+/* ── J) Mobile 390px production ── */
+@media(max-width:390px){
+  html:not([data-theme="light"]) body .app,
+  html[data-theme="dark"] body .app{
+    --aurora-font-body:13.5px;
+    --aurora-font-body-lg:13.5px;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit,
+  html[data-theme="dark"] body .app .analyticsCockpit{
+    --ax-type-body:13.5px;
+    --ax-type-headline:18px;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeadline,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeadline{
+    font-size:18px!important;
+    line-height:1.38!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsFiltersToggleSummary,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsFiltersToggleSummary{
+    font-size:12px!important;
+    white-space:normal!important;
+    line-height:1.35!important;
+  }
+  html:not([data-theme="light"]) body .app .dashboardHeatmapMatrix,
+  html[data-theme="dark"] body .app .dashboardHeatmapMatrix{
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding-bottom:6px!important;
+  }
+  html:not([data-theme="light"]) body .app :is(
+    .analyticsCockpit,.dashboardV38,.riskPage,.journalPage
+  ) .recharts-cartesian-axis-tick text,
+  html[data-theme="dark"] body .app :is(
+    .analyticsCockpit,.dashboardV38,.riskPage,.journalPage
+  ) .recharts-cartesian-axis-tick text{
+    font-size:12.5px!important;
+  }
+  html:not([data-theme="light"]) body .app .page,
+  html[data-theme="dark"] body .app .page{
+    padding-bottom:calc(136px + env(safe-area-inset-bottom))!important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA QA v24 — Targeted production fixes (no redesign)
+   Patches gaps after v23 audit. Small, localized overrides only.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── A) TradeForm / Journal inputs (gold legacy) ── */
+html:not([data-theme="light"]) body .app .tradeGuide,
+html[data-theme="dark"] body .app .tradeGuide{
+  background:rgba(51,230,196,.06)!important;
+  background-image:none!important;
+  border:1px solid rgba(51,230,196,.18)!important;
+}
+html:not([data-theme="light"]) body .app .resultInput,
+html[data-theme="dark"] body .app .resultInput{
+  border-color:rgba(124,92,255,.22)!important;
+  background:rgba(255,255,255,.04)!important;
+  background-image:none!important;
+  color:var(--aurora-text)!important;
+}
+html:not([data-theme="light"]) body .app .fileName,
+html[data-theme="dark"] body .app .fileName{color:var(--aurora-dim)!important}
+html:not([data-theme="light"]) body .app .warnText,
+html[data-theme="dark"] body .app .warnText{color:var(--aurora-violet)!important}
+html:not([data-theme="light"]) body .app :is(
+  input[type="date"],input[type="number"],input[type="datetime-local"],input[type="time"]
+),
+html[data-theme="dark"] body .app :is(
+  input[type="date"],input[type="number"],input[type="datetime-local"],input[type="time"]
+){
+  color-scheme:dark;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── B) Typography floor (operational text ≥11px) ── */
+html:not([data-theme="light"]) body .app .field>small,
+html:not([data-theme="light"]) body .app .field small,
+html[data-theme="dark"] body .app .field>small,
+html[data-theme="dark"] body .app .field small{
+  font-size:var(--aurora-font-label)!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .proTable>div:first-child,
+html[data-theme="dark"] body .app .proTable>div:first-child{
+  font-size:var(--aurora-font-label)!important;
+  letter-spacing:.08em!important;
+}
+html:not([data-theme="light"]) body .app .card h3,
+html[data-theme="dark"] body .app .card h3{
+  font-size:16px!important;
+  line-height:1.3!important;
+}
+
+/* ── C) Mobile nav + activity dot ── */
+html:not([data-theme="light"]) body .app .mobileNav button span,
+html[data-theme="dark"] body .app .mobileNav button span{
+  font-size:11px!important;
+  line-height:1.2!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .mobileNav button.active,
+html[data-theme="dark"] body .app .mobileNav button.active{
+  background:rgba(124,92,255,.16)!important;
+  border:1px solid rgba(124,92,255,.28)!important;
+  color:var(--aurora-cyan)!important;
+  box-shadow:0 0 12px rgba(51,230,196,.06)!important;
+}
+html:not([data-theme="light"]) body .app :is(
+  .side nav button.hasActivity:not(.active),.mobileNav button.hasActivity:not(.active)
+)::after,
+html[data-theme="dark"] body .app :is(
+  .side nav button.hasActivity:not(.active),.mobileNav button.hasActivity:not(.active)
+)::after{
+  background:var(--aurora-cyan)!important;
+  box-shadow:0 0 10px rgba(51,230,196,.45)!important;
+}
+
+/* ── D) Edge Lab unified — legibility + overflow ── */
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabHead h3,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabHead h3{
+  font-size:16px!important;
+  font-weight:700!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabHead p,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabHead p{
+  font-size:13px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabStatus,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabStatus{
+  font-size:11px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapZoneLabel,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapZoneLabel{
+  font-size:11px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapMetric small,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapMetric small{
+  font-size:11px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapMetric b,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapMetric b{
+  font-size:14px!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapCoreName,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapCoreName{
+  font-size:14px!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapReading,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapReading{
+  font-size:13px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgePipelineCompactHead h4,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgePipelineCompactHead h4{
+  font-size:11px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgePipelineCompactHead span,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgePipelineCompactHead span{
+  font-size:11px!important;
+  opacity:.85!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactName,.analyticsActiveLeaksCompactName
+),
+html[data-theme="dark"] body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactName,.analyticsActiveLeaksCompactName
+){
+  font-size:13px!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:unset!important;
+  overflow-wrap:anywhere!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactMeta,.analyticsActiveLeaksCompactMeta
+),
+html[data-theme="dark"] body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactMeta,.analyticsActiveLeaksCompactMeta
+){
+  font-size:11px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactPl,.analyticsActiveLeaksCompactPl
+),
+html[data-theme="dark"] body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactPl,.analyticsActiveLeaksCompactPl
+){
+  font-size:12px!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactEmpty,.analyticsEdgePipelineCompactMore,.analyticsValidationCriteriaInline
+),
+html[data-theme="dark"] body .app .analyticsCockpit :is(
+  .analyticsEdgePipelineCompactEmpty,.analyticsEdgePipelineCompactMore,.analyticsValidationCriteriaInline
+){
+  font-size:11px!important;
+  opacity:1!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgePipelineCompactCol.samples::before,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgePipelineCompactCol.samples::before{
+  background:rgba(124,92,255,.35)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgePipelineCompactCol.leaks::before,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgePipelineCompactCol.leaks::before{
+  background:rgba(255,79,163,.42)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone::before,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone::before{
+  background:
+    radial-gradient(ellipse 75% 80% at 50% 50%,rgba(124,92,255,.06),transparent 68%),
+    linear-gradient(rgba(124,92,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,92,255,.018) 1px,transparent 1px)!important;
+  background-size:auto,20px 20px,20px 20px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone.observation::before,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone.observation::before{
+  background:
+    radial-gradient(ellipse 75% 80% at 50% 50%,rgba(51,230,196,.05),transparent 68%),
+    linear-gradient(rgba(124,92,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,92,255,.018) 1px,transparent 1px)!important;
+  background-size:auto,20px 20px,20px 20px!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapGlow,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapGlow{
+  opacity:.42!important;
+  filter:blur(8px)!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeMapRing,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeMapRing{
+  box-shadow:0 0 12px rgba(51,230,196,.08)!important;
+}
+
+/* ── E) Charts — clipping + equity sharpness ── */
+html:not([data-theme="light"]) body .app :is(
+  .analyticsChartFrame,.analyticsPerformanceEvidenceChart
+) :is(.recharts-wrapper,.recharts-surface),
+html[data-theme="dark"] body .app :is(
+  .analyticsChartFrame,.analyticsPerformanceEvidenceChart
+) :is(.recharts-wrapper,.recharts-surface){
+  overflow:visible!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .mtcLwChart.positive,
+html[data-theme="dark"] body .app .analyticsCockpit .mtcLwChart.positive{
+  filter:none!important;
+}
+html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsPerformanceEvidencePanel.equity,
+html[data-theme="dark"] body .app .analyticsCockpit .analyticsPerformanceEvidencePanel.equity{
+  box-shadow:var(--aurora-shadow-compact)!important;
+}
+
+/* ── F) Journal tables + calendar micro-type ── */
+html:not([data-theme="light"]) body .app .journalPage .proTable,
+html[data-theme="dark"] body .app .journalPage .proTable{
+  overflow-x:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding-bottom:4px!important;
+}
+html:not([data-theme="light"]) body .app .journalPage .proTable>div,
+html[data-theme="dark"] body .app .journalPage .proTable>div{
+  min-width:280px!important;
+}
+html:not([data-theme="light"]) body .app :is(.monthCellMoney,.monthCellR,.tradingDayResult small),
+html[data-theme="dark"] body .app :is(.monthCellMoney,.monthCellR,.tradingDayResult small){
+  font-size:11px!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
+/* ── G) Ambient orbs — final readability pass ── */
+html:not([data-theme="light"]) .auroraAmbient,
+html[data-theme="dark"] .auroraAmbient{
+  opacity:.22!important;
+}
+
+/* ── H) Mobile 390px QA ── */
+@media(max-width:390px){
+  html:not([data-theme="light"]) body .app .main,
+  html[data-theme="dark"] body .app .main{
+    padding-bottom:calc(132px + env(safe-area-inset-bottom))!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsPerformanceEvidenceChart,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsPerformanceEvidenceChart{
+    min-height:220px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgePipelineCompact,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgePipelineCompact{
+    grid-template-columns:1fr!important;
+  }
+  html:not([data-theme="light"]) body .app .dashboardProKpi b,
+  html[data-theme="dark"] body .app .dashboardProKpi b{
+    font-size:clamp(20px,6vw,24px)!important;
   }
 }
