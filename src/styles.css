@@ -30766,3 +30766,400 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     bottom:calc(var(--mobile-tab-bar-h) + 12px)!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v32 — Kill strip above dock + light header
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  :root{
+    --mobile-tabbar-tap-h:50px;
+    --mobile-tab-bar-h:calc(var(--mobile-tabbar-tap-h) + env(safe-area-inset-bottom,0px));
+    --mobile-content-pad-bottom:var(--mobile-tab-bar-h);
+    --aurora-mobile-bg:#07050D;
+    --aurora-mobile-nav-bg:#07050D;
+    --aurora-mobile-light-bg:#F0F2F5;
+    --aurora-mobile-light-nav:#FFFFFF;
+  }
+
+  /* ── Tab bar: both themes, flush bottom, no upward shadow/gap ── */
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileBottomNav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    top:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    z-index:920!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:stretch!important;
+    height:auto!important;
+    min-height:var(--mobile-tab-bar-h)!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileBottomNav{
+    background:
+      radial-gradient(ellipse 90% 55% at 50% 100%,rgba(124,92,255,.10),transparent 58%),
+      radial-gradient(ellipse 50% 40% at 18% 100%,rgba(51,230,196,.08),transparent 52%),
+      linear-gradient(180deg,rgba(9,7,15,.99),var(--aurora-mobile-nav-bg))!important;
+    background-color:var(--aurora-mobile-nav-bg)!important;
+    border-top:1px solid rgba(124,92,255,.16)!important;
+    backdrop-filter:blur(16px) saturate(1.1)!important;
+    -webkit-backdrop-filter:blur(16px) saturate(1.1)!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav{
+    background:
+      radial-gradient(ellipse 90% 55% at 50% 100%,rgba(124,92,255,.06),transparent 58%),
+      linear-gradient(180deg,rgba(255,255,255,.99),var(--aurora-mobile-light-nav))!important;
+    background-color:var(--aurora-mobile-light-nav)!important;
+    border-top:1px solid rgba(124,92,255,.10)!important;
+    box-shadow:none!important;
+    backdrop-filter:blur(20px) saturate(1.05)!important;
+    -webkit-backdrop-filter:blur(20px) saturate(1.05)!important;
+  }
+
+  /* Kill legacy floating nav offsets (v26/v40) */
+  html body .app .mobileNav.mobileBottomNav,
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav{
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+
+  html body .app .mobileBottomNav button,
+  html body .app .mobileBottomNav .mobileNavMore{
+    flex:1 1 0!important;
+    min-height:var(--mobile-tab-bar-h)!important;
+    height:auto!important;
+    max-height:none!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:6px 3px calc(4px + env(safe-area-inset-bottom,0px))!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:3px!important;
+  }
+
+  html body .app .mobileBottomNav button svg,
+  html body .app .mobileBottomNav .mobileNavMore svg{
+    width:19px!important;
+    height:19px!important;
+  }
+
+  html body .app .mobileBottomNav button span,
+  html body .app .mobileBottomNav .mobileNavMore span{
+    font-size:10px!important;
+    font-weight:700!important;
+    line-height:1.05!important;
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:unset!important;
+    white-space:nowrap!important;
+  }
+
+  /* Dark active tones */
+  html:not([data-theme="light"]) body .app .mobileBottomNav button.active,
+  html[data-theme="dark"] body .app .mobileBottomNav button.active,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore.active,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore.active{
+    color:var(--aurora-cyan)!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="analytics"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="analytics"].active{
+    color:var(--aurora-violet)!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="emotional"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="emotional"].active{
+    color:var(--aurora-magenta)!important;
+  }
+
+  /* Light active tones — Aurora, no gold */
+  html[data-theme="light"] body .app .mobileBottomNav button,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore{
+    color:#6B7280!important;
+  }
+  html[data-theme="light"] body .app .mobileBottomNav button.active,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore.active{
+    color:#0D9488!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html[data-theme="light"] body .app .mobileBottomNav button[data-nav="analytics"].active{
+    color:#7C5CFF!important;
+  }
+  html[data-theme="light"] body .app .mobileBottomNav button[data-nav="emotional"].active{
+    color:#DB2777!important;
+  }
+  html[data-theme="light"] body .app .mobileBottomNav button.active::before,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore.active::before{
+    content:''!important;
+    position:absolute!important;
+    top:0!important;
+    left:24%!important;
+    right:24%!important;
+    height:2px!important;
+    border-radius:0 0 2px 2px!important;
+    background:linear-gradient(90deg,#33E6C4,#7C5CFF)!important;
+  }
+
+  /* Content scroll — flush to dock, no dead strip above */
+  html body .app .main.appMain{
+    padding-bottom:var(--mobile-content-pad-bottom)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .page,
+  html:not([data-theme="light"]) body .app .analyticsCockpit.analyticsPage,
+  html:not([data-theme="light"]) body .app .journalPage,
+  html:not([data-theme="light"]) body .app .riskPage,
+  html:not([data-theme="light"]) body .app .checklistPage,
+  html[data-theme="dark"] body .app .page,
+  html[data-theme="dark"] body .app .analyticsCockpit.analyticsPage,
+  html[data-theme="dark"] body .app .journalPage,
+  html[data-theme="dark"] body .app .riskPage,
+  html[data-theme="dark"] body .app .checklistPage,
+  html[data-theme="light"] body .app .page,
+  html[data-theme="light"] body .app .analyticsCockpit.analyticsPage,
+  html[data-theme="light"] body .app .journalPage,
+  html[data-theme="light"] body .app .riskPage,
+  html[data-theme="light"] body .app .checklistPage{
+    padding-bottom:8px!important;
+  }
+
+  html[data-theme="light"] body:has(.app),
+  html[data-theme="light"] body:has(.app) #root{
+    background:var(--aurora-mobile-light-bg)!important;
+    background-color:var(--aurora-mobile-light-bg)!important;
+  }
+
+  html[data-theme="light"] body .app .main.appMain{
+    background:var(--aurora-mobile-light-bg)!important;
+    background-color:var(--aurora-mobile-light-bg)!important;
+  }
+
+  /* ── Native mobile header — both themes ── */
+  html body .app .top.premiumTop{
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:10px!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:12!important;
+    width:100%!important;
+    max-width:100%!important;
+    padding-top:calc(10px + env(safe-area-inset-top,0px))!important;
+    padding-bottom:10px!important;
+    padding-left:calc(14px + env(safe-area-inset-left,0px))!important;
+    padding-right:calc(14px + env(safe-area-inset-right,0px))!important;
+    margin:0!important;
+  }
+
+  html body .app .premiumTop .topMain{
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+
+  html body .app .premiumTop .topMain h1{
+    margin:0!important;
+    font-size:17px!important;
+    line-height:1.15!important;
+    font-weight:800!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  html body .app .premiumTop .topMain p{
+    margin:2px 0 0!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  html body .app .premiumTop .topActions{
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    flex-shrink:0!important;
+    flex-wrap:nowrap!important;
+  }
+
+  html body .app .premiumTop .topCta.ghost,
+  html body .app .premiumTop .topCta.primaryMini,
+  html body .app .premiumTop .crownBadge,
+  html body .app .premiumTop .cmdHint{
+    display:none!important;
+  }
+
+  html body .app .premiumTop .topActions button.icon{
+    min-width:40px!important;
+    min-height:40px!important;
+    padding:8px!important;
+    border-radius:12px!important;
+    flex-shrink:0!important;
+  }
+
+  html body .app .mobileTopMenu{
+    display:inline-grid!important;
+    place-items:center!important;
+    min-width:40px!important;
+    min-height:40px!important;
+    padding:8px!important;
+    border-radius:12px!important;
+    flex-shrink:0!important;
+  }
+
+  /* Dark header */
+  html:not([data-theme="light"]) body .app .premiumTop,
+  html[data-theme="dark"] body .app .premiumTop{
+    background:rgba(7,5,13,.88)!important;
+    border-bottom:1px solid rgba(124,92,255,.12)!important;
+    backdrop-filter:blur(18px) saturate(1.1)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.1)!important;
+    box-shadow:none!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileTopMenu,
+  html[data-theme="dark"] body .app .mobileTopMenu{
+    border:1px solid rgba(51,230,196,.18)!important;
+    background:rgba(51,230,196,.08)!important;
+    color:var(--aurora-cyan)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .premiumTop .topActions button.icon,
+  html[data-theme="dark"] body .app .premiumTop .topActions button.icon{
+    border:1px solid rgba(124,92,255,.16)!important;
+    background:rgba(124,92,255,.08)!important;
+    color:var(--aurora-cyan)!important;
+  }
+
+  /* Light header — clean native iOS-style */
+  html[data-theme="light"] body .app .premiumTop{
+    background:rgba(255,255,255,.90)!important;
+    border-bottom:1px solid rgba(15,23,42,.08)!important;
+    backdrop-filter:blur(20px) saturate(1.08)!important;
+    -webkit-backdrop-filter:blur(20px) saturate(1.08)!important;
+    box-shadow:none!important;
+  }
+
+  html[data-theme="light"] body .app .premiumTop .topMain h1{
+    color:#111827!important;
+  }
+
+  html[data-theme="light"] body .app .premiumTop .topMain p{
+    color:#6B7280!important;
+  }
+
+  html[data-theme="light"] body .app .mobileTopMenu{
+    border:1px solid rgba(124,92,255,.14)!important;
+    background:rgba(124,92,255,.06)!important;
+    color:#7C5CFF!important;
+  }
+
+  html[data-theme="light"] body .app .premiumTop .topActions button.icon{
+    border:1px solid rgba(15,23,42,.08)!important;
+    background:rgba(15,23,42,.04)!important;
+    color:#374151!important;
+  }
+
+  html body .app .mobileNavSheet,
+  html body .app .mobileNewTradeFab,
+  html body .app .helpBubble{
+    bottom:calc(var(--mobile-tab-bar-h) + 10px)!important;
+  }
+
+  html body .app .mobileNavSheet{
+    bottom:var(--mobile-tab-bar-h)!important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v33 — Purge legacy light dock shadow + gold
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  html[data-theme="light"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app .mobileNav.mobileBottomNav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    border-radius:0!important;
+    border:none!important;
+    border-top:1px solid rgba(124,92,255,.10)!important;
+    box-shadow:none!important;
+    background:
+      radial-gradient(ellipse 90% 55% at 50% 100%,rgba(124,92,255,.06),transparent 58%),
+      linear-gradient(180deg,rgba(255,255,255,.99),#FFFFFF)!important;
+    background-color:#FFFFFF!important;
+  }
+
+  html:not([data-theme="light"]) body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav{
+    box-shadow:none!important;
+    border-radius:0!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+  }
+
+  html body .app .mobileBottomNav button,
+  html body .app .mobileBottomNav .mobileNavMore{
+    position:relative!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNav.mobileBottomNav button,
+  html[data-theme="light"] body:has(.app) .app .mobileNav.mobileBottomNav .mobileNavMore,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mobileNav.mobileBottomNav button.active,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mobileNav.mobileBottomNav .mobileNavMore.active{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    color:#6B7280!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNav.mobileBottomNav button.active,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)) .app .mobileNav.mobileBottomNav button.active{
+    color:#0D9488!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .premiumTop,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app .premiumTop{
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+    background:rgba(255,255,255,.92)!important;
+    border-bottom:1px solid rgba(15,23,42,.08)!important;
+    box-shadow:none!important;
+  }
+
+  html body .app .main.appMain{
+    padding-bottom:var(--mobile-tab-bar-h)!important;
+  }
+}
