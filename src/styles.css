@@ -31320,3 +31320,303 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     color:#FFFFFF!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v36 — Definitive iOS safe-area dock fix
+   Root cause: legacy floating offsets (bottom:8px+safe-area) + v35
+   resetting min-height:0 left the home-indicator zone unpainted.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  :root{
+    --mobile-tabbar-content-height:56px;
+    --mobile-tabbar-total-height:calc(var(--mobile-tabbar-content-height) + env(safe-area-inset-bottom,0px));
+    --mobile-tab-bar-h:var(--mobile-tabbar-total-height);
+    --mobile-content-pad-bottom:calc(var(--mobile-tabbar-total-height) + 16px);
+    --aurora-mobile-bg:#07050D;
+    --aurora-mobile-nav-bg:#07050D;
+    --aurora-mobile-light-bg:#F7F8FB;
+    --aurora-mobile-light-nav:#FFFFFF;
+  }
+
+  html,body,#root{
+    min-height:100%!important;
+    margin:0!important;
+  }
+
+  html:not([data-theme="light"]) body:has(.app),
+  html:not([data-theme="light"]) body:has(.app) #root,
+  html[data-theme="dark"] body:has(.app),
+  html[data-theme="dark"] body:has(.app) #root{
+    background:var(--aurora-mobile-bg)!important;
+    background-color:var(--aurora-mobile-bg)!important;
+  }
+
+  html[data-theme="light"] body:has(.app),
+  html[data-theme="light"] body:has(.app) #root{
+    background:var(--aurora-mobile-light-bg)!important;
+    background-color:var(--aurora-mobile-light-bg)!important;
+  }
+
+  html body .app.appShell,
+  html body .app{
+    min-height:100dvh!important;
+    background:transparent!important;
+  }
+
+  html:not([data-theme="light"]) body .app .main.appMain,
+  html[data-theme="dark"] body .app .main.appMain{
+    background:var(--aurora-mobile-bg)!important;
+    background-color:var(--aurora-mobile-bg)!important;
+  }
+
+  html[data-theme="light"] body .app .main.appMain{
+    background:var(--aurora-mobile-light-bg)!important;
+    background-color:var(--aurora-mobile-light-bg)!important;
+  }
+
+  html body .app .main.appMain{
+    padding-bottom:var(--mobile-content-pad-bottom)!important;
+  }
+
+  html body .app .page,
+  html body .app .analyticsCockpit.analyticsPage,
+  html body .app .journalPage,
+  html body .app .riskPage,
+  html body .app .checklistPage,
+  html body .app .emotionalJournalPage{
+    padding-bottom:8px!important;
+  }
+
+  /* Native dock — flush to physical bottom, safe-area inside painted surface */
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileBottomNav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    top:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    border-radius:0!important;
+    box-sizing:border-box!important;
+    height:var(--mobile-tabbar-total-height)!important;
+    min-height:var(--mobile-tabbar-total-height)!important;
+    max-height:none!important;
+    padding:0 0 env(safe-area-inset-bottom,0px)!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,1fr)!important;
+    grid-template-rows:var(--mobile-tabbar-content-height)!important;
+    align-content:start!important;
+    align-items:stretch!important;
+    gap:0!important;
+    overflow:visible!important;
+    isolation:isolate!important;
+    z-index:1000!important;
+    box-shadow:none!important;
+    -webkit-transform:translateZ(0)!important;
+    transform:translateZ(0)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileBottomNav{
+    background-color:var(--aurora-mobile-nav-bg)!important;
+    background:
+      linear-gradient(180deg,rgba(7,5,13,.94),var(--aurora-mobile-nav-bg)),
+      radial-gradient(ellipse 90% 55% at 50% 0%,rgba(124,92,255,.10),transparent 58%),
+      radial-gradient(ellipse 50% 40% at 18% 0%,rgba(51,230,196,.08),transparent 52%)!important;
+    border:none!important;
+    border-top:1px solid rgba(124,92,255,.20)!important;
+    backdrop-filter:blur(22px) saturate(1.1)!important;
+    -webkit-backdrop-filter:blur(22px) saturate(1.1)!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav{
+    background-color:var(--aurora-mobile-light-nav)!important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.98),var(--aurora-mobile-light-nav)),
+      radial-gradient(ellipse 90% 55% at 50% 0%,rgba(124,92,255,.06),transparent 58%),
+      radial-gradient(ellipse 50% 40% at 18% 0%,rgba(51,230,196,.06),transparent 52%)!important;
+    border:none!important;
+    border-top:1px solid rgba(15,23,42,.08)!important;
+    backdrop-filter:blur(20px) saturate(1.05)!important;
+    -webkit-backdrop-filter:blur(20px) saturate(1.05)!important;
+  }
+
+  /* Explicit safe-area paint layer (iOS backdrop-filter padding gap) */
+  html body .app .mobileBottomNav::after{
+    display:none!important;
+    content:none!important;
+  }
+
+  html body .app .mobileBottomNav::before{
+    content:''!important;
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:env(safe-area-inset-bottom,0px)!important;
+    pointer-events:none!important;
+    z-index:0!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav::before,
+  html[data-theme="dark"] body .app .mobileBottomNav::before{
+    background:var(--aurora-mobile-nav-bg)!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav::before{
+    background:var(--aurora-mobile-light-nav)!important;
+  }
+
+  html body .app .mobileBottomNav button,
+  html body .app .mobileBottomNav .mobileNavMore{
+    position:relative!important;
+    z-index:1!important;
+    grid-row:1!important;
+    align-self:stretch!important;
+    min-height:0!important;
+    height:var(--mobile-tabbar-content-height)!important;
+    max-height:var(--mobile-tabbar-content-height)!important;
+    min-width:0!important;
+    max-width:none!important;
+    flex:none!important;
+    padding:6px 2px 4px!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    box-sizing:border-box!important;
+  }
+
+  html body .app .mobileBottomNav button svg,
+  html body .app .mobileBottomNav .mobileNavMore svg{
+    width:19px!important;
+    height:19px!important;
+    flex-shrink:0!important;
+  }
+
+  html body .app .mobileBottomNav button span,
+  html body .app .mobileBottomNav .mobileNavMore span{
+    font-size:10px!important;
+    font-weight:700!important;
+    line-height:1.05!important;
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:unset!important;
+    white-space:nowrap!important;
+  }
+
+  /* Active — Aurora cyan/violet/magenta, never gold */
+  html:not([data-theme="light"]) body .app .mobileBottomNav button,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="dark"] body .app .mobileBottomNav button,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore{
+    color:#9C97B8!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button.active,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore.active,
+  html[data-theme="dark"] body .app .mobileBottomNav button.active,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore.active{
+    color:var(--aurora-cyan)!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="analytics"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="analytics"].active{
+    color:var(--aurora-violet)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="emotional"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="emotional"].active{
+    color:var(--aurora-magenta)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button.active::before,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore.active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button.active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore.active::before{
+    content:''!important;
+    position:absolute!important;
+    top:0!important;
+    left:22%!important;
+    right:22%!important;
+    height:2px!important;
+    border-radius:0 0 2px 2px!important;
+    background:var(--aurora-cyan)!important;
+    box-shadow:0 0 10px rgba(51,230,196,.35)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="analytics"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="analytics"].active::before{
+    background:var(--aurora-violet)!important;
+    box-shadow:0 0 10px rgba(124,92,255,.35)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="emotional"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="emotional"].active::before{
+    background:var(--aurora-magenta)!important;
+    box-shadow:0 0 10px rgba(255,79,163,.35)!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav button,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore{
+    color:#6B7280!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav button.active,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore.active{
+    color:#0D9488!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav button[data-nav="analytics"].active{
+    color:#7C5CFF!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav button[data-nav="emotional"].active{
+    color:#DB2777!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav button.active::before,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore.active::before{
+    background:linear-gradient(90deg,#33E6C4,#7C5CFF)!important;
+    box-shadow:none!important;
+  }
+
+  /* Top safe area — Aurora header */
+  html body .app .top.premiumTop{
+    padding-top:calc(10px + env(safe-area-inset-top,0px))!important;
+    padding-left:calc(14px + env(safe-area-inset-left,0px))!important;
+    padding-right:calc(14px + env(safe-area-inset-right,0px))!important;
+  }
+
+  html:not([data-theme="light"]) body .app .top.premiumTop,
+  html[data-theme="dark"] body .app .top.premiumTop{
+    background:rgba(7,5,13,.92)!important;
+    border-bottom:1px solid rgba(124,92,255,.14)!important;
+  }
+
+  html[data-theme="light"] body .app .top.premiumTop{
+    background:rgba(255,255,255,.94)!important;
+    border-bottom:1px solid rgba(15,23,42,.08)!important;
+  }
+
+  html body .app .mobileNavSheet{
+    bottom:var(--mobile-tabbar-total-height)!important;
+  }
+
+  html body .app .mobileNewTradeFab,
+  html body .app .helpBubble{
+    bottom:calc(var(--mobile-tabbar-total-height) + 12px)!important;
+  }
+}
