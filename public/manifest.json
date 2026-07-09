@@ -4,8 +4,8 @@
   "description": "Trading performance platform para medir ejecución, riesgo, conducta y revisión.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#07090D",
-  "theme_color": "#07090D",
+  "background_color": "#07050D",
+  "theme_color": "#07050D",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -29366,3 +29366,143 @@ html[data-theme="dark"] body .app .mobileNewTradeFab.journalPrimaryCta{
     padding-bottom:calc(148px + env(safe-area-inset-bottom))!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE QA v25b — Force overrides (cascade winners)
+   Fixes: violet safe-area, legacy #07090D, nav ellipsis, Edge Lab mobile
+   ═══════════════════════════════════════════════════════════════ */
+
+html:not([data-theme="light"]),
+html:not([data-theme="light"]) body,
+html:not([data-theme="light"]) #root,
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] #root{
+  background:#07050D!important;
+  background-color:#07050D!important;
+}
+
+html:not([data-theme="light"]) body .app,
+html[data-theme="dark"] body .app,
+html:not([data-theme="light"]) body .app .main,
+html[data-theme="dark"] body .app .main{
+  background:transparent!important;
+  background-image:none!important;
+}
+
+@media(max-width:860px){
+  html:not([data-theme="light"]) body::before,
+  html[data-theme="dark"] body::before{
+    content:''!important;
+    display:block!important;
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    right:0!important;
+    height:max(env(safe-area-inset-top,0px),28px)!important;
+    background:#07050D!important;
+    z-index:9998!important;
+    pointer-events:none!important;
+  }
+
+  html:not([data-theme="light"]) .auroraAmbient,
+  html[data-theme="dark"] .auroraAmbient{
+    opacity:.22!important;
+    filter:blur(72px)!important;
+  }
+
+  html:not([data-theme="light"]) .auroraOrb--violet,
+  html[data-theme="dark"] .auroraOrb--violet{
+    display:none!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNav,
+  html[data-theme="dark"] body .app .mobileNav{
+    gap:6px!important;
+    padding-right:calc(16px + env(safe-area-inset-right))!important;
+    scroll-padding-right:20px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNav::after,
+  html[data-theme="dark"] body .app .mobileNav::after{
+    content:''!important;
+    flex:0 0 14px!important;
+    min-width:14px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNav button,
+  html:not([data-theme="light"]) body .app .mobileNav .mobileLogout,
+  html[data-theme="dark"] body .app .mobileNav button,
+  html[data-theme="dark"] body .app .mobileNav .mobileLogout{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:58px!important;
+    max-width:none!important;
+    padding:8px 10px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNav button span,
+  html:not([data-theme="light"]) body .app .mobileNav .mobileLogout span,
+  html[data-theme="dark"] body .app .mobileNav button span,
+  html[data-theme="dark"] body .app .mobileNav .mobileLogout span{
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:unset!important;
+    white-space:nowrap!important;
+    font-size:10px!important;
+    line-height:1.15!important;
+  }
+
+  html:not([data-theme="light"]) body .authPage,
+  html[data-theme="dark"] body .authPage{
+    background:#07050D!important;
+  }
+
+  html:not([data-theme="light"]) body .authPage .loginCard h1,
+  html[data-theme="dark"] body .authPage .loginCard h1{
+    color:#E8E4F0!important;
+    background:none!important;
+    -webkit-text-fill-color:#E8E4F0!important;
+  }
+}
+
+/* Edge Lab — mobile layout from JSX (.is-mobile) */
+.analyticsEdgeMapZone.is-mobile .analyticsEdgeMapStage{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:12px!important;
+  padding:4px 0 8px!important;
+  overflow:visible!important;
+}
+.analyticsEdgeMapZone.is-mobile .analyticsEdgeMapCore--mobile{
+  width:100%!important;
+  padding:0 0 10px!important;
+}
+.analyticsEdgeMapZone.is-mobile .analyticsEdgeMapStatsGrid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  width:100%!important;
+}
+.analyticsEdgeMapZone.is-mobile .analyticsEdgeMapMetric--mobile{
+  max-width:none!important;
+  width:auto!important;
+  justify-self:stretch!important;
+  padding:10px 10px 9px!important;
+}
+.analyticsEdgeMapZone.is-mobile .analyticsEdgeMapRing{
+  width:80px!important;
+  height:80px!important;
+}
+.analyticsEdgeMapZone.is-mobile .analyticsEdgeMapRingInner{
+  width:62px!important;
+  height:62px!important;
+}
+
+@media(max-width:430px){
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandStripBody,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandStripBody{
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+  }
+}

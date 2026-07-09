@@ -1,3 +1,4 @@
+import { useAnalyticsViewport } from './useAnalyticsViewport.js';
 import {
   formatSetupLabel,
   buildEdgeLabPipeline,
@@ -39,10 +40,10 @@ function CompactLeakRow({ item }) {
   );
 }
 
-function EdgeIntelligenceMap({ thesis }) {
+function EdgeIntelligenceMap({ thesis, mobile = false }) {
   if (!thesis) {
     return (
-      <div className="analyticsEdgeMapZone empty">
+      <div className={`analyticsEdgeMapZone empty${mobile ? ' is-mobile' : ''}`}>
         <span className="analyticsEdgeMapZoneLabel">Mapa de edge</span>
         <div className="analyticsEdgeMapCoreEmpty">
           <b>Sin setup activo</b>
@@ -56,13 +57,59 @@ function EdgeIntelligenceMap({ thesis }) {
   const label = formatSetupLabel(row.name);
   const plTone = row.value >= 0 ? 'pos' : 'neg';
 
+  const stats = [
+    { key: 'pl', label: 'P/L', value: formatMoneyClean(row.value), tone: plTone },
+    { key: 'trades', label: 'Trades', value: row.count, tone: '' },
+    { key: 'r', label: 'R prom.', value: formatR(row.avgR), tone: '' },
+    { key: 'win', label: 'Acierto', value: row.winrate > 0 ? formatPercentCard(row.winrate) : '—', tone: '' }
+  ];
+
   return (
-    <div className={`analyticsEdgeMapZone ${tier}`}>
+    <div className={`analyticsEdgeMapZone ${tier}${mobile ? ' is-mobile' : ''}`}>
       <span className="analyticsEdgeMapZoneLabel">Mapa de edge</span>
 
       <div className="analyticsEdgeMapStage">
         <div className="analyticsEdgeMapGlow" aria-hidden="true" />
 
+        {mobile ? (
+          <>
+            <div className="analyticsEdgeMapCore analyticsEdgeMapCore--mobile">
+              <div className="analyticsEdgeMapRingWrap">
+                <div
+                  className="analyticsEdgeMapRing"
+                  style={{ '--map-pct': progress.pct }}
+                  aria-hidden="true"
+                >
+                  <div className="analyticsEdgeMapRingInner">
+                    <b>{progress.current}</b>
+                    <span>/{SETUP_VALIDATION_TARGET}</span>
+                  </div>
+                </div>
+              </div>
+              <span className="analyticsEdgeMapCoreLabel">Setup activo</span>
+              <b className="analyticsEdgeMapCoreName" title={row.name}>{label}</b>
+              <div className="analyticsValidationTrack">
+                <div className="analyticsValidationTrackHead">
+                  <span>Validación</span>
+                  <strong>{progress.current}/{SETUP_VALIDATION_TARGET}</strong>
+                </div>
+                <div className="analyticsValidationTrackBar">
+                  <span style={{ width: `${progress.pct}%` }} />
+                </div>
+                <small>{progress.current} de {SETUP_VALIDATION_TARGET} trades para validar</small>
+              </div>
+            </div>
+
+            <div className="analyticsEdgeMapStatsGrid" aria-label="Métricas del setup activo">
+              {stats.map((stat) => (
+                <div key={stat.key} className={`analyticsEdgeMapMetric analyticsEdgeMapMetric--mobile ${stat.tone}`}>
+                  <small>{stat.label}</small>
+                  <b>{stat.value}</b>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
         <div className="analyticsEdgeMapCanvas">
           <span className="analyticsEdgeMapConnector tl" aria-hidden="true" />
           <span className="analyticsEdgeMapConnector tr" aria-hidden="true" />
@@ -113,6 +160,7 @@ function EdgeIntelligenceMap({ thesis }) {
             </div>
           </div>
         </div>
+        )}
       </div>
 
       <p className="analyticsEdgeMapReading integrated">{reading}</p>
@@ -121,6 +169,8 @@ function EdgeIntelligenceMap({ thesis }) {
 }
 
 export function EdgeLab({ setupRows = [], trades = [], hasSample }) {
+  const { mobile, narrow } = useAnalyticsViewport();
+  const isMobileLayout = mobile || narrow;
   const thesis = pickActiveThesis(setupRows, trades);
   const pipeline = buildEdgeLabPipeline(setupRows);
   const activeName = thesis?.row?.name || '';
@@ -145,7 +195,7 @@ export function EdgeLab({ setupRows = [], trades = [], hasSample }) {
         <AnalyticsSectionEmpty compact title="Sin setups" text="Registrá trades con setup." />
       ) : (
         <div className="analyticsEdgeLabCanvas">
-          <EdgeIntelligenceMap thesis={thesis} />
+          <EdgeIntelligenceMap thesis={thesis} mobile={isMobileLayout} />
 
           <div className="analyticsEdgeLabBase">
             <div className="analyticsEdgePipelineCompact integrated">
