@@ -5,14 +5,14 @@
    Single file: src/styles.css (~32k lines, ~9.7k !important)
    CANONICAL SOURCE OF TRUTH (wins by cascade order):
    - Tokens:        :root L4 + AURORA DARK SYSTEM v20 ~L27066
-   - Mobile shell:  AURORA MOBILE VIEWPORT SHELL — FINAL SOURCE OF TRUTH (true EOF)
-   - Mobile dock:   in-flow flex child (NOT fixed) — same EOF block
+   - Mobile shell:  AURORA MOBILE APP SHELL — ABSOLUTE FINAL SOURCE OF TRUTH (true EOF)
+   - Mobile dock:   in-flow flex + --mobile-dock-gap (measured) — same EOF block
    - Mobile drawer: same EOF block (z-index + geometry); v38 = visual skin only
    - Dark app skin: AURORA DARK SYSTEM v20 ~L27060
    - Light patches: v43.27 / v47.12+ (scattered, consolidate in 2B)
    LEGACY — do not extend (superseded, kept for compat):
    - Floating pill .mobileNav L187, v40.2–v40.4 L456–665
-   - Fixed dock patches v32–v36 + prior NATIVE DOCK (superseded by VIEWPORT SHELL)
+   - Fixed dock patches v32–v36 + prior NATIVE DOCK / VIEWPORT SHELL
    - Gold .primary gradients L219, L419 (partially purged v47+)
    ZONE MAP (approx line ranges):
    L1–290    Tokens + base shell + early v3–v38
@@ -22,8 +22,8 @@
    L6382–18110 v47.11–v52 light mode + dashboard + share EOF guards
    L18111–26200 Analytics cockpit + charts
    L26204–29188 Aurora ambient + production tokens
-   L29189–32272 Aurora mobile v25–v38 (LEGACY mobile layer)
-   EOF         AURORA MOBILE VIEWPORT SHELL (active)
+   L29189–33165 Aurora mobile v25–v38 + prior VIEWPORT SHELL (LEGACY)
+   EOF         AURORA MOBILE APP SHELL ABSOLUTE FINAL (active)
    See ARCHITECTURE.md § CSS Design System for full audit.
    ========================================================= */
 
@@ -30424,10 +30424,9 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     max-height:var(--mobile-tabbar-total-h)!important;
     flex:0 0 var(--mobile-tabbar-total-h)!important;
     padding:0 10px env(safe-area-inset-bottom,0px)!important;
-    padding-bottom:env(safe-area-inset-bottom,0px)!important;
-    grid-template-columns:unset!important;
-    grid-template-rows:unset!important;
     gap:0!important;
+    overflow:hidden!important;
+    transform:none!important;
   }
 
   html:not([data-theme="light"]) body .app .mobileBottomNav::after,
@@ -30491,7 +30490,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   }
 
   html body .app .main.appMain{
-    padding-bottom:var(--mobile-content-pad-bottom)!important;
+    padding-bottom:18px!important;
   }
 }
 
@@ -30525,9 +30524,12 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   }
 
   html:not([data-theme="light"]) body .app .main.appMain,
-  html[data-theme="dark"] body .app .main.appMain,
-  html body .app .main.appMain{
+  html[data-theme="dark"] body .app .main.appMain{
     padding-bottom:var(--mobile-content-pad-bottom)!important;
+  }
+
+  html body .app .main.appMain{
+    padding-bottom:18px!important;
   }
 
   html:not([data-theme="light"]) body .app .page,
@@ -31020,7 +31022,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
 
   /* Content scroll — flush to dock, no dead strip above */
   html body .app .main.appMain{
-    padding-bottom:var(--mobile-content-pad-bottom)!important;
+    padding-bottom:18px!important;
   }
 
   html:not([data-theme="light"]) body .app .page,
@@ -31255,7 +31257,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   }
 
   html body .app .main.appMain{
-    padding-bottom:var(--mobile-tab-bar-h)!important;
+    padding-bottom:18px!important;
   }
 }
 
@@ -31305,7 +31307,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   }
 
   html body .app .main.appMain{
-    padding-bottom:var(--mobile-tab-bar-h)!important;
+    padding-bottom:18px!important;
   }
 
   /* ── Light theme: Explorar MTC sheet ── */
@@ -31463,7 +31465,7 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
   }
 
   html body .app .main.appMain{
-    padding-bottom:var(--mobile-content-pad-bottom)!important;
+    padding-bottom:18px!important;
   }
 
   html body .app .page,
@@ -33161,11 +33163,8 @@ html[data-theme="light"] .tradeReviewSheet{
 }
 
 /* ==========================================================================
-   AURORA MOBILE VIEWPORT SHELL — FINAL SOURCE OF TRUTH
-   Closed native shell for iOS PWA: one viewport owner, in-flow tab bar,
-   single scroll root (.main.appMain). Neutralizes legacy fixed-dock +
-   100dvh/min-height fights that caused the black dead strip on resume.
-   Do NOT add mobile dock/viewport overrides below this block.
+   AURORA MOBILE VIEWPORT SHELL — SUPERSEDED by APP SHELL ABSOLUTE FINAL (EOF)
+   Kept for cascade history. Geometry ownership moved to absolute EOF block.
    ========================================================================== */
 
 @media (max-width: 768px) {
@@ -33558,7 +33557,10 @@ html[data-theme="light"] .tradeReviewSheet{
 
   html:not([data-theme="light"]) body .app.appShell .main.appMain,
   html[data-theme="dark"] body .app.appShell .main.appMain,
-  html[data-theme="light"] body:has(.app) .app.appShell .main.appMain {
+  html[data-theme="light"] body:has(.app) .app.appShell .main.appMain,
+  html:not([data-theme="light"]) body .app .main.appMain,
+  html[data-theme="dark"] body .app .main.appMain,
+  html body .app .main.appMain {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     height: auto !important;
@@ -33566,6 +33568,7 @@ html[data-theme="light"] .tradeReviewSheet{
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding-bottom: 18px !important;
+    margin-bottom: 0 !important;
   }
 
   html:not([data-theme="light"]) body .app.appShell,
@@ -33573,6 +33576,17 @@ html[data-theme="light"] .tradeReviewSheet{
   html[data-theme="light"] body:has(.app) .app.appShell {
     display: flex !important;
     flex-direction: column !important;
+    height: var(--app-height, 100dvh) !important;
+    min-height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+  }
+
+  /* Neutralize legacy body{position:fixed;inset:0} that fights iOS resume */
+  html:has(.appShell) body {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
     height: var(--app-height, 100dvh) !important;
     min-height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
@@ -33604,6 +33618,431 @@ html[data-theme="light"] .tradeReviewSheet{
     max-height: var(--app-height, 100dvh) !important;
     overflow: hidden !important;
     background: var(--aurora-bg, #07050D) !important;
+  }
+
+  html.is-ios-standalone[data-theme="light"]:has(.appShell),
+  html.is-ios-standalone[data-theme="light"]:has(.appShell) body,
+  html.is-ios-standalone[data-theme="light"]:has(.appShell) #root,
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell),
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell) body,
+  html.is-standalone-pwa[data-theme="light"]:has(.appShell) #root {
+    background: #F7F8FB !important;
+  }
+}
+
+/* ==========================================================================
+   AURORA MOBILE APP SHELL — ABSOLUTE FINAL SOURCE OF TRUTH
+   Native closed viewport for iOS PWA resume.
+   --app-height from JS (Math.max on standalone); --mobile-dock-gap measured.
+   Do NOT add mobile dock/viewport overrides below this block.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  :root {
+    --mobile-tabbar-visual-h: 86px;
+    --mobile-tabbar-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-tabbar-total-h: calc(var(--mobile-tabbar-visual-h) + env(safe-area-inset-bottom, 0px));
+    --mobile-dock-gap: 0px;
+    --mobile-top-safe: env(safe-area-inset-top, 0px);
+    --aurora-mobile-dock-h: var(--mobile-tabbar-visual-h);
+    --aurora-safe-bottom: var(--mobile-tabbar-safe-bottom);
+    --aurora-dock-total-h: var(--mobile-tabbar-total-h);
+    --mobile-tabbar-content-height: var(--mobile-tabbar-visual-h);
+    --mobile-tabbar-total-height: var(--mobile-tabbar-total-h);
+    --mobile-tab-bar-h: var(--mobile-tabbar-total-h);
+    --mobile-content-pad-bottom: 18px;
+  }
+
+  /* Logged-in app only — auth/landing keep their own scroll */
+  html:has(.appShell),
+  html:has(.appShell) body,
+  html:has(.appShell) #root {
+    width: 100% !important;
+    height: auto !important;
+    min-height: var(--app-height, 100svh) !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: var(--aurora-bg, #07050D) !important;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html:has(.appShell)[data-theme="light"],
+  html:has(.appShell)[data-theme="light"] body,
+  html:has(.appShell)[data-theme="light"] #root {
+    background: #F7F8FB !important;
+  }
+
+  /* body fills the real device frame; do NOT max-height to a stale --app-height */
+  html:has(.appShell) body {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: var(--app-height, 100svh) !important;
+    touch-action: manipulation;
+  }
+
+  html:has(.appShell) #root {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  /* Shell fills physical screen via inset:0 — height from edges, not stale JS px */
+  .app.appShell,
+  html body .app.appShell,
+  html:not([data-theme="light"]) body .app.appShell,
+  html[data-theme="dark"] body .app.appShell,
+  html[data-theme="light"] body:has(.app) .app.appShell {
+    position: fixed !important;
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: var(--app-height, 100svh) !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(51, 230, 196, .08), transparent 34%),
+      radial-gradient(circle at 90% 12%, rgba(124, 92, 255, .10), transparent 38%),
+      #07050D !important;
+  }
+
+  html[data-theme="light"] .app.appShell,
+  html[data-theme="light"] body .app.appShell {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(51, 230, 196, .08), transparent 34%),
+      radial-gradient(circle at 90% 12%, rgba(124, 92, 255, .08), transparent 38%),
+      #F7F8FB !important;
+  }
+
+  /* Only scroll owner */
+  html body .app.appShell > .main.appMain,
+  html body .app .main.appMain,
+  html:not([data-theme="light"]) body .app.appShell .main.appMain,
+  html[data-theme="dark"] body .app.appShell .main.appMain,
+  html[data-theme="light"] body:has(.app) .app.appShell .main.appMain,
+  .main.appMain {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding-bottom: 18px !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+  }
+
+  .page,
+  .dashboardPage,
+  .journalPage,
+  .analyticsPage,
+  .analyticsShell,
+  .analyticsCockpit,
+  .riskPage,
+  .checklistPage,
+  .emotionalPage,
+  .emotionalJournalPage,
+  .resultsPage,
+  .ideasPage,
+  .guidePage {
+    min-height: auto !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* In-flow dock + measured gap filler for iOS resume lies */
+  html body .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileNavDock.mobileBottomNav,
+  html body .app .mobileBottomNav,
+  html:not([data-theme="light"]) body .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body .app.appShell .mobileBottomNav,
+  html[data-theme="dark"] body .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body .app.appShell .mobileBottomNav,
+  html[data-theme="light"] body:has(.app) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body:has(.app) .app.appShell .mobileBottomNav,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .app.appShell .mobileBottomNav,
+  html:not([data-theme="light"]) body:has(.app) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body:has(.app) .app.appShell .mobileNav.mobileNavDock.mobileBottomNav,
+  .mobileNav.mobileNavDock.mobileBottomNav,
+  .mobileBottomNav,
+  .mobileNavDock.mobileBottomNav,
+  nav.mobileBottomNav {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    transform: none !important;
+    translate: none !important;
+    will-change: auto !important;
+
+    flex: 0 0 calc(var(--mobile-tabbar-total-h) + var(--mobile-dock-gap, 0px)) !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    align-self: stretch !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    height: calc(var(--mobile-tabbar-total-h) + var(--mobile-dock-gap, 0px)) !important;
+    min-height: calc(var(--mobile-tabbar-total-h) + var(--mobile-dock-gap, 0px)) !important;
+    max-height: calc(var(--mobile-tabbar-total-h) + var(--mobile-dock-gap, 0px)) !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    gap: 0 !important;
+
+    padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + var(--mobile-dock-gap, 0px)) !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+
+    border-radius: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-top: 1px solid rgba(124, 92, 255, .30) !important;
+
+    background:
+      linear-gradient(180deg, rgba(12, 9, 20, .96), rgba(7, 5, 13, .995)),
+      #07050D !important;
+    background-color: #07050D !important;
+    box-shadow:
+      0 -18px 44px rgba(0, 0, 0, .54),
+      0 -1px 0 rgba(255, 255, 255, .04) inset !important;
+
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+
+    overflow: visible !important;
+    z-index: 9000 !important;
+    touch-action: manipulation !important;
+  }
+
+  html[data-theme="light"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body .app .mobileBottomNav,
+  html[data-theme="light"] .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] .mobileBottomNav,
+  html[data-theme="light"] .mobileNavDock.mobileBottomNav {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .97), rgba(247, 248, 251, .995)),
+      #F7F8FB !important;
+    background-color: #F7F8FB !important;
+    border-top: 1px solid rgba(15, 23, 42, .10) !important;
+    box-shadow:
+      0 -18px 44px rgba(15, 23, 42, .12),
+      0 -1px 0 rgba(255, 255, 255, .80) inset !important;
+  }
+
+  html body .app .mobileBottomNav::before,
+  html body .app .mobileBottomNav::after,
+  html body .app .mobileNavDock::before,
+  html body .app .mobileNavDock::after,
+  .mobileBottomNav::before,
+  .mobileBottomNav::after,
+  .mobileNavDock::before,
+  .mobileNavDock::after,
+  nav.mobileBottomNav::before,
+  nav.mobileBottomNav::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    z-index: auto !important;
+  }
+
+  html body .app .mobileBottomNav button,
+  html body .app .mobileBottomNav .mobileNavMore,
+  .mobileBottomNav button,
+  .mobileBottomNav .mobileNavMore {
+    height: var(--mobile-tabbar-visual-h) !important;
+    min-height: var(--mobile-tabbar-visual-h) !important;
+    max-height: var(--mobile-tabbar-visual-h) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 6px 0 8px !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    overflow: hidden !important;
+    color: rgba(226, 232, 240, .72) !important;
+  }
+
+  html[data-theme="light"] .mobileBottomNav button,
+  html[data-theme="light"] .mobileBottomNav .mobileNavMore {
+    color: rgba(51, 65, 85, .72) !important;
+  }
+
+  .mobileBottomNav button svg,
+  .mobileBottomNav .mobileNavMore svg {
+    width: 24px !important;
+    height: 24px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .mobileBottomNav button span,
+  .mobileBottomNav .mobileNavMore span {
+    font-size: 12px !important;
+    line-height: 1.05 !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .mobileBottomNav .active,
+  .mobileBottomNav button.active,
+  .mobileBottomNav .mobileNavMore.active {
+    color: #33E6C4 !important;
+  }
+
+  .mobileBottomNav button[data-nav="analytics"].active {
+    color: #7C5CFF !important;
+  }
+
+  .mobileBottomNav button[data-nav="emotional"].active {
+    color: #FF4FA3 !important;
+  }
+
+  /* Sheets / overlays against real app height */
+  .mobileCommandOverlay,
+  .mobileNavSheetOverlay,
+  .mobileNavSheetBackdrop,
+  .mobileCommandOverlay.mobileNavSheetBackdrop,
+  .tradeDetailOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: var(--app-height, 100svh) !important;
+    max-height: var(--app-height, 100svh) !important;
+    overflow: hidden !important;
+  }
+
+  .mobileCommandSheet,
+  .mobileNavSheet,
+  .mobileCommandSheet.mobileNavSheet,
+  html body .app .mobileCommandSheet.mobileNavSheet,
+  html body .app .mobileNavSheet {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: calc(var(--mobile-tabbar-total-h) + var(--mobile-dock-gap, 0px)) !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(var(--app-height, 100svh) - var(--mobile-tabbar-total-h) - var(--mobile-dock-gap, 0px) - env(safe-area-inset-top, 0px) - 10px) !important;
+    margin: 0 !important;
+    z-index: 10051 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+
+  .tradeReviewSheet,
+  .tradeReviewSheet.tradeDetailModal {
+    max-height: calc(var(--app-height, 100svh) - var(--mobile-tabbar-total-h) - 16px) !important;
+  }
+
+  .mobileCommandContent.mobileNavSheetNav,
+  .mobileNavSheetNav {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding-bottom: 20px !important;
+  }
+
+  .mobileCommandContent.mobileNavSheetNav::-webkit-scrollbar,
+  .mobileNavSheetNav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .mobileNewTradeFab,
+  .helpBubble {
+    bottom: calc(var(--mobile-tabbar-total-h) + var(--mobile-dock-gap, 0px) + 12px) !important;
+    z-index: 8990 !important;
+  }
+
+  html body.menu-open:has(.appShell) {
+    overflow: hidden !important;
+  }
+
+  /* Non-dock siblings must not steal column space */
+  .appShell > .side,
+  .appShell > .toastHost,
+  .appShell > .cmdOverlay {
+    flex: 0 0 auto !important;
+  }
+}
+
+/* iOS standalone resume lock — fill device frame; never cap to stale short height */
+@media (max-width: 767px) {
+  html.is-ios-standalone:has(.appShell),
+  html.is-ios-standalone:has(.appShell) body,
+  html.is-ios-standalone:has(.appShell) #root,
+  html.is-standalone-pwa:has(.appShell),
+  html.is-standalone-pwa:has(.appShell) body,
+  html.is-standalone-pwa:has(.appShell) #root {
+    min-height: var(--app-height, 100svh) !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    background: var(--aurora-bg, #07050D) !important;
+  }
+
+  html.is-ios-standalone:has(.appShell) .app.appShell,
+  html.is-standalone-pwa:has(.appShell) .app.appShell {
+    position: fixed !important;
+    inset: 0 !important;
+    height: auto !important;
+    min-height: var(--app-height, 100svh) !important;
+    max-height: none !important;
   }
 
   html.is-ios-standalone[data-theme="light"]:has(.appShell),
