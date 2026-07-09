@@ -33146,11 +33146,12 @@ html[data-theme="light"] .tradeReviewSheet{
     overflow:hidden;
   }
 
-  html body .app .mobileCommandSheet .mobileNavSheetLabel{
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    max-width:100%;
+  html body .app .mobileCommandSheet .mobileNavSheetLabel,
+  html body .app .mobileCommandSheet .mobileCommandLabel{
+    overflow:visible!important;
+    text-overflow:clip!important;
+    white-space:normal!important;
+    max-width:none!important;
   }
 }
 
@@ -33325,31 +33326,50 @@ html[data-theme="light"] .tradeReviewSheet{
     overscroll-behavior: none !important;
   }
 
+  /* Beat legacy .mobileNav dock rules (:not dock) that force 78px pills + ellipsis */
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock),
   .mobileNav.mobileCommandOverlay {
     position: fixed !important;
     inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
     z-index: 10050 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 100% !important;
     display: flex !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    padding: 0 !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0 !important;
+    padding: 12px 14px max(12px, env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 !important;
     border: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
     background:
       radial-gradient(circle at 20% 10%, rgba(51, 230, 196, 0.14), transparent 34%),
       radial-gradient(circle at 82% 16%, rgba(124, 92, 255, 0.2), transparent 38%),
       rgba(4, 3, 10, 0.72) !important;
     backdrop-filter: blur(18px) !important;
     -webkit-backdrop-filter: blur(18px) !important;
+    box-shadow: none !important;
     overscroll-behavior: contain !important;
+    touch-action: none !important;
   }
 
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) .mobileCommandSheet,
   .mobileNav.mobileCommandOverlay .mobileCommandSheet {
+    position: relative !important;
     width: 100% !important;
-    max-width: 100% !important;
-    max-height: min(88dvh, calc(var(--app-height, 100dvh) - 22px)) !important;
-    margin: 0 !important;
-    border-radius: 30px 30px 0 0 !important;
+    max-width: 430px !important;
+    max-height: min(88svh, 760px) !important;
+    margin: 0 auto !important;
+    border-radius: 30px !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
@@ -33358,9 +33378,8 @@ html[data-theme="light"] .tradeReviewSheet{
       radial-gradient(circle at 12% 0%, rgba(51, 230, 196, 0.18), transparent 32%),
       radial-gradient(circle at 88% 0%, rgba(124, 92, 255, 0.22), transparent 38%) !important;
     border: 1px solid rgba(124, 92, 255, 0.26) !important;
-    border-bottom: 0 !important;
     box-shadow:
-      0 -24px 80px rgba(0, 0, 0, 0.62),
+      0 24px 80px rgba(0, 0, 0, 0.55),
       inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     color: #f8f7ff !important;
     animation: mtcCommandSheetIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
@@ -33369,44 +33388,73 @@ html[data-theme="light"] .tradeReviewSheet{
   .mobileNav.mobileCommandOverlay .mobileCommandSheet::before {
     content: "" !important;
     display: block !important;
-    width: 64px !important;
-    height: 5px !important;
-    margin: 10px auto 0 !important;
+    width: 48px !important;
+    height: 4px !important;
+    margin: 12px auto 0 !important;
     border-radius: 999px !important;
     background: linear-gradient(90deg, #33e6c4, #7c5cff, #ff4fa3) !important;
-    opacity: 0.9 !important;
+    opacity: 0.85 !important;
     flex-shrink: 0 !important;
   }
 
+  /* Single surface — neutralize nested legacy shells if present */
+  .mobileCommandSheet .mobileNavSheet,
+  .mobileCommandSheet .mobileNavSheetNav,
+  .mobileCommandSheet .mobileNavPanel,
+  .mobileCommandSheet .mobileNavSheetHead,
+  .mobileCommandSheet .mobileNavSheetHandle {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
   .mobileNav.mobileCommandOverlay .mobileCommandHeader {
-    position: relative !important;
+    position: sticky !important;
+    top: 0 !important;
     z-index: 2 !important;
     flex-shrink: 0 !important;
-    padding: 18px 24px 16px !important;
-    padding-right: 84px !important;
-    background: linear-gradient(180deg, rgba(18, 14, 31, 0.96), rgba(18, 14, 31, 0.84)) !important;
-    border-bottom: 1px solid rgba(124, 92, 255, 0.18) !important;
+    display: block !important;
+    padding: 20px 84px 18px 24px !important;
+    background: linear-gradient(180deg, rgba(18, 14, 31, 0.98), rgba(18, 14, 31, 0.92)) !important;
+    border-bottom: 1px solid rgba(124, 92, 255, 0.14) !important;
     backdrop-filter: blur(18px) !important;
     -webkit-backdrop-filter: blur(18px) !important;
+  }
+
+  .mobileNav.mobileCommandOverlay .mobileCommandHeadMain {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding-right: 0 !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandEyebrow {
     display: block !important;
     font-size: 11px !important;
-    letter-spacing: 0.18em !important;
+    letter-spacing: 0.16em !important;
     text-transform: uppercase !important;
-    color: rgba(191, 184, 218, 0.76) !important;
+    color: rgba(191, 184, 218, 0.72) !important;
     font-weight: 800 !important;
-    margin: 0 0 8px !important;
+    margin: 0 0 10px !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandTitle {
+    display: block !important;
     margin: 0 !important;
-    font-size: 30px !important;
-    line-height: 0.98 !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.04em !important;
+    max-width: 100% !important;
+    font-size: clamp(34px, 10vw, 46px) !important;
+    line-height: 0.92 !important;
+    font-weight: 950 !important;
+    letter-spacing: -0.055em !important;
     color: #f8f7ff !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandTitle .accent {
@@ -33414,25 +33462,32 @@ html[data-theme="light"] .tradeReviewSheet{
     -webkit-background-clip: text !important;
     background-clip: text !important;
     color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandSubtitle {
-    margin: 8px 0 0 !important;
+    display: block !important;
+    margin: 10px 0 0 !important;
+    max-width: 260px !important;
     color: rgba(191, 184, 218, 0.82) !important;
     font-size: 15px !important;
     font-weight: 600 !important;
-    line-height: 1.35 !important;
+    line-height: 1.28 !important;
+    white-space: normal !important;
   }
 
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) .mobileCommandClose,
   .mobileNav.mobileCommandOverlay .mobileCommandClose {
     position: absolute !important;
     top: 22px !important;
-    right: 22px !important;
-    width: 52px !important;
-    height: 52px !important;
-    min-width: 52px !important;
-    min-height: 52px !important;
-    border-radius: 18px !important;
+    right: 20px !important;
+    flex: none !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    max-width: 56px !important;
+    border-radius: 20px !important;
     display: grid !important;
     place-items: center !important;
     border: 1px solid rgba(124, 92, 255, 0.32) !important;
@@ -33441,18 +33496,23 @@ html[data-theme="light"] .tradeReviewSheet{
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     cursor: pointer !important;
     z-index: 3 !important;
+    padding: 0 !important;
+    white-space: normal !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandContent {
     flex: 1 1 auto !important;
     min-height: 0 !important;
-    max-height: calc(min(88dvh, var(--app-height, 100dvh)) - 124px) !important;
+    max-height: none !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior: contain !important;
-    padding: 18px 24px max(28px, env(safe-area-inset-bottom, 0px)) !important;
+    padding: 20px 22px max(28px, env(safe-area-inset-bottom, 0px)) !important;
     scrollbar-width: none !important;
+    display: block !important;
+    grid-template-columns: none !important;
+    gap: 0 !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandContent::-webkit-scrollbar {
@@ -33460,46 +33520,56 @@ html[data-theme="light"] .tradeReviewSheet{
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandSection {
-    margin: 0 0 26px !important;
+    margin: 0 0 22px !important;
   }
 
-  .mobileNav.mobileCommandOverlay .mobileCommandSection:last-child {
-    margin-bottom: 8px !important;
+  .mobileNav.mobileCommandOverlay .mobileCommandSection:last-of-type {
+    margin-bottom: 10px !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandSectionTitle {
-    font-size: 12px !important;
-    letter-spacing: 0.18em !important;
+    font-size: 11px !important;
+    letter-spacing: 0.16em !important;
     text-transform: uppercase !important;
     color: rgba(191, 184, 218, 0.68) !important;
     font-weight: 900 !important;
-    margin: 0 0 12px !important;
+    margin: 0 0 12px 2px !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandGrid {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 12px !important;
+    width: 100% !important;
   }
 
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) button.mobileCommandCard,
+  .mobileNav.mobileCommandOverlay button.mobileCommandCard,
   .mobileNav.mobileCommandOverlay .mobileCommandCard {
-    min-height: 118px !important;
+    position: relative !important;
+    flex: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 124px !important;
+    height: auto !important;
     border-radius: 22px !important;
-    padding: 18px !important;
+    padding: 16px !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: flex-start !important;
     justify-content: space-between !important;
-    gap: 14px !important;
+    gap: 12px !important;
     text-decoration: none !important;
+    text-align: left !important;
     color: #f8f7ff !important;
     background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
-      radial-gradient(circle at 18% 14%, rgba(51, 230, 196, 0.1), transparent 42%),
-      radial-gradient(circle at 90% 12%, rgba(124, 92, 255, 0.12), transparent 45%) !important;
-    border: 1px solid rgba(124, 92, 255, 0.18) !important;
-    box-shadow:
-      0 14px 30px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+      linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.016)),
+      rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(124, 92, 255, 0.16) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22) !important;
+    overflow: visible !important;
+    white-space: normal !important;
     transition: border-color 0.18s ease, transform 0.18s ease !important;
   }
 
@@ -33508,22 +33578,31 @@ html[data-theme="light"] .tradeReviewSheet{
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandCard.active {
-    border-color: rgba(51, 230, 196, 0.54) !important;
+    border-color: rgba(51, 230, 196, 0.48) !important;
+    background:
+      linear-gradient(145deg, rgba(51, 230, 196, 0.12), rgba(124, 92, 255, 0.06)),
+      rgba(10, 14, 20, 0.55) !important;
     box-shadow:
-      0 18px 42px rgba(51, 230, 196, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+      0 14px 32px rgba(51, 230, 196, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
   }
 
-  .mobileNav.mobileCommandOverlay .mobileCommandIcon {
-    width: 46px !important;
-    height: 46px !important;
-    border-radius: 16px !important;
+  .mobileNav.mobileCommandOverlay .mobileCommandIcon,
+  .mobileNav.mobileCommandOverlay .mobileCommandCard span.mobileCommandIcon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    border-radius: 14px !important;
     display: grid !important;
     place-items: center !important;
     color: #33e6c4 !important;
     background: rgba(51, 230, 196, 0.1) !important;
-    border: 1px solid rgba(51, 230, 196, 0.24) !important;
+    border: 1px solid rgba(51, 230, 196, 0.22) !important;
     flex-shrink: 0 !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
   }
 
   .mobileNav.mobileCommandOverlay .mobileCommandCard--violet .mobileCommandIcon {
@@ -33538,15 +33617,33 @@ html[data-theme="light"] .tradeReviewSheet{
     border-color: rgba(255, 79, 163, 0.24) !important;
   }
 
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) button.mobileCommandCard span.mobileCommandLabel,
+  .mobileNav.mobileCommandOverlay button.mobileCommandCard .mobileCommandLabel,
   .mobileNav.mobileCommandOverlay .mobileCommandLabel {
-    font-size: 18px !important;
+    display: block !important;
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    font-size: 16px !important;
     font-weight: 850 !important;
     letter-spacing: -0.02em !important;
-    line-height: 1.15 !important;
+    line-height: 1.08 !important;
+    color: inherit !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
 
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) .mobileCommandLogout,
   .mobileNav.mobileCommandOverlay .mobileCommandLogout {
+    flex: none !important;
     width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
     min-height: 56px !important;
     border-radius: 18px !important;
     border: 1px solid rgba(255, 79, 163, 0.28) !important;
@@ -33558,27 +33655,27 @@ html[data-theme="light"] .tradeReviewSheet{
     text-transform: uppercase !important;
     cursor: pointer !important;
     margin-top: 4px !important;
+    white-space: normal !important;
   }
 
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock),
   html[data-theme="light"] .mobileNav.mobileCommandOverlay {
     background:
-      radial-gradient(circle at 20% 10%, rgba(51, 230, 196, 0.16), transparent 34%),
-      radial-gradient(circle at 82% 16%, rgba(124, 92, 255, 0.16), transparent 38%),
-      rgba(247, 248, 251, 0.76) !important;
+      radial-gradient(circle at 20% 10%, rgba(51, 230, 196, 0.1), transparent 34%),
+      radial-gradient(circle at 82% 16%, rgba(124, 92, 255, 0.1), transparent 38%),
+      rgba(247, 248, 251, 0.72) !important;
   }
 
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandSheet {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 248, 251, 0.98)),
-      radial-gradient(circle at 12% 0%, rgba(51, 230, 196, 0.12), transparent 32%),
-      radial-gradient(circle at 88% 0%, rgba(124, 92, 255, 0.12), transparent 38%) !important;
-    border-color: rgba(124, 92, 255, 0.18) !important;
+      linear-gradient(180deg, #ffffff, #f7f8fb) !important;
+    border-color: rgba(15, 23, 42, 0.1) !important;
     color: #07111f !important;
-    box-shadow: 0 -22px 70px rgba(15, 23, 42, 0.18) !important;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.16) !important;
   }
 
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandHeader {
-    background: rgba(255, 255, 255, 0.88) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
     border-bottom-color: rgba(15, 23, 42, 0.08) !important;
   }
 
@@ -33589,21 +33686,31 @@ html[data-theme="light"] .tradeReviewSheet{
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandSubtitle,
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandSectionTitle,
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandEyebrow {
-    color: rgba(15, 23, 42, 0.62) !important;
+    color: rgba(7, 17, 31, 0.58) !important;
   }
 
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay button.mobileCommandCard,
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandCard {
     color: #07111f !important;
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 251, 0.92)),
-      radial-gradient(circle at 18% 14%, rgba(51, 230, 196, 0.08), transparent 42%) !important;
+    background: #ffffff !important;
     border-color: rgba(15, 23, 42, 0.08) !important;
-    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandCard.active {
+    border-color: rgba(13, 148, 136, 0.28) !important;
+    background: linear-gradient(145deg, rgba(51, 230, 196, 0.08), rgba(255, 255, 255, 0.98)) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
   }
 
   html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandClose {
     background: rgba(15, 23, 42, 0.04) !important;
+    border-color: rgba(15, 23, 42, 0.1) !important;
     color: #0d9488 !important;
+  }
+
+  html[data-theme="light"] .mobileNav.mobileCommandOverlay .mobileCommandLabel {
+    color: #07111f !important;
   }
 }
 
@@ -33714,6 +33821,28 @@ MTC MOBILE NAVIGATION CONTRACT
     overscroll-behavior-y: auto !important;
     touch-action: pan-y !important;
     transform: none !important;
+  }
+
+  /* Command sheet label/card final guard — beats legacy .mobileNav pill ellipsis */
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) button.mobileCommandCard,
+  .mobileNav.mobileCommandOverlay button.mobileCommandCard {
+    flex: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+
+  .mobileNav.mobileCommandOverlay:not(.mobileBottomNav):not(.mobileNavDock) button.mobileCommandCard span,
+  .mobileNav.mobileCommandOverlay button.mobileCommandCard span.mobileCommandLabel,
+  .mobileNav.mobileCommandOverlay .mobileCommandLabel {
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 16px !important;
+    line-height: 1.08 !important;
   }
 }
 
