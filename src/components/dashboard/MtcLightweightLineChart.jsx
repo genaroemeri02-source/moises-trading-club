@@ -61,15 +61,17 @@ function normalizeLwChartPoints(data = [], mode = 'pnl') {
   return normalizeLightweightChartData(data, mode);
 }
 
-function getLwChartOptions(theme = 'dark', compact = false, showCrosshair = true) {
+function getLwChartOptions(theme = 'dark', compact = false, showCrosshair = true, mobileOptimized = false, palette = null) {
   const isDark = theme !== 'light';
   const crosshairColor = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(15,17,23,0.14)';
+  const fontSize = mobileOptimized ? 12 : compact ? 10 : 11;
+  const axisColor = palette?.axis ?? (isDark ? '#9C97B8' : '#374151');
   return {
     layout: {
       background: { type: 'solid', color: 'transparent' },
-      textColor: isDark ? '#8b94a7' : '#4b5563',
+      textColor: axisColor,
       fontFamily: "'Manrope','Inter',system-ui,sans-serif",
-      fontSize: compact ? 10 : 11,
+      fontSize,
       attributionLogo: false
     },
     grid: {
@@ -81,26 +83,34 @@ function getLwChartOptions(theme = 'dark', compact = false, showCrosshair = true
       vertLine: { visible: showCrosshair, width: 1, color: crosshairColor, style: 2, labelBackgroundColor: isDark ? 'rgba(18,22,30,0.92)' : 'rgba(255,255,255,0.96)' },
       horzLine: { visible: showCrosshair, width: 1, color: crosshairColor, style: 2, labelBackgroundColor: isDark ? 'rgba(18,22,30,0.92)' : 'rgba(255,255,255,0.96)' }
     },
-    rightPriceScale: { borderVisible: false, scaleMargins: { top: compact ? 0.18 : 0.16, bottom: compact ? 0.14 : 0.12 } },
+    rightPriceScale: {
+      borderVisible: false,
+      minimumWidth: mobileOptimized ? 68 : compact ? 56 : 52,
+      scaleMargins: { top: mobileOptimized ? 0.16 : compact ? 0.18 : 0.16, bottom: mobileOptimized ? 0.12 : compact ? 0.14 : 0.12 }
+    },
     leftPriceScale: { visible: false },
-    timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true, rightOffset: 4 },
+    timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true, rightOffset: mobileOptimized ? 6 : 4 },
     handleScroll: false,
     handleScale: false
   };
 }
 
-function getLwAreaSeriesOptions(positive, theme = 'dark', compact = false, currency) {
-  const line = positive ? '#22c55e' : '#ef4444';
-  const top = positive ? (theme !== 'light' ? 'rgba(34,197,94,0.16)' : 'rgba(34,197,94,0.11)') : (theme !== 'light' ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.10)');
+function getLwAreaSeriesOptions(positive, theme = 'dark', compact = false, currency, mobileOptimized = false, palette = null) {
+  const line = positive
+    ? (palette?.positive ?? (theme !== 'light' ? '#33E6C4' : '#22c55e'))
+    : (palette?.negative ?? (theme !== 'light' ? '#FF4FA3' : '#ef4444'));
+  const top = positive
+    ? (palette?.areaPositive ?? (theme !== 'light' ? 'rgba(51,230,196,0.14)' : 'rgba(34,197,94,0.11)'))
+    : (palette?.areaNegative ?? (theme !== 'light' ? 'rgba(255,79,163,0.12)' : 'rgba(239,68,68,0.10)'));
   const formatValue = (price) => currency ? currency(price) : money(price);
   return {
     lineColor: line,
     topColor: top,
     bottomColor: 'rgba(0,0,0,0)',
-    lineWidth: compact ? 1.8 : 2.15,
+    lineWidth: mobileOptimized ? 2.35 : compact ? 1.8 : 2.15,
     lineType: LineType.Simple,
     crosshairMarkerVisible: true,
-    crosshairMarkerRadius: compact ? 3.5 : 4,
+    crosshairMarkerRadius: mobileOptimized ? 4 : compact ? 3.5 : 4,
     crosshairMarkerBorderColor: theme !== 'light' ? 'rgba(7,9,13,0.85)' : 'rgba(255,255,255,0.95)',
     crosshairMarkerBackgroundColor: line,
     priceFormat: { type: 'custom', formatter: formatValue, minMove: 0.01 }
@@ -117,7 +127,7 @@ export function DashboardChartFallback({ compact = false }) {
   );
 }
 
-export function MtcLightweightLineChart({ data = [], mode = 'pnl', height = 240, compact = false, theme = 'auto', currency, showCrosshair = true }) {
+export function MtcLightweightLineChart({ data = [], mode = 'pnl', height = 240, compact = false, mobileOptimized = false, theme = 'auto', currency, showCrosshair = true, palette = null }) {
   const containerRef = useRef(null);
   const [resolvedTheme, setResolvedTheme] = useState('dark');
   const points = useMemo(() => normalizeLwChartPoints(data, mode), [data, mode]);
@@ -138,24 +148,25 @@ export function MtcLightweightLineChart({ data = [], mode = 'pnl', height = 240,
   useEffect(() => {
     const el = containerRef.current;
     if (!el || !hasEnoughData) return undefined;
-    const chart = createChart(el, { ...getLwChartOptions(resolvedTheme, compact, showCrosshair), width: el.clientWidth || 320, height });
-    const series = chart.addSeries(AreaSeries, getLwAreaSeriesOptions(positive, resolvedTheme, compact, currency));
+    const chart = createChart(el, {
+      ...getLwChartOptions(resolvedTheme, compact, showCrosshair, mobileOptimized, palette),
+      autoSize: true,
+      height
+    });
+    const series = chart.addSeries(AreaSeries, getLwAreaSeriesOptions(positive, resolvedTheme, compact, currency, mobileOptimized, palette));
     series.setData(points);
     chart.timeScale().fitContent();
-    const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      const nextWidth = Math.floor(entry.contentRect.width);
-      if (nextWidth > 0) chart.applyOptions({ width: nextWidth, height });
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth > 0) chart.applyOptions({ height });
     });
     ro.observe(el);
     return () => { ro.disconnect(); chart.remove(); };
-  }, [points, hasEnoughData, resolvedTheme, compact, showCrosshair, height, positive, currency]);
+  }, [points, hasEnoughData, resolvedTheme, compact, mobileOptimized, showCrosshair, height, positive, currency, palette]);
   if (!hasEnoughData) return <DashboardChartFallback compact={compact} />;
   return (
     <div
       ref={containerRef}
-      className={`mtcLwChart ${compact ? 'compact' : ''} ${resolvedTheme === 'light' ? 'light' : 'dark'} ${positive ? 'positive' : 'negative'}`}
+      className={`mtcLwChart ${compact ? 'compact' : ''} ${mobileOptimized ? 'mobile-sharp' : ''} ${resolvedTheme === 'light' ? 'light' : 'dark'} ${positive ? 'positive' : 'negative'}`}
       style={{ height }}
       role="img"
       aria-label={mode === 'pnl' ? 'Gráfico de P/L neto acumulado' : 'Gráfico de curva de equity'}

@@ -30280,3 +30280,116 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     max-width:100%!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v30 — Compact bottom dock (no dead zone)
+   Icons anchor above home indicator; safe-area counted once
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  :root{
+    --mobile-tabbar-content-h:42px;
+    --mobile-tab-bar-h:calc(var(--mobile-tabbar-content-h) + env(safe-area-inset-bottom,0px));
+    --mobile-content-pad-bottom:calc(var(--mobile-tab-bar-h) + 12px);
+  }
+
+  html:not([data-theme="light"]) body .app .main.appMain,
+  html[data-theme="dark"] body .app .main.appMain{
+    padding-bottom:var(--mobile-content-pad-bottom)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .page,
+  html:not([data-theme="light"]) body .app .analyticsCockpit.analyticsPage,
+  html:not([data-theme="light"]) body .app .journalPage,
+  html:not([data-theme="light"]) body .app .riskPage,
+  html:not([data-theme="light"]) body .app .checklistPage,
+  html[data-theme="dark"] body .app .page,
+  html[data-theme="dark"] body .app .analyticsCockpit.analyticsPage,
+  html[data-theme="dark"] body .app .journalPage,
+  html[data-theme="dark"] body .app .riskPage,
+  html[data-theme="dark"] body .app .checklistPage{
+    padding-bottom:8px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body .app .mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileBottomNav{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:flex-end!important;
+    justify-content:stretch!important;
+    height:auto!important;
+    min-height:unset!important;
+    max-height:none!important;
+    padding:0!important;
+    padding-bottom:env(safe-area-inset-bottom,0px)!important;
+    grid-template-columns:unset!important;
+    grid-template-rows:unset!important;
+    gap:0!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav::after,
+  html[data-theme="dark"] body .app .mobileBottomNav::after,
+  html[data-theme="light"] body .app .mobileBottomNav::after{
+    display:none!important;
+    content:none!important;
+    height:0!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="dark"] body .app .mobileBottomNav button,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore{
+    flex:1 1 0!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:var(--mobile-tabbar-content-h)!important;
+    height:auto!important;
+    max-height:none!important;
+    padding:4px 2px 3px!important;
+    margin:0!important;
+    align-self:flex-end!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:1px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button svg,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore svg,
+  html[data-theme="dark"] body .app .mobileBottomNav button svg,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore svg{
+    width:17px!important;
+    height:17px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button span,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore span,
+  html[data-theme="dark"] body .app .mobileBottomNav button span,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore span{
+    font-size:9px!important;
+    line-height:1!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNavSheet,
+  html[data-theme="dark"] body .app .mobileNavSheet{
+    bottom:var(--mobile-tab-bar-h)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNewTradeFab,
+  html[data-theme="dark"] body .app .mobileNewTradeFab{
+    bottom:calc(var(--mobile-tab-bar-h) + 10px)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .helpBubble,
+  html[data-theme="dark"] body .app .helpBubble{
+    bottom:calc(var(--mobile-tab-bar-h) + 10px)!important;
+  }
+
+  html body .app .main.appMain{
+    padding-bottom:var(--mobile-content-pad-bottom)!important;
+  }
+}
