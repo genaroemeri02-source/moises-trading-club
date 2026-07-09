@@ -1,17 +1,21 @@
 /**
- * Mobile viewport sync for iOS PWA.
- * Bottom dock retired — no --mobile-dock-gap.
- * Keeps --app-height stable on standalone resume.
+ * Mobile viewport sync for iOS PWA / Safari.
+ *
+ * Contract:
+ * - No bottom dock. --mobile-dock-gap is always 0px.
+ * - Never listen to visualViewport.scroll — rewriting --app-height mid-gesture
+ *   resets/bounces natural document scroll on iOS.
+ * - Never set body position:fixed or touch scrollTop.
+ * - Sync only on bootstrap / resize / orientation / focus / pageshow / visibility / vv.resize.
  */
 
 let initialized = false;
-let rafId = null;
 let timers = [];
 
-function isIOS() {
+function isIOSDevice() {
   return (
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    /iPad|iPhone|iPod/.test(window.navigator.userAgent) ||
+    (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1)
   );
 }
 
@@ -22,31 +26,30 @@ function isStandalonePWA() {
   );
 }
 
-function px(value) {
-  return `${Math.max(0, Math.round(value || 0))}px`;
-}
-
-function getStableViewportHeight() {
-  const vv = window.visualViewport;
-  const values = [window.innerHeight, document.documentElement?.clientHeight, vv?.height]
+function getViewportHeight() {
+  const values = [
+    window.innerHeight,
+    document.documentElement?.clientHeight,
+    window.visualViewport?.height,
+  ]
     .filter((n) => n != null)
     .map(Number)
     .filter((n) => Number.isFinite(n) && n > 300);
 
   if (!values.length) return window.innerHeight || 0;
 
-  if (isIOS() && isStandalonePWA()) {
-    const stored = Number(sessionStorage.getItem('mtc:last-app-height') || 0);
-    if (Number.isFinite(stored) && stored > 300) values.push(stored);
-    return Math.max(...values);
-  }
+  // iOS standalone: prefer the largest stable value to avoid a stale short viewport.
+  if (isIOSDevice() && isStandalonePWA()) return Math.max(...values);
 
-  return vv?.height || window.innerHeight || Math.max(...values);
+  return window.innerHeight || Math.max(...values);
 }
 
-function getStableViewportWidth() {
-  const vv = window.visualViewport;
-  const values = [window.innerWidth, document.documentElement?.clientWidth, vv?.width]
+function getViewportWidth() {
+  const values = [
+    window.innerWidth,
+    document.documentElement?.clientWidth,
+    window.visualViewport?.width,
+  ]
     .filter((n) => n != null)
     .map(Number)
     .filter((n) => Number.isFinite(n) && n > 200);
@@ -56,33 +59,23 @@ function getStableViewportWidth() {
 
 function applyViewportVars() {
   const root = document.documentElement;
-  const ios = isIOS();
+  const ios = isIOSDevice();
   const standalone = isStandalonePWA();
-  const h = getStableViewportHeight();
-  const w = getStableViewportWidth();
+  const h = getViewportHeight();
+  const w = getViewportWidth();
 
   root.classList.toggle('is-ios', ios);
   root.classList.toggle('is-standalone-pwa', standalone);
   root.classList.toggle('is-ios-standalone', ios && standalone);
 
-  root.style.setProperty('--app-height', px(h));
-  root.style.setProperty('--app-width', px(w));
+  root.style.setProperty('--app-height', `${Math.round(h)}px`);
+  root.style.setProperty('--app-width', `${Math.round(w)}px`);
   root.style.setProperty('--app-vh', `${h * 0.01}px`);
   root.style.setProperty('--mobile-dock-gap', '0px');
   root.style.setProperty('--mobile-tabbar-visual-h', '0px');
   root.style.setProperty('--mobile-tabbar-total-h', '0px');
   root.style.setProperty('--mobile-tab-bar-h', '0px');
   root.style.setProperty('--mobile-content-pad-bottom', '28px');
-
-  if (ios && standalone && h > 300) {
-    try {
-      sessionStorage.setItem('mtc:last-app-height', String(Math.round(h)));
-    } catch {
-      /* private mode */
-    }
-  }
-
-  document.body?.style.setProperty('--viewport-refresh-token', String(Date.now()));
 
   window.dispatchEvent(
     new CustomEvent('mtc:viewport-sync', {
@@ -91,25 +84,16 @@ function applyViewportVars() {
   );
 }
 
-function clearTimers() {
-  if (rafId) {
-    window.cancelAnimationFrame(rafId);
-    rafId = null;
-  }
-  timers.forEach((timer) => window.clearTimeout(timer));
-  timers = [];
-}
-
 function scheduleViewportSync() {
-  clearTimers();
+  timers.forEach(clearTimeout);
+  timers = [];
+
   applyViewportVars();
-  rafId = window.requestAnimationFrame(() => {
-    applyViewportVars();
-    rafId = null;
+  requestAnimationFrame(applyViewportVars);
+
+  [80, 220, 500].forEach((delay) => {
+    timers.push(setTimeout(applyViewportVars, delay));
   });
-  timers = [60, 180, 350, 700, 1200].map((delay) =>
-    window.setTimeout(applyViewportVars, delay)
-  );
 }
 
 export function initMobileViewportManager() {
@@ -128,8 +112,9 @@ export function initMobileViewportManager() {
     if (!document.hidden) scheduleViewportSync();
   });
 
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', scheduleViewportSync, { passive: true });
-    window.visualViewport.addEventListener('scroll', scheduleViewportSync, { passive: true });
-  }
+  window.visualViewport?.addEventListener('resize', scheduleViewportSync, { passive: true });
+
+  // IMPORTANT:
+  // Do NOT listen to visualViewport.scroll. On iOS PWA it rewrites --app-height
+  // during the gesture and snaps natural document scroll back to the anchor.
 }

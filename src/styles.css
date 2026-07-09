@@ -34808,4 +34808,55 @@ MTC MOBILE NAVIGATION CONTRACT
 - Do not add fixed bottom nav, mobileBottomNav, mobileNavDock or padding reserves.
 - Do not use .mobileNav global for sheets and docks together.
 - Main content must scroll naturally after closing command sheet.
+- mobileViewport.js must NEVER sync on visualViewport.scroll.
+- Shell/main height must NOT bind to --app-height (reflow mid-scroll snaps position).
 */
+
+/* ============================================================================
+   MTC MOBILE — SCROLL STABILITY HARDENING (post dock removal)
+   Prevent legacy shell blocks from re-binding height to --app-height.
+   Command sheet may still use --app-height for max-height only.
+   ============================================================================ */
+@media (max-width: 768px) {
+  html:has(.appShell),
+  html:has(.appShell) body,
+  html:has(.appShell) #root,
+  html:has(.appShell) .app.appShell,
+  html:has(.appShell) .main.appMain {
+    height: auto !important;
+    max-height: none !important;
+    position: static !important;
+  }
+
+  html:has(.appShell) .app.appShell,
+  html:has(.appShell) .main.appMain {
+    position: relative !important;
+  }
+
+  html:has(.appShell) body {
+    position: static !important;
+    inset: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    touch-action: pan-y !important;
+  }
+
+  html:has(.appShell) body.mobile-command-open,
+  html:has(.appShell) body.menu-open {
+    overflow: hidden !important;
+    touch-action: none !important;
+  }
+
+  html:has(.appShell) #root,
+  html:has(.appShell) .app.appShell {
+    min-height: 100dvh !important;
+    overflow: visible !important;
+  }
+
+  html:has(.appShell) .main.appMain {
+    overflow: visible !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
