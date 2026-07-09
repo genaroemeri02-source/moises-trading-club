@@ -33182,10 +33182,10 @@ html[data-theme="light"] .tradeReviewSheet{
     position: relative !important;
     flex-shrink: 0 !important;
     display: block !important;
-    padding: 18px 84px 18px 24px !important;
+    padding: 16px 76px 14px 22px !important;
     background: transparent !important;
     border: 0 !important;
-    border-bottom: 1px solid rgba(124, 92, 255, 0.12) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
     box-shadow: none !important;
   }
 
@@ -33251,21 +33251,22 @@ html[data-theme="light"] .tradeReviewSheet{
 
   .mobileCommandClose {
     position: absolute !important;
-    top: 18px !important;
-    right: 18px !important;
-    width: 52px !important;
-    height: 52px !important;
-    min-width: 52px !important;
-    min-height: 52px !important;
-    border-radius: 18px !important;
+    top: 16px !important;
+    right: 16px !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    border-radius: 999px !important;
     display: grid !important;
     place-items: center !important;
-    border: 1px solid rgba(124, 92, 255, 0.28) !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    color: #33e6c4 !important;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #e8e4f4 !important;
     cursor: pointer !important;
     z-index: 3 !important;
     padding: 0 !important;
+    box-shadow: none !important;
   }
 
   .mobileCommandContent {
@@ -33306,68 +33307,98 @@ html[data-theme="light"] .tradeReviewSheet{
   .mobileCommandGrid {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 14px !important;
+    gap: 10px !important;
     width: 100% !important;
   }
 
+  /* Native tile: ONE surface. Icon is bare (no nested chip/box). */
   button.mobileCommandCard,
   .mobileCommandCard {
     flex: none !important;
     width: auto !important;
     min-width: 0 !important;
     max-width: none !important;
-    min-height: 124px !important;
+    min-height: 112px !important;
     height: auto !important;
-    padding: 16px !important;
-    border-radius: 22px !important;
+    padding: 18px 16px 16px !important;
+    border-radius: 20px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: space-between !important;
-    gap: 12px !important;
+    gap: 18px !important;
     text-align: left !important;
-    color: #f8f7ff !important;
-    background: rgba(255, 255, 255, 0.035) !important;
-    border: 1px solid rgba(124, 92, 255, 0.14) !important;
+    color: #f5f3ff !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    border: 0 !important;
     box-shadow: none !important;
+    outline: none !important;
     cursor: pointer !important;
     white-space: normal !important;
     overflow: visible !important;
-    transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease !important;
+    transition: background 0.16s ease, transform 0.16s ease !important;
   }
 
   .mobileCommandCard:active {
     transform: scale(0.985) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
   }
 
   .mobileCommandCard.active {
-    border-color: rgba(51, 230, 196, 0.42) !important;
-    background: rgba(51, 230, 196, 0.1) !important;
-    box-shadow: 0 10px 28px rgba(51, 230, 196, 0.08) !important;
+    border: 0 !important;
+    background: rgba(51, 230, 196, 0.12) !important;
+    box-shadow: none !important;
   }
 
-  .mobileCommandIcon {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 14px !important;
-    display: grid !important;
-    place-items: center !important;
+  .mobileCommandCard.active .mobileCommandLabel {
+    color: #33e6c4 !important;
+  }
+
+  /* Flatten icon — kill the inner frame the photos show */
+  .mobileCommandIcon,
+  .mobileCommandCard span.mobileCommandIcon,
+  button.mobileCommandCard span.mobileCommandIcon {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
     flex-shrink: 0 !important;
     color: #33e6c4 !important;
-    background: rgba(51, 230, 196, 0.1) !important;
-    border: 1px solid rgba(51, 230, 196, 0.2) !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .mobileCommandIcon svg {
+    width: 26px !important;
+    height: 26px !important;
+    stroke-width: 1.85 !important;
   }
 
   .mobileCommandCard--violet .mobileCommandIcon {
-    color: #8f7bff !important;
-    background: rgba(124, 92, 255, 0.12) !important;
-    border-color: rgba(124, 92, 255, 0.26) !important;
+    color: #9b87ff !important;
+    background: transparent !important;
+    border: 0 !important;
   }
 
   .mobileCommandCard--magenta .mobileCommandIcon {
     color: #ff4fa3 !important;
-    background: rgba(255, 79, 163, 0.1) !important;
-    border-color: rgba(255, 79, 163, 0.22) !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  .mobileCommandCard--cyan .mobileCommandIcon,
+  .mobileCommandCard--muted .mobileCommandIcon {
+    color: #33e6c4 !important;
+    background: transparent !important;
+    border: 0 !important;
   }
 
   button.mobileCommandCard span.mobileCommandLabel,
@@ -33378,16 +33409,16 @@ html[data-theme="light"] .tradeReviewSheet{
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
-    font-size: 16px !important;
-    font-weight: 850 !important;
-    letter-spacing: -0.02em !important;
-    line-height: 1.1 !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    line-height: 1.12 !important;
     color: inherit !important;
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: clip !important;
     word-break: normal !important;
-    overflow-wrap: anywhere !important;
+    overflow-wrap: break-word !important;
   }
 
   .mobileCommandLogout {
@@ -33438,22 +33469,33 @@ html[data-theme="light"] .tradeReviewSheet{
   }
 
   html[data-theme="light"] .mobileCommandClose {
-    background: rgba(15, 23, 42, 0.04) !important;
-    border-color: rgba(15, 23, 42, 0.1) !important;
-    color: #0d9488 !important;
+    background: rgba(15, 23, 42, 0.06) !important;
+    border: 0 !important;
+    color: #07111f !important;
   }
 
   html[data-theme="light"] button.mobileCommandCard,
   html[data-theme="light"] .mobileCommandCard {
     color: #07111f !important;
-    background: #f7f8fb !important;
-    border-color: rgba(15, 23, 42, 0.08) !important;
+    background: #f2f4f8 !important;
+    border: 0 !important;
     box-shadow: none !important;
   }
 
   html[data-theme="light"] .mobileCommandCard.active {
-    border-color: rgba(13, 148, 136, 0.28) !important;
-    background: rgba(51, 230, 196, 0.1) !important;
+    border: 0 !important;
+    background: rgba(13, 148, 136, 0.12) !important;
+    box-shadow: none !important;
+  }
+
+  html[data-theme="light"] .mobileCommandCard.active .mobileCommandLabel {
+    color: #0d9488 !important;
+  }
+
+  html[data-theme="light"] .mobileCommandIcon,
+  html[data-theme="light"] .mobileCommandCard span.mobileCommandIcon {
+    background: transparent !important;
+    border: 0 !important;
     box-shadow: none !important;
   }
 
@@ -33462,8 +33504,8 @@ html[data-theme="light"] .tradeReviewSheet{
   }
 
   html[data-theme="light"] .mobileCommandLogout {
-    border-color: rgba(15, 23, 42, 0.12) !important;
-    background: rgba(15, 23, 42, 0.03) !important;
+    border: 0 !important;
+    background: #f2f4f8 !important;
     color: #42506a !important;
   }
 }
@@ -33640,9 +33682,56 @@ MTC MOBILE NAVIGATION CONTRACT
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: clip !important;
-    font-size: 16px !important;
-    line-height: 1.1 !important;
-    font-weight: 850 !important;
+    font-size: 17px !important;
+    line-height: 1.12 !important;
+    font-weight: 800 !important;
+  }
+
+  html body .app .mobileCommandSheet .mobileCommandIcon,
+  html body .mobileCommandSheet .mobileCommandIcon {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  /* ── Mobile native surface polish (layout only, no business logic) ──
+     Reduce "card inside card" / screen-in-screen feel on phone. */
+  html:has(.appShell) .main.appMain .page,
+  html:has(.appShell) .main.appMain .dashboardPage,
+  html:has(.appShell) .main.appMain .dashboardV38,
+  html:has(.appShell) .main.appMain .dashboardClean {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  html:has(.appShell) .main.appMain .page > .card,
+  html:has(.appShell) .main.appMain .dashboardV38 > .card,
+  html:has(.appShell) .main.appMain .dashboardClean > .card,
+  html:has(.appShell) .main.appMain .dashboardVisualGrid > .card {
+    border-radius: 22px !important;
+    box-shadow: none !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+  }
+
+  html[data-theme="light"]:has(.appShell) .main.appMain .page > .card,
+  html[data-theme="light"]:has(.appShell) .main.appMain .dashboardV38 > .card,
+  html[data-theme="light"]:has(.appShell) .main.appMain .dashboardClean > .card,
+  html[data-theme="light"]:has(.appShell) .main.appMain .dashboardVisualGrid > .card {
+    border-color: rgba(15, 23, 42, 0.06) !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Nested tiles inside a parent card: drop outer chrome so they don't look boxed twice */
+  html:has(.appShell) .main.appMain .card .card,
+  html:has(.appShell) .main.appMain .card .insightPro,
+  html:has(.appShell) .main.appMain .card .metricPremium,
+  html:has(.appShell) .main.appMain .card .analyticsInsightCard,
+  html:has(.appShell) .main.appMain .card .analyticsBehaviorFocusCard {
+    box-shadow: none !important;
   }
 }
 

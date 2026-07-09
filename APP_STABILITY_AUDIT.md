@@ -233,3 +233,9 @@ Evidencia en `moisestradingclub.com`: Network 404 de `index-*.css` (SW cacheaba 
 | Labels | Guard nuclear EOF sobre `button.mobileCommandCard span` |
 
 **Deploy required** + hard refresh / unregister SW en dispositivos que ya tenían `mtc-cache-v2-*`.
+
+### Native polish (fotos WhatsApp)
+- Icon chip interno del command sheet eliminado (icono bare, sin border/bg).
+- Cards del menú sin borde externo agresivo; active = tint, no marco.
+- Close circular sin borde.
+- Mobile page: menos sombra en cards top-level; nested cards sin box-shadow doble.
