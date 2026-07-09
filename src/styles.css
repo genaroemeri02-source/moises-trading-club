@@ -30393,3 +30393,376 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     padding-bottom:var(--mobile-content-pad-bottom)!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v31 — Definitive dock + premium sheet
+   Safe-area inside tap targets; restore tab size; kill black void
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  :root{
+    --mobile-tabbar-tap-h:50px;
+    --mobile-tab-bar-h:calc(var(--mobile-tabbar-tap-h) + env(safe-area-inset-bottom,0px));
+    --mobile-content-pad-bottom:calc(var(--mobile-tab-bar-h) + 16px);
+    --aurora-mobile-bg:#07050D;
+    --aurora-mobile-nav-bg:#07050D;
+  }
+
+  html:not([data-theme="light"]),
+  html:not([data-theme="light"]) body,
+  html:not([data-theme="light"]) #root,
+  html[data-theme="dark"],
+  html[data-theme="dark"] body,
+  html[data-theme="dark"] #root{
+    background:var(--aurora-mobile-bg)!important;
+    background-color:var(--aurora-mobile-bg)!important;
+  }
+
+  html:not([data-theme="light"]) body:has(.app),
+  html[data-theme="dark"] body:has(.app){
+    background:var(--aurora-mobile-bg)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .main.appMain,
+  html[data-theme="dark"] body .app .main.appMain,
+  html body .app .main.appMain{
+    padding-bottom:var(--mobile-content-pad-bottom)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .page,
+  html:not([data-theme="light"]) body .app .analyticsCockpit.analyticsPage,
+  html:not([data-theme="light"]) body .app .journalPage,
+  html:not([data-theme="light"]) body .app .riskPage,
+  html:not([data-theme="light"]) body .app .checklistPage,
+  html[data-theme="dark"] body .app .page,
+  html[data-theme="dark"] body .app .analyticsCockpit.analyticsPage,
+  html[data-theme="dark"] body .app .journalPage,
+  html[data-theme="dark"] body .app .riskPage,
+  html[data-theme="dark"] body .app .checklistPage{
+    padding-bottom:12px!important;
+  }
+
+  /* Dock — full bleed, safe-area inside buttons, aurora glow at bottom */
+  html:not([data-theme="light"]) body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body .app .mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileBottomNav{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:stretch!important;
+    justify-content:stretch!important;
+    height:auto!important;
+    min-height:var(--mobile-tab-bar-h)!important;
+    max-height:none!important;
+    padding:0!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    grid-template-columns:unset!important;
+    grid-template-rows:unset!important;
+    gap:0!important;
+    overflow:visible!important;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 100%,rgba(124,92,255,.14),transparent 62%),
+      radial-gradient(ellipse 55% 45% at 18% 100%,rgba(51,230,196,.10),transparent 58%),
+      radial-gradient(ellipse 45% 40% at 82% 100%,rgba(255,79,163,.08),transparent 55%),
+      linear-gradient(180deg,rgba(9,7,15,.98),var(--aurora-mobile-nav-bg))!important;
+    background-color:var(--aurora-mobile-nav-bg)!important;
+    border-top:1px solid rgba(124,92,255,.20)!important;
+    box-shadow:0 -8px 32px rgba(0,0,0,.32)!important;
+    backdrop-filter:blur(18px) saturate(1.12)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.12)!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav{
+    --aurora-mobile-nav-bg:#F0F2F5;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 100%,rgba(124,92,255,.08),transparent 62%),
+      linear-gradient(180deg,rgba(248,249,252,.98),#F0F2F5)!important;
+    background-color:#F0F2F5!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav::after,
+  html[data-theme="dark"] body .app .mobileBottomNav::after,
+  html[data-theme="light"] body .app .mobileBottomNav::after{
+    display:none!important;
+    content:none!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="dark"] body .app .mobileBottomNav button,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore{
+    flex:1 1 0!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:var(--mobile-tab-bar-h)!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:6px 3px calc(4px + env(safe-area-inset-bottom,0px))!important;
+    border-radius:0!important;
+    border:0!important;
+    background:transparent!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:3px!important;
+    touch-action:manipulation!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button svg,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore svg,
+  html[data-theme="dark"] body .app .mobileBottomNav button svg,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore svg{
+    width:19px!important;
+    height:19px!important;
+    opacity:.88!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button span,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore span,
+  html[data-theme="dark"] body .app .mobileBottomNav button span,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore span{
+    font-size:10px!important;
+    font-weight:700!important;
+    line-height:1.05!important;
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:unset!important;
+    white-space:nowrap!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button.active svg,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore.active svg,
+  html[data-theme="dark"] body .app .mobileBottomNav button.active svg,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore.active svg{
+    opacity:1!important;
+  }
+
+  /* Restore full-size CTA buttons — v30 must not shrink app actions */
+  html body .app .nextActionBody button,
+  html body .app .controlActions button,
+  html body .app .dashboardRightRail .nextActionBody button,
+  html body .app .premiumEmptyAction button,
+  html body .app .onboardingSteps button{
+    min-height:52px!important;
+    padding:13px 18px!important;
+    font-size:15px!important;
+    font-weight:800!important;
+  }
+
+  html body .app .mobileNavSheet,
+  html:not([data-theme="light"]) body .app .mobileNavSheet,
+  html[data-theme="dark"] body .app .mobileNavSheet{
+    bottom:var(--mobile-tab-bar-h)!important;
+    max-height:min(78vh,620px)!important;
+    border-radius:24px 24px 0 0!important;
+    border-top:1px solid rgba(51,230,196,.22)!important;
+    background:
+      radial-gradient(circle at 12% 0%,rgba(51,230,196,.12),transparent 38%),
+      radial-gradient(circle at 88% 8%,rgba(124,92,255,.16),transparent 34%),
+      radial-gradient(circle at 50% 100%,rgba(255,79,163,.08),transparent 42%),
+      linear-gradient(180deg,rgba(12,10,18,.99),rgba(7,5,13,1))!important;
+    box-shadow:0 -24px 80px rgba(0,0,0,.55),0 0 0 1px rgba(124,92,255,.10) inset!important;
+    overflow:hidden!important;
+  }
+
+  html body .app .mobileNavSheetHandle{
+    display:block!important;
+    width:38px!important;
+    height:4px!important;
+    margin:10px auto 2px!important;
+    border-radius:999px!important;
+    background:linear-gradient(90deg,rgba(51,230,196,.55),rgba(124,92,255,.65),rgba(255,79,163,.45))!important;
+    box-shadow:0 0 14px rgba(51,230,196,.25)!important;
+    flex-shrink:0!important;
+  }
+
+  html body .app .mobileNavSheetHead{
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    padding:10px 18px 14px!important;
+    border-bottom:1px solid rgba(124,92,255,.14)!important;
+    background:linear-gradient(180deg,rgba(124,92,255,.06),transparent)!important;
+  }
+
+  html body .app .mobileNavSheetHeadMain{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    min-width:0!important;
+  }
+
+  html body .app .mobileNavSheetHeadMain b{
+    font-size:18px!important;
+    font-weight:900!important;
+    letter-spacing:-.03em!important;
+    text-transform:none!important;
+    color:#F4F1FA!important;
+    background:linear-gradient(90deg,#F4F1FA 0%,rgba(51,230,196,.95) 55%,rgba(124,92,255,.92) 100%)!important;
+    -webkit-background-clip:text!important;
+    background-clip:text!important;
+    -webkit-text-fill-color:transparent!important;
+  }
+
+  html body .app .mobileNavSheetHeadMain small{
+    font-size:12px!important;
+    font-weight:600!important;
+    color:rgba(156,151,184,.92)!important;
+    line-height:1.35!important;
+  }
+
+  html body .app .mobileNavSheetClose{
+    min-height:40px!important;
+    min-width:40px!important;
+    padding:8px!important;
+    border-radius:12px!important;
+    border:1px solid rgba(124,92,255,.18)!important;
+    background:rgba(124,92,255,.10)!important;
+    color:var(--aurora-cyan)!important;
+    flex-shrink:0!important;
+  }
+
+  html body .app .mobileNavSheetNav{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+    padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px))!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  html body .app .mobileNavSheetNav button{
+    position:relative!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+    min-height:88px!important;
+    padding:12px 12px 14px!important;
+    border-radius:16px!important;
+    border:1px solid rgba(124,92,255,.14)!important;
+    background:
+      linear-gradient(155deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),
+      rgba(12,10,18,.72)!important;
+    color:#E8E4F4!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    text-align:left!important;
+    overflow:hidden!important;
+    box-shadow:0 10px 28px rgba(0,0,0,.22)!important;
+  }
+
+  html body .app .mobileNavSheetNav button::before{
+    content:''!important;
+    position:absolute!important;
+    inset:0!important;
+    background:radial-gradient(circle at 18% 12%,rgba(51,230,196,.10),transparent 52%)!important;
+    pointer-events:none!important;
+    opacity:.85!important;
+  }
+
+  html body .app .mobileNavSheetIcon{
+    position:relative!important;
+    z-index:1!important;
+    display:grid!important;
+    place-items:center!important;
+    width:38px!important;
+    height:38px!important;
+    border-radius:12px!important;
+    border:1px solid rgba(51,230,196,.20)!important;
+    background:linear-gradient(135deg,rgba(51,230,196,.16),rgba(124,92,255,.12))!important;
+    color:var(--aurora-cyan)!important;
+    box-shadow:0 8px 22px rgba(51,230,196,.12)!important;
+    flex-shrink:0!important;
+  }
+
+  html body .app .mobileNavSheetLabel{
+    position:relative!important;
+    z-index:1!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    line-height:1.15!important;
+    color:#F0ECFA!important;
+  }
+
+  html body .app .mobileNavSheetNav button.active{
+    border-color:rgba(51,230,196,.34)!important;
+    background:
+      linear-gradient(155deg,rgba(51,230,196,.14),rgba(124,92,255,.08)),
+      rgba(10,14,20,.88)!important;
+    box-shadow:0 12px 32px rgba(51,230,196,.14),0 0 0 1px rgba(51,230,196,.12) inset!important;
+  }
+
+  html body .app .mobileNavSheetNav button.active .mobileNavSheetIcon{
+    border-color:rgba(51,230,196,.42)!important;
+    background:linear-gradient(135deg,rgba(51,230,196,.28),rgba(124,92,255,.18))!important;
+    color:#33E6C4!important;
+    box-shadow:0 0 18px rgba(51,230,196,.22)!important;
+  }
+
+  html body .app .mobileNavSheetNav button.active .mobileNavSheetLabel{
+    color:var(--aurora-cyan)!important;
+  }
+
+  html body .app .mobileNavSheetNav button.mobileLogout{
+    grid-column:1/-1!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:54px!important;
+    gap:10px!important;
+    border-color:rgba(255,79,163,.26)!important;
+    background:linear-gradient(135deg,rgba(255,79,163,.12),rgba(124,92,255,.06))!important;
+    color:#FFB8D9!important;
+  }
+
+  html body .app .mobileNavSheetNav button.mobileLogout .mobileNavSheetIcon{
+    width:34px!important;
+    height:34px!important;
+    border-radius:10px!important;
+    border-color:rgba(255,79,163,.28)!important;
+    background:rgba(255,79,163,.14)!important;
+    color:#FF4FA3!important;
+    box-shadow:0 8px 20px rgba(255,79,163,.14)!important;
+  }
+
+  html body .app .mobileNavSheetNav button em{
+    position:absolute!important;
+    top:10px!important;
+    right:10px!important;
+    z-index:2!important;
+    min-width:18px!important;
+    height:18px!important;
+    padding:0 5px!important;
+    border-radius:999px!important;
+    background:linear-gradient(135deg,#33E6C4,#7C5CFF)!important;
+    color:#07050D!important;
+    font-size:10px!important;
+    font-weight:900!important;
+    font-style:normal!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+
+  html body .app .mobileNavSheetBackdrop{
+    background:rgba(4,3,8,.62)!important;
+    backdrop-filter:blur(6px) saturate(1.1)!important;
+    -webkit-backdrop-filter:blur(6px) saturate(1.1)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNewTradeFab,
+  html[data-theme="dark"] body .app .mobileNewTradeFab{
+    bottom:calc(var(--mobile-tab-bar-h) + 12px)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .helpBubble,
+  html[data-theme="dark"] body .app .helpBubble{
+    bottom:calc(var(--mobile-tab-bar-h) + 12px)!important;
+  }
+}

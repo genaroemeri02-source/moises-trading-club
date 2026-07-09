@@ -923,9 +923,13 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
   return <>
     {menuOpen&&<button type="button" className="mobileNavSheetBackdrop" aria-label="Cerrar menú" onClick={()=>setMenuOpen(false)}/>}
     {menuOpen&&<div className="mobileNavSheet" role="dialog" aria-label="Navegación">
-      <header className="mobileNavSheetHead"><b>Menú</b><button type="button" className="icon" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={18}/></button></header>
-      <nav className="mobileNavSheetNav">{overflow.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); const navLabel=MOBILE_NAV_SHORT[id]||label; return <button key={id} type="button" className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><Icon size={18}/><span>{navLabel}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
-        <button type="button" className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button>
+      <div className="mobileNavSheetHandle" aria-hidden="true"/>
+      <header className="mobileNavSheetHead">
+        <div className="mobileNavSheetHeadMain"><b>Explorar MTC</b><small>Herramientas, workspace y perfil</small></div>
+        <button type="button" className="icon mobileNavSheetClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={18}/></button>
+      </header>
+      <nav className="mobileNavSheetNav">{overflow.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); const navLabel=MOBILE_NAV_SHORT[id]||label; return <button key={id} type="button" data-sheet-nav={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><span className="mobileNavSheetIcon"><Icon size={18}/></span><span className="mobileNavSheetLabel">{navLabel}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
+        <button type="button" className="mobileLogout" onClick={()=>signOut(auth)}><span className="mobileNavSheetIcon"><LogOut size={18}/></span><span className="mobileNavSheetLabel">Salir</span></button>
       </nav>
     </div>}
     <nav className="mobileNav mobileNavDock mobileBottomNav" aria-label="Navegación principal">{MOBILE_TAB_DOCK.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} type="button" data-nav={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
