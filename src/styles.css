@@ -31165,38 +31165,43 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   AURORA MOBILE NATIVE v34 — Centered dock icons (fix black band)
-   Root cause: v30 left 42px buttons + flex-end inside 84px nav
+   AURORA MOBILE NATIVE v35 — iOS safe-area dock + light sheet theme
+   Desktop F12: safe-area=0 hides v30 flex-end bug; iOS exposes it
    ═══════════════════════════════════════════════════════════════ */
 
 @media(max-width:860px){
   :root{
     --mobile-tabbar-tap-h:48px;
-    --mobile-tab-bar-h:calc(var(--mobile-tabbar-tap-h) + env(safe-area-inset-bottom,0px));
+    --mobile-safe-bottom:env(safe-area-inset-bottom,0px);
+    --mobile-tab-bar-h:calc(var(--mobile-tabbar-tap-h) + var(--mobile-safe-bottom));
     --mobile-content-pad-bottom:var(--mobile-tab-bar-h);
   }
 
+  html:not([data-theme="light"]) body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="light"] body:has(.app) .app .mobileNav.mobileNavDock.mobileBottomNav,
   html body .app .mobileNav.mobileNavDock.mobileBottomNav,
   html body .app .mobileBottomNav{
     display:flex!important;
     flex-direction:row!important;
     align-items:stretch!important;
+    align-content:stretch!important;
     justify-content:stretch!important;
     height:auto!important;
-    min-height:var(--mobile-tab-bar-h)!important;
+    min-height:0!important;
     max-height:none!important;
-    padding:0 0 env(safe-area-inset-bottom,0px)!important;
+    padding:0 0 var(--mobile-safe-bottom)!important;
     box-sizing:border-box!important;
   }
 
+  html:not([data-theme="light"]) body:has(.app) .app .mobileBottomNav button,
+  html:not([data-theme="light"]) body:has(.app) .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="dark"] body:has(.app) .app .mobileBottomNav button,
+  html[data-theme="dark"] body:has(.app) .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="light"] body:has(.app) .app .mobileBottomNav button,
+  html[data-theme="light"] body:has(.app) .app .mobileBottomNav .mobileNavMore,
   html body .app .mobileBottomNav button,
-  html body .app .mobileBottomNav .mobileNavMore,
-  html:not([data-theme="light"]) body .app .mobileBottomNav button,
-  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore,
-  html[data-theme="dark"] body .app .mobileBottomNav button,
-  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore,
-  html[data-theme="light"] body .app .mobileBottomNav button,
-  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore{
+  html body .app .mobileBottomNav .mobileNavMore{
     flex:1 1 0!important;
     align-self:stretch!important;
     min-height:var(--mobile-tabbar-tap-h)!important;
@@ -31212,21 +31217,106 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     box-sizing:border-box!important;
   }
 
-  html body .app .mobileBottomNav button svg,
-  html body .app .mobileBottomNav .mobileNavMore svg{
-    width:20px!important;
-    height:20px!important;
-    flex-shrink:0!important;
-  }
-
-  html body .app .mobileBottomNav button span,
-  html body .app .mobileBottomNav .mobileNavMore span{
-    font-size:10px!important;
-    font-weight:700!important;
-    line-height:1!important;
-  }
-
   html body .app .main.appMain{
     padding-bottom:var(--mobile-tab-bar-h)!important;
+  }
+
+  /* ── Light theme: Explorar MTC sheet ── */
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetBackdrop{
+    background:rgba(15,23,42,.28)!important;
+    backdrop-filter:blur(8px) saturate(1.05)!important;
+    -webkit-backdrop-filter:blur(8px) saturate(1.05)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheet{
+    background:
+      radial-gradient(circle at 14% 0%,rgba(51,230,196,.10),transparent 36%),
+      radial-gradient(circle at 86% 6%,rgba(124,92,255,.08),transparent 32%),
+      linear-gradient(180deg,rgba(255,255,255,.99),#F8FAFC)!important;
+    border-top:1px solid rgba(15,23,42,.10)!important;
+    box-shadow:0 -20px 60px rgba(15,23,42,.12)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetHandle{
+    background:linear-gradient(90deg,rgba(13,148,136,.55),rgba(124,92,255,.45),rgba(219,39,119,.35))!important;
+    box-shadow:none!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetHead{
+    border-bottom:1px solid rgba(15,23,42,.08)!important;
+    background:linear-gradient(180deg,rgba(124,92,255,.04),transparent)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetHeadMain b{
+    color:#111827!important;
+    background:linear-gradient(90deg,#111827 0%,#0D9488 52%,#7C5CFF 100%)!important;
+    -webkit-background-clip:text!important;
+    background-clip:text!important;
+    -webkit-text-fill-color:transparent!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetHeadMain small{
+    color:#6B7280!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetClose{
+    border:1px solid rgba(15,23,42,.10)!important;
+    background:rgba(15,23,42,.04)!important;
+    color:#374151!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button{
+    border:1px solid rgba(15,23,42,.08)!important;
+    background:linear-gradient(155deg,rgba(255,255,255,.98),rgba(248,250,252,.92))!important;
+    color:#374151!important;
+    box-shadow:0 8px 22px rgba(15,23,42,.06)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button::before{
+    background:radial-gradient(circle at 18% 12%,rgba(51,230,196,.08),transparent 52%)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetIcon{
+    border:1px solid rgba(13,148,136,.18)!important;
+    background:linear-gradient(135deg,rgba(51,230,196,.12),rgba(124,92,255,.08))!important;
+    color:#0D9488!important;
+    box-shadow:0 6px 16px rgba(13,148,136,.10)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetLabel{
+    color:#1F2937!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button.active{
+    border-color:rgba(13,148,136,.28)!important;
+    background:linear-gradient(155deg,rgba(51,230,196,.10),rgba(124,92,255,.06))!important;
+    box-shadow:0 10px 24px rgba(13,148,136,.10)!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button.active .mobileNavSheetIcon{
+    border-color:rgba(13,148,136,.30)!important;
+    background:linear-gradient(135deg,rgba(51,230,196,.20),rgba(124,92,255,.12))!important;
+    color:#0D9488!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button.active .mobileNavSheetLabel{
+    color:#0D9488!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button.mobileLogout{
+    border-color:rgba(219,39,119,.20)!important;
+    background:linear-gradient(135deg,rgba(255,79,163,.08),rgba(124,92,255,.04))!important;
+    color:#BE185D!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button.mobileLogout .mobileNavSheetIcon{
+    border-color:rgba(219,39,119,.22)!important;
+    background:rgba(255,79,163,.10)!important;
+    color:#DB2777!important;
+  }
+
+  html[data-theme="light"] body:has(.app) .app .mobileNavSheetNav button em{
+    background:linear-gradient(135deg,#0D9488,#7C5CFF)!important;
+    color:#FFFFFF!important;
   }
 }
