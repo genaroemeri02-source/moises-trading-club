@@ -912,8 +912,8 @@ function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPER
 </button><div className="user"><div className="avatar">{profile.avatar||profile.name?.slice(0,2)||'MT'}</div><div><b>{profile.name}</b><span>{displayRoleLabel(profile)}</span></div><button onClick={()=>signOut(auth)} title="Salir"><LogOut size={16}/></button></div></aside>}
 
 const MOBILE_NAV_SHORT={dashboard:'Dash',journal:'Journal',checklist:'Check',ideas:'Ideas',risk:'Riesgo',analytics:'Stats',results:'Results',brokers:'Broker',ecosystem:'Guía',emotional:'Emoción',system:'Sistema',reading:'Libros',news:'News',community:'Espacio',announcements:'Avisos',chat:'Chat',online:'Online',notifications:'Avisos',settings:'Perfil',admin:'Admin'};
-const MOBILE_TAB_PRIMARY=new Set(['dashboard','journal','checklist','analytics']);
-const MOBILE_TAB_DOCK=[['dashboard','Dash',Home],['journal','Journal',LineChart],['checklist','Check',CheckCircle2],['analytics','Stats',BarChart3]];
+const MOBILE_TAB_PRIMARY=new Set(['dashboard','analytics','journal','emotional']);
+const MOBILE_TAB_DOCK=[['dashboard','Dash',Home],['analytics','Analytics',BarChart3],['journal','Journal',LineChart],['emotional','Emocional',Heart]];
 function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
   const items=[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['brokers','Integraciones',Activity],['ecosystem','Guía',Sparkles],['emotional','Emocional',Heart],['system','Sistema',Shield],['reading','Biblioteca',BookOpen],['news','Noticias',Newspaper],['community','Mi espacio',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['notifications','Avisos',Bell],['settings','Perfil',Settings]];
   if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]);
@@ -928,8 +928,8 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
         <button type="button" className="mobileLogout" onClick={()=>signOut(auth)}><LogOut size={18}/><span>Salir</span></button>
       </nav>
     </div>}
-    <nav className="mobileNav mobileNavDock" aria-label="Navegación principal">{MOBILE_TAB_DOCK.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} type="button" className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><Icon size={20}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
-      <button type="button" className={`mobileNavMore ${menuOpen||overflowActive?'active':''} ${overflowActive?'hasActivity':''}`} onClick={()=>setMenuOpen(v=>!v)} aria-expanded={menuOpen} aria-label="Más opciones"><Menu size={20}/><span>Más</span></button>
+    <nav className="mobileNav mobileNavDock" aria-label="Navegación principal">{MOBILE_TAB_DOCK.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} type="button" className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
+      <button type="button" className={`mobileNavMore ${menuOpen||overflowActive?'active':''} ${overflowActive?'hasActivity':''}`} onClick={()=>setMenuOpen(v=>!v)} aria-expanded={menuOpen} aria-label="Más opciones"><Menu size={18}/><span>Más</span></button>
     </nav>
   </>;
 }
