@@ -30035,3 +30035,248 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     padding:0 3px!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v29 — Safe-area shell + opaque bottom dock
+   Fase 1: elimina hueco negro bajo tab bar en iPhone/Android
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  :root{
+    --mobile-tabbar-content-h:52px;
+    --mobile-tab-bar-h:calc(var(--mobile-tabbar-content-h) + env(safe-area-inset-bottom,0px));
+    --mobile-content-pad-bottom:calc(var(--mobile-tab-bar-h) + 20px);
+    --aurora-mobile-bg:#07050D;
+    --aurora-mobile-nav-bg:#07050D;
+  }
+
+  html{
+    color-scheme:dark light;
+  }
+
+  html:not([data-theme="light"]),
+  html:not([data-theme="light"]) body,
+  html:not([data-theme="light"]) #root,
+  html[data-theme="dark"],
+  html[data-theme="dark"] body,
+  html[data-theme="dark"] #root{
+    min-height:100%!important;
+    min-height:100dvh!important;
+    min-height:100svh!important;
+    background:var(--aurora-mobile-bg)!important;
+    background-color:var(--aurora-mobile-bg)!important;
+  }
+
+  html[data-theme="light"] body:has(.app),
+  html[data-theme="light"] body:has(.app) #root{
+    min-height:100%!important;
+    min-height:100dvh!important;
+    min-height:100svh!important;
+    background:#F0F2F5!important;
+    background-color:#F0F2F5!important;
+  }
+
+  html:not([data-theme="light"]) body:has(.app),
+  html[data-theme="dark"] body:has(.app){
+    overflow-x:hidden!important;
+  }
+
+  html:not([data-theme="light"]) body .app.appShell,
+  html[data-theme="dark"] body .app.appShell{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-height:100dvh!important;
+    min-height:100svh!important;
+    overflow:hidden!important;
+    background:transparent!important;
+  }
+
+  html:not([data-theme="light"]) body .app .main.appMain,
+  html[data-theme="dark"] body .app .main.appMain{
+    width:100%!important;
+    max-width:100%!important;
+    min-height:100dvh!important;
+    min-height:100svh!important;
+    max-height:100dvh!important;
+    max-height:100svh!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding-bottom:var(--mobile-content-pad-bottom)!important;
+    background:transparent!important;
+  }
+
+  html:not([data-theme="light"]) body .app .page,
+  html:not([data-theme="light"]) body .app .analyticsCockpit.analyticsPage,
+  html:not([data-theme="light"]) body .app .journalPage,
+  html:not([data-theme="light"]) body .app .riskPage,
+  html:not([data-theme="light"]) body .app .checklistPage,
+  html[data-theme="dark"] body .app .page,
+  html[data-theme="dark"] body .app .analyticsCockpit.analyticsPage,
+  html[data-theme="dark"] body .app .journalPage,
+  html[data-theme="dark"] body .app .riskPage,
+  html[data-theme="dark"] body .app .checklistPage{
+    max-width:100%!important;
+    overflow-x:hidden!important;
+    padding-bottom:24px!important;
+  }
+
+  html:not([data-theme="light"]) body .app .premiumTop,
+  html:not([data-theme="light"]) body .app .top,
+  html[data-theme="dark"] body .app .premiumTop,
+  html[data-theme="dark"] body .app .top{
+    padding-top:max(12px,env(safe-area-inset-top,0px))!important;
+  }
+
+  /* Bottom dock — opaque, full bleed, safe-area included in height */
+  html:not([data-theme="light"]) body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html:not([data-theme="light"]) body .app .mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html[data-theme="dark"] body .app .mobileBottomNav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    top:auto!important;
+    margin:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:var(--mobile-tab-bar-h)!important;
+    min-height:var(--mobile-tab-bar-h)!important;
+    box-sizing:border-box!important;
+    padding:0 0 env(safe-area-inset-bottom,0px)!important;
+    border-radius:0!important;
+    border:none!important;
+    border-top:1px solid rgba(124,92,255,.18)!important;
+    box-shadow:0 -12px 40px rgba(0,0,0,.38)!important;
+    z-index:920!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,1fr)!important;
+    grid-template-rows:var(--mobile-tabbar-content-h)!important;
+    align-content:start!important;
+    align-items:stretch!important;
+    gap:0!important;
+    overflow:visible!important;
+    background:
+      linear-gradient(180deg,rgba(7,5,13,.92),rgba(7,5,13,1)),
+      radial-gradient(circle at 18% 0%,rgba(51,230,196,.08),transparent 38%),
+      radial-gradient(circle at 82% 0%,rgba(124,92,255,.10),transparent 36%)!important;
+    background-color:var(--aurora-mobile-nav-bg)!important;
+    backdrop-filter:blur(20px) saturate(1.15)!important;
+    -webkit-backdrop-filter:blur(20px) saturate(1.15)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav::after,
+  html[data-theme="dark"] body .app .mobileBottomNav::after{
+    content:''!important;
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:env(safe-area-inset-bottom,0px)!important;
+    background:var(--aurora-mobile-nav-bg)!important;
+    pointer-events:none!important;
+    z-index:-1!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav{
+    --aurora-mobile-nav-bg:#F0F2F5;
+    background:
+      linear-gradient(180deg,rgba(240,242,245,.94),rgba(240,242,245,1)),
+      radial-gradient(circle at 20% 0%,rgba(51,230,196,.06),transparent 36%)!important;
+    background-color:#F0F2F5!important;
+    border-top-color:rgba(124,92,255,.14)!important;
+    box-shadow:0 -8px 28px rgba(15,23,42,.08)!important;
+  }
+
+  html[data-theme="light"] body .app .mobileBottomNav::after{
+    background:#F0F2F5!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="dark"] body .app .mobileBottomNav button,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore{
+    align-self:stretch!important;
+    min-height:0!important;
+    height:100%!important;
+    max-height:var(--mobile-tabbar-content-h)!important;
+  }
+
+  /* Active tones — Aurora, no gold */
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="dashboard"].active,
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="journal"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="dashboard"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="journal"].active{
+    color:var(--aurora-cyan)!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="dashboard"].active::before,
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="journal"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="dashboard"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="journal"].active::before{
+    background:var(--aurora-cyan)!important;
+    box-shadow:0 0 10px rgba(51,230,196,.4)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="analytics"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="analytics"].active{
+    color:var(--aurora-violet)!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="analytics"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="analytics"].active::before{
+    background:var(--aurora-violet)!important;
+    box-shadow:0 0 10px rgba(124,92,255,.35)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="emotional"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="emotional"].active{
+    color:var(--aurora-magenta)!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="emotional"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="emotional"].active::before{
+    background:var(--aurora-magenta)!important;
+    box-shadow:0 0 10px rgba(255,79,163,.35)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="more"].active,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="more"].active{
+    color:var(--aurora-violet)!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="more"].active::before,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="more"].active::before{
+    background:var(--aurora-violet)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="analytics"].active svg,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="analytics"].active svg{
+    filter:drop-shadow(0 0 6px rgba(124,92,255,.35))!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileBottomNav button[data-nav="emotional"].active svg,
+  html[data-theme="dark"] body .app .mobileBottomNav button[data-nav="emotional"].active svg{
+    filter:drop-shadow(0 0 6px rgba(255,79,163,.32))!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNavSheet,
+  html[data-theme="dark"] body .app .mobileNavSheet{
+    bottom:var(--mobile-tab-bar-h)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .mobileNewTradeFab,
+  html[data-theme="dark"] body .app .mobileNewTradeFab{
+    bottom:calc(var(--mobile-tab-bar-h) + 12px)!important;
+  }
+
+  html:not([data-theme="light"]) body .app .helpBubble,
+  html[data-theme="dark"] body .app .helpBubble{
+    bottom:calc(var(--mobile-tab-bar-h) + 12px)!important;
+  }
+
+  /* Kill legacy floating-nav offsets */
+  html body .app .mobileNav.mobileBottomNav{
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    max-width:100%!important;
+  }
+}
