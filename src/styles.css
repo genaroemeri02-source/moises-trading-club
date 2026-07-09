@@ -33579,24 +33579,15 @@ html[data-theme="light"] .tradeReviewSheet{
     overflow: hidden !important;
   }
 
-  /* Non-dock flex siblings must not steal column space */
+  /* Non-dock flex siblings must not steal column space (overlays are position:fixed) */
   .appShell > .side,
   .appShell > .toastHost,
-  .appShell > .cmdOverlay {
-    flex: 0 0 auto !important;
-  }
-
+  .appShell > .cmdOverlay,
   .appShell > .mobileNavSheetBackdrop,
   .appShell > .mobileNavSheet,
   .appShell > .mobileCommandOverlay,
   .appShell > .mobileCommandSheet {
-    flex: 0 0 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    overflow: visible !important;
+    flex: 0 0 auto !important;
   }
 }
 
