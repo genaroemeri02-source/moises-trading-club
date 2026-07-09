@@ -34814,49 +34814,76 @@ MTC MOBILE NAVIGATION CONTRACT
 
 /* ============================================================================
    MTC MOBILE — SCROLL STABILITY HARDENING (post dock removal)
-   Prevent legacy shell blocks from re-binding height to --app-height.
+   Evidence: legacy blocks at ~33187 / ~33559 / ~33575 / ~33587 still bind
+   html/body/#root/.appShell height+max-height to var(--app-height) and keep
+   .main.appMain as overflow-y:auto. When mobileViewport updates --app-height
+   (resize / visualViewport.resize during iOS chrome collapse), that scroller
+   snaps. Beat those selectors with equal/higher specificity at true EOF.
    Command sheet may still use --app-height for max-height only.
    ============================================================================ */
 @media (max-width: 768px) {
   html:has(.appShell),
   html:has(.appShell) body,
   html:has(.appShell) #root,
-  html:has(.appShell) .app.appShell,
-  html:has(.appShell) .main.appMain {
+  html:not([data-theme="light"]) body .app.appShell,
+  html[data-theme="dark"] body .app.appShell,
+  html[data-theme="light"] body:has(.app) .app.appShell,
+  html body .app.appShell,
+  html:has(.appShell) .app.appShell {
     height: auto !important;
+    min-height: 100dvh !important;
     max-height: none !important;
     position: static !important;
-  }
-
-  html:has(.appShell) .app.appShell,
-  html:has(.appShell) .main.appMain {
-    position: relative !important;
+    inset: auto !important;
   }
 
   html:has(.appShell) body {
     position: static !important;
-    inset: auto !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
+    overscroll-behavior-y: auto !important;
     touch-action: pan-y !important;
   }
 
   html:has(.appShell) body.mobile-command-open,
-  html:has(.appShell) body.menu-open {
+  html:has(.appShell) body.menu-open,
+  html body.menu-open:has(.appShell) {
     overflow: hidden !important;
     touch-action: none !important;
   }
 
   html:has(.appShell) #root,
-  html:has(.appShell) .app.appShell {
-    min-height: 100dvh !important;
-    overflow: visible !important;
-  }
-
-  html:has(.appShell) .main.appMain {
+  html:not([data-theme="light"]) body .app.appShell,
+  html[data-theme="dark"] body .app.appShell,
+  html[data-theme="light"] body:has(.app) .app.appShell,
+  html body .app.appShell {
+    position: relative !important;
     overflow: visible !important;
     overflow-y: visible !important;
+    transform: none !important;
+  }
+
+  html:not([data-theme="light"]) body .app.appShell .main.appMain,
+  html[data-theme="dark"] body .app.appShell .main.appMain,
+  html[data-theme="light"] body:has(.app) .app.appShell .main.appMain,
+  html:not([data-theme="light"]) body .app .main.appMain,
+  html[data-theme="dark"] body .app .main.appMain,
+  html body .app .main.appMain,
+  html body .app.appShell > .main.appMain,
+  html:has(.appShell) body .app .main.appMain,
+  .main.appMain {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: auto !important;
+    touch-action: pan-y !important;
+    transform: none !important;
   }
 }
 
