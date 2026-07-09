@@ -30138,10 +30138,15 @@ html[data-theme="dark"] body .app .main{
     display:none!important;
   }
 
+  /* Safe-area top: same geometry in dark AND light (theme colors differ only) */
   html:not([data-theme="light"]) body .app .top,
   html:not([data-theme="light"]) body .app .premiumTop,
   html[data-theme="dark"] body .app .top,
-  html[data-theme="dark"] body .app .premiumTop{
+  html[data-theme="dark"] body .app .premiumTop,
+  html[data-theme="light"] body .app .top,
+  html[data-theme="light"] body .app .premiumTop,
+  html[data-theme="light"] body .app.appShell .top,
+  html[data-theme="light"] body .app.appShell .premiumTop{
     position:sticky!important;
     top:0!important;
     z-index:12!important;
@@ -30152,7 +30157,8 @@ html[data-theme="dark"] body .app .main{
   }
 
   html:not([data-theme="light"]) body .app .topActions button.icon,
-  html[data-theme="dark"] body .app .topActions button.icon{
+  html[data-theme="dark"] body .app .topActions button.icon,
+  html[data-theme="light"] body .app .topActions button.icon{
     min-width:44px!important;
     min-height:44px!important;
     padding:10px!important;
@@ -31565,9 +31571,26 @@ MTC MOBILE NAVIGATION CONTRACT
   }
 
   html[data-theme="light"]:has(.appShell) .top.premiumTop,
-  html[data-theme="light"]:has(.appShell) .top {
+  html[data-theme="light"]:has(.appShell) .top,
+  html[data-theme="light"] body:has(.appShell) .app .top,
+  html[data-theme="light"] body:has(.appShell) .app .premiumTop {
     background: rgba(247, 248, 251, 0.92) !important;
     background-image: none !important;
+    /* Match dark header geometry — keep theme toggle below status bar */
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 12 !important;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 12px !important;
+    padding-left: calc(16px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(16px + env(safe-area-inset-right, 0px)) !important;
+  }
+
+  html[data-theme="light"]:has(.appShell) .topActions button.icon,
+  html[data-theme="light"] body:has(.appShell) .app .topActions button.icon {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 10px !important;
   }
 
   /* If .mobileNav ever reappears on overlay, strip pill chrome (retired path) */
