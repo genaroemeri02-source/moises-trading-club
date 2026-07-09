@@ -7,6 +7,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Home, BookOpen, BarChart3, LineChart, Users, Lightbulb, Trophy, Shield, Bell, Settings, Plus, Trash2, Download, Upload, Search, LogOut, CheckCircle2, Lock, PlayCircle, FileText, Heart, MessageCircle, Bookmark, Menu, X, Megaphone, Edit3, Sparkles, Crown, Newspaper, ExternalLink, Camera, Image as ImageIcon, Copy, ChevronDown, ChevronRight, SlidersHorizontal, CalendarDays, Clock3, Flame, Medal, Activity, TrendingUp, Target, XCircle, AlertTriangle, Info, Rocket } from 'lucide-react';
 import './styles.css';
+import { initMobileViewportManager } from './lib/mobileViewport.js';
 import {
   money,
   formatMoneyCompactCard, formatMoneyClean, formatPercentCard, formatMetricCard, formatR,
@@ -911,25 +912,39 @@ function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPER
   }
 </button><div className="user"><div className="avatar">{profile.avatar||profile.name?.slice(0,2)||'MT'}</div><div><b>{profile.name}</b><span>{displayRoleLabel(profile)}</span></div><button onClick={()=>signOut(auth)} title="Salir"><LogOut size={16}/></button></div></aside>}
 
-const MOBILE_NAV_SHORT={dashboard:'Dash',journal:'Journal',checklist:'Check',ideas:'Ideas',risk:'Riesgo',analytics:'Stats',results:'Results',brokers:'Broker',ecosystem:'Guía',emotional:'Emoción',system:'Sistema',reading:'Libros',news:'News',community:'Espacio',announcements:'Avisos',chat:'Chat',online:'Online',notifications:'Avisos',settings:'Perfil',admin:'Admin'};
 const MOBILE_TAB_PRIMARY=new Set(['dashboard','analytics','journal','emotional']);
 const MOBILE_TAB_DOCK=[['dashboard','Dash',Home],['analytics','Analytics',BarChart3],['journal','Journal',LineChart],['emotional','Emocional',Heart]];
+const MOBILE_SHEET_LABELS={checklist:'Checklist',ideas:'Ideas',risk:'Riesgo',results:'Resultados',brokers:'Integraciones',ecosystem:'Guía',system:'Sistema',reading:'Biblioteca',news:'Novedades',community:'Mi espacio',announcements:'Anuncios',chat:'Chat',online:'Online',notifications:'Avisos',settings:'Perfil',admin:'Admin'};
+const MOBILE_SHEET_GROUPS=[{key:'operativa',label:'OPERATIVA',ids:['checklist','risk','results','brokers']},{key:'workspace',label:'WORKSPACE',ids:['ideas','ecosystem','reading','community']},{key:'comunidad',label:'COMUNIDAD',ids:['announcements','chat','online']},{key:'sistema',label:'SISTEMA',ids:['system','news','notifications','settings','admin']}];
+const MOBILE_SHEET_PRIMARY=new Set(['checklist','risk','results','community']);
+const MOBILE_SHEET_SECTION_CLASS={operativa:'mobileCommandSection--operativa',workspace:'mobileCommandSection--workspace',comunidad:'mobileCommandSection--community',sistema:'mobileCommandSection--system'};
+const MOBILE_SHEET_TONE={checklist:'cyan',risk:'magenta',results:'cyan',brokers:'cyan',ideas:'violet',ecosystem:'violet',reading:'violet',community:'violet',announcements:'violet',chat:'violet',online:'muted',system:'muted',news:'muted',notifications:'muted',settings:'muted',admin:'cyan'};
 function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
+  useEffect(()=>{
+    if(menuOpen)document.body.classList.add('menu-open');
+    else document.body.classList.remove('menu-open');
+    return()=>document.body.classList.remove('menu-open');
+  },[menuOpen]);
   const items=[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['brokers','Integraciones',Activity],['ecosystem','Guía',Sparkles],['emotional','Emocional',Heart],['system','Sistema',Shield],['reading','Biblioteca',BookOpen],['news','Noticias',Newspaper],['community','Mi espacio',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity],['notifications','Avisos',Bell],['settings','Perfil',Settings]];
   if(['admin','moderador'].includes(profile.role))items.push(['admin','Admin',Shield]);
-  const overflow=items.filter(([id])=>!MOBILE_TAB_PRIMARY.has(id));
-  const overflowActive=overflow.some(([id])=>id===tab);
+  const itemMap=Object.fromEntries(items.map(([id,label,Icon])=>[id,{id,label,Icon}]));
+  const overflowIds=new Set(items.filter(([id])=>!MOBILE_TAB_PRIMARY.has(id)).map(([id])=>id));
+  const overflowActive=[...overflowIds].some(id=>id===tab);
   const pickTab=(id)=>{markNotificationsForTarget(data.notifications,id); setMenuOpen(false); setTab(id);};
+  const sheetGroups=MOBILE_SHEET_GROUPS.map(group=>({...group,entries:group.ids.map(id=>itemMap[id]).filter(item=>item&&overflowIds.has(item.id))})).filter(group=>group.entries.length);
   return <>
-    {menuOpen&&<button type="button" className="mobileNavSheetBackdrop" aria-label="Cerrar menú" onClick={()=>setMenuOpen(false)}/>}
-    {menuOpen&&<div className="mobileNavSheet" role="dialog" aria-label="Navegación">
-      <div className="mobileNavSheetHandle" aria-hidden="true"/>
-      <header className="mobileNavSheetHead">
-        <div className="mobileNavSheetHeadMain"><b>Explorar MTC</b><small>Herramientas, workspace y perfil</small></div>
-        <button type="button" className="icon mobileNavSheetClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={18}/></button>
+    {menuOpen&&<button type="button" className="mobileNavSheetBackdrop mobileCommandOverlay" aria-label="Cerrar menú" onClick={()=>setMenuOpen(false)}/>}
+    {menuOpen&&<div className="mobileNavSheet mobileCommandSheet" role="dialog" aria-label="Navegación">
+      <div className="mobileNavSheetHandle mobileCommandHandle" aria-hidden="true"/>
+      <header className="mobileNavSheetHead mobileCommandHeader">
+        <div className="mobileNavSheetHeadMain"><span className="mobileNavSheetEyebrow">CENTRO DE ACCESO</span><b>Explorar <span className="mobileNavSheetAccent">MTC</span></b><small>Herramientas, workspace y configuración</small></div>
+        <button type="button" className="icon mobileNavSheetClose mobileCommandClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={18}/></button>
       </header>
-      <nav className="mobileNavSheetNav">{overflow.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); const navLabel=MOBILE_NAV_SHORT[id]||label; return <button key={id} type="button" data-sheet-nav={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><span className="mobileNavSheetIcon"><Icon size={18}/></span><span className="mobileNavSheetLabel">{navLabel}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
-        <button type="button" className="mobileLogout" onClick={()=>signOut(auth)}><span className="mobileNavSheetIcon"><LogOut size={18}/></span><span className="mobileNavSheetLabel">Salir</span></button>
+      <nav className="mobileNavSheetNav mobileCommandContent">
+        <div className="mobileCommandFadeTop" aria-hidden="true"/>
+        {sheetGroups.map(group=><section key={group.key} className={`mobileNavSheetSection mobileCommandSection ${MOBILE_SHEET_SECTION_CLASS[group.key]||''}`}><h3 className="mobileNavSheetSectionLabel mobileCommandSectionTitle">{group.label}</h3><div className="mobileNavSheetGrid mobileCommandGrid">{group.entries.map(({id,label,Icon})=>{const count=activityCount(data,profile,id); const navLabel=MOBILE_SHEET_LABELS[id]||label; const tone=MOBILE_SHEET_TONE[id]||'cyan'; const isActive=tab===id; return <button key={id} type="button" data-sheet-nav={id} className={`mobileNavSheetCard mobileCommandCard ${MOBILE_SHEET_PRIMARY.has(id)?'mobileCommandCard--primary isPrimary':'mobileCommandCard--secondary isSecondary'} tone-${tone} ${isActive?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><span className="mobileNavSheetIcon"><Icon size={18}/></span><span className="mobileNavSheetLabel">{navLabel}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div></section>)}
+        <button type="button" className="mobileLogout mobileNavSheetCard mobileNavSheetLogout mobileCommandCard mobileCommandCard--system" onClick={()=>signOut(auth)}><span className="mobileNavSheetIcon tone-magenta"><LogOut size={18}/></span><span className="mobileNavSheetLabel">Salir</span></button>
+        <div className="mobileCommandFadeBottom" aria-hidden="true"/>
       </nav>
     </div>}
     <nav className="mobileNav mobileNavDock mobileBottomNav" aria-label="Navegación principal">{MOBILE_TAB_DOCK.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} type="button" data-nav={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>pickTab(id)}><Icon size={18}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}
@@ -2503,5 +2518,7 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+initMobileViewportManager();
 
 createRoot(document.getElementById('root')).render(<ErrorBoundary><AuroraBackground/><App/></ErrorBoundary>);

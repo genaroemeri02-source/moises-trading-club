@@ -7,6 +7,13 @@ import { behaviorScoreFromTrade, behaviorScoreLabel } from '../../lib/analyticsU
 import { DetailBlock, TraderBehaviorReviewDetail } from './TraderBehaviorReviewDetail.jsx';
 import { mentorStatusLabel } from './tradeFormConstants.js';
 
+function metricTone(value) {
+  const n = Number(value || 0);
+  if (n > 0) return 'positive';
+  if (n < 0) return 'negative';
+  return 'neutral';
+}
+
 export function TradeDetailModal({ trade, onClose, onEdit, onDelete, data, onExport, ShareModal }) {
   const [shareOpen, setShareOpen] = useState(false);
   const executionBehaviors = safeArray(trade.executionBehaviors);
@@ -22,26 +29,26 @@ export function TradeDetailModal({ trade, onClose, onEdit, onDelete, data, onExp
   const modal = (
     <>
       <div className="modal tradeDetailOverlay">
-        <div className="modalCard tradeDetailModal">
-          <div className="modalHead">
-            <div>
+        <div className="modalCard tradeDetailModal tradeReviewSheet">
+          <header className="modalHead tradeReviewHeader">
+            <div className="tradeReviewHeaderMain">
               <h3>{trade.asset} · {trade.side}</h3>
               <p>{trade.date} · {trade.session} · {trade.tradeSystem || 'Sistema de Moisés'}</p>
             </div>
-            <div className="modalActions">
-              <button className="exportModalButton compact" onClick={() => onExport(trade, 'json')}><Download size={15} />Exportar JSON</button>
-              <button className="exportModalButton compact" onClick={() => onExport(trade, 'csv')}><Download size={15} />Exportar CSV</button>
-              <button className="exportModalButton compact" onClick={() => setShareOpen(true)}><Share2 size={15} />Compartir revisión</button>
-              <button className="ghost compact" onClick={onEdit}><Edit3 size={15} />Editar</button>
-              {onDelete && <button className="ghost danger compact" onClick={onDelete}><Trash2 size={15} />Eliminar</button>}
-              <button onClick={onClose}><X size={20} /></button>
-            </div>
+            <button type="button" className="icon tradeReviewClose" onClick={onClose} aria-label="Cerrar"><X size={18} /></button>
+          </header>
+          <div className="modalActions tradeReviewActions">
+            <button type="button" className="tradeReviewAction tradeReviewAction--export" onClick={() => onExport(trade, 'json')}><Download size={14} /><span>JSON</span></button>
+            <button type="button" className="tradeReviewAction tradeReviewAction--export" onClick={() => onExport(trade, 'csv')}><Download size={14} /><span>CSV</span></button>
+            <button type="button" className="tradeReviewAction tradeReviewAction--share" onClick={() => setShareOpen(true)}><Share2 size={14} /><span>Compartir</span></button>
+            <button type="button" className="tradeReviewAction tradeReviewAction--edit" onClick={onEdit}><Edit3 size={14} /><span>Editar</span></button>
+            {onDelete && <button type="button" className="tradeReviewAction tradeReviewAction--delete" onClick={onDelete}><Trash2 size={14} /><span>Eliminar</span></button>}
           </div>
-          <div className="detailKpis">
-            <div className={value > 0 ? 'pos' : value < 0 ? 'neg' : ''}><span>P/L $</span><b>{value > 0 ? '+' : ''}{money(value)}</b></div>
-            <div className={pctVal > 0 ? 'pos' : pctVal < 0 ? 'neg' : ''}><span>P/L %</span><b>{pctVal > 0 ? '+' : ''}{pct(pctVal)}</b></div>
-            <div className={rVal > 0 ? 'pos' : rVal < 0 ? 'neg' : ''}><span>Resultado R</span><b>{rVal > 0 ? '+' : ''}{rVal.toFixed(2)}R</b></div>
-            <div><span>Calidad</span><b>{trade.quality || '—'}</b></div>
+          <div className="detailKpis tradeReviewMetrics">
+            <div className={`tradeMetricCard tradeMetricCard--${metricTone(value)}`}><span>P/L $</span><b>{value > 0 ? '+' : ''}{money(value)}</b></div>
+            <div className={`tradeMetricCard tradeMetricCard--${metricTone(pctVal)}`}><span>P/L %</span><b>{pctVal > 0 ? '+' : ''}{pct(pctVal)}</b></div>
+            <div className={`tradeMetricCard tradeMetricCard--${metricTone(rVal)}`}><span>Resultado R</span><b>{rVal > 0 ? '+' : ''}{rVal.toFixed(2)}R</b></div>
+            <div className="tradeMetricCard tradeMetricCard--neutral"><span>Calidad</span><b>{trade.quality || '—'}</b></div>
           </div>
           {trade.createdFromChecklist || trade.checklistId ? (
             <div className={`linkedValidationCard ${trade.checklistFinalGreen ? 'ok' : 'warn'}`}>
@@ -72,7 +79,7 @@ export function TradeDetailModal({ trade, onClose, onEdit, onDelete, data, onExp
               {trade.mentorReviewResponse && <p><b>Devolución:</b> {trade.mentorReviewResponse}</p>}
             </div>
           )}
-          <div className="detailGrid">
+          <div className="detailGrid tradeReviewBody">
             <DetailBlock title="Patrón de Moisés"><p>{trade.pattern || trade.otherSystem || '—'}</p></DetailBlock>
             <DetailBlock title="Setup / contexto"><p>{normalizeTradeSetup(trade)}</p></DetailBlock>
             <DetailBlock title="Precios"><p>{`Entry: ${trade.entry || '—'} · SL: ${trade.sl || '—'} · TP: ${trade.tp || '—'} · Exit: ${trade.exit || '—'} · Riesgo: ${trade.riskMoney ? money(trade.riskMoney) : '—'}`}</p></DetailBlock>
