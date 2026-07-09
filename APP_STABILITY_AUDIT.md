@@ -196,11 +196,11 @@ La app ya tenía el **contrato correcto documentado al EOF** (scroll natural + c
 
 ## 7. Riesgos restantes
 
-1. ~288 selectores dock mid-file siguen en el archivo (muertos) → ruido en grep / peso CSS.
-2. Height locks mid-file (~L30185) aún existen en texto; EOF los gana — no reintroducir bloques posteriores al EOF.
+1. ~~Purga física dock~~ → **hecho en Fase 2B** (experiments v27–v36 + superseded geometry). Quedan ~55 menciones (exclusiones pill legacy + kill switches + docs).
+2. Height locks mid-file residuales: EOF hardening sigue siendo el ganador — no reintroducir bloques posteriores al EOF.
 3. Light mode de Analytics/Journal aún tiene patches fragmentados v47 — posibles contrastes locales.
-4. `!important` densísimo: cualquier hotfix mid-file puede reabrir wars.
-5. Purga física de bloques dock L29189–33165 requiere QA visual dedicado (siguiente sprint CSS hygiene).
+4. `!important` aún alto (~11k): no agregar más al EOF; bajar por módulo en sprints siguientes.
+5. Floating pill `.mobileNav:not(.mobileBottomNav)` mid-file sigue en archivo — inerte si no hay DOM pill; no reusar `.mobileNav` en overlays.
 
 ---
 

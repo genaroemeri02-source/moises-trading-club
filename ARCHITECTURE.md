@@ -88,20 +88,19 @@ main.jsx (App, tabs, Firestore)
 
 ---
 
-## CSS Design System — Stability Sprint (`src/styles.css`)
+## CSS Design System — Fase 2B (`src/styles.css`)
 
-**Estado:** monolito acumulativo (v3 → v52 + Aurora). Ver **`APP_STABILITY_AUDIT.md`** para deuda, contratos y QA.
+**Estado:** monolito seccionado (tokens Aurora + RETIRED stubs + EOF canónico). Ver **`CSS_AURORA_AUDIT.md`** + **`APP_STABILITY_AUDIT.md`**.
 
 ### Fuente de verdad canónica (gana por orden de cascada)
 
 | Dominio | Bloque | Notas |
 |---------|--------|-------|
-| Tokens dark | `:root` | `--aurora-bg: #07050D` |
-| Tokens light | `:root[data-theme="light"]` | `--aurora-bg: #F7F8FB` (obligatorio) |
-| Dark app skin | `AURORA DARK SYSTEM v20` | ~L27060 |
-| **Mobile shell** | **NATURAL DOCUMENT SCROLL + HARDENING (EOF)** | Document scroll; sin `body:fixed` |
+| Tokens | `AURORA DESIGN TOKENS — SOURCE OF TRUTH` | Dark + light; aliases `--bg/--panel/--text` |
+| Dark app skin | `AURORA DARK SYSTEM v20` | Authenticated dark |
+| **Mobile shell** | **MOBILE — CANONICAL (EOF)** | Document scroll; sin `body:fixed` |
 | **Mobile nav** | **`.mobileCommandOverlay` + `.mobileCommandSheet`** | Hamburger + sheet; sin dock |
-| Bottom dock | **RETIRED** | Kill switch EOF; 0 DOM |
+| Bottom dock | **RETIRED** | Geometry purged; kill switch + var lock = 0 |
 
 ### Contratos de estabilidad (resumen)
 
@@ -109,7 +108,7 @@ main.jsx (App, tabs, Firestore)
 2. **Nav** — Sin `.mobileBottomNav` / `.mobileNavDock`. Solo command sheet.
 3. **Theme** — Light canvas `#F7F8FB`; ningún fill negro fuera de cards/sheets.
 4. **Modals** — Una overlay + una superficie. Body lock solo mientras abierto.
-5. **CSS** — No nuevos bloques FINAL gigantes. Legacy → delete o RETIRED stub.
+5. **CSS** — No nuevos bloques FINAL gigantes. Legacy → delete o RETIRED stub. Guardrails al EOF.
 
 ### Aurora Mobile — post dock
 
@@ -119,29 +118,30 @@ main.jsx (App, tabs, Firestore)
 | Scroll container | Documento (`body`), no `.main.appMain` overflow |
 | Viewport JS | `initMobileViewportManager()` — sin `visualViewport.scroll`; dock gap = 0 |
 | `--app-height` | Auxiliar (sheet max-height); **no** height lock de shell |
-| Dock classes | Dead CSS + `display:none` kill switch |
+| Dock classes | Purged mid-file + kill switch; residual = exclusions / comments |
 
 ### Tokens Aurora (oficial)
 
 ```css
 /* Dark */
---aurora-bg: #07050D
---aurora-panel: rgba(255,255,255,.035)
---aurora-border: rgba(124,92,255,.16)
+--aurora-canvas / --aurora-bg: #07050D
+--aurora-shell: #0B0812
+--aurora-surface / --aurora-surface-2
+--aurora-text / --aurora-text-soft / --aurora-text-muted
 --aurora-cyan: #33E6C4
 --aurora-violet: #7C5CFF
 --aurora-magenta: #FF4FA3
+--aurora-brand-gold: #D4A63A   /* brand only — not action */
 
 /* Light */
---aurora-bg: #F7F8FB   /* overrides dark token when data-theme=light */
---aurora-light-bg: #F7F8FB
---aurora-light-text: #101525
---aurora-light-muted: #667085
+--aurora-canvas / --aurora-bg: #F7F8FB
+--aurora-text: #07111F
+--shadow-soft / --shadow-elevated (light-tuned)
 ```
 
 ### Próximos pasos (CSS hygiene — no features)
 
-1. Purga física de selectores dock mid-file (~549 menciones muertas)
-2. Extraer `paywall.css` / `analytics.css`
-3. Reducir `!important` en capas ganadoras
-4. Consolidar `@media 860px` fragmentados
+1. Extraer `paywall.css` / `analytics.css`
+2. Seguir bajando `!important` en capas no canónicas
+3. Consolidar `@media 860px` fragmentados
+4. Migrar `.primary` global → botones Aurora scoped (JSX)
