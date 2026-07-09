@@ -31163,3 +31163,70 @@ html[data-theme="dark"] body:has(.app) .helpBubble svg{
     padding-bottom:var(--mobile-tab-bar-h)!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE NATIVE v34 — Centered dock icons (fix black band)
+   Root cause: v30 left 42px buttons + flex-end inside 84px nav
+   ═══════════════════════════════════════════════════════════════ */
+
+@media(max-width:860px){
+  :root{
+    --mobile-tabbar-tap-h:48px;
+    --mobile-tab-bar-h:calc(var(--mobile-tabbar-tap-h) + env(safe-area-inset-bottom,0px));
+    --mobile-content-pad-bottom:var(--mobile-tab-bar-h);
+  }
+
+  html body .app .mobileNav.mobileNavDock.mobileBottomNav,
+  html body .app .mobileBottomNav{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:stretch!important;
+    justify-content:stretch!important;
+    height:auto!important;
+    min-height:var(--mobile-tab-bar-h)!important;
+    max-height:none!important;
+    padding:0 0 env(safe-area-inset-bottom,0px)!important;
+    box-sizing:border-box!important;
+  }
+
+  html body .app .mobileBottomNav button,
+  html body .app .mobileBottomNav .mobileNavMore,
+  html:not([data-theme="light"]) body .app .mobileBottomNav button,
+  html:not([data-theme="light"]) body .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="dark"] body .app .mobileBottomNav button,
+  html[data-theme="dark"] body .app .mobileBottomNav .mobileNavMore,
+  html[data-theme="light"] body .app .mobileBottomNav button,
+  html[data-theme="light"] body .app .mobileBottomNav .mobileNavMore{
+    flex:1 1 0!important;
+    align-self:stretch!important;
+    min-height:var(--mobile-tabbar-tap-h)!important;
+    height:var(--mobile-tabbar-tap-h)!important;
+    max-height:var(--mobile-tabbar-tap-h)!important;
+    padding:0 2px!important;
+    margin:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    box-sizing:border-box!important;
+  }
+
+  html body .app .mobileBottomNav button svg,
+  html body .app .mobileBottomNav .mobileNavMore svg{
+    width:20px!important;
+    height:20px!important;
+    flex-shrink:0!important;
+  }
+
+  html body .app .mobileBottomNav button span,
+  html body .app .mobileBottomNav .mobileNavMore span{
+    font-size:10px!important;
+    font-weight:700!important;
+    line-height:1!important;
+  }
+
+  html body .app .main.appMain{
+    padding-bottom:var(--mobile-tab-bar-h)!important;
+  }
+}
