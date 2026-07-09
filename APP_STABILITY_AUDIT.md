@@ -201,3 +201,35 @@ La app ya tenía el **contrato correcto documentado al EOF** (scroll natural + c
 3. Light mode de Analytics/Journal aún tiene patches fragmentados v47 — posibles contrastes locales.
 4. `!important` densísimo: cualquier hotfix mid-file puede reabrir wars.
 5. Purga física de bloques dock L29189–33165 requiere QA visual dedicado (siguiente sprint CSS hygiene).
+
+---
+
+## 8. Follow-up 2026-07-09 — Command sheet + light canvas (structural)
+
+### Causa raíz — doble caja
+El overlay montaba `className="mobileNav mobileCommandOverlay"`. Las reglas legacy de `.mobileNav:not(.mobileBottomNav)` (pill flotante: fondo, borde, `border-radius`, sombra, padding) seguían pintando **una caja externa**, mientras `.mobileCommandSheet` pintaba la interna → “cuadro dentro de cuadro”.
+
+### Causa raíz — white mode roto
+Bloques v40.x hardcodean `html,body,#root,.app,.main { background:#07090D !important }`. El token light `--aurora-bg:#F7F8FB` existía, pero esas reglas mid-file ganaban en cascada sobre partes del shell.
+
+### Qué se hizo
+| Cambio | Detalle |
+|--------|---------|
+| JSX | Overlay = solo `.mobileCommandOverlay` (sin `.mobileNav`). Handle real en DOM. Cards sin clases duales `isPrimary`/`mobileNavSheet*`. |
+| CSS EOF | Bloque canónico: overlay = scrim; **única superficie** = `.mobileCommandSheet`. |
+| Light EOF | Canvas `#F7F8FB` en `html/body/#root/.appShell/.main/.page/.pullWrap` con especificidad que gana a v40.x. |
+| Legacy | Dual-class `mobileCommand*+mobileNavSheet*` neutralizado (transparent / no paint). |
+
+### Dueña de superficie
+**`.mobileCommandSheet`** — única clase autorizada a pintar fondo/borde/sombra del menú mobile.
+
+### Follow-up hotfix (misma fecha) — producción + ellipsis
+Evidencia en `moisestradingclub.com`: Network 404 de `index-*.css` (SW cacheaba `index.html` viejo apuntando a hash CSS borrado) + sheet con padding lateral (caja flotante).
+
+| Fix | Detalle |
+|-----|---------|
+| `public/sw.js` | Cache `v3`; HTML + `/assets/*` network-first; no precache de `/` |
+| Sheet | Edge-to-edge bottom sheet (`border-radius` solo arriba, padding overlay 0) |
+| Labels | Guard nuclear EOF sobre `button.mobileCommandCard span` |
+
+**Deploy required** + hard refresh / unregister SW en dispositivos que ya tenían `mtc-cache-v2-*`.

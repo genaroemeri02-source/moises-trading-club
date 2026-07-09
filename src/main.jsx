@@ -922,7 +922,6 @@ const MOBILE_SHEET_GROUPS=[
   {key:'comunidad',label:'COMUNIDAD',ids:['announcements','chat']},
   {key:'sistema',label:'SISTEMA',ids:['settings','system','admin']},
 ];
-const MOBILE_SHEET_PRIMARY=new Set(['dashboard','analytics','journal','emotional','checklist','risk','results','community']);
 const MOBILE_SHEET_SECTION_CLASS={principal:'mobileCommandSection--principal',operativa:'mobileCommandSection--operativa',workspace:'mobileCommandSection--workspace',comunidad:'mobileCommandSection--community',sistema:'mobileCommandSection--system'};
 const MOBILE_SHEET_TONE={dashboard:'cyan',analytics:'violet',journal:'cyan',emotional:'magenta',checklist:'cyan',risk:'magenta',results:'cyan',brokers:'cyan',ideas:'violet',ecosystem:'violet',reading:'violet',community:'violet',announcements:'violet',chat:'violet',online:'muted',system:'muted',news:'muted',notifications:'muted',settings:'muted',admin:'cyan'};
 function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
@@ -949,10 +948,10 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
   const pickTab=(id)=>{markNotificationsForTarget(data.notifications,id); setMenuOpen(false); setTab(id);};
   const sheetGroups=MOBILE_SHEET_GROUPS.map(group=>({...group,entries:group.ids.map(id=>itemMap[id]).filter(Boolean)})).filter(group=>group.entries.length);
   if(!menuOpen)return null;
-  /* CONTRATO 4 — single overlay + single sheet surface (no legacy mobileNavSheet dual classes) */
+  /* CONTRATO 4 — overlay + sheet only. Never reuse .mobileNav (legacy pill paints a second box). */
   return (
     <div
-      className="mobileNav mobileCommandOverlay"
+      className="mobileCommandOverlay"
       role="presentation"
       onClick={()=>setMenuOpen(false)}
     >
@@ -963,13 +962,14 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
         aria-label="Centro de acceso MTC"
         onClick={e=>e.stopPropagation()}
       >
+        <div className="mobileCommandHandle" aria-hidden="true"/>
         <header className="mobileCommandHeader">
           <div className="mobileCommandHeadMain">
             <span className="mobileCommandEyebrow">CENTRO DE ACCESO</span>
             <b className="mobileCommandTitle">Explorar <span className="accent">MTC</span></b>
             <small className="mobileCommandSubtitle">Herramientas, workspace y configuración</small>
           </div>
-          <button type="button" className="icon mobileCommandClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={20}/></button>
+          <button type="button" className="mobileCommandClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={20}/></button>
         </header>
         <nav className="mobileCommandContent">
           {sheetGroups.map(group=>(
@@ -986,7 +986,7 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
                       key={id}
                       type="button"
                       data-sheet-nav={id}
-                      className={`mobileCommandCard mobileCommandCard--${tone} ${MOBILE_SHEET_PRIMARY.has(id)?'mobileCommandCard--primary isPrimary':'mobileCommandCard--secondary isSecondary'} tone-${tone} ${isActive?'active':''} ${count?'hasActivity':''}`}
+                      className={`mobileCommandCard mobileCommandCard--${tone} ${isActive?'active':''} ${count?'hasActivity':''}`}
                       onClick={()=>pickTab(id)}
                     >
                       <span className="mobileCommandIcon"><Icon size={20}/></span>
