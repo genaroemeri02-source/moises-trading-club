@@ -75,6 +75,22 @@ function chartMoneyDomain(data = []) {
   return [-limit, limit];
 }
 
+function dailyChartXAxisProps(mobile, count) {
+  if (!mobile) {
+    return { interval: 0, angle: 0, textAnchor: 'middle', height: 28, tickMargin: 6 };
+  }
+  const dense = count > 8;
+  const interval = count <= 5 ? 0 : count <= 10 ? 1 : Math.max(1, Math.ceil(count / 4) - 1);
+  return {
+    interval,
+    minTickGap: 12,
+    angle: dense ? -42 : count > 5 ? -32 : 0,
+    textAnchor: dense ? 'end' : 'middle',
+    height: dense ? 54 : count > 5 ? 40 : 28,
+    tickMargin: 8
+  };
+}
+
 function chartRDomain(data = []) {
   const vals = data.map(d => Number(d.r || 0)).filter(Number.isFinite);
   if (!vals.length) return [-2, 2];
@@ -187,6 +203,7 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
     ? rDistribution.reduce((sum, d) => sum + Number(d.r || 0), 0) / rDistribution.length
     : 0;
   const dailyDomain = chartMoneyDomain(dailyPnl);
+  const dailyXAxis = dailyChartXAxisProps(mobile, dailyPnl.length);
   const rDomain = chartRDomain(rDistribution);
   const lastEquity = equityCurve[equityCurve.length - 1]?.equity || stats?.equity || 0;
   const startEquity = equityCurve.find(p => p.time)?.equity ?? stats?.initial ?? lastEquity;
@@ -258,7 +275,11 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
           {hasDailyChart ? (
             <div className="analyticsPerformanceEvidenceChart daily analyticsChartFrame" style={{ height: chartHPrimary }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dailyPnl} margin={{ top: 8, right: 8, left: 0, bottom: mobile ? 2 : 0 }} barCategoryGap="20%">
+                <BarChart
+                  data={dailyPnl}
+                  margin={{ top: 8, right: 8, left: 0, bottom: mobile ? Math.max(12, dailyXAxis.height - 20) : 0 }}
+                  barCategoryGap={mobile ? '14%' : '20%'}
+                >
                   <defs>
                     <linearGradient id="dailyPosGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor={AURORA_CHART.cyan} />
@@ -275,8 +296,7 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
                     tick={chartAxis}
                     axisLine={false}
                     tickLine={false}
-                    interval={mobile ? 'preserveStartEnd' : 0}
-                    tickMargin={6}
+                    {...dailyXAxis}
                   />
                   <YAxis
                     tick={chartAxis}
@@ -289,7 +309,7 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
                   />
                   <ReferenceLine y={0} stroke="rgba(255,255,255,.28)" strokeWidth={1.5} />
                   <Tooltip content={<ChartTooltipPremium mode="daily" />} cursor={{ fill: 'rgba(255,255,255,.04)' }} />
-                  <Bar dataKey="value" shape={<RoundedDailyBar />} maxBarSize={mobile ? 26 : 34}>
+                  <Bar dataKey="value" shape={<RoundedDailyBar />} maxBarSize={mobile ? 22 : 34}>
                     {dailyPnl.map((entry, i) => (
                       <Cell key={i} fill={entry.value >= 0 ? 'url(#dailyPosGrad)' : 'url(#dailyNegGrad)'} />
                     ))}

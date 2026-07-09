@@ -188,7 +188,7 @@ export function EdgeLab({ setupRows = [], trades = [], hasSample }) {
             </div>
 
             <p className="analyticsValidationCriteriaInline integrated">
-              Validado {SETUP_VALIDATION_TARGET}+ trades · Observación 3–9 · Insuficiente &lt;3
+              Validado {SETUP_VALIDATION_TARGET}+ trades · Observación 3–9 · Insuficiente: menor a 3
             </p>
           </div>
         </div>

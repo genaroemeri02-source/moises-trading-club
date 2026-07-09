@@ -24887,9 +24887,13 @@ html[data-theme="light"] .analyticsCommandChip{
     padding:12px 14px 10px!important;
   }
   .analyticsCockpit .analyticsCommandStripBody{
-    grid-template-columns:64px minmax(0,1fr);
+    grid-template-columns:80px minmax(0,1fr);
     gap:10px 12px;
     align-items:flex-start;
+  }
+  .analyticsCockpit .analyticsCommandScore.compact{
+    flex-shrink:0;
+    min-width:80px;
   }
   .analyticsCockpit .analyticsCommandChips{
     grid-column:1/-1;
@@ -25815,7 +25819,7 @@ html[data-theme="dark"] .analyticsCockpit .analyticsCommandHeroV14.analyticsSurf
 }
 html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone,
 html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone{
-  overflow:hidden;
+  overflow:visible;
 }
 html:not([data-theme="light"]) .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone::before,
 html[data-theme="dark"] .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapZone::before{
@@ -29178,5 +29182,187 @@ html[data-theme="dark"] .auroraAmbient{
   html:not([data-theme="light"]) body .app .dashboardProKpi b,
   html[data-theme="dark"] body .app .dashboardProKpi b{
     font-size:clamp(20px,6vw,24px)!important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AURORA MOBILE QA v25 — Root-cause fixes @390px (scoped, small)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1) Top safe-area / canvas — unify #07050D, soften top orb */
+html:not([data-theme="light"]),
+html[data-theme="dark"]{
+  background-color:#07050D!important;
+}
+html:not([data-theme="light"]) body,
+html[data-theme="dark"] body{
+  background-color:#07050D!important;
+}
+html[data-theme="light"] body:has(.app){
+  background-color:var(--bg,#f0f2f5)!important;
+}
+@media(max-width:860px){
+  html:not([data-theme="light"]) .auroraOrb--violet,
+  html[data-theme="dark"] .auroraOrb--violet{
+    top:-240px!important;
+    opacity:.55!important;
+  }
+}
+
+/* 6) Journal — Nuevo trade CTA Aurora */
+html:not([data-theme="light"]) body .app .mobileNewTradeFab,
+html:not([data-theme="light"]) body .app .mobileNewTradeFab.journalPrimaryCta,
+html[data-theme="dark"] body .app .mobileNewTradeFab,
+html[data-theme="dark"] body .app .mobileNewTradeFab.journalPrimaryCta{
+  background:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  background-image:linear-gradient(90deg,var(--aurora-cyan),var(--aurora-violet))!important;
+  color:#07050D!important;
+  border:none!important;
+  box-shadow:0 14px 36px rgba(124,92,255,.28)!important;
+  font-size:14px!important;
+  font-weight:700!important;
+}
+
+/* 7) Bottom nav — Aurora border + last-item breathing room */
+@media(max-width:860px){
+  html:not([data-theme="light"]) body .app .mobileNav,
+  html[data-theme="dark"] body .app .mobileNav{
+    border-top-color:rgba(124,92,255,.16)!important;
+    background:rgba(7,5,13,.94)!important;
+    padding-right:calc(12px + env(safe-area-inset-right))!important;
+    padding-left:calc(12px + env(safe-area-inset-left))!important;
+    scroll-padding-right:16px!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileNav button,
+  html:not([data-theme="light"]) body .app .mobileNav .mobileLogout,
+  html[data-theme="dark"] body .app .mobileNav button,
+  html[data-theme="dark"] body .app .mobileNav .mobileLogout{
+    flex:0 0 72px!important;
+    width:72px!important;
+    min-width:72px!important;
+    max-width:72px!important;
+  }
+  html:not([data-theme="light"]) body .app .mobileNav button span,
+  html[data-theme="dark"] body .app .mobileNav button span{
+    font-size:11px!important;
+    max-width:68px!important;
+  }
+}
+
+/* 2) Diagnóstico score — mobile stack, ring intact */
+@media(max-width:390px){
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeroV14.analyticsSurfaceFlagship{
+    overflow:visible!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandStripBody,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandStripBody{
+    grid-template-columns:1fr!important;
+    grid-template-rows:auto auto auto;
+    gap:12px!important;
+    align-items:stretch!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandScore.compact,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandScore.compact{
+    justify-self:center;
+    flex-shrink:0;
+    min-width:0;
+    width:100%;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandScoreRing,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandScoreRing{
+    width:76px!important;
+    height:76px!important;
+    flex-shrink:0;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandScoreInner,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandHeroV14 .analyticsCommandScoreInner{
+    width:60px!important;
+    height:60px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandStripCore,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandStripCore{
+    min-width:0;
+    width:100%;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsCommandChips,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsCommandChips{
+    grid-column:1/-1!important;
+    width:100%;
+    min-width:0;
+  }
+
+  /* 5) Edge Lab — real mobile composition */
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapStage,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapStage{
+    padding:4px 0 8px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCanvas,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCanvas{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    grid-template-rows:auto auto auto auto!important;
+    gap:8px!important;
+    min-height:unset!important;
+    padding:0!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapConnector,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapConnector{
+    display:none!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCore,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapCore{
+    grid-column:1/-1!important;
+    grid-row:1!important;
+    padding:0 0 10px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite{
+    max-width:none!important;
+    width:100%!important;
+    justify-self:stretch!important;
+    padding:10px 10px 9px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.tl,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.tl{
+    grid-column:1!important;
+    grid-row:2!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.tr,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.tr{
+    grid-column:2!important;
+    grid-row:2!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.bl,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.bl{
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.br,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapMetric.satellite.br{
+    grid-column:2!important;
+    grid-row:3!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapReading.integrated,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapReading.integrated{
+    grid-column:1/-1;
+    margin-top:4px!important;
+    font-size:13px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRing,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRing{
+    width:80px!important;
+    height:80px!important;
+  }
+  html:not([data-theme="light"]) body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRingInner,
+  html[data-theme="dark"] body .app .analyticsCockpit .analyticsEdgeLabUnified .analyticsEdgeMapRingInner{
+    width:62px!important;
+    height:62px!important;
+  }
+
+  /* 8) Journal page bottom clearance for FAB + nav */
+  html:not([data-theme="light"]) body .app .page.journalPage,
+  html[data-theme="dark"] body .app .page.journalPage{
+    padding-bottom:calc(148px + env(safe-area-inset-bottom))!important;
   }
 }
