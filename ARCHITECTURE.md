@@ -85,3 +85,63 @@ main.jsx (App, tabs, Firestore)
   ├── Journal → components/journal/* + TradeForm + TradeDetailModal + share modals
   └── lib/* (helpers compartidos)
 ```
+
+---
+
+## CSS Design System — Stability Sprint (`src/styles.css`)
+
+**Estado:** monolito acumulativo (v3 → v52 + Aurora). Ver **`APP_STABILITY_AUDIT.md`** para deuda, contratos y QA.
+
+### Fuente de verdad canónica (gana por orden de cascada)
+
+| Dominio | Bloque | Notas |
+|---------|--------|-------|
+| Tokens dark | `:root` | `--aurora-bg: #07050D` |
+| Tokens light | `:root[data-theme="light"]` | `--aurora-bg: #F7F8FB` (obligatorio) |
+| Dark app skin | `AURORA DARK SYSTEM v20` | ~L27060 |
+| **Mobile shell** | **NATURAL DOCUMENT SCROLL + HARDENING (EOF)** | Document scroll; sin `body:fixed` |
+| **Mobile nav** | **`.mobileCommandOverlay` + `.mobileCommandSheet`** | Hamburger + sheet; sin dock |
+| Bottom dock | **RETIRED** | Kill switch EOF; 0 DOM |
+
+### Contratos de estabilidad (resumen)
+
+1. **Scroll** — Mobile: documento. Desktop: shell actual. No `body:fixed` salvo overlay. `--app-height` no dimensiona shell/main.
+2. **Nav** — Sin `.mobileBottomNav` / `.mobileNavDock`. Solo command sheet.
+3. **Theme** — Light canvas `#F7F8FB`; ningún fill negro fuera de cards/sheets.
+4. **Modals** — Una overlay + una superficie. Body lock solo mientras abierto.
+5. **CSS** — No nuevos bloques FINAL gigantes. Legacy → delete o RETIRED stub.
+
+### Aurora Mobile — post dock
+
+| Concepto | Valor |
+|----------|-------|
+| Nav mobile | Topbar hamburger → `MobileNav` command sheet |
+| Scroll container | Documento (`body`), no `.main.appMain` overflow |
+| Viewport JS | `initMobileViewportManager()` — sin `visualViewport.scroll`; dock gap = 0 |
+| `--app-height` | Auxiliar (sheet max-height); **no** height lock de shell |
+| Dock classes | Dead CSS + `display:none` kill switch |
+
+### Tokens Aurora (oficial)
+
+```css
+/* Dark */
+--aurora-bg: #07050D
+--aurora-panel: rgba(255,255,255,.035)
+--aurora-border: rgba(124,92,255,.16)
+--aurora-cyan: #33E6C4
+--aurora-violet: #7C5CFF
+--aurora-magenta: #FF4FA3
+
+/* Light */
+--aurora-bg: #F7F8FB   /* overrides dark token when data-theme=light */
+--aurora-light-bg: #F7F8FB
+--aurora-light-text: #101525
+--aurora-light-muted: #667085
+```
+
+### Próximos pasos (CSS hygiene — no features)
+
+1. Purga física de selectores dock mid-file (~549 menciones muertas)
+2. Extraer `paywall.css` / `analytics.css`
+3. Reducir `!important` en capas ganadoras
+4. Consolidar `@media 860px` fragmentados

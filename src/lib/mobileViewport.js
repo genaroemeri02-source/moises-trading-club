@@ -1,13 +1,13 @@
 /**
  * Mobile viewport sync for iOS PWA / Safari.
  *
- * Contract:
- * - No bottom dock. --mobile-dock-gap is always 0px.
+ * Stability contracts (see APP_STABILITY_AUDIT.md):
+ * - No bottom dock. --mobile-dock-gap / tabbar heights always 0px.
  * - Never listen to visualViewport.scroll.
  * - Never mutate --app-height during an active scroll/touch gesture.
- *   iOS fires window.resize / visualViewport.resize while chrome collapses;
- *   rewriting height mid-gesture snaps overflow scroll containers.
  * - Never set body position:fixed or touch scrollTop.
+ * - --app-height is AUXILIARY only (e.g. command-sheet max-height).
+ *   It must NOT size html/body/#root/.appShell/.main on mobile.
  */
 
 let initialized = false;

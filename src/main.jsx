@@ -949,6 +949,7 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
   const pickTab=(id)=>{markNotificationsForTarget(data.notifications,id); setMenuOpen(false); setTab(id);};
   const sheetGroups=MOBILE_SHEET_GROUPS.map(group=>({...group,entries:group.ids.map(id=>itemMap[id]).filter(Boolean)})).filter(group=>group.entries.length);
   if(!menuOpen)return null;
+  /* CONTRATO 4 — single overlay + single sheet surface (no legacy mobileNavSheet dual classes) */
   return (
     <div
       className="mobileNav mobileCommandOverlay"
@@ -956,25 +957,25 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
       onClick={()=>setMenuOpen(false)}
     >
       <div
-        className="mobileNavSheet mobileCommandSheet"
+        className="mobileCommandSheet"
         role="dialog"
         aria-modal="true"
         aria-label="Centro de acceso MTC"
         onClick={e=>e.stopPropagation()}
       >
-        <header className="mobileNavSheetHead mobileCommandHeader">
-          <div className="mobileNavSheetHeadMain">
-            <span className="mobileNavSheetEyebrow mobileCommandEyebrow">CENTRO DE ACCESO</span>
+        <header className="mobileCommandHeader">
+          <div className="mobileCommandHeadMain">
+            <span className="mobileCommandEyebrow">CENTRO DE ACCESO</span>
             <b className="mobileCommandTitle">Explorar <span className="accent">MTC</span></b>
             <small className="mobileCommandSubtitle">Herramientas, workspace y configuración</small>
           </div>
-          <button type="button" className="icon mobileNavSheetClose mobileCommandClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={20}/></button>
+          <button type="button" className="icon mobileCommandClose" onClick={()=>setMenuOpen(false)} aria-label="Cerrar"><X size={20}/></button>
         </header>
-        <nav className="mobileNavSheetNav mobileCommandContent">
+        <nav className="mobileCommandContent">
           {sheetGroups.map(group=>(
-            <section key={group.key} className={`mobileNavSheetSection mobileCommandSection ${MOBILE_SHEET_SECTION_CLASS[group.key]||''}`}>
-              <h3 className="mobileNavSheetSectionLabel mobileCommandSectionTitle">{group.label}</h3>
-              <div className="mobileNavSheetGrid mobileCommandGrid">
+            <section key={group.key} className={`mobileCommandSection ${MOBILE_SHEET_SECTION_CLASS[group.key]||''}`}>
+              <h3 className="mobileCommandSectionTitle">{group.label}</h3>
+              <div className="mobileCommandGrid">
                 {group.entries.map(({id,label,Icon})=>{
                   const count=activityCount(data,profile,id);
                   const navLabel=MOBILE_SHEET_LABELS[id]||label;
@@ -985,11 +986,11 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
                       key={id}
                       type="button"
                       data-sheet-nav={id}
-                      className={`mobileNavSheetCard mobileCommandCard mobileCommandCard--${tone} ${MOBILE_SHEET_PRIMARY.has(id)?'mobileCommandCard--primary isPrimary':'mobileCommandCard--secondary isSecondary'} tone-${tone} ${isActive?'active':''} ${count?'hasActivity':''}`}
+                      className={`mobileCommandCard mobileCommandCard--${tone} ${MOBILE_SHEET_PRIMARY.has(id)?'mobileCommandCard--primary isPrimary':'mobileCommandCard--secondary isSecondary'} tone-${tone} ${isActive?'active':''} ${count?'hasActivity':''}`}
                       onClick={()=>pickTab(id)}
                     >
-                      <span className="mobileNavSheetIcon mobileCommandIcon"><Icon size={20}/></span>
-                      <span className="mobileNavSheetLabel mobileCommandLabel">{navLabel}</span>
+                      <span className="mobileCommandIcon"><Icon size={20}/></span>
+                      <span className="mobileCommandLabel">{navLabel}</span>
                       {count>0&&<em>{count>9?'9+':count}</em>}
                     </button>
                   );
@@ -997,7 +998,7 @@ function MobileNav({profile,tab,setTab,data,menuOpen,setMenuOpen}){
               </div>
             </section>
           ))}
-          <button type="button" className="mobileLogout mobileCommandLogout" onClick={()=>signOut(auth)}>Salir</button>
+          <button type="button" className="mobileCommandLogout" onClick={()=>signOut(auth)}>Salir</button>
         </nav>
       </div>
     </div>
