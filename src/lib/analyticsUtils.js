@@ -745,14 +745,32 @@ export function classifySetupConfidence(n = 0) {
   return { label: 'Validado', shortLabel: 'Validado', tier: 'validated', status: 'validated', rank: 2 };
 }
 
+/**
+ * EdgeLab leak rule (shared by pipeline, status, identifyLeakSetup):
+ * - P/L negativo con N≥2, o
+ * - avgR negativo con N≥3 (muestra de observación+).
+ * N=1 nunca marca fuga.
+ */
+export function isEdgeLabLeakSetup(row = {}) {
+  const count = Number(row.count || 0);
+  if (count < 2) return false;
+  const value = Number(row.value || 0);
+  const avgR = Number(row.avgR || 0);
+  if (value < 0) return true;
+  return count >= 3 && avgR < 0;
+}
+
+function compareLeakSeverity(a = {}, b = {}) {
+  const valueDiff = Number(a.value || 0) - Number(b.value || 0);
+  if (valueDiff !== 0) return valueDiff;
+  return Number(a.avgR || 0) - Number(b.avgR || 0);
+}
+
 /** Research-desk status for a setup row (includes risky when leaking with N≥2). */
 export function classifyEdgeLabStatus(row = {}) {
   const count = Number(row.count || 0);
-  const value = Number(row.value || 0);
-  const avgR = Number(row.avgR || 0);
   const conf = classifySetupConfidence(count);
-  const isLeak = value < 0 || (count >= 3 && avgR < 0);
-  if (isLeak && count >= 2) {
+  if (isEdgeLabLeakSetup(row)) {
     return {
       status: 'risky',
       label: 'Riesgoso',
@@ -828,10 +846,10 @@ export function identifyEdgeSetup(trades = []) {
 
 export function identifyLeakSetup(trades = []) {
   const rows = breakdownBySetup(trades);
-  const valid = rows.filter(r => r.count >= 2 && r.value < 0);
+  const valid = rows.filter(isEdgeLabLeakSetup);
   if (!valid.length) return null;
-  const worst = [...valid].sort((a, b) => a.value - b.value)[0];
-  return { name: worst.name, value: worst.value, count: worst.count, winrate: worst.winrate };
+  const worst = [...valid].sort(compareLeakSeverity)[0];
+  return { name: worst.name, value: worst.value, count: worst.count, winrate: worst.winrate, avgR: worst.avgR };
 }
 
 export function generateMainInsightSentence(edge, leak, sessionRows = [], count = 0) {
@@ -1168,8 +1186,8 @@ export function buildExecutiveCommandCopy(edge, leak, sessionRows = [], count = 
 export function buildEdgeLabPipeline(setupRows = []) {
   const { observation, insufficient } = groupSetupsForValidation(setupRows);
   const leaks = (setupRows || [])
-    .filter(r => r.count >= 2 && r.value < 0)
-    .sort((a, b) => a.value - b.value);
+    .filter(isEdgeLabLeakSetup)
+    .sort(compareLeakSeverity);
   const toItem = (row, status) => ({
     name: row.name,
     label: formatSetupLabel(row.name),
@@ -1197,7 +1215,7 @@ export function prioritizeInsufficientSetups(items = [], limit = 4) {
 }
 
 export function prioritizeLeakSetups(items = [], limit = 2) {
-  return [...items].sort((a, b) => a.value - b.value).slice(0, limit);
+  return [...items].sort(compareLeakSeverity).slice(0, limit);
 }
 
 export function buildUpcomingEdgeSamples(pipeline = {}, activeSetupName = '', limit = 4) {
@@ -1214,8 +1232,10 @@ export function buildUpcomingEdgeSamples(pipeline = {}, activeSetupName = '', li
 
 export function pickActiveThesis(setupRows = [], trades = []) {
   const { validated, observation } = groupSetupsForValidation(setupRows);
+  // Never promote insufficient (N<3): only validated (10+) then observation (3–9).
   if (validated.length) {
-    const row = validated[0];
+    const positive = validated.filter((r) => Number(r.value || 0) > 0);
+    const row = (positive.length ? positive : validated)[0];
     return {
       row,
       tier: 'validated',
@@ -1228,7 +1248,7 @@ export function pickActiveThesis(setupRows = [], trades = []) {
   const row = primary.count !== undefined
     ? primary
     : observation.find(r => r.name === primary.name) || observation[0];
-  if (!row) return null;
+  if (!row || Number(row.count || 0) < 3) return null;
   return {
     row,
     tier: 'observation',
@@ -1632,7 +1652,7 @@ export function buildOperationalPriorities(stats = {}, setupRows = [], sessionRo
     }
   }
 
-  const cutSetup = [...(setupRows || [])].filter(s => s.count >= 2 && s.value < 0).sort((a, b) => a.value - b.value)[0];
+  const cutSetup = [...(setupRows || [])].filter(isEdgeLabLeakSetup).sort(compareLeakSeverity)[0];
   const leak = stats?.errorMostRepeated;
   if (cutSetup) {
     cut = {
@@ -1721,7 +1741,7 @@ export function buildOperationalBrief(stats = {}, setupRows = [], sessionRows = 
     };
   }
 
-  const cutSetup = [...(setupRows || [])].filter(s => s.count >= 2 && s.value < 0).sort((a, b) => a.value - b.value)[0];
+  const cutSetup = [...(setupRows || [])].filter(isEdgeLabLeakSetup).sort(compareLeakSeverity)[0];
   const leak = stats?.errorMostRepeated;
   let leakBlock = { label: 'Fuga principal', name: 'Sin fuga marcada', meta: 'Sin setup negativo ni error', tone: 'neutral' };
   if (cutSetup) {
