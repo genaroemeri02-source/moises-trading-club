@@ -23,14 +23,17 @@ Esta versión deja el frontend preparado para un paywall premium, pricing real p
 
 ## Pricing centralizado
 
-Los precios base viven en `PLAN_PRICING` dentro de `src/main.jsx`:
+Los precios base viven en `src/lib/commercialConfig.js` (`PLAN_PRICING` / `COMMERCIAL_PLANS`):
 
 ```js
 const PLAN_PRICING = {
-  basic: { monthly: 29, currency: 'USD' },
-  premium: { monthly: 49, currency: 'USD' }
+  basic: { monthly: 14.99, currency: 'USD' },
+  premium: { monthly: 24.99, currency: 'USD' },
+  mentorship: { monthly: 250, currency: 'USD' }
 };
 ```
+
+> Sprint 09: la UI y el paywall consumen esta fuente. Docs legacy que citaban 29/49 están obsoletos.
 
 La función `calculatePlanPrice(planId, cycle)` calcula:
 

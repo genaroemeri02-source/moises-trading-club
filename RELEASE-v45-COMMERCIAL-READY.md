@@ -20,9 +20,12 @@ Backend ya incluye endpoints:
 - `POST /api/syncMembership`
 - `GET /api/plans`
 
-Planes actuales en backend:
-- `basic` / Club: USD 29 mensual
-- `premium` / Pro: USD 49 mensual
+Planes actuales en backend / UI (Sprint 09 Commercial Truth):
+- `basic` / Club: USD **14.99** mensual
+- `premium` / Pro: USD **24.99** mensual
+- Mentoría: USD **250** mensual (WhatsApp; sin PayPal)
+
+> Nota: RELEASE histórico citaba 29/49. La fuente de verdad es `src/lib/commercialConfig.js` + `server/index.js` PLAN_PRICING (14.99/24.99).
 
 Ciclos:
 - mensual

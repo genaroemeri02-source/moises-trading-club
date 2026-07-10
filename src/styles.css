@@ -14957,6 +14957,27 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurf
   line-height:1.02;
   letter-spacing:-.045em;
   font-weight:900;
+  max-width:min(100%,18ch);
+  text-wrap:balance;
+}
+.dashboardHeroCopy{
+  min-width:0;
+  flex:1 1 auto;
+}
+.dashboardCommandHeader .dashboardHeroLead{
+  margin:0 0 6px;
+  max-width:52ch;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:650;
+  line-height:1.45;
+}
+.dashboardCommandHeader .dashboardHeroMeta{
+  margin:0;
+  color:var(--muted2);
+  font-size:13px;
+  font-weight:700;
+  line-height:1.4;
 }
 .dashboardCommandHeader p{
   margin:0;
@@ -15123,8 +15144,16 @@ html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):
 }
 .dashboardClean .dashboardCommandHeader h2{
   margin:7px 0 3px!important;
-  font-size:clamp(24px,2.2vw,34px)!important;
+  font-size:clamp(22px,2.2vw,32px)!important;
   letter-spacing:-.032em!important;
+  max-width:min(100%,20ch)!important;
+}
+.dashboardClean .dashboardCommandHeader .dashboardHeroLead{
+  font-size:13px!important;
+  font-weight:650!important;
+}
+.dashboardClean .dashboardCommandHeader .dashboardHeroMeta{
+  font-size:12px!important;
 }
 .dashboardClean .controlBadge{
   padding:6px 10px!important;
@@ -15680,6 +15709,15 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurf
 .dashboardCockpitHeaderMain{
   min-width:0;
   flex:1 1 auto;
+}
+.dashboardCockpitEyebrow{
+  display:block;
+  margin:0 0 8px;
+  color:var(--muted2);
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
 }
 .dashboardCockpitHeaderMain h2{
   margin:8px 0 6px;
@@ -32561,6 +32599,70 @@ MTC MOBILE NAVIGATION CONTRACT
     box-shadow: none !important;
   }
 }
+
+/* ==========================================================================
+   SPRINT 09 — COMMERCIAL TRUTH (pricing / paywall feature status)
+   ========================================================================== */
+.commercialFeatureList{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.commercialFeatureList li{display:flex;align-items:flex-start;gap:8px;position:relative;padding-left:0;font-weight:700;font-size:13.5px;line-height:1.35}
+.landingPlanCard .commercialFeatureList li{padding-left:0}
+.landingPlanCard .commercialFeatureList li:before{display:none}
+.commercialFeatureList .featureStatusLabel{
+  flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  padding:3px 7px;border-radius:999px;border:1px solid transparent;line-height:1.2;margin-top:1px
+}
+.featureStatus-available .featureStatusLabel,
+li.featureStatus-available .featureStatusLabel{
+  color:#67e8f9;border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.10)
+}
+.featureStatus-beta .featureStatusLabel,
+li.featureStatus-beta .featureStatusLabel{
+  color:#c4b5fd;border-color:rgba(167,139,250,.40);background:rgba(139,92,246,.14)
+}
+.featureStatus-coming-soon .featureStatusLabel,
+li.featureStatus-coming-soon .featureStatusLabel{
+  color:#94a3b8;border-color:rgba(148,163,184,.28);background:rgba(148,163,184,.08)
+}
+.featureStatus-not-included .featureStatusLabel,
+li.featureStatus-not-included .featureStatusLabel{
+  color:#64748b;border-color:rgba(100,116,139,.25);background:rgba(100,116,139,.06)
+}
+.featureStatus-coming-soon,
+.featureStatus-not-included{opacity:.78}
+.paywallFunnelPlan .commercialFeatureList li{
+  display:grid;grid-template-columns:18px 1fr auto;align-items:start;gap:8px
+}
+.paywallFunnelPlan .commercialFeatureList li svg{color:#67e8f9;margin-top:2px}
+.paywallFunnelPlan .featureStatus-coming-soon svg,
+.paywallFunnelPlan .featureStatus-not-included svg{color:#64748b}
+.paywallFunnelPlan .commercialFeatureList .featureStatusLabel{margin-top:0}
+.commercialGatingNote{
+  margin:0 0 16px;padding:10px 14px;border-radius:12px;font-size:12.5px;line-height:1.45;
+  color:#94a3b8;border:1px solid rgba(148,163,184,.18);background:rgba(148,163,184,.06)
+}
+.paywallGatingNote{margin:0 0 18px;color:#cbd5e1}
+html[data-theme="light"] .commercialGatingNote{
+  color:#475569;border-color:rgba(15,23,42,.08);background:rgba(248,250,252,.9)
+}
+html[data-theme="light"] .featureStatus-available .featureStatusLabel,
+html[data-theme="light"] li.featureStatus-available .featureStatusLabel{
+  color:#0e7490;border-color:rgba(14,116,144,.28);background:rgba(6,182,212,.10)
+}
+html[data-theme="light"] .featureStatus-beta .featureStatusLabel,
+html[data-theme="light"] li.featureStatus-beta .featureStatusLabel{
+  color:#6d28d9;border-color:rgba(109,40,217,.25);background:rgba(139,92,246,.10)
+}
+html[data-theme="light"] .featureStatus-coming-soon .featureStatusLabel,
+html[data-theme="light"] li.featureStatus-coming-soon .featureStatusLabel{
+  color:#64748b;border-color:rgba(100,116,139,.22);background:rgba(241,245,249,.9)
+}
+.landingPricingSection .primary.landingCta,
+.paywallFunnelPlan button.primary{
+  background:linear-gradient(135deg,#22d3ee,#8b5cf6)!important;
+  border-color:transparent!important;color:#041018!important;font-weight:800
+}
+.landingPricingSection .primary.landingCta:hover,
+.paywallFunnelPlan button.primary:hover{filter:brightness(1.06)}
 
 /* ==========================================================================
    MTC CSS GUARDRAILS

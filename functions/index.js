@@ -287,8 +287,8 @@ const PAYPAL_BASE_URL =
     : 'https://api-m.sandbox.paypal.com';
 
 const PLAN_PRICING = {
-  basic: { name: 'Esencial', monthly: 29, currency: 'USD' },
-  premium: { name: 'Pro', monthly: 49, currency: 'USD' },
+  basic: { name: 'Club', monthly: 14.99, currency: 'USD' },
+  premium: { name: 'Pro', monthly: 24.99, currency: 'USD' },
 };
 
 const BILLING_MONTHS = {

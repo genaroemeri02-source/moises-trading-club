@@ -24,7 +24,8 @@ import {
   safeArray, normalizeTradeArrayFields,
   normalizeImportedTradeRow, parseCsv,
   normalizeTradeSetup, tradeDayKey, isClosedEvaluableTrade, accountName,
-  sanitizeFirestoreObject, normalizedAccounts
+  sanitizeFirestoreObject, normalizedAccounts,
+  buildCsvImportResult, formatCsvImportToast
 } from './lib/tradeUtils.js';
 import {
   behaviorScoreFromTrade, behaviorScoreLabel,
@@ -37,6 +38,17 @@ import {
   exportToJson, exportToCsv,
   buildTradeExportFilename, buildTradesExportFilename
 } from './lib/importExportUtils.js';
+import {
+  BILLING_CYCLES,
+  ACCESS_PLANS,
+  COMMERCIAL_PLANS,
+  FEATURE_STATUS_LABEL,
+  GATING_TRUTH,
+  checkoutPlanId,
+  calculatePlanPrice,
+  planCycleSummary,
+  formatPlanMonthlyPrice,
+} from './lib/commercialConfig.js';
 import { Card } from './components/ui/Card.jsx';
 import { AuroraBackground } from './components/ui/AuroraBackground.jsx';
 import { DashboardHero } from './components/dashboard/DashboardHero.jsx';
@@ -494,15 +506,6 @@ function accessLabel(status){
   return labels[s] || 'Activación pendiente';
 }
 
-const PLAN_PRICING={
-  basic:{monthly:14.99,currency:'USD'},
-  premium:{monthly:24.99,currency:'USD'}
-};
-const BILLING_CYCLES={
-  monthly:{id:'monthly',label:'Mensual',short:'1 mes',suffix:'/mes',months:1,badge:null,featured:false},
-  quarterly:{id:'quarterly',label:'Trimestral',short:'3 meses',suffix:'/trim.',months:3,badge:'Ahorro 20%',featured:false},
-  annual:{id:'annual',label:'Anual',short:'12 meses',suffix:'/año',months:12,badge:'Mejor valor',featured:true}
-};
 const WHATSAPP_MENTORIA=import.meta.env.VITE_WHATSAPP_MENTORIA || '5493412133662';
 const API_BASE_URL=String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 const apiUrl=(path)=>`${API_BASE_URL}${path.startsWith('/')?path:`/${path}`}`;
@@ -516,44 +519,6 @@ const PAYMENT_CONFIG={
   cancelUrl:import.meta.env.VITE_PAYMENT_CANCEL_URL || `${window.location.origin}/payment-cancel`,
   membershipSyncEndpoint:import.meta.env.VITE_MEMBERSHIP_SYNC_ENDPOINT || ''
 };
-const ACCESS_PLANS=[
-  {id:'basic',name:'Club',kicker:'Founding Access',headline:'Base operativa para registrar, validar y revisar sin improvisar.',cta:'Activar Club',tone:'base',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. Ideal para ordenar tu proceso diario con evidencia.',features:['Journal operativo','Checklist','Calendario P/L','Gesti\u00f3n b\u00e1sica de riesgo','Base / comunidad']},
-  {id:'premium',name:'Pro',kicker:'M\u00e1s elegido',headline:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',cta:'Activar Pro',recommended:true,tone:'pro',valueNote:'Precio preferencial durante etapa de expansi\u00f3n. La mejor relaci\u00f3n entre datos, riesgo y revisi\u00f3n.',features:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync','Mayor profundidad de m\u00e9tricas']},
-  {id:'mentorship',name:'Mentor\u00eda',kicker:'1 a 1',headline:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',cta:'Aplicar a mentor\u00eda',tone:'mentor',valueNote:'Cupos limitados para traders que necesitan revisi\u00f3n directa y seguimiento.',features:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
-];
-function checkoutPlanId(planId){
-  if(planId==='basic') return 'club';
-  if(planId==='premium') return 'pro';
-  return planId;
-}
-function calculatePlanPrice(planId,cycleId='monthly'){
-  const pricing=PLAN_PRICING[planId];
-  if(!pricing) return null;
-  const monthly=pricing.monthly;
-  if(cycleId==='monthly') return {currency:pricing.currency,monthly,regular:monthly,total:monthly,savePct:0,saveAmount:0,months:1};
-  if(cycleId==='quarterly'){
-    const regular=monthly*3;
-    const total=regular*.8;
-    return {currency:pricing.currency,monthly,regular,total,savePct:20,saveAmount:regular-total,months:3};
-  }
-  const quarterlyTotal=monthly*3*.8;
-  const regular=quarterlyTotal*4;
-  const total=regular*.9;
-  const monthlyEquivalent=monthly*12;
-  const effectiveSavePct=Math.round((1-(total/monthlyEquivalent))*100);
-  return {currency:pricing.currency,monthly,regular,total,savePct:10,effectiveSavePct,saveAmount:regular-total,months:12};
-}
-function formatCurrencyValue(value,currency='USD',options={}){
-  const amount=Number(value||0);
-  const hasDecimals=Math.abs(amount%1)>0.0001;
-  const decimals=options.decimals ?? hasDecimals;
-  return `${currency} ${amount.toLocaleString('en-US',{minimumFractionDigits:decimals?2:0,maximumFractionDigits:decimals?2:0})}`;
-}
-function planCycleSummary(planId,cycleId){
-  const price=calculatePlanPrice(planId,cycleId);
-  if(!price) return null;
-  return {price,final:formatCurrencyValue(price.total,price.currency),regular:price.regular>price.total?formatCurrencyValue(price.regular,price.currency):null,perMonth:cycleId==='monthly'?null:`Equiv. ${formatCurrencyValue(price.total/price.months,price.currency)}/mes`};
-}
 function membershipDurationMonths(cycleId){return cycleId==='annual'?12:cycleId==='quarterly'?3:1}
 function membershipDurationDays(cycleId){return cycleId==='annual'?365:cycleId==='quarterly'?90:30}
 async function notifyUsers(users,text,type='general',meta={}){const unique=[...new Map((users||[]).filter(u=>u.uid).map(u=>[u.uid,u])).values()]; for(const u of unique){await addDoc(collection(db,'notifications'),{userId:u.uid,text,type,read:false,target:meta.target||type,targetId:meta.targetId||'',createdAt:serverTimestamp(),createdDate:today()});}}
@@ -758,11 +723,7 @@ function AnimatedProductDemo({images,title,className='',variant='hero',videoSrc=
 
 function PublicLanding(){
   const [landingVideoFailed,setLandingVideoFailed]=useState(false);
-  const landingPlans=[
-    {name:'Club',badge:'Founding Access',price:'USD 14.99',copy:'Base operativa para registrar, validar y revisar sin improvisar.',items:['Journal operativo','Checklist','Calendario P/L','Gesti\u00f3n b\u00e1sica de riesgo','Base / comunidad']},
-    {name:'Pro',badge:'M\u00e1s elegido',price:'USD 24.99',copy:'Analytics, insights y revisi\u00f3n de conducta para traders activos.',featured:true,items:['Todo Club','Analytics avanzados','Insights accionables','Reportes de performance','Revisi\u00f3n de conducta','An\u00e1lisis IA operativo','MT5 Sync','Mayor profundidad de m\u00e9tricas']},
-    {name:'Mentor\u00eda',badge:'1 a 1',price:'USD 250',copy:'Acompa\u00f1amiento y feedback personalizado sobre tu proceso.',items:['Todo Pro','Revisi\u00f3n personalizada','Acompa\u00f1amiento','Feedback sobre proceso','Cupos limitados']}
-  ];
+  const landingPlans=COMMERCIAL_PLANS;
   const proofDemos=[
     {title:'Validá antes de operar',benefit:'Checklist, contexto, setup y RR antes de poner capital en riesgo.',src:'/commercial/mtc-demo-checklist-execution.png'},
     {title:'Protegé tu riesgo',benefit:'Límites, drawdown y exposición visibles para sostener disciplina.',src:'/commercial/mtc-demo-risk-limits.png'},
@@ -835,12 +796,13 @@ function PublicLanding(){
     <section className="landingSection landingPricingSection finalPricingSection" id="precios">
       <span className="landingBadge soft">Acceso Founding Members</span>
       <h2>Elegí el nivel de estructura que exige tu operativa.</h2>
-      <p>Precio preferencial durante etapa de expansión para traders que quieren convertir actividad en evidencia, criterio y mejora continua.</p>
-      <div className="landingPlanGrid">{landingPlans.map(plan=><article className={plan.featured?'landingPlanCard featured':'landingPlanCard'} key={plan.name}>
-        <div className="landingPlanTop"><span>{plan.badge}</span><h3>{plan.name}</h3><p>{plan.copy}</p></div>
-        <div className="landingPlanPrice"><b>{plan.price}</b><em>/ mes</em></div>
-        <ul>{plan.items.map(item=><li key={item}>{item}</li>)}</ul>
-        <button className={plan.featured?'primary landingCta':'ghost landingCta'} onClick={()=>goPublic('/register')}>Activar {plan.name}</button>
+      <p>Precio preferencial durante etapa de expansión. Comparativa comercial honesta: disponible hoy, beta o próximamente — sin prometer sync automático ni IA que aún no existe.</p>
+      {GATING_TRUTH.commercialComparisonOnly&&<p className="commercialGatingNote">Los planes describen el producto. El acceso actual se activa por membresía aprobada; el gating fino Club/Pro sigue en roadmap.</p>}
+      <div className="landingPlanGrid">{landingPlans.map(plan=><article className={plan.recommended?'landingPlanCard featured':'landingPlanCard'} key={plan.id}>
+        <div className="landingPlanTop"><span>{plan.badge}</span><h3>{plan.name}</h3><p>{plan.subtitle}</p></div>
+        <div className="landingPlanPrice"><b>{formatPlanMonthlyPrice(plan)}</b><em>/ mes</em></div>
+        <ul className="commercialFeatureList">{plan.features.map(item=><li key={item.id} className={'featureStatus-'+item.status}><span className="featureStatusLabel">{FEATURE_STATUS_LABEL[item.status]||item.status}</span><span>{item.label}</span></li>)}</ul>
+        <button className={plan.recommended?'primary landingCta':'ghost landingCta'} onClick={()=>goPublic('/register')}>{plan.id==='mentorship'?'Aplicar a mentoría':`Activar ${plan.name}`}</button>
       </article>)}</div>
     </section>
     <section className="landingFinal" id="plataforma">
@@ -1381,21 +1343,41 @@ function Journal({data,profile}){
     const f=e.target.files?.[0];
     if(!f)return;
     try{
-      const rows=parseCsv(await f.text(),profile.uid);
-      if(!rows.length){toast('El CSV está vacío o no tiene filas válidas.','error'); e.target.value=''; return;}
+      const text=await f.text();
+      const debugImport=typeof window!=='undefined' && window.location.search.includes('debugImport=1');
+      const activeNames=activeAccountNames(data.settings);
+      const lastAccount=localStorage.getItem('mtc-last-account')||'';
+      const importAccount=activeNames.includes(lastAccount)?lastAccount:(active!=='__all__'&&activeNames.includes(active)?active:(activeNames[0]||'Cuenta principal'));
       const signature=t=>[profile.uid,getTradeOperationalDateKey(t)||'',String(t.asset||'').toUpperCase(),String(t.side||''),toNumberSafe(t.resultMoney),toNumberSafe(t.resultR),normalizeTradeSetup(t)].join('|');
       const existing=new Set((data.trades||[]).map(signature));
-      let imported=0,skipped=0;
-      for(const r of rows){
-        const clean=normalizeImportedTradeRow(r,profile.uid);
-        if(!String(clean.asset||'').trim()){skipped++; continue;}
-        const sig=signature(clean);
-        if(existing.has(sig)){skipped++; continue;}
-        existing.add(sig);
-        imported++;
-        await addDoc(collection(db,'trades'),sanitizeFirestoreObject({...clean,uid:profile.uid,ownerId:profile.uid,createdAt:serverTimestamp()}));
+      const result=buildCsvImportResult(text,profile.uid,{
+        account:importAccount,
+        existingSignatures:existing,
+        signatureFn:signature,
+        debug:debugImport
+      });
+      if(debugImport) console.log('[debugImport] summary', result.summary, result.skipped);
+
+      for(const clean of result.imported){
+        await addDoc(collection(db,'trades'),sanitizeFirestoreObject({
+          ...clean,
+          uid:profile.uid,
+          ownerId:profile.uid,
+          userId:profile.uid,
+          createdAt:serverTimestamp()
+        }));
       }
-      toast(`${imported} trades importados${skipped?` · ${skipped} omitidos`:''}`);
+
+      if(result.imported.length){
+        const firstDate=result.imported[0]?.tradingDay||result.imported[0]?.date;
+        if(firstDate) setSelectedDate(firstDate);
+      }
+
+      const feedback=formatCsvImportToast(result);
+      toast(feedback.text, feedback.type);
+      if(result.skipped.length && result.imported.length===0 && result.skipped[0]){
+        console.warn('importCsv:skipped', result.skipped.slice(0,5));
+      }
     }catch(err){
       console.error('importCsv:error',err);
       toast('No se pudo importar el CSV. Revisá el formato del archivo.','error');
@@ -2129,34 +2111,34 @@ function BrokerStatusPill({status}) {
 function BrokerSync({data,profile}){
   const [notify,setNotify]=useState(()=>localStorage.getItem('mtc-mt5-notify')==='1');
   const importedTrades=(data.trades||[]).filter(t=>t.brokerSource==='metaapi');
-  function activateReminder(){localStorage.setItem('mtc-mt5-notify','1'); setNotify(true); toast('Listo. Te avisaremos cuando las integraciones estén disponibles.','success')}
+  function activateReminder(){localStorage.setItem('mtc-mt5-notify','1'); setNotify(true); toast('Listo. Te avisaremos cuando BrokerSync esté disponible.','success')}
   return <main className="page brokerSyncPage comingSoonBrokerPage">
     <section className="brokerHero cleanBrokerHero">
       <div>
-        <span className="brokerBadge"><Activity size={15}/> Integraciones profesionales</span>
-        <h2>Integraciones MT4 / MT5</h2>
-        <p>Centralizá tu operativa y mantené tu proceso conectado con las herramientas clave del ecosistema. Las integraciones disponibles dependen de tu membresía y del nivel de acceso activo.</p>
-        <div className="brokerHeroStats"><span>Journal profesional</span><span>Membresías privadas</span><span>Ecosistema conectado</span></div>
+        <span className="brokerBadge"><Clock3 size={15}/> Próximamente</span>
+        <h2>BrokerSync / MT4 · MT5</h2>
+        <p>La sincronización automática con broker todavía no está disponible en la app. Hoy podés cargar operaciones de forma manual (journal y CSV). El sync automático forma parte del roadmap.</p>
+        <div className="brokerHeroStats"><span>Importación manual disponible</span><span>Sync automático próximamente</span><span>Sin promesas de conexión activa</span></div>
       </div>
-      <div className="brokerHeroPanel"><b>Conexión operativa</b><small>Usá esta sección para centralizar herramientas externas y mantener tu proceso ordenado según tu plan.</small></div>
+      <div className="brokerHeroPanel"><b>Estado: próximamente</b><small>No hay conexión MT5 activa en esta versión. Cuando esté listo, te avisamos.</small></div>
     </section>
 
     <div className="brokerGrid">
-      <Card title="Herramientas activas del ecosistema" sub="Tu plataforma centraliza operativa, gestión, revisión y evolución como trader.">
+      <Card title="Qué está disponible hoy" sub="Honestidad comercial: no vendemos sync automático hasta que exista.">
         <div className="comingSoonStack">
-          <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Los traders ya pueden cargar operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
-          <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Analytics disponible</b><p>La app ya puede medir rendimiento, comportamiento, sesiones, errores y evolución.</p></div></div>
-          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>Integraciones según membresía</b><p>El acceso a conexiones externas se organiza por plan para mantener una experiencia clara, segura y profesional.</p></div></div>
+          <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Cargá operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
+          <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Importación / export manual</b><p>Podés exportar e importar datos desde el journal. No hay auto-sync con el broker.</p></div></div>
+          <div className="comingSoonItem muted"><Clock3 size={18}/><div><b>BrokerSync MT5 — próximamente</b><p>La conexión automática MetaTrader no está activa en la UI. Backend experimental no se ofrece como producto.</p></div></div>
         </div>
         <div className="brokerActions"><button className="primary" onClick={activateReminder}>{notify?'Aviso activado':'Avisarme cuando esté disponible'}</button></div>
       </Card>
-      <Card title="Flujo del ecosistema" sub="Herramientas diseñadas para registrar, validar, medir y mejorar tu operativa diaria.">
-        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Membresía</span><p>Acceso privado al ecosistema según tu plan activo.</p></div><div><b>2</b><span>Journal</span><p>Registro profesional de operaciones, emociones y lecciones.</p></div><div><b>3</b><span>Checklist</span><p>Validación operativa antes de ejecutar una idea.</p></div><div><b>4</b><span>Analytics</span><p>Medición objetiva para convertir datos en disciplina.</p></div></div>
+      <Card title="Flujo actual del ecosistema" sub="Registrá, validá y medí sin depender de sync externo.">
+        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Journal</span><p>Registro manual de operaciones y lecciones.</p></div><div><b>2</b><span>Checklist</span><p>Validación operativa antes de ejecutar.</p></div><div><b>3</b><span>Analytics</span><p>Decision Intelligence sobre tu evidencia.</p></div><div><b>4</b><span>BrokerSync</span><p>Sincronización automática — roadmap.</p></div></div>
       </Card>
     </div>
 
-    <Card title="Registro de integraciones" sub="Cuando conectes una fuente operativa, este espacio te ayudará a revisar actividad y consistencia.">
-      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">Todavía no hay actividad importada. Mientras tanto, podés mantener tu proceso completo desde Journal, Checklist y Analytics.</p>}</div>
+    <Card title="Registro de importaciones" sub="Si en el futuro hay sync, este espacio mostrará actividad importada.">
+      <div className="syncHistory">{importedTrades.slice(0,8).map(t=><div key={t.id}><span>{t.tradingDay||t.date}</span><b>{t.asset} · {t.side}</b><strong className={Number(t.resultMoney)>=0?'pos':'neg'}>{Number(t.resultMoney)>=0?'+':''}{money(t.resultMoney)}</strong></div>)}{!importedTrades.length&&<p className="muted">No hay actividad importada por sync. Mientras tanto, mantené tu proceso desde Journal, Checklist y Analytics.</p>}</div>
     </Card>
   </main>
 }
@@ -2313,7 +2295,7 @@ function CoachIA({data,profile}){
   ];
   parts.push('Regla de cierre: si tu estado emocional busca alivio, validación o recuperación, no estás operando: estás reaccionando. Volvé al checklist.'); setAns(parts.join('\n\n'));}
   const prompt=`Actúa como psicólogo de trading de Moisés Trading Club. Analiza mi situación sin motivación vacía, detecta sesgos emocionales, riesgo de venganza/sobreoperativa y dame una regla concreta. Contexto: ${q}`;
-  return <main className="page"><Card title="Coach psicológico de trading" sub="IA-lite con memoria ampliada: psicología, riesgo, noticias, fondeo y ejecución."><div className="coachFaqs">{faqs.map(f=><button key={f} onClick={()=>{setQ(f); analyze(f)}}>{f}</button>)}</div><TextareaWithEmoji className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Escribí cómo te sentís, qué trade querés tomar o qué error repetiste..."/><div className="actions"><button className="primary" onClick={()=>analyze()}><Activity size={16}/>Analizar estado mental</button><button className="ghost" onClick={()=>copyText(prompt,'Prompt para IA copiado')}><Copy size={16}/>Copiar prompt avanzado</button></div>{ans&&<div className="coachAnswer"><h3>Lectura del coach</h3>{ans.split('\n\n').map((p,i)=><p key={i}>{p}</p>)}</div>}</Card><Card title="Coach avanzado" sub="Análisis guiado para mejorar conducta, riesgo y ejecución."><p className="muted">Usá este espacio para ordenar tus pensamientos, detectar patrones repetidos y convertir cada sesión en una decisión más consciente.</p></Card></main>
+  return <main className="page"><Card title="Coach de proceso (reglas locales)" sub="No es IA conectada a tus datos. Es un asistente de palabras clave + prompts para copiar a una IA externa."><div className="coachFaqs">{faqs.map(f=><button key={f} onClick={()=>{setQ(f); analyze(f)}}>{f}</button>)}</div><TextareaWithEmoji className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Escribí cómo te sentís, qué trade querés tomar o qué error repetiste..."/><div className="actions"><button className="primary" onClick={()=>analyze()}><Activity size={16}/>Analizar con reglas locales</button><button className="ghost" onClick={()=>copyText(prompt,'Prompt para IA externa copiado')}><Copy size={16}/>Copiar prompt para IA externa</button></div>{ans&&<div className="coachAnswer"><h3>Lectura del coach</h3>{ans.split('\n\n').map((p,i)=><p key={i}>{p}</p>)}</div>}</Card><Card title="AI Review — próximamente" sub="Revisión asistida por IA basada en tus datos operativos aún no está disponible."><p className="muted">Cuando exista AI Review, usará tu journal y métricas reales. Hoy este módulo no analiza tus trades con un modelo de IA.</p></Card></main>
 }
 
 function Notifications({data,profile,setTab}){async function read(n){await markNotificationAsRead(n.id); const target=n.target||n.type; if(target==='announcement'||target==='announcements') setTab('announcements'); else if(target==='idea'||target==='ideas') setTab('ideas'); else if(target==='academy') setTab('academy'); else if(target==='community') setTab('community'); else if(target==='chat') setTab('chat'); else toast('Notificación leída');} const ordered=[...(data.notifications||[])].sort((a,b)=>(a.read===b.read?0:a.read?1:-1)); return <main className="page"><Card title="Centro de notificaciones" sub="Tocá una notificación para ir directo a la sección correspondiente.">{ordered.map(n=><button className="notif clickable" key={n.id} onClick={()=>read(n)}><span className={n.read?'read':''}></span><div><b>{n.text}</b><p>{safeDate(n.createdAt)||n.date} · {n.type||'general'}</p></div><ChevronRight size={16}/></button>)}{!ordered.length&&<Empty title="Sin notificaciones" text="Las alertas aparecerán acá."/>}</Card></main>}
@@ -2495,27 +2477,29 @@ function AccessGate({profile}){
           <div className="finalPaywallDemoFrame">{paywallDemo}</div>
         </div>
         <div className="paywallFunnelBilling finalPaywallBilling">
-          <div><b>Precio preferencial durante etapa de expansión.</b><span>Proceso completo: ejecución, riesgo, conducta, analytics y revisión.</span></div>
+          <div><b>Precio preferencial durante etapa de expansión.</b><span>Comparativa honesta: disponible hoy vs próximamente. Sin sync automático ni IA vendidos como activos.</span></div>
           <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
         </div>
         {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
+        {GATING_TRUTH.commercialComparisonOnly&&<p className="commercialGatingNote paywallGatingNote">Los planes son comparativa comercial. El acceso se activa por membresía aprobada; el gating fino Club/Pro está en roadmap.</p>}
         <div className="paywallFunnelPlans finalPaywallPlans">
           {ACCESS_PLANS.map(plan=>{
             const quote=planCycleSummary(plan.id,cycle);
             const active=selected===plan.id;
+            const mentorPrice=formatPlanMonthlyPrice(plan);
             return <article key={plan.id} className={'paywallFunnelPlan '+plan.tone+' '+(plan.recommended?'featured':'')+' '+(active?'selected':'')} onClick={()=>setSelected(plan.id)}>
               {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
               <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
               <div className="paywallFunnelPrice">
-                {quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} / {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>USD 250</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
+                {quote? <>{quote.regular&&<s>{quote.regular}</s>}<b>{quote.final}</b><em>{BILLING_CYCLES[cycle].suffix} / {BILLING_CYCLES[cycle].short}</em>{quote.perMonth&&<small>{quote.perMonth}</small>}</> : <><b>{mentorPrice}</b><em>/mes</em><small>Mentoría personalizada 1 a 1</small></>}
               </div>
               <p className="paywallFunnelValue">{plan.valueNote}</p>
-              <ul>{plan.features.map(f=><li key={f}><CheckCircle2 size={15}/><span>{f}</span></li>)}</ul>
-              <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout...':plan.id==='mentorship'?'Aplicar a mentor\u00eda':plan.cta}</button>
+              <ul className="commercialFeatureList">{plan.features.map(f=><li key={f.id} className={'featureStatus-'+f.status}><CheckCircle2 size={15}/><span>{f.label}</span><em className="featureStatusLabel">{FEATURE_STATUS_LABEL[f.status]||f.status}</em></li>)}</ul>
+              <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout...':plan.id==='mentorship'?'Aplicar a mentoría':plan.cta}</button>
             </article>
           })}
         </div>
-        <p className="paywallFunnelDisclaimer">MTC Analytics no promete resultados financieros. Es una plataforma para registrar, analizar y mejorar tu proceso de trading.</p>
+        <p className="paywallFunnelDisclaimer">MTC Analytics no promete resultados financieros. Es una plataforma para registrar, analizar y mejorar tu proceso de trading. BrokerSync y AI Review están marcados como próximamente hasta que existan.</p>
       </div>
     </section>
   </div>

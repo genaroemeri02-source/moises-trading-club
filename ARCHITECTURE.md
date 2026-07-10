@@ -24,7 +24,7 @@ Componentes del tab Dashboard. Datos y cálculos pesados vienen de `main.jsx` + 
 
 | Archivo | Rol |
 |---------|-----|
-| `DashboardHero.jsx` | Cabecera operativa (cuenta / sesión) |
+| `DashboardHero.jsx` | Centro de decisión diario (cuenta / sesión / foco) — no repite título del topbar |
 | `DashboardCockpitPanel.jsx` | Cockpit operativo: estado + razón + pulso (Sprint 07) |
 | `DashboardActionCard.jsx` | Próxima acción (1 directiva) |
 | `DashboardRiskSnapshot.jsx` | Snapshot compacto de límites / R / checklist |
@@ -471,10 +471,12 @@ Bloqueo emocional solo con evidencia de la jornada actual (check-in de hoy, pér
 
 ### Orden visual
 
-1. `DashboardHero` (cuenta / sesión)
-2. **Cockpit** (`DashboardCockpitPanel` → acción + riesgo + señal)
+1. `DashboardHero` — centro de decisión diario (cuenta / sesión / foco)
+2. **Cockpit** (`DashboardCockpitPanel` → lectura operativa actual + acción + riesgo + señal)
 3. KPI strip (secundario)
 4. Calendario + right rail + insights (evidencia)
+
+Jerarquía de copy: topbar “Dashboard principal” ≠ hero “Centro de decisión diario” ≠ cockpit “Lectura operativa actual”.
 
 Mobile ≤390: stack vertical — Cockpit → acción → riesgo → señal → KPIs → calendario. Sin overflow horizontal; menú hamburguesa / command sheet intactos.
 
@@ -566,3 +568,70 @@ El panel responde “qué hacer ahora” antes de que existan métricas. El Cock
 - No Firebase/Auth/Pricing/Checkout, no shell/nav, no Journal save core, no Risk calc, no broker sync, no IA.
 - Persistencia dismiss = localStorage; risk step = key `mtc-risk-settings` presente.
 - CSS en sección `ONBOARDING / FIRST RUN` (no EOF).
+
+---
+
+## Sprint 09 — Commercial Truth
+
+Fuente única de verdad comercial: `src/lib/commercialConfig.js`.
+
+### Planes y precios finales (USD / mes)
+
+| Plan | Id interno | Checkout alias | Precio |
+|------|------------|----------------|--------|
+| Club | `basic` | `club` | **14.99** |
+| Pro | `premium` | `pro` | **24.99** |
+| Mentoría | `mentorship` | WhatsApp only | **250** |
+
+Ciclos: mensual / trimestral (−20%) / anual (−10% sobre trimestral anualizado). Mentoría no usa PayPal.
+
+### Feature availability model
+
+Estados: `available` | `beta` | `coming-soon` | `not-included`.
+
+**Disponible ahora**
+
+- Club: journal manual, checklist, calendario P/L, riesgo básico, dashboard, comunidad/onboarding
+- Pro (+ Mentoría): Analytics / Decision Intelligence, Edge Lab, directivas, journal emocional, Emotion Intelligence, cockpit avanzado, export JSON/CSV
+- Mentoría: revisión 1 a 1, acompañamiento, feedback (Pro incluido)
+
+**Coming soon (no vender como activo)**
+
+- BrokerSync / MT5 (sync automático)
+- AI Review (IA conectada a datos)
+- Reportes PDF
+
+**Beta:** ninguna feature comercial marcada beta en este sprint.
+
+### Honestidad MT5 / IA / BrokerSync
+
+- Landing + paywall: Pro lista BrokerSync y AI Review como **próximamente**, no como incluidos activos.
+- Página Integraciones: copy explícito de “próximamente”; journal/CSV manual disponibles.
+- CoachIA (ruta huérfana): etiquetado como reglas locales + prompt externo; no “IA operativa”.
+
+### Gating real vs pendiente
+
+| Real hoy | Pendiente (Sprint 10/11) |
+|----------|---------------------------|
+| Binario: `isApproved` → app vs `AccessGate` | Gating Club vs Pro en frontend |
+| Roles privilegiados bypass | Alinear `defaultPlanFeatures` server (Club `analytics:true`) |
+| Backend `mt5Sync` solo en API MT5 (UI no llama) | Unificar PayPal orders vs subscriptions |
+
+`GATING_TRUTH.commercialComparisonOnly = true` — la matriz de planes es comparativa comercial, no enforcement de tier.
+
+### PayPal / checkout
+
+- **No se tocó** lógica profunda de provider.
+- Frontend sigue enviando `club` / `pro` vía `checkoutPlanId()`.
+- Precios de labels alineados a 14.99 / 24.99; montos reales de suscripción siguen en env PayPal.
+- Deuda documentada: Render `server/index.js` espera `basic`/`premium` en orders; Vercel `api/createPayPalOrder.js` acepta aliases.
+
+### Service worker
+
+- `public/sw.js` sigue en `mtc-cache-v2-system-reading` (network-first).
+- **No bump** en este sprint; deuda Sprint 10: `mtc-cache-v3-commercial-s09` tras deploy de copy/precios.
+
+### Docs alineados
+
+- `docs/payments-architecture.md`, `RELEASE-v45-COMMERCIAL-READY.md` → precios 14.99 / 24.99
+- `docs/COMMERCIAL_TRUTH_AUDIT.md` — auditoría completa Sprint 09
