@@ -386,7 +386,7 @@ export const COMMERCIAL_PLANS = [
     headline: 'Acompañamiento humano.',
     bestFor: 'Para traders que quieren acompañamiento, criterio externo y corrección del proceso.',
     valueNote: 'Pro + revisión estratégica, seguimiento y feedback operativo.',
-    cta: 'Hablar por WhatsApp',
+    cta: 'Hablar por Mentoría',
     recommended: false,
     tone: 'mentor',
     available: true,

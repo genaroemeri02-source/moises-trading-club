@@ -33996,6 +33996,12 @@ html[data-theme="light"] .diLanding .diDemoCard small{
   color:var(--aurora-text,#F8F7FF);
 }
 
+/* neutralize legacy gold background overlay on the Aurora paywall */
+.auroraPaywall.paywallFunnel::before{
+  content:none!important;
+  background:none!important;
+}
+
 .auroraPaywall .paywallFunnelBg{
   background:
     radial-gradient(circle at 18% 10%,rgba(124,92,255,.16),transparent 32%),
@@ -34220,6 +34226,725 @@ html[data-theme="light"] .diLanding .diDemoCard small{
   .auroraPaywall .paywallFunnelBilling button{min-width:108px;flex:0 0 auto}
   .auroraPaywall .auroraPaywallCard button.primary,
   .auroraPaywall .auroraPaywallCard button.secondary{width:100%}
+}
+
+/* ==========================================================================
+   COMMERCIAL EXPERIENCE — SHARED
+   ========================================================================== */
+
+.commercialHeader.landingNav{
+  position:sticky;
+  top:0;
+  z-index:40;
+  backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,rgba(7,5,13,.86),rgba(7,5,13,.55));
+  border-bottom:1px solid rgba(124,92,255,.14);
+}
+
+.diLanding .commercialHeader.landingNav nav a:hover{
+  color:var(--aurora-cyan,#33E6C4);
+}
+
+/* offset anchors so sticky header does not cover section titles */
+.diLanding .diSection,
+.diLanding .diPricing,
+.diLanding .diFinalCta{
+  scroll-margin-top:96px;
+}
+
+/* ==========================================================================
+   COMMERCIAL LANDING — PREMIUM REBUILD
+   ========================================================================== */
+
+.diLanding .diCompareGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:22px;
+}
+
+.diLanding .diCompareCard{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  background:rgba(255,255,255,.035);
+  padding:20px 18px;
+}
+
+.diLanding .diCompareCard--mtc{
+  border-color:rgba(51,230,196,.26);
+  background:linear-gradient(160deg,rgba(51,230,196,.10),rgba(124,92,255,.06));
+}
+
+.diLanding .diCompareKicker{
+  display:block;
+  margin-bottom:12px;
+  color:var(--aurora-dim,#9C97B8);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.diLanding .diCompareCard--mtc .diCompareKicker{color:var(--aurora-cyan,#33E6C4)}
+
+.diLanding .diCompareCard ul{
+  display:grid;
+  gap:10px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.diLanding .diCompareCard li{
+  position:relative;
+  padding-left:20px;
+  color:var(--aurora-text-soft,rgba(248,247,255,.82));
+  font-size:14px;
+  font-weight:650;
+  line-height:1.4;
+}
+
+.diLanding .diCompareCard li:before{
+  content:'';
+  position:absolute;
+  left:2px;
+  top:8px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:rgba(191,184,218,.4);
+}
+
+.diLanding .diCompareCard--mtc li:before{background:var(--aurora-cyan,#33E6C4)}
+
+.diLanding .diSystemFlow{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:10px;
+  margin-top:24px;
+}
+
+.diLanding .diSystemNode{
+  position:relative;
+  border:1px solid rgba(124,92,255,.16);
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+  padding:16px 12px;
+  min-width:0;
+}
+
+.diLanding .diSystemStep{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  margin-bottom:10px;
+  border-radius:8px;
+  background:linear-gradient(135deg,rgba(51,230,196,.18),rgba(124,92,255,.22));
+  color:var(--aurora-text,#F8F7FF);
+  font-size:12px;
+  font-weight:900;
+}
+
+.diLanding .diSystemNode b{
+  display:block;
+  margin-bottom:6px;
+  color:var(--aurora-text,#F8F7FF);
+  font-size:14px;
+  letter-spacing:-.01em;
+}
+
+.diLanding .diSystemNode small{
+  color:var(--aurora-text-muted,rgba(191,184,218,.7));
+  font-size:12px;
+  line-height:1.35;
+}
+
+.diLanding .diModuleGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-top:22px;
+}
+
+.diLanding .diModuleCard{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  padding:18px 16px;
+  min-width:0;
+}
+
+.diLanding .diModuleCard h3{
+  margin:0;
+  color:var(--aurora-text,#F8F7FF);
+  font-size:16px;
+  letter-spacing:-.02em;
+}
+
+.diLanding .diModuleCard p{
+  margin:0;
+  flex:1;
+  color:var(--aurora-text-muted,rgba(191,184,218,.72));
+  font-size:13.5px;
+  line-height:1.45;
+}
+
+.diLanding .diModuleStatus{
+  align-self:flex-start;
+  border-radius:999px;
+  padding:4px 9px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+.diLanding .diModuleStatus--live{
+  color:var(--aurora-cyan,#33E6C4);
+  border:1px solid rgba(51,230,196,.28);
+  background:rgba(51,230,196,.08);
+}
+
+.diLanding .diModuleStatus--soon{
+  color:#FFB4D8;
+  border:1px solid rgba(255,79,163,.28);
+  background:rgba(255,79,163,.08);
+}
+
+@media(max-width:1100px){
+  .diLanding .diSystemFlow{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .diLanding .diModuleGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:640px){
+  .diLanding .diCompareGrid{grid-template-columns:1fr}
+  .diLanding .diSystemFlow{grid-template-columns:1fr 1fr}
+  .diLanding .diModuleGrid{grid-template-columns:1fr}
+}
+
+/* ==========================================================================
+   AUTH EXPERIENCE — PREMIUM LOGIN
+   ========================================================================== */
+
+.authExperience.authPage{
+  min-height:100dvh;
+  display:block;
+  padding:clamp(16px,4vw,40px);
+  background:
+    radial-gradient(ellipse 60% 45% at 14% -6%,rgba(124,92,255,.22),transparent 55%),
+    radial-gradient(ellipse 50% 40% at 88% 6%,rgba(51,230,196,.14),transparent 52%),
+    radial-gradient(ellipse 55% 45% at 60% 108%,rgba(124,92,255,.12),transparent 55%),
+    radial-gradient(ellipse 40% 30% at 40% 55%,rgba(51,230,196,.05),transparent 60%),
+    linear-gradient(180deg,#08060F 0%,#0C0917 48%,#08060F 100%)!important;
+  color:var(--aurora-text,#F8F7FF);
+  overflow:hidden auto;
+}
+
+.authExperience .authExperienceBg{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+.authExperience .authExperienceBg span{
+  position:absolute;
+  border-radius:999px;
+  filter:blur(80px);
+  opacity:.5;
+}
+
+.authExperience .authExperienceBg span:nth-child(1){width:360px;height:360px;background:rgba(124,92,255,.28);left:8%;top:12%}
+.authExperience .authExperienceBg span:nth-child(2){width:320px;height:320px;background:rgba(51,230,196,.16);right:10%;bottom:12%}
+
+.authExperience .authBack{
+  position:relative;
+  z-index:2;
+  margin:0 0 18px;
+  color:var(--aurora-text-muted,rgba(191,184,218,.8));
+}
+
+.authExperience .authExperienceGrid{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(380px,.85fr);
+  gap:clamp(24px,5vw,64px);
+  align-items:center;
+  max-width:1160px;
+  margin:0 auto;
+  min-height:calc(100dvh - 120px);
+}
+
+.authExperience .authValue{
+  min-width:0;
+}
+
+.authExperience .authValueBrand img{
+  height:34px;
+  width:auto;
+  margin-bottom:26px;
+}
+
+.authExperience .authValueEyebrow{
+  display:inline-block;
+  color:var(--aurora-cyan,#33E6C4);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.authExperience .authValue h1{
+  margin:14px 0 14px;
+  max-width:16ch;
+  font-size:clamp(34px,4vw,50px);
+  letter-spacing:-.04em;
+  line-height:1.04;
+  color:var(--aurora-text,#F8F7FF);
+}
+
+.authExperience .authValue>p{
+  max-width:46ch;
+  color:var(--aurora-text-muted,rgba(191,184,218,.76));
+  font-size:16px;
+  line-height:1.55;
+}
+
+.authExperience .authValueProof{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:26px 0;
+  max-width:460px;
+}
+
+.authExperience .authValueCard{
+  border:1px solid rgba(124,92,255,.18);
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  padding:14px 16px;
+}
+
+.authExperience .authValueCard b{
+  display:block;
+  color:var(--aurora-text,#F8F7FF);
+  font-size:15px;
+  letter-spacing:-.01em;
+}
+
+.authExperience .authValueCard small{
+  color:var(--aurora-text-muted,rgba(191,184,218,.7));
+  font-size:12.5px;
+}
+
+.authExperience .authValueNote{
+  max-width:44ch;
+  color:var(--aurora-text-muted,rgba(191,184,218,.62));
+  font-size:13px;
+  line-height:1.5;
+}
+
+.authExperience .authCardWrap{
+  display:flex;
+  justify-content:center;
+  min-width:0;
+}
+
+.authExperience .authCard{
+  width:100%;
+  max-width:430px;
+  border:1px solid rgba(124,92,255,.20);
+  border-radius:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));
+  box-shadow:0 30px 90px rgba(0,0,0,.44);
+  backdrop-filter:blur(16px);
+  padding:26px 24px;
+}
+
+.authExperience .authCardHead{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.authExperience .authCardLogo{
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.authExperience .authCardHead b{
+  display:block;
+  color:var(--aurora-text,#F8F7FF);
+  font-size:18px;
+  letter-spacing:-.02em;
+}
+
+.authExperience .authCardHead span{
+  color:var(--aurora-text-muted,rgba(191,184,218,.72));
+  font-size:13px;
+}
+
+.authExperience .authTabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  padding:5px;
+  margin:6px 0 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.authExperience .authTabs button{
+  border:none;
+  border-radius:10px;
+  padding:10px 12px;
+  background:transparent;
+  color:var(--aurora-text-muted,rgba(191,184,218,.78));
+  font-weight:800;
+  font-size:14px;
+}
+
+.authExperience .authTabs button.on{
+  background:linear-gradient(135deg,rgba(51,230,196,.16),rgba(124,92,255,.24));
+  color:var(--aurora-text,#F8F7FF);
+  box-shadow:0 8px 24px rgba(124,92,255,.22);
+}
+
+.authExperience .authInput{
+  width:100%;
+  margin:8px 0;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
+  color:var(--aurora-text,#F8F7FF);
+  padding:13px 14px;
+  font-size:15px;
+}
+
+.authExperience .authInput::placeholder{color:rgba(191,184,218,.5)}
+.authExperience .authInput:focus{outline:none;border-color:rgba(51,230,196,.4);background:rgba(255,255,255,.06)}
+
+.authExperience .authSubmit.primary.full{
+  width:100%;
+  margin-top:8px;
+  border:none!important;
+  border-radius:13px;
+  padding:14px;
+  background:linear-gradient(135deg,#33E6C4,#7C5CFF)!important;
+  background-image:linear-gradient(135deg,#33E6C4,#7C5CFF)!important;
+  color:#06070D!important;
+  font-weight:900;
+  font-size:15px;
+  box-shadow:0 16px 40px rgba(124,92,255,.32);
+}
+
+.authExperience .authSubmit:disabled{opacity:.7}
+
+.authExperience .authLink{
+  display:block;
+  width:100%;
+  margin-top:12px;
+  background:transparent;
+  border:none;
+  color:var(--aurora-cyan,#33E6C4);
+  font-weight:700;
+  font-size:13.5px;
+}
+
+.authExperience .authHint{
+  margin-top:16px;
+  color:var(--aurora-text-muted,rgba(191,184,218,.6));
+  font-size:12.5px;
+  line-height:1.5;
+  text-align:center;
+}
+
+.authExperience .authMsg.err{color:#FF8FB4;font-size:13px;margin:4px 0}
+.authExperience .authMsg.ok{color:#33E6C4;font-size:13px;margin:4px 0}
+
+.authExperience .googleBtn{
+  margin:0 0 10px;
+}
+
+.authExperience .orLine span{
+  background:transparent;
+  color:var(--aurora-text-muted,rgba(191,184,218,.6));
+}
+
+@media(max-width:960px){
+  .authExperience .authExperienceGrid{
+    grid-template-columns:1fr;
+    gap:26px;
+    min-height:0;
+  }
+  .authExperience .authCardWrap{order:-1}
+  .authExperience .authValueProof{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:640px){
+  .authExperience.authPage{padding:14px}
+  .authExperience .authCard{padding:20px 16px;border-radius:20px}
+  .authExperience .authValue h1{font-size:clamp(28px,9vw,38px);max-width:none}
+  .authExperience .authValueProof{gap:10px}
+}
+
+/* ==========================================================================
+   ACTIVATION PAYWALL — PREMIUM REBUILD
+   ========================================================================== */
+
+.activationBadge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:7px 12px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+.activationBadge.is-pending{color:#F7C948;border:1px solid rgba(247,201,72,.28);background:rgba(247,201,72,.10)}
+.activationBadge.is-choose{color:var(--aurora-cyan,#33E6C4);border:1px solid rgba(51,230,196,.28);background:rgba(51,230,196,.10)}
+.activationBadge.is-blocked{color:#FF8FB4;border:1px solid rgba(255,79,163,.3);background:rgba(255,79,163,.10)}
+
+.activationPaywall .finalPaywallDemoFrame{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.paywallAuroraDemo{
+  width:100%;
+  border:1px solid rgba(124,92,255,.22);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(51,230,196,.12),transparent 42%),
+    radial-gradient(circle at 88% 12%,rgba(255,79,163,.10),transparent 40%),
+    linear-gradient(180deg,rgba(18,15,31,.92),rgba(11,8,18,.95));
+  box-shadow:0 28px 80px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.06);
+  padding:20px;
+  display:grid;
+  gap:14px;
+  align-content:start;
+}
+
+.paywallAuroraDemoTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.paywallAuroraDemoKicker{
+  color:rgba(248,247,255,.78);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.paywallAuroraChip{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.paywallAuroraChip--caution{color:#F7C948;border:1px solid rgba(247,201,72,.28);background:rgba(247,201,72,.10)}
+
+.paywallAuroraDemoGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.paywallAuroraMini{
+  min-width:0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+  padding:14px;
+}
+
+.paywallAuroraMini span{
+  display:block;
+  margin-bottom:6px;
+  color:#9C97B8;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.paywallAuroraMini b{
+  display:block;
+  color:#F8F7FF;
+  font-size:17px;
+  letter-spacing:-.01em;
+}
+
+.paywallAuroraMini small{color:rgba(191,184,218,.7);font-size:12px}
+.paywallAuroraMini--edge{border-color:rgba(247,201,72,.22)}
+.paywallAuroraMini--live{border-color:rgba(51,230,196,.24)}
+.paywallAuroraMini--leak{border-color:rgba(255,79,163,.24)}
+.paywallAuroraMini--emotion{border-color:rgba(124,92,255,.24)}
+
+.paywallAuroraDemoAction{
+  border:1px solid rgba(124,92,255,.24);
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(51,230,196,.08),rgba(124,92,255,.12));
+  padding:14px 16px;
+}
+
+.paywallAuroraDemoAction span{
+  display:block;
+  margin-bottom:6px;
+  color:#9C97B8;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.paywallAuroraDemoAction b{color:#F8F7FF;font-size:15px;line-height:1.35}
+
+/* Incluye / Próximamente feature groups (replaces per-feature badges) */
+.auroraPlanFeatures{display:grid;gap:8px;margin:4px 0 14px}
+
+.auroraPlanFeaturesLabel{
+  color:var(--aurora-cyan,#33E6C4);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-top:6px;
+}
+
+.auroraPlanFeaturesLabel--soon{color:#FFB4D8}
+
+.auroraPlanList{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+
+.auroraPlanList li{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  color:var(--aurora-text-soft,rgba(248,247,255,.86));
+  font-size:13.5px;
+  font-weight:650;
+  line-height:1.35;
+}
+
+.auroraPlanList li svg{color:var(--aurora-cyan,#33E6C4);flex:0 0 auto;margin-top:2px}
+.auroraPlanList--soon li{color:var(--aurora-text-muted,rgba(191,184,218,.66))}
+.auroraPlanList--soon li svg{color:#FFB4D8}
+
+/* ==========================================================================
+   HOTFIX — AURORA DEMO POLISH + FULL AURORA DEPTH
+   ========================================================================== */
+
+/* ---- Native product images (landing + paywall) — Aurora integrated ---- */
+/* Neutralize legacy gold/mock wrappers behind the demos (no display change: keep responsive toggles) */
+.diLanding .landingMediaStack.finalLandingVisual.diHeroVisual,
+.diLanding .mobileHeroVideoFrame.diMobileHeroDemo,
+.activationPaywall .finalPaywallDemoFrame{
+  background:transparent!important;
+  background-color:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  aspect-ratio:auto!important;
+  min-height:0!important;
+  height:auto!important;
+  overflow:visible!important;
+  border-radius:0!important;
+  padding:0!important;
+}
+
+.activationPaywall .finalPaywallDemoFrame{
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  max-width:560px!important;
+  justify-self:center!important;
+  align-self:center!important;
+}
+
+/* The real image = native product surface (no gold box, no letterbox).
+   High specificity to beat legacy .finalLandingVisual img / .finalPaywallDemoFrame img. */
+.diLanding .diHeroVisual .landingSurfaceImage,
+.diLanding .diMobileHeroDemo .landingSurfaceImage,
+.activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:100%!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:transparent!important;
+  border:1px solid rgba(124,92,255,.16)!important;
+  border-radius:22px!important;
+  box-shadow:0 44px 130px rgba(6,4,16,.6),0 0 0 1px rgba(124,92,255,.08) inset!important;
+}
+
+.diLanding .diHeroVisual .landingSurfaceImage{
+  max-width:min(560px,100%)!important;
+  margin:0 auto!important;
+}
+
+@media(max-width:640px){
+  .diLanding .diHeroVisual .landingSurfaceImage,
+  .diLanding .diMobileHeroDemo .landingSurfaceImage,
+  .activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{
+    border-radius:18px!important;
+  }
+}
+
+/* ---- Full Aurora depth: login canvas texture + glows ---- */
+.authExperience .authExperienceBg::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(circle at 30% 20%,#000,transparent 72%);
+  -webkit-mask-image:radial-gradient(circle at 30% 20%,#000,transparent 72%);
+  pointer-events:none;
+}
+
+.authExperience .authExperienceBg span:nth-child(1){opacity:.6}
+.authExperience .authExperienceBg span:nth-child(2){opacity:.55}
+
+.authExperience .authValue{
+  position:relative;
+}
+
+.authExperience .authValueCard{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+  box-shadow:0 14px 40px rgba(6,4,16,.28);
+}
+
+/* Landing + paywall: guarantee deep aurora canvas (no flat black fallback) */
+.diLanding.publicLanding,
+.auroraPaywall.finalPaywallSurface.paywallFunnel,
+.authExperience.authPage{
+  background-color:#07050D!important;
 }
 
 /* ==========================================================================

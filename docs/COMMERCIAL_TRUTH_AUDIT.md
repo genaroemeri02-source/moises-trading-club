@@ -150,3 +150,51 @@ Preparado en `commercialConfig.js`. Enforcement funcional **no** activado.
 - Plan IDs de checkout  
 - Auth, Firestore rules, SW  
 - Gating binario (approved vs paywall)
+
+---
+
+## Sprint 15 — Commercial Experience Rebuild
+
+Fecha: 2026-07-10  
+Alcance: Landing + Login + Paywall/Activation rework (Aurora Institutional SaaS). **Checkout intacto.**
+
+### Veredicto
+
+Las 3 superficies comerciales quedan alineadas: Decision Intelligence, sin founding legacy, sin video roto, con Club/Pro/Mentoría claros.
+
+### Commercial truth
+
+| Item | Estado |
+|------|--------|
+| AI Review | **Próximamente** (Pro) |
+| BrokerSync / MT5 | **Próximamente** (Pro) |
+| PDF avanzado | **Próximamente** (Pro) |
+| Video demo paywall | **Eliminado** → Aurora demo card estática |
+| "Founding Members/Access" | **Eliminado** de landing/login/paywall |
+| Login dorado legacy | Reemplazado por Aurora (cyan/violet) |
+| Checkout | Intact: `basic`/`premium` + Mentoría WhatsApp |
+
+### Prohibiciones respetadas
+
+- No se vende AI Review / BrokerSync / MT5 como activo.
+- No hay video demo roto / caja negra.
+- No se promete automatización ni "IA operativa" activa.
+- No se usa "founding" en superficie visible.
+
+### Qué no cambió
+
+- PayPal provider, endpoints, plan IDs
+- Auth internals, Firestore rules, SW
+- Pipelines de save, engines, dashboard interno
+
+---
+
+## Sprint 15 — Hotfix (Aurora demo polish + login español)
+
+Fecha: 2026-07-10  
+Alcance: demos comerciales, copy login, profundidad Aurora. **Checkout/auth intactos.**
+
+- **Demo landing/paywall**: mini-UI "Lectura operativa" (síntesis + edge/fuga + disciplina + directiva). Vende Decision Intelligence, no una caja de datos.
+- **Login 100% español**: Laboratorio de riesgo / Registro operativo / Centro de control / Lectura emocional; microcopys sin inglés ("espacio operativo", "espacio de trabajo").
+- **Aurora total**: background/glow/grid/paneles unificados en landing, login y paywall; sin negro plano ni fallback legacy.
+- Sin claims de IA/MT5 activos; roadmap sigue honesto.

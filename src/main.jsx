@@ -45,7 +45,6 @@ import {
   FEATURE_STATUS_LABEL,
   GATING_TRUTH,
   PLAN_COMPARISON_ROWS,
-  UPGRADE_SURFACE_COPY,
   checkoutPlanId,
   resolveBackendPlanId,
   calculatePlanPrice,
@@ -802,22 +801,7 @@ function AnimatedProductDemo({images,title,className='',variant='hero',videoSrc=
 
 
 function LandingDemoCockpit(){
-  return <aside className="diHeroDemo" aria-label="Vista previa del cockpit operativo">
-    <div className="diHeroDemoTop">
-      <span className="diHeroDemoKicker">Cockpit operativo</span>
-      <span className="diStatusChip diStatusChip--caution">Precaución</span>
-    </div>
-    <div className="diHeroDemoGrid">
-      <article className="diMiniCard diMiniCard--edge"><span>Edge activo</span><b>FVG NY</b><small>+1.8R promedio</small></article>
-      <article className="diMiniCard diMiniCard--leak"><span>Fuga principal</span><b>Early Entry</b><small>−3.2R esta semana</small></article>
-      <article className="diMiniCard"><span>Riesgo hoy</span><b>1 / 3</b><small>ops · límite diario configurado</small></article>
-      <article className="diMiniCard diMiniCard--emotion"><span>Señal emocional</span><b>Ansiedad alta</b><small>en trades perdedores</small></article>
-    </div>
-    <div className="diHeroDemoAction">
-      <span>Acción semanal</span>
-      <b>Reducir riesgo 50% después de pérdida</b>
-    </div>
-  </aside>;
+  return <img className="commercialSurfaceImage landingSurfaceImage" src="/landing2026.png" alt="MTC Analytics — lectura operativa del producto" loading="lazy" decoding="async"/>;
 }
 
 function PublicLanding(){
@@ -866,9 +850,38 @@ function PublicLanding(){
     'Journal','Checklist','Calendario P/L','Risk Lab','Dashboard / Cockpit','Emotion Intelligence','Tags','Export CSV / JSON',
   ];
   const comingSoon=[
-    {label:'BrokerSync / MT5 Sync',note:'Importación manual disponible hoy'},
+    {label:'BrokerSync / MT5',note:'Importación manual disponible hoy'},
     {label:'AI Review',note:'Revisión asistida — no activa aún'},
-    {label:'Reportes PDF',note:'En roadmap'},
+    {label:'Reportes PDF avanzado',note:'En roadmap'},
+  ];
+  const problemJournal=[
+    'Registro aislado de entradas y salidas',
+    'Métricas sueltas sin contexto',
+    'Poca lectura de conducta y riesgo',
+  ];
+  const problemMtc=[
+    'Sistema operativo: contexto, riesgo y conducta',
+    'Riesgo + checklist + emoción conectados',
+    'Directivas concretas de mejora',
+  ];
+  const systemFlow=[
+    {step:'Trade',copy:'Evidencia operativa registrada.'},
+    {step:'Checklist',copy:'Validación del plan antes de ejecutar.'},
+    {step:'Riesgo',copy:'Exposición bajo control.'},
+    {step:'Emoción',copy:'Conducta medible, no anecdótica.'},
+    {step:'Tags',copy:'Clasificación del contexto.'},
+    {step:'Diagnóstico',copy:'Edge y fuga sobre tu historial.'},
+    {step:'Acción',copy:'Qué repetir o corregir.'},
+  ];
+  const modules=[
+    {title:'Journal operativo',copy:'Registro manual rápido con notas y evidencia.'},
+    {title:'Checklist pre-trade',copy:'Validá el plan antes de poner capital en riesgo.'},
+    {title:'Risk Lab',copy:'Capital, riesgo por trade y límites diarios/semanales.'},
+    {title:'Emotion Intelligence',copy:'Conducta conectada a performance.'},
+    {title:'Tags y clasificación',copy:'Setup, contexto, conducta y calidad.'},
+    {title:'Analytics / Edge Lab',copy:'Diagnóstico de edge y fuga principal.',soon:false},
+    {title:'Cockpit operativo',copy:'Estado del día antes de tomar riesgo.'},
+    {title:'Export / evidencia',copy:'Exportá tus trades en CSV / JSON.'},
   ];
   const planPosition={
     basic:{headline:'Ordená tu operativa.',blurb:'Para traders que necesitan registrar, validar y ordenar su proceso diario.'},
@@ -876,27 +889,56 @@ function PublicLanding(){
     mentorship:{headline:'Acompañamiento humano.',blurb:'Para traders que quieren acompañamiento, criterio externo y corrección del proceso.'},
   };
 
-  return <div className="publicLanding commercialSurface finalCommercialSurface diLanding">
-    <header className="landingNav">
+  return <div className="publicLanding commercialSurface finalCommercialSurface diLanding commercialShell">
+    <header className="landingNav commercialHeader">
       <button className="landingNavBrand" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} aria-label="MTC Analytics inicio"><picture><source media="(max-width: 640px)" srcSet="/brand/mtc-analytics-logo-horizontal.png"/><img src="/brand/mtc-analytics-logo-horizontal.png" alt="MTC Analytics"/></picture></button>
-      <nav><a href="#diagnostico">Diagnóstico</a><a href="#modulos">Producto</a><a href="#precios">Planes</a></nav>
-      <div className="landingNavActions"><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button><button className="primary landingCta" onClick={()=>goPublic('/register')}>Entrar a MTC Analytics</button></div>
+      <nav><a href="#sistema">Plataforma</a><a href="#edge">Inteligencia</a><a href="#precios">Planes</a></nav>
+      <div className="landingNavActions"><button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button><button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button></div>
     </header>
 
     <section className="landingHero finalLandingHero diHero" id="plataforma">
       <div className="landingHeroText finalLandingCopy">
         <span className="landingBadge subtleHero diEyebrow">Decision Intelligence para traders discrecionales</span>
         <h1>Tu operativa, traducida en decisiones.</h1>
-        <p>MTC Analytics cruza tus trades, tu riesgo, tu checklist y tu estado emocional para mostrarte qué repetir, qué cortar y qué corregir antes de volver a operar.</p>
+        <p>MTC Analytics conecta tus trades, riesgo, checklist y estado emocional para mostrarte qué repetir, qué cortar y qué corregir antes de volver a tomar riesgo.</p>
         <div className="landingActions">
-          <button className="primary landingCta" onClick={()=>goPublic('/register')}>Entrar a MTC Analytics</button>
-          <a className="ghost landingCta" href="#diagnostico">Ver cómo funciona</a>
+          <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
+          <a className="ghost landingCta" href="#sistema">Ver plataforma</a>
         </div>
         <div className="mobileHeroVideoFrame diMobileHeroDemo"><LandingDemoCockpit/></div>
-        <small className="landingMicro">Journal, Checklist, Risk Lab, Emotion Intelligence y Cockpit operativo, en una sola plataforma.</small>
+        <small className="landingMicro">Journal, Checklist, Risk Lab, Emotion Intelligence, Tags y Cockpit operativo.</small>
       </div>
       <div className="landingMediaStack finalLandingVisual diHeroVisual">
         <LandingDemoCockpit/>
+      </div>
+    </section>
+
+    <section className="landingSection diSection diProblem" id="problema">
+      <span className="landingBadge soft">El problema</span>
+      <h2>Un journal registra trades. MTC conecta tu proceso completo.</h2>
+      <p className="diLead">Entrada, salida y resultado no alcanzan para mejorar. Necesitás ver contexto, riesgo, validación, conducta y revisión en un mismo flujo.</p>
+      <div className="diCompareGrid">
+        <article className="diCompareCard diCompareCard--plain">
+          <span className="diCompareKicker">Journal común</span>
+          <ul>{problemJournal.map(item=><li key={item}>{item}</li>)}</ul>
+        </article>
+        <article className="diCompareCard diCompareCard--mtc">
+          <span className="diCompareKicker">MTC Analytics</span>
+          <ul>{problemMtc.map(item=><li key={item}>{item}</li>)}</ul>
+        </article>
+      </div>
+    </section>
+
+    <section className="landingSection diSection diSystem" id="sistema">
+      <span className="landingBadge soft">Sistema MTC</span>
+      <h2>Del trade a la directiva.</h2>
+      <p className="diLead">Cada operación pasa por un flujo que transforma registro en decisión operativa.</p>
+      <div className="diSystemFlow">
+        {systemFlow.map((node,i)=><article className="diSystemNode" key={node.step}>
+          <span className="diSystemStep">{i+1}</span>
+          <b>{node.step}</b>
+          <small>{node.copy}</small>
+        </article>)}
       </div>
     </section>
 
@@ -914,8 +956,8 @@ function PublicLanding(){
 
     <section className="landingSection diSection diCockpit" id="cockpit">
       <span className="landingBadge soft">Cockpit operativo</span>
-      <h2>Antes de buscar la próxima oportunidad, revisá tu estado.</h2>
-      <p className="diLead">El cockpit no reemplaza tu criterio. Lo obliga a pasar primero por riesgo, conducta y contexto.</p>
+      <h2>Antes de operar, leé tu estado.</h2>
+      <p className="diLead">El cockpit resume riesgo, disciplina, conducta y contexto para ayudarte a decidir si estás apto para tomar riesgo. No decide por vos.</p>
       <div className="diCardGrid diCardGrid--5">
         {cockpitCards.map(card=><article className="diDemoCard" key={card.label}>
           <span>{card.label}</span>
@@ -937,7 +979,7 @@ function PublicLanding(){
       </div>
     </section>
 
-    <section className="landingSection diSection diJournal" id="modulos">
+    <section className="landingSection diSection diJournal" id="journal">
       <span className="landingBadge soft">Evidencia</span>
       <h2>Cada trade queda documentado.</h2>
       <p className="diLead">El checklist mejora la calidad del dato registrado; no condiciona el resultado matemático del trade.</p>
@@ -968,10 +1010,23 @@ function PublicLanding(){
       </ul>
     </section>
 
+    <section className="landingSection diSection diModules" id="modulos">
+      <span className="landingBadge soft">Módulos</span>
+      <h2>Todo lo que necesitás para operar con proceso.</h2>
+      <p className="diLead">Una plataforma, no una colección de features sueltas.</p>
+      <div className="diModuleGrid">
+        {modules.map(mod=><article className="diModuleCard" key={mod.title}>
+          <h3>{mod.title}</h3>
+          <p>{mod.copy}</p>
+          <span className={'diModuleStatus '+(mod.soon?'diModuleStatus--soon':'diModuleStatus--live')}>{mod.soon?'Próximamente':'Disponible'}</span>
+        </article>)}
+      </div>
+    </section>
+
     <section className="landingSection landingPricingSection finalPricingSection diPricing" id="precios">
       <span className="landingBadge soft">Planes</span>
       <h2>Elegí tu nivel de inteligencia operativa.</h2>
-      <p className="diLead">Club te ayuda a construir evidencia. Pro convierte esa evidencia en decisiones.</p>
+      <p className="diLead">Club registra y ordena. Pro interpreta y decide. Mentoría acompaña y corrige.</p>
       {GATING_TRUTH.commercialComparisonOnly&&<p className="commercialGatingNote">Los planes describen el producto. El acceso actual se activa por membresía aprobada; el gating fino Club/Pro sigue en roadmap.</p>}
       <div className="landingPlanGrid">{landingPlans.map(plan=>{
         const pos=planPosition[plan.id]||{};
@@ -979,7 +1034,7 @@ function PublicLanding(){
           <div className="landingPlanTop"><span>{plan.badge}</span><h3>{plan.name}</h3><p className="diPlanHeadline">{pos.headline||plan.subtitle}</p><p>{pos.blurb||plan.valueNote}</p></div>
           <div className="landingPlanPrice"><b>{formatPlanMonthlyPrice(plan)}</b><em>/ mes</em></div>
           <ul className="commercialFeatureList">{plan.features.map(item=><li key={item.id} className={'featureStatus-'+item.status}><span className="featureStatusLabel">{FEATURE_STATUS_LABEL[item.status]||item.status}</span><span>{item.label}</span></li>)}</ul>
-          <button className={plan.recommended?'primary landingCta':'ghost landingCta'} onClick={()=>goPublic('/register')}>{plan.id==='mentorship'?'Hablar por WhatsApp':plan.cta||`Empezar con ${plan.name}`}</button>
+          <button className={plan.recommended?'primary landingCta':'ghost landingCta'} onClick={()=>goPublic('/register')}>{plan.cta||`Empezar con ${plan.name}`}</button>
         </article>;
       })}</div>
     </section>
@@ -1003,8 +1058,8 @@ function PublicLanding(){
       <h2>Dejá de acumular métricas. Empezá a tomar mejores decisiones.</h2>
       <p>Construí evidencia, detectá fugas y operá con más claridad antes de volver a tomar riesgo.</p>
       <div className="landingActions center">
-        <button className="primary landingCta" onClick={()=>goPublic('/register')}>Entrar a MTC Analytics</button>
-        <a className="ghost landingCta" href="#precios">Comparar planes</a>
+        <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
+        <button className="ghost landingCta" onClick={()=>goPublic('/login')}>Iniciar sesión</button>
       </div>
     </section>
   </div>
@@ -1031,7 +1086,11 @@ function Login({initialMode='login'}){
         });
         await setDoc(doc(db,'settings',cred.user.uid),settingsDefault);
       }
-    }catch(e){setErr(e.message?.replace('Firebase: ','')||'Error de acceso');}
+    }catch(e){
+      const raw=String(e?.message||'');
+      if(raw.includes('Completa nombre')) setErr('Completá nombre, email y contraseña.');
+      else setErr('No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.');
+    }
     finally{setBusy(false)}
   }
   async function googleLogin(){
@@ -1065,10 +1124,53 @@ function Login({initialMode='login'}){
     try{await sendPasswordResetEmail(auth,email); setOk('Te enviamos un email para recuperar la contraseña.');}
     catch(e){setErr(e.message?.replace('Firebase: ','')||'No se pudo enviar el email.')}
   }
-  return <div className="authPage"><div className="authShell">
-    <button className="backLanding" onClick={()=>goPublic('/')} type="button">← Volver</button>
-    <div className="loginCard premiumAuth standaloneAuth"><img className="logoImage loginLogo" src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><h1>Acceso a MTC Analytics</h1><p>{mode==='login'?'Ingresá a tu workspace de performance.':'Creá tu cuenta para activar o solicitar acceso.'}</p><button className="googleBtn" onClick={googleLogin} disabled={busy}><span>G</span> Continuar con Google</button><div className="orLine"><span>o ingresar con email</span></div><div className="seg"><button className={mode==='login'?'on':''} onClick={()=>{setMode('login');goPublic('/login')}}>Ingresar</button><button className={mode==='register'?'on':''} onClick={()=>{setMode('register');goPublic('/register')}}>Registro</button></div>{mode==='register'&&<input className="input" placeholder="Nombre visible" value={name} onChange={e=>setName(e.target.value)}/>}<input className="input" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)}/><input className="input" placeholder="Contraseña" type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()}/>{err&&<p className="err">{err}</p>}{ok&&<p className="ok">{ok}</p>}<button className="primary full" onClick={submit} disabled={busy}>{busy?'Procesando...':mode==='login'?'Ingresar':'Crear cuenta'}</button>{mode==='login'&&<button className="linkBtn" onClick={resetPassword}>Recuperar contraseña</button>}<p className="hint">Si tu acceso fue habilitado por el equipo, vas a poder entrar directamente a tu workspace.</p></div>
-  </div></div>
+  const authProof=[
+    {label:'Laboratorio de riesgo',copy:'Exposición bajo control'},
+    {label:'Registro operativo',copy:'Evidencia de cada operación'},
+    {label:'Centro de control',copy:'Estado operativo del día'},
+    {label:'Lectura emocional',copy:'Conducta medible'},
+  ];
+  return <div className="authPage authExperience commercialShell">
+    <div className="authExperienceBg" aria-hidden="true"><span></span><span></span></div>
+    <button className="backLanding authBack" onClick={()=>goPublic('/')} type="button">← Volver</button>
+    <div className="authExperienceGrid">
+      <aside className="authValue">
+        <picture className="authValueBrand"><img src="/brand/mtc-analytics-logo-horizontal.png" alt="MTC Analytics"/></picture>
+        <span className="authValueEyebrow">Acceso a tu espacio operativo</span>
+        <h1>Entrá a tu centro de decisión operativa.</h1>
+        <p>Accedé a tu registro operativo, checklist, laboratorio de riesgo y centro de control para revisar tu proceso antes de tomar riesgo.</p>
+        <div className="authValueProof">
+          {authProof.map(p=><article key={p.label} className="authValueCard"><b>{p.label}</b><small>{p.copy}</small></article>)}
+        </div>
+        <p className="authValueNote">Si tu acceso fue aprobado por el equipo, vas a entrar directamente a tu espacio de trabajo.</p>
+      </aside>
+      <div className="authCardWrap">
+        <div className="authCard">
+          <div className="authCardHead">
+            <img className="authCardLogo" src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/>
+            <div>
+              <b>{mode==='register'?'Creá tu cuenta':'Iniciá sesión'}</b>
+              <span>{mode==='register'?'Preparás tu workspace en un paso.':'Entrá a tu centro de decisión operativa.'}</span>
+            </div>
+          </div>
+          <button className="googleBtn" onClick={googleLogin} disabled={busy}><span>G</span> Continuar con Google</button>
+          <div className="orLine"><span>o con email</span></div>
+          <div className="authTabs" role="tablist">
+            <button role="tab" aria-selected={mode==='login'} className={mode==='login'?'on':''} onClick={()=>{setMode('login');goPublic('/login')}}>Ingresar</button>
+            <button role="tab" aria-selected={mode==='register'} className={mode==='register'?'on':''} onClick={()=>{setMode('register');goPublic('/register')}}>Registro</button>
+          </div>
+          {mode==='register'&&<input className="input authInput" placeholder="Nombre visible" value={name} onChange={e=>setName(e.target.value)}/>}
+          <input className="input authInput" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)}/>
+          <input className="input authInput" placeholder="Contraseña" type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
+          {err&&<p className="err authMsg">{err}</p>}
+          {ok&&<p className="ok authMsg">{ok}</p>}
+          <button className="primary full authSubmit" onClick={submit} disabled={busy}>{busy?'Procesando...':mode==='login'?'Ingresar':'Crear cuenta'}</button>
+          {mode==='login'&&<button className="linkBtn authLink" onClick={resetPassword}>Recuperar contraseña</button>}
+          <p className="hint authHint">Si tu acceso todavía no fue aprobado, vas a ver la pantalla de activación pendiente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 }
 
 function Shell({profile,tab,setTab,data,theme,toggleTheme}){const groups=[['OPERATIVA',[['dashboard','Dashboard',Home],['journal','Journal',LineChart],['checklist','Checklist',CheckCircle2],['ideas','Ideas',Lightbulb],['risk','Riesgo',SlidersHorizontal],['analytics','Analytics',BarChart3],['results','Resultados',Trophy],['brokers','Integraciones',Activity],['ecosystem','Guía',Sparkles],['emotional','Emocional',Heart]]],['WORKSPACE',[['academy','Base',BookOpen],['community','Mi espacio',Users],['announcements','Anuncios',Megaphone],['chat','Chat',MessageCircle],['online','Online',Activity]]],['RECURSOS',[['system','Sistema',Shield],['reading','Biblioteca',BookOpen],['news','Noticias',Newspaper]]],['PERFIL',[['notifications','Notificaciones',Bell],['settings','Perfil',Settings]]]]; if(['admin','moderador'].includes(profile.role))groups.push(['ADMIN',[['admin','Admin',Shield]]]); return <aside className="side premiumSide"><div className="brand"><img className="brandLogo" src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><div><b>MTC Analytics</b><span>Plataforma de rendimiento operativo</span></div></div><nav>{groups.map(([group,items])=><div className="navGroup" key={group}><small>{group}</small>{items.map(([id,label,Icon])=>{const count=activityCount(data,profile,id); return <button key={id} className={`${tab===id?'active':''} ${count?'hasActivity':''}`} onClick={()=>{markNotificationsForTarget(data.notifications,id); setTab(id);}}><Icon size={16}/><span>{label}</span>{count>0&&<em>{count>9?'9+':count}</em>}</button>})}</div>)}</nav><button
@@ -2659,10 +2761,8 @@ function AccessGate({profile}){
   const [cycle,setCycle]=useState('monthly');
   const [selected,setSelected]=useState('premium');
   const [busy,setBusy]=useState(null);
-  const [paywallVideoFailed,setPaywallVideoFailed]=useState(false);
   const status=effectiveStatus(profile);
   const isBlocked=status==='denied'||status==='suspended'||status==='blocked';
-  const upgradeCopy=UPGRADE_SURFACE_COPY.default;
   const billingOptions=[
     {id:'monthly',label:'Mensual',note:'Flexible'},
     {id:'quarterly',label:'Trimestral',note:'3 meses'},
@@ -2677,10 +2777,9 @@ function AccessGate({profile}){
     suspended:'Tu acceso está suspendido. Contactá al administrador.'
   };
   const whatsappUrl=`https://wa.me/${WHATSAPP_MENTORIA}?text=${encodeURIComponent('Estoy interesado en Mentoría personalizada de Moisés Trading Club')}`;
-  const paywallDemoFallback='/commercial/mtc-paywall-demo-premium.png';
-  const paywallDemo=paywallVideoFailed
-    ? <img className="commercialDemoVideo paywallDemoVideo paywallDemoFallback" src={paywallDemoFallback} alt="MTC Analytics product preview"/>
-    : <video className="commercialDemoVideo paywallDemoVideo" src="/commercial/mtc-paywall-demo-premium.mp4" autoPlay muted loop playsInline preload="auto" poster={paywallDemoFallback} aria-label="MTC Analytics paywall product demo" onLoadedData={()=>console.log('MTC video loaded:','/commercial/mtc-paywall-demo-premium.mp4')} onError={(e)=>{console.error('MTC video error:',e.currentTarget.error,e.currentTarget.src);setPaywallVideoFailed(true)}}></video>;
+  const isPending=status==='pending'||status==='pending_payment'||status==='none';
+  const headerBadge=isBlocked?'Acceso en revisión':isPending?'Activación pendiente':'Elegí tu plan';
+  const paywallDemo=<img className="commercialSurfaceImage paywallSurfaceImage" src="/paywall2026.png" alt="MTC Analytics — lectura operativa del producto" loading="lazy" decoding="async"/>;
   async function startCheckout(plan){
     setSelected(plan.id);
     if(plan.id==='mentorship'){
@@ -2742,21 +2841,21 @@ function AccessGate({profile}){
       toast('No se pudo iniciar el pago. Intentá nuevamente o contactá soporte.','error');
     }finally{setBusy(null)}
   }
-  return <div className="paywallFunnel finalPaywallSurface auroraPaywall">
+  return <div className="paywallFunnel finalPaywallSurface auroraPaywall activationPaywall">
     <div className="paywallFunnelBg" aria-hidden="true"><span></span><span></span><span></span></div>
-    <section className="paywallFunnelShell finalPaywallShell" aria-label="Elegí tu nivel de inteligencia operativa">
+    <section className="paywallFunnelShell finalPaywallShell" aria-label="Activación de workspace">
       <header className="paywallFunnelHeader finalPaywallHeader">
         <div className="paywallFunnelBrand"><img src="/brand/mtc-analytics-icon.png" alt="MTC Analytics"/><div><b>MTC Analytics</b><span>Decision Intelligence</span></div></div>
-        <div className="paywallFunnelActions"><span className={'paywallFunnelStatus '+status}>{accessLabel(status)}</span><button className="paywallLogout" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
+        <div className="paywallFunnelActions"><span className={'activationBadge '+(isPending?'is-pending':isBlocked?'is-blocked':'is-choose')}>{headerBadge}</span><button className="paywallLogout" onClick={()=>signOut(auth)}><LogOut size={15}/> Cerrar sesión</button></div>
       </header>
       <div className="paywallFunnelMain finalPaywallMain">
         <div className="paywallFunnelLayout finalPaywallLayout">
           <div className="paywallFunnelHero finalPaywallHero">
-            <p className="auroraPaywallEyebrow">Nivel de inteligencia operativa</p>
-            <h1>{upgradeCopy.title}</h1>
-            <h2>{upgradeCopy.body}</h2>
+            <p className="auroraPaywallEyebrow">Activación de workspace</p>
+            <h1>Elegí cómo querés usar MTC Analytics.</h1>
+            <h2>Podés empezar ordenando tu operativa con Club, o desbloquear Decision Intelligence con Pro para interpretar edge, fugas y conducta.</h2>
             <p className="auroraPaywallStrategic">Club registra y ordena. Pro interpreta y decide. Mentoría acompaña y corrige.</p>
-            <div className="paywallFunnelChips"><span><Target size={14}/> Club · evidencia</span><span><BarChart3 size={14}/> Pro · decisiones</span><span><Shield size={14}/> Mentoría · criterio humano</span></div>
+            <div className="paywallFunnelChips"><span><Target size={14}/> Checklist operativo</span><span><BarChart3 size={14}/> Analytics de edge y fuga</span><span><Shield size={14}/> Sistema de revisión</span></div>
           </div>
           <div className="finalPaywallDemoFrame">{paywallDemo}</div>
         </div>
@@ -2765,12 +2864,13 @@ function AccessGate({profile}){
           <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
         </div>
         {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
-        {GATING_TRUTH.commercialComparisonOnly&&<p className="commercialGatingNote paywallGatingNote">Comparativa comercial. El acceso se activa por membresía aprobada; el enforcement fino Club/Pro queda preparado en PLAN_CAPABILITIES.</p>}
         <div className="paywallFunnelPlans finalPaywallPlans auroraPaywallPlans">
           {ACCESS_PLANS.map(plan=>{
             const quote=planCycleSummary(plan.id,cycle);
             const active=selected===plan.id;
             const mentorPrice=formatPlanMonthlyPrice(plan);
+            const included=plan.features.filter(f=>f.status!=='coming-soon');
+            const soon=plan.features.filter(f=>f.status==='coming-soon');
             return <article key={plan.id} className={'paywallFunnelPlan auroraPaywallCard '+plan.tone+' '+(plan.recommended?'featured':'')+' '+(active?'selected':'')} onClick={()=>setSelected(plan.id)}>
               {plan.recommended&&<div className="paywallFunnelBadge"><Crown size={13}/> Más elegido</div>}
               <div className="paywallFunnelPlanTop"><span>{plan.kicker}</span><h3>{plan.name}</h3><p>{plan.headline}</p></div>
@@ -2779,7 +2879,14 @@ function AccessGate({profile}){
               </div>
               <p className="paywallFunnelValue">{plan.valueNote}</p>
               {plan.bestFor&&<p className="auroraPaywallBestFor">{plan.bestFor}</p>}
-              <ul className="commercialFeatureList">{plan.features.map(f=><li key={f.id} className={'featureStatus-'+f.status}><CheckCircle2 size={15}/><span>{f.label}</span><em className="featureStatusLabel">{FEATURE_STATUS_LABEL[f.status]||f.status}</em></li>)}</ul>
+              <div className="auroraPlanFeatures">
+                <span className="auroraPlanFeaturesLabel">Incluye</span>
+                <ul className="auroraPlanList">{included.map(f=><li key={f.id}><CheckCircle2 size={15}/><span>{f.label}</span></li>)}</ul>
+                {soon.length>0&&<>
+                  <span className="auroraPlanFeaturesLabel auroraPlanFeaturesLabel--soon">Próximamente</span>
+                  <ul className="auroraPlanList auroraPlanList--soon">{soon.map(f=><li key={f.id}><Clock3 size={14}/><span>{f.label}</span></li>)}</ul>
+                </>}
+              </div>
               <button className={plan.recommended?'primary':'secondary'} disabled={busy===plan.id || isBlocked} onClick={(e)=>{e.stopPropagation();startCheckout(plan)}}>{busy===plan.id?'Preparando checkout...':plan.cta}</button>
             </article>
           })}
