@@ -286,10 +286,18 @@ const PAYPAL_BASE_URL =
     ? 'https://api-m.paypal.com'
     : 'https://api-m.sandbox.paypal.com';
 
+// Canonical order/pricing keys (aligned with commercialConfig). Brand aliases via resolveCheckoutPlanId.
 const PLAN_PRICING = {
   basic: { name: 'Club', monthly: 14.99, currency: 'USD' },
   premium: { name: 'Pro', monthly: 24.99, currency: 'USD' },
 };
+
+/** Brand → backend: club→basic, pro→premium. Unknown → null. */
+function resolveCheckoutPlanId(planId) {
+  const raw = String(planId || '').trim().toLowerCase();
+  const map = { club: 'basic', basic: 'basic', pro: 'premium', premium: 'premium' };
+  return map[raw] || null;
+}
 
 const BILLING_MONTHS = {
   monthly: 1,
@@ -493,8 +501,12 @@ export const createPayPalOrder = onRequest({ region: 'us-central1', cors: false 
     if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
 
     const user = await requireUser(req);
-    const { planId, billingCycle = 'monthly', successUrl, cancelUrl } = req.body || {};
-    if (!PLAN_PRICING[planId]) return res.status(400).json({ error: 'invalid_plan' });
+    const { planId: rawPlanId, billingCycle = 'monthly', successUrl, cancelUrl } = req.body || {};
+    const planId = resolveCheckoutPlanId(rawPlanId);
+    if (!planId || !PLAN_PRICING[planId]) {
+      console.error('createPayPalOrder:invalid_plan', { rawPlanId });
+      return res.status(400).json({ error: 'invalid_plan', message: 'Plan must be club/basic or pro/premium' });
+    }
     if (!BILLING_MONTHS[billingCycle]) return res.status(400).json({ error: 'invalid_billing_cycle' });
 
     const quote = calculatePlanPrice(planId, billingCycle);

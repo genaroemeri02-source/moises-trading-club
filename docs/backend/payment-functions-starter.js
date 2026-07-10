@@ -19,9 +19,14 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
 
+/**
+ * HISTORICAL STARTER — NOT RUNTIME
+ * Legacy sample prices 29/49. Canonical prices: 14.99 / 24.99 in commercialConfig + server/functions.
+ * Do not copy these amounts into live checkout.
+ */
 const PLAN_PRICING = {
-  basic: { monthly: 29, currency: 'USD', label: 'Esencial' },
-  premium: { monthly: 49, currency: 'USD', label: 'Pro' }
+  basic: { monthly: 29, currency: 'USD', label: 'Esencial' }, // HISTORICAL — use 14.99
+  premium: { monthly: 49, currency: 'USD', label: 'Pro' } // HISTORICAL — use 24.99
 };
 const BILLING_CYCLES = {
   monthly: { months: 1 },

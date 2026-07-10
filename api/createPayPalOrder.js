@@ -1,3 +1,10 @@
+/**
+ * Sprint 10 — Payment runtime integrity
+ * Accepts brand (club/pro) and backend (basic/premium) aliases.
+ * Subscription amounts come from PayPal plan IDs in env (PAYPAL_PLAN_ID_*).
+ * Labels/quotes here must stay aligned with commercialConfig (14.99 / 24.99).
+ * WARNING: if PayPal Dashboard plans still bill 29/49, update those plan IDs in env.
+ */
 const DEFAULT_CURRENCY = 'USD';
 
 const PLAN_CONFIG = {

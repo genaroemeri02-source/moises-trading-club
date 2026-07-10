@@ -1,13 +1,15 @@
 /**
  * Sprint 09 — Commercial Truth
+ * Sprint 10 — SW + Payment Runtime Integrity
  * Single source of truth for plans, prices, and feature availability.
  *
- * Checkout compatibility:
- * - Internal plan ids: basic (Club), premium (Pro), mentorship
- * - PayPal / Vercel aliases: club ↔ basic, pro ↔ premium
+ * Plan id model:
+ * - Brand / UI labels: Club, Pro, Mentoría
+ * - Internal / Firestore / Render orders: basic, premium, mentorship
+ * - Brand aliases accepted at edges: club ↔ basic, pro ↔ premium
  * - Mentorship is WhatsApp-only (no PayPal checkout)
  *
- * Gating truth (Sprint 09):
+ * Gating truth (Sprint 09/10):
  * - Real gate: approved/paid vs AccessGate (binary)
  * - Club vs Pro feature gating is NOT enforced in the frontend
  * - Plan matrices below are commercial comparison + honesty labels
@@ -19,12 +21,33 @@ export const PLAN_IDS = {
   MENTORSHIP: 'mentorship',
 };
 
-/** PayPal / API aliases used by checkout payloads */
-export const PLAN_CHECKOUT_ALIASES = {
+/**
+ * Bidirectional brand ↔ backend aliases.
+ * club/pro = brand; basic/premium = backend/orders/Firestore.
+ */
+export const PLAN_RUNTIME_ALIASES = {
+  club: 'basic',
+  pro: 'premium',
+  mentorship: 'mentorship',
   basic: 'club',
   premium: 'pro',
-  mentorship: 'mentorship',
 };
+
+/**
+ * Any known plan id → backend checkout id (basic | premium | mentorship).
+ * Checkout payloads MUST use these keys for Render `server/index.js` and `functions/index.js`.
+ * Vercel `api/createPayPalOrder.js` also accepts brand aliases.
+ */
+export const CHECKOUT_PLAN_IDS = {
+  club: 'basic',
+  pro: 'premium',
+  mentorship: 'mentorship',
+  basic: 'basic',
+  premium: 'premium',
+};
+
+/** @deprecated Use CHECKOUT_PLAN_IDS / resolveBackendPlanId */
+export const PLAN_CHECKOUT_ALIASES = CHECKOUT_PLAN_IDS;
 
 export const FEATURE_STATUS = {
   AVAILABLE: 'available',
@@ -287,12 +310,32 @@ export const GATING_TRUTH = {
     'Gating Club vs Pro en frontend (Analytics, Emotional, Edge Lab)',
     'Alinear defaultPlanFeatures del server (Club analytics:true) con marketing',
     'Unificar PayPal orders (server) vs subscriptions (api/createPayPalOrder)',
+    'Verificar PayPal Dashboard plan amounts vs 14.99/24.99 (env PAYPAL_PLAN_ID_*)',
   ],
   commercialComparisonOnly: true,
 };
 
+/** Resolve any known id to backend plan id, or null if unknown. */
+export function resolveBackendPlanId(planId) {
+  const raw = String(planId || '').trim().toLowerCase();
+  return CHECKOUT_PLAN_IDS[raw] || null;
+}
+
+/** Resolve any known id to brand alias (club | pro | mentorship), or null. */
+export function resolveBrandPlanId(planId) {
+  const backend = resolveBackendPlanId(planId);
+  if (!backend) return null;
+  if (backend === 'basic') return 'club';
+  if (backend === 'premium') return 'pro';
+  return backend;
+}
+
+/**
+ * Checkout payload plan id → backend legacy keys (basic | premium | mentorship).
+ * Returns null for unknown plans (caller must not create order silently).
+ */
 export function checkoutPlanId(planId) {
-  return PLAN_CHECKOUT_ALIASES[planId] || planId;
+  return resolveBackendPlanId(planId);
 }
 
 export function calculatePlanPrice(planId, cycleId = 'monthly') {

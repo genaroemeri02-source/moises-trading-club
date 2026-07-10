@@ -33,7 +33,7 @@ const PLAN_PRICING = {
 };
 ```
 
-> Sprint 09: la UI y el paywall consumen esta fuente. Docs legacy que citaban 29/49 están obsoletos.
+> Sprint 09/10: la UI y el paywall consumen esta fuente. Docs legacy que citaban 29/49 son históricos — no runtime.
 
 La función `calculatePlanPrice(planId, cycle)` calcula:
 
@@ -42,6 +42,53 @@ La función `calculatePlanPrice(planId, cycle)` calcula:
 - Anual: `(monthly * 3 * 0.8 * 4) * 0.9` = 10% adicional sobre el total trimestral anualizado.
 
 Mentoría queda como precio personalizado y abre WhatsApp con el mensaje exacto requerido.
+
+## Plan id mapping (Sprint 10)
+
+| UI / marca | Id interno | Checkout orders (Render/functions) | Subscriptions (Vercel) |
+|------------|------------|------------------------------------|------------------------|
+| Club | `basic` | `basic` (alias `club`) | `club` / `basic` → env `PAYPAL_PLAN_ID_CLUB_*` |
+| Pro | `premium` | `premium` (alias `pro`) | `pro` / `premium` → env `PAYPAL_PLAN_ID_PRO_*` |
+| Mentoría | `mentorship` | no PayPal | WhatsApp |
+
+- Frontend: `checkoutPlanId()` / `CHECKOUT_PLAN_IDS` envían **`basic` / `premium`**.
+- Backend orders: `resolveCheckoutPlanId()` acepta brand + legacy.
+- Plan desconocido → `400 invalid_plan` (no order silenciosa).
+- **WARNING:** si los plan IDs de PayPal Dashboard aún cobran 29/49, actualizar env / planes en PayPal. No hardcodear credenciales.
+
+### Env vars esperadas
+
+**Render / Cloud Functions (orders + capture):**
+
+- `PAYPAL_ENV` (`sandbox` | `live`)
+- `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`
+- `APP_URL`
+- Opcional: `PLAN_BASIC_MONTHLY`, `PLAN_PREMIUM_MONTHLY` (fallback 14.99 / 24.99)
+
+**Vercel `api/createPayPalOrder.js` (subscriptions):**
+
+- `PAYPAL_MODE`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `APP_URL`
+- `PAYPAL_PLAN_ID_CLUB_MONTHLY` / `_QUARTERLY` / `_ANNUAL`
+- `PAYPAL_PLAN_ID_PRO_MONTHLY` / `_QUARTERLY` / `_ANNUAL`
+
+**Frontend:**
+
+- `VITE_PAYMENTS_ENABLED`, `VITE_PAYMENT_PROVIDER`
+- `VITE_CREATE_PAYPAL_ORDER_URL` o `VITE_CHECKOUT_ENDPOINT`
+- `VITE_PAYPAL_CAPTURE_ORDER_ENDPOINT`
+- `VITE_PAYMENT_SUCCESS_URL`, `VITE_PAYMENT_CANCEL_URL`
+
+### Service worker / cache
+
+- Versión: `mtc-cache-v3-commercial-truth` (antes `mtc-cache-v2-system-reading`)
+- Activate limpia caches viejos; network-first + offline fallback
+- Tag runtime: `v45-commercial-truth-runtime`
+
+### Deuda restante
+
+- Unificar flujo orders (Render) vs subscriptions (Vercel)
+- Gating fino Club/Pro
+- Confirmar montos reales en PayPal Dashboard = 14.99 / 24.99
 
 ## Campos protegidos en `users/{uid}`
 

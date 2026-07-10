@@ -619,19 +619,62 @@ Estados: `available` | `beta` | `coming-soon` | `not-included`.
 
 `GATING_TRUTH.commercialComparisonOnly = true` — la matriz de planes es comparativa comercial, no enforcement de tier.
 
-### PayPal / checkout
+### PayPal / checkout (histórico Sprint 09)
 
-- **No se tocó** lógica profunda de provider.
-- Frontend sigue enviando `club` / `pro` vía `checkoutPlanId()`.
-- Precios de labels alineados a 14.99 / 24.99; montos reales de suscripción siguen en env PayPal.
-- Deuda documentada: Render `server/index.js` espera `basic`/`premium` en orders; Vercel `api/createPayPalOrder.js` acepta aliases.
+- Labels 14.99 / 24.99; mapping runtime cerrado en **Sprint 10** (ver abajo).
 
-### Service worker
+### Service worker (histórico Sprint 09)
 
-- `public/sw.js` sigue en `mtc-cache-v2-system-reading` (network-first).
-- **No bump** en este sprint; deuda Sprint 10: `mtc-cache-v3-commercial-s09` tras deploy de copy/precios.
+- Deuda de bump v2 → v3 cerrada en **Sprint 10**.
 
 ### Docs alineados
 
 - `docs/payments-architecture.md`, `RELEASE-v45-COMMERCIAL-READY.md` → precios 14.99 / 24.99
-- `docs/COMMERCIAL_TRUTH_AUDIT.md` — auditoría completa Sprint 09
+- `docs/COMMERCIAL_TRUTH_AUDIT.md` — auditoría Sprint 09 + runtime Sprint 10
+
+---
+
+## Sprint 10 — SW + Payment Runtime Integrity
+
+Cierra consistencia runtime comercial: plan ids, precios, mapping legacy y cache PWA.
+
+### Plan ids y mapping
+
+| Marca (UI) | Id interno / Firestore | Checkout payload (orders) |
+|------------|------------------------|---------------------------|
+| Club | `basic` | `basic` (acepta también `club`) |
+| Pro | `premium` | `premium` (acepta también `pro`) |
+| Mentoría | `mentorship` | WhatsApp only |
+
+Fuente: `CHECKOUT_PLAN_IDS` / `resolveBackendPlanId()` / `checkoutPlanId()` en `src/lib/commercialConfig.js`.
+
+- Frontend checkout envía **backend ids** (`basic` / `premium`).
+- Render `server/index.js` y `functions/index.js` normalizan `club`/`pro` → `basic`/`premium`.
+- Vercel `api/createPayPalOrder.js` ya aceptaba ambos aliases (subscriptions vía env).
+
+### Precios runtime
+
+- Club **14.99** · Pro **24.99** · Mentoría **250**
+- Fallbacks server: `PLAN_BASIC_MONTHLY` / `PLAN_PREMIUM_MONTHLY` (default 14.99/24.99)
+- Suscripciones PayPal: montos reales en Dashboard + `PAYPAL_PLAN_ID_*` (verificar ≠ 29/49)
+
+### Env PayPal esperadas
+
+**Orders (Render / functions):** `PAYPAL_ENV`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `APP_URL`, opcional `PLAN_BASIC_MONTHLY` / `PLAN_PREMIUM_MONTHLY`
+
+**Subscriptions (Vercel api):** `PAYPAL_MODE`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `APP_URL`, `PAYPAL_PLAN_ID_CLUB_{MONTHLY|QUARTERLY|ANNUAL}`, `PAYPAL_PLAN_ID_PRO_{MONTHLY|QUARTERLY|ANNUAL}`
+
+### Service worker
+
+| Antes | Después |
+|-------|---------|
+| `mtc-cache-v2-system-reading` | `mtc-cache-v3-commercial-truth` |
+
+Activate borra cualquier cache ≠ actual (incluye v2). `skipWaiting` + `clients.claim` se mantienen. App version tag: `v45-commercial-truth-runtime`.
+
+### Pendiente (no este sprint)
+
+- Gating fino Club/Pro en frontend
+- Unificación completa orders vs subscriptions
+- Risk → Firestore (Sprint 11)
+- Verificar montos reales en PayPal Dashboard vs 14.99/24.99

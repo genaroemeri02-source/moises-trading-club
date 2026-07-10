@@ -45,6 +45,7 @@ import {
   FEATURE_STATUS_LABEL,
   GATING_TRUTH,
   checkoutPlanId,
+  resolveBackendPlanId,
   calculatePlanPrice,
   planCycleSummary,
   formatPlanMonthlyPrice,
@@ -2423,7 +2424,12 @@ function AccessGate({profile}){
     try{
       setBusy(plan.id);
       const token=await auth.currentUser?.getIdToken?.();
-      const paypalPlanId=checkoutPlanId(plan.id);
+      const paypalPlanId=checkoutPlanId(plan.id) || resolveBackendPlanId(plan.id);
+      if(!paypalPlanId || paypalPlanId==='mentorship'){
+        console.error('startCheckout:invalid_plan',{planId:plan.id,resolved:paypalPlanId});
+        toast('Plan no válido para checkout online.','error');
+        return;
+      }
       const checkoutPayload={
         planId:paypalPlanId,
         plan:paypalPlanId,
