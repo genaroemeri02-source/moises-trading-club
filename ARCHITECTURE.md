@@ -359,19 +359,28 @@ Con poca muestra: lenguaje de hipótesis (“Señal en observación”, “Aún 
 - `emotionSignals` (preferido), o
 - `emotionalSignals` / `emotionalState`
 
-Reglas adicionales (sin romper input legacy):
+**Contrato actual vs histórico (hotfix Sprint 07):**
+
+| Campo | Rol |
+|-------|-----|
+| `behaviorSignals`, `directives`, `performanceByEmotion` | Analítico / histórico — **no** bloquean cockpit |
+| `operationalSignals` | Solo jornada actual (`isCurrent`, `source`, `sourceDate`) |
+
+`buildOperationalEmotionSignals` **no** cae a journals/trades de días previos. Sin check-in de hoy → `isCurrent: false`, `emotionalRisk: "unknown"`, `shouldBlockTrading: false`.
+
+Reglas de gate (solo si `isCurrent === true` / señal conocida):
 
 | Señal | Efecto |
 |-------|--------|
 | `shouldBlockTrading === true` | `blocked` |
 | `postLossProtocolRequired === true` | `blocked` |
 | `emotionalRisk === "high"` | `blocked` |
-| `anxiety >= 7` + `recentLoss` | `blocked` |
-| `recoveryImpulse` alto + `recentLoss` | `blocked` |
+| `anxiety >= 7` + pérdida **de hoy** | `blocked` |
+| `recoveryImpulse` alto + pérdida **de hoy** | `blocked` |
 | `shouldReduceRisk === true` | `caution` |
 | `clarity <= 4` | `caution` |
 
-Sin emoción → comportamiento idéntico a Sprint 05 (`emotionalRisk: "unknown"`).
+Sin emoción actual → `emotionalRisk: "unknown"` (no bloquea). `buildOperationalState` ignora payloads con `isCurrent: false`.
 
 ### Consumidores posteriores
 
@@ -388,6 +397,7 @@ Sin emoción → comportamiento idéntico a Sprint 05 (`emotionalRisk: "unknown"
 - No es diagnóstico clínico ni terapéutico.
 - Solo señales operativas de mesa de riesgo/performance.
 - Sprint 06 **no** integra UI/CSS/Firebase: capa pura + contrato + wire mínimo a OperationalState.
+- Hotfix: señales históricas no pueden bloquear el estado operativo del día.
 
 ---
 
@@ -429,18 +439,27 @@ emotionIntelligence = buildEmotionIntelligence({
   now: new Date()
 })
 
+// Solo señales con isCurrent === true alimentan el gate.
+currentEmotionSignals = emotionIntelligence.operationalSignals.isCurrent
+  ? emotionIntelligence.operationalSignals
+  : { emotionalRisk: 'unknown', isCurrent: false, shouldBlockTrading: false, ... }
+
 operationalState = buildOperationalState({
   trades: filtered,
   riskSettings,                     // localStorage + defaults
   checklistState,                   // derivado de última checklist
-  emotionSignals: emotionIntelligence.operationalSignals,
+  emotionSignals: currentEmotionSignals,
   account: { capital, name },
   dailyPlan,
   now: new Date()
 })
 ```
 
-Fallback UI: `FALLBACK_OPERATIONAL_STATE` (`caution` suave) si falta output o hay excepciones. Sin journals emocionales → Emotion Intelligence en `unknown` / empty; OperationalState sigue con riesgo base.
+Fallback UI: `FALLBACK_OPERATIONAL_STATE` (`caution` suave) si falta output o hay excepciones. Sin journals emocionales **de hoy** → Emotion Intelligence `operationalSignals.isCurrent: false`; OperationalState no bloquea por emoción histórica.
+
+### Hotfix — Current Operational Context
+
+Bloqueo emocional solo con evidencia de la jornada actual (check-in de hoy, pérdida de hoy + ansiedad/recovery altos, checklist de hoy incompleto + emoción elevada). Patrones históricos quedan en `behaviorSignals` / Analytics, no en el badge Apto/Precaución/Bloqueado.
 
 ### Orden visual
 

@@ -932,105 +932,116 @@ export function buildEmotionDirectives(signals = {}, sample = {}, context = {}) 
   return directives.slice(0, 5);
 }
 
-function latestEmotionalSnapshot(records = [], now) {
-  const emotional = asArray(records)
-    .filter(hasEmotionalSignal)
-    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+/**
+ * Current-day emotional snapshot only.
+ * Never falls back to historical journals/trades for operational gating.
+ */
+function currentEmotionalSnapshot(records = [], now) {
   const dayKey = tradingDayKey(resolveNow(now));
-  const today = emotional.filter(r => r.date === dayKey);
-  const recent = today[0] || emotional[0] || null;
-  return { recent, dayKey, todayCount: today.length };
+  const todayEmotional = asArray(records)
+    .filter(r => hasEmotionalSignal(r) && r.date === dayKey)
+    .sort((a, b) => {
+      const sourceRank = (s) => (s === 'journal' ? 3 : s === 'trade' ? 2 : 1);
+      const bySource = sourceRank(b.source) - sourceRank(a.source);
+      if (bySource) return bySource;
+      return String(b.id || '').localeCompare(String(a.id || ''));
+    });
+  return {
+    current: todayEmotional[0] || null,
+    dayKey,
+    todayCount: todayEmotional.length
+  };
+}
+
+function emptyCurrentOperationalSignals(reason, dayKey = null) {
+  return {
+    emotionalRisk: 'unknown',
+    anxiety: null,
+    recoveryImpulse: null,
+    clarity: null,
+    dominantState: 'desconocido',
+    recentEmotionalState: 'desconocido',
+    postLossProtocolRequired: false,
+    shouldBlockTrading: false,
+    shouldReduceRisk: false,
+    reason,
+    isCurrent: false,
+    source: null,
+    sourceDate: dayKey
+  };
 }
 
 /**
- * Compact signal for buildOperationalState / cockpit consumers.
+ * Compact CURRENT signal for buildOperationalState / cockpit.
+ * Historical behaviorSignals / profile averages must NOT gate trading.
+ * Only today's check-in (or today's loss + today's elevated emotion) can block.
  */
 export function buildOperationalEmotionSignals(intelligence = {}, options = {}) {
-  const intel = asObject(intelligence);
-  const profile = asObject(intel.emotionalProfile);
-  const behavior = asObject(intel.behaviorSignals);
-  const sample = asObject(intel.sample);
   const records = asArray(options.records);
   const now = resolveNow(options.now);
-  const { recent, dayKey } = latestEmotionalSnapshot(records.length ? records : [], now);
+  const { current, dayKey } = currentEmotionalSnapshot(records, now);
 
-  const anxiety = recent?.anxiety ?? profile.avgAnxiety ?? null;
-  const clarity = recent?.clarity ?? profile.avgClarity ?? null;
-  const recoveryImpulse = recent?.recoveryImpulse ?? profile.avgRecoveryImpulse ?? null;
-  const dominantState = recent?.dominantState || profile.dominantState || 'desconocido';
+  const todayTrades = records.filter(r => r.source === 'trade' && r.date === dayKey);
+  // Only losses from the current trading day — ignore options.recentLoss historical bleed.
+  const todayLoss = todayTrades.some(r => r.result === 'loss');
 
-  const trades = asArray(records).filter(r => r.source === 'trade' && r.date === dayKey);
-  const recentLoss = trades.some(r => r.result === 'loss') || options.recentLoss === true;
+  const todayChecklists = records.filter(r => r.source === 'checklist' && r.date === dayKey);
+  const checklistIncompleteToday = todayChecklists.some(c => c.checklistComplete === false);
+
+  // No current emotional check-in → never block/reduce from emotion layer.
+  if (!current) {
+    return emptyCurrentOperationalSignals(
+      todayLoss
+        ? 'Pérdida del día sin check-in emocional actual. Sin bloqueo emocional.'
+        : 'Sin check-in emocional de la jornada actual.',
+      dayKey
+    );
+  }
+
+  const anxiety = current.anxiety ?? null;
+  const clarity = current.clarity ?? null;
+  const recoveryImpulse = current.recoveryImpulse ?? null;
+  const dominantState = current.dominantState || 'desconocido';
   const recoveryHigh = recoveryImpulse != null && recoveryImpulse >= EMOTION_DEFAULTS.recoveryHigh;
   const anxietyHigh = anxiety != null && anxiety >= EMOTION_DEFAULTS.anxietyHigh;
   const clarityLow = clarity != null && clarity <= EMOTION_DEFAULTS.lowClarityThreshold;
+  const elevatedNow = anxietyHigh || recoveryHigh;
 
-  const postLossProtocolRequired =
-    recentLoss &&
-    (recoveryHigh ||
-      anxietyHigh ||
-      behavior.recoveryRisk?.active ||
-      behavior.postLossRisk?.level === 'high');
+  const postLossProtocolRequired = todayLoss && elevatedNow;
+  const checklistEmotionBlock = checklistIncompleteToday && elevatedNow;
 
-  let emotionalRisk = 'unknown';
-  if (sample.quality === 'empty') {
-    emotionalRisk = 'unknown';
-  } else if (
-    postLossProtocolRequired ||
-    (anxietyHigh && recentLoss) ||
-    (recoveryHigh && recentLoss) ||
-    behavior.checklistMismatch?.active ||
-    behavior.postLossRisk?.level === 'high' ||
-    (anxietyHigh && (behavior.anxietyDrag?.active || behavior.recoveryRisk?.active))
-  ) {
+  let emotionalRisk = 'low';
+  if (postLossProtocolRequired || checklistEmotionBlock || (anxietyHigh && todayLoss) || (recoveryHigh && todayLoss)) {
     emotionalRisk = 'high';
-  } else if (
-    anxietyHigh ||
-    recoveryHigh ||
-    clarityLow ||
-    behavior.anxietyDrag?.active ||
-    behavior.fomoRisk?.active ||
-    behavior.planBreakRisk?.level === 'high' ||
-    behavior.fatigueRisk?.level === 'medium'
-  ) {
+  } else if (anxietyHigh || recoveryHigh || clarityLow || current.fomo === true) {
     emotionalRisk = 'medium';
-  } else if (recent || profile.sampleSize > 0) {
-    emotionalRisk = 'low';
   }
 
   const shouldBlockTrading =
-    emotionalRisk === 'high' ||
-    (anxietyHigh && recentLoss) ||
-    (recoveryHigh && recentLoss) ||
-    postLossProtocolRequired;
+    postLossProtocolRequired ||
+    checklistEmotionBlock ||
+    (anxietyHigh && todayLoss) ||
+    (recoveryHigh && todayLoss);
 
   const shouldReduceRisk =
     !shouldBlockTrading &&
-    (emotionalRisk === 'medium' ||
-      clarityLow ||
-      behavior.anxietyDrag?.active ||
-      behavior.fomoRisk?.active ||
-      (behavior.fatigueRisk?.active && ['medium', 'high'].includes(behavior.fatigueRisk.level)));
+    (emotionalRisk === 'medium' || clarityLow || current.fomo === true || current.fatigue === true);
 
-  let reason = 'Sin señal emocional dominante.';
-  if (shouldBlockTrading && recentLoss && recoveryHigh) {
-    reason = 'Bloqueado: pérdida reciente + impulso de recuperar alto.';
-  } else if (shouldBlockTrading && anxietyHigh && recentLoss) {
-    reason = 'Bloqueado: pérdida reciente + ansiedad alta registrada.';
-  } else if (shouldBlockTrading && behavior.checklistMismatch?.active) {
-    reason = 'Bloqueado: checklist incompleto + emoción elevada.';
+  let reason = 'Estado emocional de la jornada estable para operar con plan.';
+  if (shouldBlockTrading && todayLoss && recoveryHigh) {
+    reason = 'Bloqueado: pérdida de hoy + impulso de recuperar alto.';
+  } else if (shouldBlockTrading && todayLoss && anxietyHigh) {
+    reason = 'Bloqueado: pérdida de hoy + ansiedad alta en check-in actual.';
+  } else if (shouldBlockTrading && checklistEmotionBlock) {
+    reason = 'Bloqueado: checklist de hoy incompleto + emoción elevada.';
   } else if (shouldBlockTrading) {
-    reason = 'Bloqueado: riesgo emocional alto. Activá protocolo de contención.';
+    reason = 'Bloqueado: riesgo emocional alto en la jornada actual.';
   } else if (shouldReduceRisk && anxietyHigh) {
-    reason = 'Precaución: ansiedad alta registrada. Reducí riesgo o pausá.';
+    reason = 'Precaución: ansiedad alta en check-in de hoy. Reducí riesgo o pausá.';
   } else if (shouldReduceRisk && clarityLow) {
-    reason = 'Precaución: claridad baja. Reducí riesgo hasta estabilizar.';
+    reason = 'Precaución: claridad baja en check-in de hoy. Reducí riesgo.';
   } else if (shouldReduceRisk) {
-    reason = 'Precaución: señal emocional/conductual elevada. Reducí riesgo.';
-  } else if (emotionalRisk === 'low') {
-    reason = 'Estado emocional estable para operar con plan.';
-  } else if (sample.quality === 'insufficient' || sample.quality === 'observing') {
-    reason = sample.message || 'Señal en observación. Medir más check-ins.';
+    reason = 'Precaución: señal emocional de la jornada elevada. Reducí riesgo.';
   }
 
   return {
@@ -1039,15 +1050,18 @@ export function buildOperationalEmotionSignals(intelligence = {}, options = {}) 
     recoveryImpulse,
     clarity,
     dominantState,
-    recentEmotionalState: recent?.dominantState || dominantState,
+    recentEmotionalState: dominantState,
     postLossProtocolRequired: !!postLossProtocolRequired,
     shouldBlockTrading: !!shouldBlockTrading,
     shouldReduceRisk: !!shouldReduceRisk,
-    reason
+    reason,
+    isCurrent: true,
+    source: current.source || 'journal',
+    sourceDate: current.date || dayKey
   };
 }
 
-function resolveOverallStatus(sample, operationalSignals, directives) {
+function resolveOverallStatus(sample, operationalSignals, directives, behaviorSignals = {}) {
   if (sample.quality === 'empty') {
     return {
       status: EMOTION_STATUS.UNKNOWN,
@@ -1057,7 +1071,11 @@ function resolveOverallStatus(sample, operationalSignals, directives) {
     };
   }
 
-  if (operationalSignals.shouldBlockTrading || operationalSignals.emotionalRisk === 'high') {
+  // RISK only from CURRENT operational signals — never from historical aggregates.
+  if (
+    operationalSignals.isCurrent &&
+    (operationalSignals.shouldBlockTrading || operationalSignals.emotionalRisk === 'high')
+  ) {
     return {
       status: EMOTION_STATUS.RISK,
       label: EMOTION_LABEL.risk,
@@ -1066,11 +1084,19 @@ function resolveOverallStatus(sample, operationalSignals, directives) {
     };
   }
 
+  const historicalWatch =
+    behaviorSignals.anxietyDrag?.active ||
+    behaviorSignals.recoveryRisk?.active ||
+    behaviorSignals.postLossRisk?.active ||
+    behaviorSignals.fomoRisk?.active ||
+    behaviorSignals.planBreakRisk?.level === 'high';
+
   if (
     sample.quality === 'insufficient' ||
     sample.quality === 'observing' ||
-    operationalSignals.shouldReduceRisk ||
-    operationalSignals.emotionalRisk === 'medium'
+    (operationalSignals.isCurrent && operationalSignals.shouldReduceRisk) ||
+    (operationalSignals.isCurrent && operationalSignals.emotionalRisk === 'medium') ||
+    historicalWatch
   ) {
     return {
       status: EMOTION_STATUS.WATCH,
@@ -1156,7 +1182,7 @@ export function buildEmotionIntelligence(input = {}) {
 
     const operationalSignals = buildOperationalEmotionSignals(
       { emotionalProfile: profile, behaviorSignals, sample },
-      { records, now, recentLoss: options.recentLoss }
+      { records, now }
     );
 
     const primaryPattern =
@@ -1169,14 +1195,18 @@ export function buildEmotionIntelligence(input = {}) {
       (profile.dominantState !== 'desconocido' && `Estado dominante: ${profile.dominantState}`) ||
       'Sin patrón emocional dominante';
 
-    const primaryRisk =
-      operationalSignals.reason ||
-      (behaviorSignals.recoveryRisk.active && behaviorSignals.recoveryRisk.detail) ||
-      (behaviorSignals.anxietyDrag.active && behaviorSignals.anxietyDrag.detail) ||
-      (behaviorSignals.planBreakRisk.active && behaviorSignals.planBreakRisk.detail) ||
-      sample.message;
+    // primaryRisk for cockpit prefers CURRENT operational reason; historical stays analytical.
+    const primaryRisk = operationalSignals.isCurrent
+      ? (operationalSignals.reason ||
+        (behaviorSignals.recoveryRisk.active && behaviorSignals.recoveryRisk.detail) ||
+        (behaviorSignals.anxietyDrag.active && behaviorSignals.anxietyDrag.detail) ||
+        sample.message)
+      : (sample.message ||
+        (behaviorSignals.anxietyDrag.active && `${behaviorSignals.anxietyDrag.detail} (histórico)`) ||
+        (behaviorSignals.recoveryRisk.active && `${behaviorSignals.recoveryRisk.detail} (histórico)`) ||
+        'Sin check-in emocional de la jornada actual.');
 
-    const overall = resolveOverallStatus(sample, operationalSignals, directives);
+    const overall = resolveOverallStatus(sample, operationalSignals, directives, behaviorSignals);
     const summary = buildSummary({
       status: overall.status,
       sample,
@@ -1256,7 +1286,10 @@ export function buildEmotionIntelligence(input = {}) {
         postLossProtocolRequired: false,
         shouldBlockTrading: false,
         shouldReduceRisk: false,
-        reason: 'Sin señal emocional dominante.'
+        reason: 'Sin señal emocional dominante.',
+        isCurrent: false,
+        source: null,
+        sourceDate: null
       },
       sample: {
         tradesWithEmotion: 0,

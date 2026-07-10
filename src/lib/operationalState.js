@@ -235,6 +235,9 @@ function isRecoveryFlag(value) {
 /**
  * Read emotionalState / Sprint 06 emotionSignals.
  * Accepts legacy emotionalState and compact operationalSignals.
+ *
+ * Sprint 07 hotfix: signals with `isCurrent === false` never gate trading.
+ * Historical emotion intelligence must not block the current session.
  */
 function readEmotionalSignals(emotionalState = {}) {
   const state = asObject(emotionalState);
@@ -249,7 +252,25 @@ function readEmotionalSignals(emotionalState = {}) {
       shouldReduceRisk: false,
       postLossProtocolRequired: false,
       emotionReason: null,
-      known: false
+      known: false,
+      isCurrent: false
+    };
+  }
+
+  // Explicit non-current payload from Emotion Intelligence → ignore for gating.
+  if (state.isCurrent === false) {
+    return {
+      anxiety: null,
+      recoveryImpulse: false,
+      clarity: null,
+      dominantState: null,
+      emotionalRisk: 'unknown',
+      shouldBlockTrading: false,
+      shouldReduceRisk: false,
+      postLossProtocolRequired: false,
+      emotionReason: typeof state.reason === 'string' ? state.reason : 'Sin check-in emocional de la jornada actual.',
+      known: false,
+      isCurrent: false
     };
   }
 
@@ -296,7 +317,8 @@ function readEmotionalSignals(emotionalState = {}) {
     shouldReduceRisk,
     postLossProtocolRequired,
     emotionReason,
-    known: true
+    known: true,
+    isCurrent: state.isCurrent === true || state.isCurrent == null
   };
 }
 
@@ -409,7 +431,8 @@ export function normalizeOperationalInputs(input = {}) {
     emotionReason: emotional.emotionReason || null,
     incompleteData,
     hasTradeData,
-    hasRiskSettings
+    hasRiskSettings,
+    emotionIsCurrent: emotional.isCurrent === true
   };
 }
 
@@ -490,7 +513,8 @@ export function evaluateEmotionalRisk(normalized = {}) {
     shouldReduceRisk: n.shouldReduceRisk === true,
     postLossProtocolRequired: n.postLossProtocolRequired === true,
     emotionReason: n.emotionReason || null,
-    known: n.emotionalKnown === true
+    known: n.emotionalKnown === true,
+    isCurrent: n.emotionIsCurrent === true || n.emotionalKnown === true
   };
 }
 
@@ -574,6 +598,7 @@ export function buildOperationalReasons(normalized = {}, evaluations = {}) {
 
   if (
     n.recentLoss &&
+    emotional.known &&
     (emotional.emotionalRisk === 'high' ||
       emotional.recoveryImpulse ||
       emotional.shouldBlockTrading ||
@@ -591,7 +616,10 @@ export function buildOperationalReasons(normalized = {}, evaluations = {}) {
       metric: emotional.anxiety != null ? `${emotional.anxiety}/10` : undefined,
       action: 'Activar post-loss protocol. No re-entrar.'
     });
-  } else if (emotional.shouldBlockTrading || emotional.emotionalRisk === 'high') {
+  } else if (
+    emotional.known &&
+    (emotional.shouldBlockTrading || emotional.emotionalRisk === 'high')
+  ) {
     pushReason(reasons, {
       code: 'emotional_high',
       level: 'danger',
@@ -613,9 +641,10 @@ export function buildOperationalReasons(normalized = {}, evaluations = {}) {
       action: 'Reducir riesgo o pausar la siguiente entrada.'
     });
   } else if (
-    emotional.shouldReduceRisk ||
-    emotional.emotionalRisk === 'medium' ||
-    (emotional.clarity != null && emotional.clarity <= 4)
+    emotional.known &&
+    (emotional.shouldReduceRisk ||
+      emotional.emotionalRisk === 'medium' ||
+      (emotional.clarity != null && emotional.clarity <= 4))
   ) {
     pushReason(reasons, {
       code: 'emotional_medium',
@@ -774,7 +803,10 @@ function formatRSigned(value) {
 }
 
 function resolveStatus({ risk, checklist, emotional, normalized }) {
+  // Emotional gates only apply when Emotion Intelligence marked the signal as current.
+  const emotionActive = emotional.known === true;
   const anxietyHigh =
+    emotionActive &&
     emotional.anxiety != null &&
     emotional.anxiety >= OPERATIONAL_DEFAULTS.emotionalHighRiskThreshold;
 
@@ -784,20 +816,22 @@ function resolveStatus({ risk, checklist, emotional, normalized }) {
     risk.drawdownLimitHit ||
     risk.maxTradesHit ||
     (checklist.checklistRequired && checklist.checklistMissing && checklist.attemptingToOperate) ||
-    emotional.shouldBlockTrading === true ||
-    emotional.postLossProtocolRequired === true ||
-    emotional.emotionalRisk === 'high' ||
-    (normalized.recentLoss && anxietyHigh) ||
-    (normalized.recentLoss && (emotional.emotionalRisk === 'high' || emotional.recoveryImpulse));
+    (emotionActive && emotional.shouldBlockTrading === true) ||
+    (emotionActive && emotional.postLossProtocolRequired === true) ||
+    (emotionActive && emotional.emotionalRisk === 'high') ||
+    (emotionActive && normalized.recentLoss && anxietyHigh) ||
+    (emotionActive &&
+      normalized.recentLoss &&
+      (emotional.emotionalRisk === 'high' || emotional.recoveryImpulse));
 
   if (blocked) return OPERATIONAL_STATUS.BLOCKED;
 
   const caution =
     normalized.recentLoss ||
     checklist.checklistMissing ||
-    emotional.shouldReduceRisk === true ||
-    emotional.emotionalRisk === 'medium' ||
-    (emotional.clarity != null && emotional.clarity <= 4) ||
+    (emotionActive && emotional.shouldReduceRisk === true) ||
+    (emotionActive && emotional.emotionalRisk === 'medium') ||
+    (emotionActive && emotional.clarity != null && emotional.clarity <= 4) ||
     risk.nearMaxTrades ||
     risk.dailyLossPartial ||
     normalized.riskyConduct;

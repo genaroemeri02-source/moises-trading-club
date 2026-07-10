@@ -1210,6 +1210,27 @@ function Dashboard({data,profile,setTab}){
     }
   },[filtered, data.emotionalJournals, data.checklists]);
 
+  // Only CURRENT emotional signals may gate OperationalState (isCurrent === true).
+  const currentEmotionSignals=useMemo(()=>{
+    const signals=emotionIntelligence?.operationalSignals;
+    if(signals?.isCurrent===true) return signals;
+    return {
+      emotionalRisk:'unknown',
+      anxiety:null,
+      recoveryImpulse:null,
+      clarity:null,
+      dominantState:'desconocido',
+      recentEmotionalState:'desconocido',
+      postLossProtocolRequired:false,
+      shouldBlockTrading:false,
+      shouldReduceRisk:false,
+      reason:signals?.reason || 'Sin check-in emocional de la jornada actual.',
+      isCurrent:false,
+      source:null,
+      sourceDate:signals?.sourceDate || null
+    };
+  },[emotionIntelligence]);
+
   const operationalState=useMemo(()=>{
     try{
       return buildOperationalState({
@@ -1217,8 +1238,7 @@ function Dashboard({data,profile,setTab}){
         riskSettings,
         checklistState,
         checklistEntries: data.checklists || [],
-        emotionSignals: emotionIntelligence?.operationalSignals,
-        emotionalState: emotionIntelligence?.operationalSignals,
+        emotionSignals: currentEmotionSignals,
         account: accountForOps,
         dailyPlan: todayPlan || null,
         now: new Date()
@@ -1227,7 +1247,7 @@ function Dashboard({data,profile,setTab}){
       console.warn('Dashboard operationalState fallback', err?.message || err);
       return FALLBACK_OPERATIONAL_STATE;
     }
-  },[filtered, riskSettings, checklistState, data.checklists, emotionIntelligence, accountForOps, todayPlan]);
+  },[filtered, riskSettings, checklistState, data.checklists, currentEmotionSignals, accountForOps, todayPlan]);
 
   const safeOperationalState=operationalState || FALLBACK_OPERATIONAL_STATE;
 
