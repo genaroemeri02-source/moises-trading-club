@@ -3,9 +3,11 @@ import { buildMentorReviewPatch, buildTradeFirestoreDocument, buildTradeSavePayl
 
 export function validateTradeFormBeforeSave(form = {}) {
   const hasResultMetric = String(form.resultMoney ?? '').trim() !== '' || String(form.resultPct ?? '').trim() !== '' || String(form.resultR ?? '').trim() !== '';
-  if (!String(form.asset || '').trim()) return { ok: false, message: 'Falta seleccionar activo.' };
+  const day = String(form.date || form.tradingDay || '').slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false, message: 'Fecha inválida.' };
+  if (!String(form.account || form.accountName || '').trim()) return { ok: false, message: 'Falta seleccionar cuenta.' };
   if (!String(form.result || '').trim()) return { ok: false, message: 'Falta seleccionar resultado.' };
-  if (!hasResultMetric) return { ok: false, message: 'Cargá al menos P/L en $, resultado en R o porcentaje.' };
+  if (!hasResultMetric) return { ok: false, message: 'Cargá al menos P/L en $ o resultado en R.' };
   return { ok: true };
 }
 

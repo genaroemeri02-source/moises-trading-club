@@ -15239,17 +15239,20 @@ html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):
 }
 .dashboardRiskList{
   display:grid;
-  gap:8px;
+  gap:10px;
+  min-width:0;
 }
 .dashboardRiskList>div{
   display:grid;
-  grid-template-columns:minmax(78px,.55fr) minmax(80px,.55fr) minmax(0,1fr);
-  align-items:center;
-  gap:10px;
+  grid-template-columns:1fr;
+  align-items:start;
+  justify-items:stretch;
+  gap:6px;
   border:1px solid rgba(255,255,255,.080);
   border-radius:14px;
-  padding:10px 12px;
+  padding:14px 14px;
   background:linear-gradient(180deg,rgba(255,255,255,.036),rgba(255,255,255,.014));
+  min-width:0;
 }
 .dashboardRiskList span{
   color:var(--muted2);
@@ -15257,16 +15260,21 @@ html[data-theme="light"] body.trade-detail-modal-open:not(:has(.paywallFunnel)):
   font-weight:900;
   letter-spacing:.10em;
   text-transform:uppercase;
+  line-height:1.25;
 }
 .dashboardRiskList b{
   color:var(--text);
-  font-size:17px;
-  line-height:1.1;
+  font-size:18px;
+  line-height:1.2;
+  font-weight:850;
+  overflow-wrap:anywhere;
 }
 .dashboardRiskList small{
   color:var(--muted);
+  font-size:12px;
   font-weight:650;
-  line-height:1.35;
+  line-height:1.4;
+  overflow-wrap:anywhere;
 }
 html[data-theme="dark"] body .dashboardClean .dashboardRightRail .card,
 html[data-theme="dark"] body .dashboardClean .dashboardKpiStrip .metricPremium{
@@ -15305,7 +15313,8 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurf
   }
   .dashboardRiskList>div{
     grid-template-columns:1fr;
-    gap:4px;
+    gap:6px;
+    padding:14px 14px;
   }
 }
 @media(max-width:520px){
@@ -15920,34 +15929,35 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurf
 .dashboardRiskSnapshotGrid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+  gap:10px;
 }
 .dashboardRiskSnapshotGrid > div{
   min-width:0;
-  padding:10px;
+  padding:12px 12px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,.08);
   background:rgba(0,0,0,.14);
   display:grid;
-  gap:3px;
+  gap:5px;
 }
 .dashboardRiskSnapshotGrid span{
   color:var(--muted2);
-  font-size:9px;
+  font-size:10px;
   font-weight:850;
   letter-spacing:.08em;
   text-transform:uppercase;
+  line-height:1.25;
 }
 .dashboardRiskSnapshotGrid b{
   color:var(--text);
-  font-size:15px;
-  line-height:1.15;
+  font-size:16px;
+  line-height:1.2;
   overflow-wrap:anywhere;
 }
 .dashboardRiskSnapshotGrid small{
   color:var(--muted);
-  font-size:11px;
-  line-height:1.3;
+  font-size:12px;
+  line-height:1.35;
   font-weight:650;
 }
 .dashboardRiskSnapshotGrid .pos b{color:var(--aurora-cyan)}
@@ -16929,8 +16939,28 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurf
 .dashboardClean .dashboardMapGrid b{
   font-size:14px!important;
 }
+/* Hotfix: breathe risk rail rows (overrides prior compact padding) */
+.dashboardClean .dashboardRiskList{
+  gap:10px;
+}
 .dashboardClean .dashboardRiskList>div{
-  padding:9px 10px!important;
+  display:grid;
+  grid-template-columns:1fr;
+  align-items:start;
+  gap:6px;
+  padding:14px 14px!important;
+}
+.dashboardClean .dashboardRiskList span{
+  margin:0;
+}
+.dashboardClean .dashboardRiskList b{
+  font-size:18px;
+  line-height:1.2;
+}
+.dashboardClean .dashboardRiskList small{
+  font-size:12px;
+  line-height:1.4;
+  margin-top:1px;
 }
 .dashboardClean .dashboardDisciplineBadge{
   min-height:52px!important;
@@ -32663,6 +32693,442 @@ html[data-theme="light"] li.featureStatus-coming-soon .featureStatusLabel{
 }
 .landingPricingSection .primary.landingCta:hover,
 .paywallFunnelPlan button.primary:hover{filter:brightness(1.06)}
+
+/* ==========================================================================
+   TRADE FORM — STEPPED CAPTURE
+   Sprint 12 — mobile-first stepped trade registration
+   ========================================================================== */
+
+.tradeFormCard--stepped{
+  display:grid;
+  gap:0;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  border-color:var(--aurora-border,rgba(124,92,255,.16));
+  background:
+    radial-gradient(circle at 8% 0%,rgba(51,230,196,.07),transparent 32%),
+    radial-gradient(circle at 96% 4%,rgba(124,92,255,.10),transparent 36%),
+    var(--aurora-surface,rgba(18,15,31,.92));
+}
+
+.tradeFormStepper{
+  display:grid;
+  gap:14px;
+  min-width:0;
+  max-width:100%;
+}
+
+.tradeFormSteps{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  min-width:0;
+}
+
+.tradeFormStep{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:6px;
+  min-width:0;
+  min-height:52px;
+  padding:10px 10px 9px;
+  border-radius:14px;
+  border:1px solid var(--aurora-border,rgba(124,92,255,.16));
+  background:var(--aurora-panel-soft,rgba(255,255,255,.025));
+  color:var(--aurora-text-muted,rgba(191,184,218,.68));
+  cursor:pointer;
+  text-align:left;
+  transition:border-color .18s ease, background .18s ease, color .18s ease;
+}
+
+.tradeFormStepIndex{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  border:1px solid rgba(124,92,255,.22);
+  background:rgba(124,92,255,.10);
+  color:var(--aurora-violet,#7C5CFF);
+  font-size:11px;
+  font-weight:850;
+  line-height:1;
+}
+
+.tradeFormStepLabel{
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.01em;
+  line-height:1.2;
+  overflow-wrap:anywhere;
+}
+
+.tradeFormStep--active{
+  border-color:rgba(51,230,196,.34);
+  background:
+    linear-gradient(135deg,rgba(51,230,196,.12),rgba(124,92,255,.10));
+  color:var(--aurora-text,#F8F7FF);
+}
+
+.tradeFormStep--active .tradeFormStepIndex{
+  border-color:rgba(51,230,196,.40);
+  background:rgba(51,230,196,.16);
+  color:var(--aurora-cyan,#33E6C4);
+}
+
+.tradeFormStep--done{
+  border-color:rgba(124,92,255,.28);
+  color:var(--aurora-text-soft,rgba(248,247,255,.78));
+}
+
+.tradeFormStep--done .tradeFormStepIndex{
+  border-color:rgba(124,92,255,.30);
+  background:rgba(124,92,255,.14);
+  color:var(--aurora-violet,#7C5CFF);
+}
+
+.tradeFormStepMeta{
+  display:grid;
+  gap:4px;
+  min-width:0;
+}
+
+.tradeFormStepMeta b{
+  color:var(--aurora-text,#F8F7FF);
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:.02em;
+}
+
+.tradeFormStepMeta p{
+  margin:0;
+  color:var(--aurora-text-muted,rgba(191,184,218,.68));
+  font-size:13px;
+  line-height:1.4;
+  font-weight:600;
+}
+
+.tradeFormPanel{
+  display:grid;
+  gap:14px;
+  min-width:0;
+  max-width:100%;
+}
+
+.tradeFormFieldGroup{
+  display:grid;
+  gap:14px;
+  min-width:0;
+}
+
+.tradeFormGrid{
+  min-width:0;
+}
+
+.tradeFormFooter{
+  position:sticky;
+  bottom:0;
+  z-index:6;
+  display:grid;
+  gap:8px;
+  margin-top:4px;
+  padding:12px 0 calc(8px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--aurora-border,rgba(124,92,255,.16));
+  background:
+    linear-gradient(180deg,rgba(11,8,18,.72),rgba(11,8,18,.96));
+  backdrop-filter:blur(10px);
+}
+
+.tradeFormFooterNav{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);
+  gap:10px;
+  min-width:0;
+}
+
+.tradeFormFooterNav .primary,
+.tradeFormFooterNav .ghost{
+  min-height:48px;
+  width:100%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border-radius:14px;
+  font-weight:800;
+}
+
+.tradeFormFooterNav .primary.tradeFormBtnNext,
+.tradeFormFooterNav .primary.tradeFormBtnSave{
+  background:linear-gradient(135deg,rgba(51,230,196,.95),rgba(124,92,255,.95));
+  border-color:transparent;
+  color:#041018;
+}
+
+.tradeFormFooterNav .primary.tradeFormBtnNext:hover,
+.tradeFormFooterNav .primary.tradeFormBtnSave:hover{
+  filter:brightness(1.05);
+}
+
+.tradeFormFooterMeta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+  color:var(--aurora-text-muted,rgba(191,184,218,.68));
+  font-size:12px;
+  font-weight:650;
+}
+
+.tradeFormFooterMeta .tradeFormBtnSaveEarly{
+  min-height:36px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+}
+
+.tradeFormWarning{
+  margin:0;
+  padding:11px 13px;
+  border-radius:14px;
+  border:1px solid rgba(247,201,72,.28);
+  background:rgba(247,201,72,.08);
+  color:var(--aurora-text-soft,rgba(248,247,255,.78));
+  font-size:13px;
+  line-height:1.4;
+  font-weight:600;
+}
+
+.tradeFormWarning--soft{
+  border-color:rgba(247,201,72,.16);
+  background:rgba(247,201,72,.045);
+  color:var(--aurora-text-soft,rgba(248,247,255,.68));
+  font-weight:500;
+}
+
+.tradeFormWarning--error{
+  border-color:rgba(255,79,139,.34);
+  background:rgba(255,79,139,.10);
+  color:var(--aurora-text,#F8F7FF);
+}
+
+.tradeFormInput--error{
+  border-color:rgba(255,79,139,.45);
+}
+
+.tradeFormSummary{
+  display:grid;
+  gap:10px;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid var(--aurora-border,rgba(124,92,255,.16));
+  background:var(--aurora-panel,rgba(255,255,255,.035));
+  min-width:0;
+}
+
+.tradeFormSummary > b{
+  color:var(--aurora-text,#F8F7FF);
+  font-size:13px;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.tradeFormSummary ul{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 12px;
+  min-width:0;
+}
+
+.tradeFormSummary li{
+  display:grid;
+  gap:2px;
+  min-width:0;
+  padding:8px 10px;
+  border-radius:12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.tradeFormSummary li span{
+  color:var(--aurora-text-muted,rgba(191,184,218,.68));
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.tradeFormSummary li strong{
+  color:var(--aurora-text,#F8F7FF);
+  font-size:14px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.tradeFormAdvanced{
+  border:1px solid var(--aurora-border,rgba(124,92,255,.16));
+  border-radius:16px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.02);
+}
+
+.tradeFormAdvanced > summary{
+  cursor:pointer;
+  color:var(--aurora-text-soft,rgba(248,247,255,.78));
+  font-weight:750;
+  font-size:13px;
+  padding:6px 2px;
+}
+
+.tradeFormSubhead{
+  margin:14px 0 8px;
+  color:var(--aurora-text,#F8F7FF);
+  font-size:15px;
+  font-weight:800;
+}
+
+@media (min-width:861px){
+  .tradeFormCard--stepped .tradeFormGrid.formGrid.labeled{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .tradeFormFooter{
+    position:static;
+    background:transparent;
+    backdrop-filter:none;
+    padding-bottom:0;
+  }
+  .tradeFormFooterNav{
+    grid-template-columns:180px minmax(0,220px);
+    justify-content:flex-end;
+  }
+}
+
+@media (max-width:860px){
+  .tradeFormSteps{
+    gap:6px;
+  }
+  .tradeFormStep{
+    padding:9px 8px;
+    min-height:48px;
+  }
+  .tradeFormStepLabel{
+    font-size:11px;
+  }
+  .tradeFormCard--stepped{
+    margin-bottom:12px;
+  }
+  .tradeFormCard--stepped .resultStrip.resultHero{
+    grid-template-columns:1fr;
+  }
+  .tradeFormSummary ul{
+    grid-template-columns:1fr;
+  }
+  .journalPage > .tradeFormCard--stepped{
+    position:relative;
+    z-index:5;
+  }
+  /* Keep footer CTAs above soft keyboard / safe area when possible */
+  .tradeFormFooter{
+    margin-left:-2px;
+    margin-right:-2px;
+    padding-left:2px;
+    padding-right:2px;
+  }
+}
+
+@media (max-width:390px){
+  .tradeFormSteps{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px;
+  }
+  .tradeFormStep{
+    padding:8px 6px;
+    border-radius:12px;
+  }
+  .tradeFormStepLabel{
+    font-size:10px;
+    letter-spacing:0;
+  }
+  .tradeFormStepIndex{
+    width:20px;
+    height:20px;
+    font-size:10px;
+  }
+  .tradeFormFooterNav{
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);
+    gap:8px;
+  }
+}
+
+html[data-theme="light"] .tradeFormCard--stepped,
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .tradeFormCard--stepped{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(51,230,196,.08),transparent 32%),
+    radial-gradient(circle at 96% 4%,rgba(124,92,255,.08),transparent 36%),
+    #FFFFFF;
+  border-color:rgba(15,23,42,.10);
+}
+
+html[data-theme="light"] .tradeFormStep{
+  background:#F8FAFC;
+  border-color:rgba(15,23,42,.10);
+  color:var(--aurora-light-muted,#667085);
+}
+
+html[data-theme="light"] .tradeFormStep--active{
+  background:linear-gradient(135deg,rgba(51,230,196,.12),rgba(124,92,255,.10));
+  border-color:rgba(51,230,196,.34);
+  color:var(--aurora-light-text,#07111F);
+}
+
+html[data-theme="light"] .tradeFormStepMeta b,
+html[data-theme="light"] .tradeFormSummary > b,
+html[data-theme="light"] .tradeFormSummary li strong,
+html[data-theme="light"] .tradeFormSubhead{
+  color:var(--aurora-light-text,#07111F);
+}
+
+html[data-theme="light"] .tradeFormStepMeta p,
+html[data-theme="light"] .tradeFormSummary li span,
+html[data-theme="light"] .tradeFormFooterMeta,
+html[data-theme="light"] .tradeFormAdvanced > summary{
+  color:var(--aurora-light-muted,#667085);
+}
+
+html[data-theme="light"] .tradeFormFooter{
+  background:linear-gradient(180deg,rgba(247,248,251,.82),rgba(247,248,251,.96));
+  border-top-color:rgba(15,23,42,.10);
+}
+
+html[data-theme="light"] .tradeFormSummary,
+html[data-theme="light"] .tradeFormAdvanced{
+  background:#F8FAFC;
+  border-color:rgba(15,23,42,.10);
+}
+
+html[data-theme="light"] .tradeFormSummary li{
+  background:#FFFFFF;
+  border-color:rgba(15,23,42,.08);
+}
+
+html[data-theme="light"] .tradeFormWarning{
+  color:#5B4A12;
+  background:rgba(247,201,72,.12);
+}
+
+html[data-theme="light"] .tradeFormWarning--soft{
+  color:#6B5A28;
+  background:rgba(247,201,72,.07);
+  border-color:rgba(247,201,72,.18);
+}
 
 /* ==========================================================================
    MTC CSS GUARDRAILS

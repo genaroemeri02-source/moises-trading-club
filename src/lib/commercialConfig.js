@@ -112,7 +112,7 @@ export const COMMERCIAL_FEATURES = [
   {
     id: 'risk-basic',
     label: 'Gestión básica de riesgo',
-    description: 'Límites, lotaje y exposición visibles.',
+    description: 'Límites diarios, lotaje y exposición configurables.',
     status: FEATURE_STATUS.AVAILABLE,
     plans: ['basic', 'premium', 'mentorship'],
   },
@@ -209,14 +209,17 @@ export const COMMERCIAL_FEATURES = [
   },
 ];
 
-/** Plan feature rows for landing / paywall (honest labels + status). */
+/** Plan feature rows for landing / paywall (honest labels + status).
+ * Club = captura/control. Pro = Decision Intelligence.
+ * Strategic line: "Club registra y ordena. Pro interpreta y decide."
+ */
 const CLUB_FEATURE_ROWS = [
   { id: 'journal', label: 'Journal manual', status: FEATURE_STATUS.AVAILABLE },
   { id: 'checklist', label: 'Checklist operativo', status: FEATURE_STATUS.AVAILABLE },
   { id: 'calendar-pl', label: 'Calendario P/L', status: FEATURE_STATUS.AVAILABLE },
   { id: 'risk-basic', label: 'Gestión básica de riesgo', status: FEATURE_STATUS.AVAILABLE },
   { id: 'dashboard', label: 'Dashboard operativo', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'community', label: 'Base / comunidad', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'export-basic', label: 'Export básico (CSV)', status: FEATURE_STATUS.AVAILABLE },
 ];
 
 const PRO_FEATURE_ROWS = [
@@ -224,10 +227,10 @@ const PRO_FEATURE_ROWS = [
   { id: 'analytics', label: 'Analytics y diagnóstico operativo', status: FEATURE_STATUS.AVAILABLE },
   { id: 'edge-lab', label: 'Edge Lab y directivas operativas', status: FEATURE_STATUS.AVAILABLE },
   { id: 'emotional-journal', label: 'Journal emocional y señales de conducta', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'cockpit-advanced', label: 'Cockpit operativo avanzado', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'export', label: 'Export JSON / CSV', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'broker-sync', label: 'BrokerSync / MT5', status: FEATURE_STATUS.COMING_SOON },
+  { id: 'cockpit-advanced', label: 'Cockpit avanzado', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'pdf-reports', label: 'Reportes PDF', status: FEATURE_STATUS.COMING_SOON },
   { id: 'ai-review', label: 'AI Review', status: FEATURE_STATUS.COMING_SOON },
+  { id: 'broker-sync', label: 'BrokerSync', status: FEATURE_STATUS.COMING_SOON },
 ];
 
 const MENTORSHIP_FEATURE_ROWS = [
@@ -247,9 +250,9 @@ export const COMMERCIAL_PLANS = [
     currency: 'USD',
     kicker: 'Founding Access',
     badge: 'Founding Access',
-    subtitle: 'Journal, checklist y riesgo para armar tu rutina diaria.',
-    headline: 'Journal, checklist y riesgo para armar tu rutina diaria.',
-    valueNote: 'Para quien arranca con registro serio: operaciones, validación pre-trade y límites visibles.',
+    subtitle: 'Journal, checklist y riesgo para construir tu rutina diaria.',
+    headline: 'Journal, checklist y riesgo para construir tu rutina diaria.',
+    valueNote: 'Para quien empieza a ordenar su operativa: registro manual, validación pre-trade, calendario P/L y control básico de riesgo.',
     cta: 'Activar Club',
     recommended: false,
     tone: 'base',
@@ -267,7 +270,7 @@ export const COMMERCIAL_PLANS = [
     badge: 'Más elegido',
     subtitle: 'Diagnóstico de edge, fugas y conducta sobre tu historial.',
     headline: 'Diagnóstico de edge, fugas y conducta sobre tu historial.',
-    valueNote: 'Para traders con volumen: edge, fuga principal, directivas semanales y lectura emocional conectada al journal.',
+    valueNote: 'Decision Intelligence: edge, fuga principal, directivas semanales y lectura emocional conectada a tu historial.',
     cta: 'Activar Pro',
     recommended: true,
     tone: 'pro',

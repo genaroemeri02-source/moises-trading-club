@@ -803,7 +803,7 @@ function PublicLanding(){
   const landingPlans=COMMERCIAL_PLANS;
   const proofDemos=[
     {title:'Validá antes de operar',benefit:'Checklist, contexto, setup y RR antes de poner capital en riesgo.',src:'/commercial/mtc-demo-checklist-execution.png'},
-    {title:'Protegé tu riesgo',benefit:'Límites, drawdown y exposición visibles para sostener disciplina.',src:'/commercial/mtc-demo-risk-limits.png'},
+    {title:'Protegé tu riesgo',benefit:'Límites diarios, drawdown y exposición configurables para sostener disciplina.',src:'/commercial/mtc-demo-risk-limits.png'},
     {title:'Revisá con evidencia',benefit:'Journal, conducta y analytics conectados para detectar patrones reales.',src:'/commercial/mtc-demo-journal-review.png'}
   ];
   const landingDemoFallback='/commercial/mtc-landing-demo-premium.png';
@@ -1324,10 +1324,18 @@ function Dashboard({data,profile,setTab}){
     setOnboardingDismissed(true);
   };
 
+  const navigateFromFirstRun=(target)=>{
+    // Sprint 12: First-run CTA can open the stepped trade form directly on Journal.
+    if(target==='journal'){
+      try{localStorage.setItem('mtc-open-new-trade','1');}catch(e){}
+      try{window.dispatchEvent(new CustomEvent('mtc-open-new-trade',{detail:{source:'first-run'}}));}catch(e){}
+    }
+    setTab(target);
+  };
   const firstRunPanel=showFirstRun?(
     <FirstRunPanel
       onboardingState={onboardingState}
-      onNavigate={setTab}
+      onNavigate={navigateFromFirstRun}
       onDismiss={firstRunCompact?dismissOnboarding:undefined}
       compact={firstRunCompact}
     />
@@ -1462,7 +1470,7 @@ function Journal({data,profile}){
   const activeNames=activeAccountNames(data.settings);
   const lastAccount=localStorage.getItem('mtc-last-account')||'';
   const defaultTradeAccount=activeNames.includes(lastAccount)?lastAccount:(active!=='__all__'&&activeNames.includes(active)?active:(activeNames[0]||'Cuenta principal'));
-  const emptyForm={date:selectedDate||tradingDayKey(),tradingDay:selectedDate||tradingDayKey(),account:defaultTradeAccount,asset:'XAUUSD',session:'NY',side:'BUY',tradeSystem:'Sistema de Moisés',pattern:'Método Estructural: ChoCH en M1',confluencesUsed:[],otherSystem:'',setup:'',riskPct:riskSettings.riskPerTradePct||.5,entry:'',sl:'',tp:'',exit:'',riskMoney:'',result:'',resultMoney:'',resultPct:'',resultR:'',quality:'A',followedPlan:true,checklist:[],captureLink:'',captureFileName:'',emotionBefore:'',emotionDuring:'',emotionAfter:'',executionBehaviors:[],postTradeBehavior:'',calidadTesis:'',calidadEjecucion:'',calidadComportamiento:'',calidadRevision:'',respetoProceso:'',estadoMental:'',motivoOperacion:'',notasComportamiento:'',indiceCalidadContextual:'',alineacionMacro:'',alineacionHTF:'',alineacionIntra:'',liquidezClara:'',dxyConfirma:'',zonaConFuncion:'',notasContexto:'',privateJournal:'',lesson:''};
+  const emptyForm={date:selectedDate||tradingDayKey(),tradingDay:selectedDate||tradingDayKey(),account:defaultTradeAccount,asset:'XAUUSD',session:'NY',side:'BUY',tradeSystem:'Sistema de Moisés',pattern:'Método Estructural: ChoCH en M1',confluencesUsed:[],otherSystem:'',setup:'',riskPct:riskSettings.riskPerTradePct||.5,entry:'',sl:'',tp:'',exit:'',stopLoss:'',takeProfit:'',riskMoney:'',result:'',resultMoney:'',resultPct:'',resultR:'',quality:'A',followedPlan:true,followedPlanLabel:'Sí',planFollowed:true,checklistComplete:undefined,checklistCompleteLabel:'',mistakeType:'',checklist:[],captureLink:'',captureFileName:'',emotionBefore:'',emotionDuring:'',emotionAfter:'',anxiety:'',confidence:'',clarity:'',recoveryImpulse:undefined,executionBehaviors:[],postTradeBehavior:'',calidadTesis:'',calidadEjecucion:'',calidadComportamiento:'',calidadRevision:'',respetoProceso:'',estadoMental:'',motivoOperacion:'',notasComportamiento:'',indiceCalidadContextual:'',alineacionMacro:'',alineacionHTF:'',alineacionIntra:'',liquidezClara:'',dxyConfirma:'',zonaConFuncion:'',notasContexto:'',privateJournal:'',lesson:'',notes:''};
   const openNewTrade=()=>guard.blocked?toast('Modo reflexión activo hasta el próximo rollover 17:00 NY o ajustá límites en Riesgo'):setForm({...emptyForm,date:selectedDate||tradingDayKey(),tradingDay:selectedDate||tradingDayKey()});
   useEffect(()=>{
     const raw=localStorage.getItem('mtc-checklist-prefill');
@@ -1485,11 +1493,24 @@ function Journal({data,profile}){
     const d=localStorage.getItem('mtc-open-journal-date');
     if(d){setSelectedDate(d.slice(0,10)); localStorage.removeItem('mtc-open-journal-date');}
   },[]);
+  // Sprint 12 — First-run / deep-link: open stepped trade form on Journal
+  useEffect(()=>{
+    const openFromFlag=()=>{
+      if(localStorage.getItem('mtc-open-new-trade')!=='1') return;
+      localStorage.removeItem('mtc-open-new-trade');
+      openNewTrade();
+    };
+    openFromFlag();
+    const onOpen=()=>{try{localStorage.removeItem('mtc-open-new-trade');}catch(e){} openNewTrade();};
+    window.addEventListener('mtc-open-new-trade',onOpen);
+    return ()=>window.removeEventListener('mtc-open-new-trade',onOpen);
+  },[]);
   const exportDisabled=!filtered.length;
   const filteredExportDisabled=!list.length;
+  const firstRunHint=!(data.trades||[]).length;
   return <main className="page journalPage">
     <JournalHeader showMobileFab={!form} onNewTrade={openNewTrade} guard={guard}/>
-    {form&&<TradeForm form={form} setForm={setForm} profile={profile} data={data} db={db} uploadFile={uploadFile} uid={uid} toast={toast}/>}
+    {form&&<TradeForm form={form} setForm={setForm} profile={profile} data={data} db={db} uploadFile={uploadFile} uid={uid} toast={toast} firstRunHint={firstRunHint}/>}
     <JournalActions
       accountSwitcher={<AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>}
       onNewTrade={openNewTrade}

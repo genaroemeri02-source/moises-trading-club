@@ -589,10 +589,19 @@ Ciclos: mensual / trimestral (−20%) / anual (−10% sobre trimestral anualizad
 
 Estados: `available` | `beta` | `coming-soon` | `not-included`.
 
+**Diferenciación Club vs Pro (copy estratégico)**
+
+> Club registra y ordena. Pro interpreta y decide.
+
+| Plan | Rol | Incluye |
+|------|-----|---------|
+| **Club** | Captura / control | Journal, checklist, calendario P/L, riesgo básico, dashboard operativo, export básico |
+| **Pro** | Decision Intelligence | Todo Club + Analytics/diagnóstico, Edge Lab, directivas, journal emocional/conducta, cockpit avanzado; PDF / AI Review / BrokerSync = próximamente |
+
 **Disponible ahora**
 
-- Club: journal manual, checklist, calendario P/L, riesgo básico, dashboard, comunidad/onboarding
-- Pro (+ Mentoría): Analytics / Decision Intelligence, Edge Lab, directivas, journal emocional, Emotion Intelligence, cockpit avanzado, export JSON/CSV
+- Club: journal manual, checklist, calendario P/L, riesgo básico, dashboard, export básico
+- Pro (+ Mentoría): Analytics / Decision Intelligence, Edge Lab, directivas, journal emocional, Emotion Intelligence, cockpit avanzado
 - Mentoría: revisión 1 a 1, acompañamiento, feedback (Pro incluido)
 
 **Coming soon (no vender como activo)**
@@ -763,3 +772,77 @@ Defensivo: sin `db` / sin `uid` / sin cuenta → no rompe; guarda local.
 - Vista “Todas las cuentas” usa doc `default` (no agrega límites por cuenta).
 - `sharePngUtils` sigue leyendo cache local (suficiente para labels de share).
 - Gating fino Club/Pro y unificación PayPal siguen fuera de este sprint.
+
+---
+
+## Sprint 12 — Trade Form Mobile Stepped
+
+Convierte el registro de trade en un flujo **stepped mobile-first** sin romper el pipeline de guardado existente (`persistTrade` → Firestore `trades`).
+
+### Propósito
+
+Cargar un trade desde mobile en &lt; 45s: guiado, claro, alimentando Analytics / Risk / Emotion / Checklist / Journal / Cockpit.
+
+### Steps
+
+| # | id | Label | Contenido |
+|---|-----|-------|-----------|
+| 1 | `result` | Resultado | cuenta, fecha, activo, resultado, P/L $, R |
+| 2 | `setup` | Setup | setup, sesión, side, entry/exit/SL/TP, patrón |
+| 3 | `behavior` | Conducta | plan, checklist, error, emociones, anxiety/recovery |
+| 4 | `evidence` | Evidencia | nota, screenshot/link, resumen, mentor review |
+
+Desktop: mismo stepper + grid 2 columnas. Mobile 390: un panel por paso + CTA sticky (Atrás / Siguiente / Guardar).
+
+### Campos obligatorios (hard)
+
+- fecha válida (`date` / `tradingDay`)
+- cuenta (`account` / `accountName`)
+- resultado (`result`: Profit / Stop / BE / …)
+- P/L `$` **o** R (`resultMoney` / `resultR`; `%` también cuenta)
+
+Activo vacío → fallback `"Sin activo"` (no bloquea).
+
+### Campos opcionales
+
+setup, session, side, entry/exit/sl/tp, pattern, confluences, quality, followedPlan, checklistComplete, mistakeType, emotionBefore/After, anxiety, confidence, clarity, recoveryImpulse, executionBehaviors, lesson/notes, capture, mentor review, revisión avanzada ICC.
+
+### Validaciones
+
+- **Hard** (bloquean avanzar desde Resultado / guardar): fecha, cuenta, resultado, métrica P/L|R.
+- **Soft warnings** (no bloquean): sin setup, sin emoción, sin checklist, sin nota, sin screenshot.
+
+### Guardado / edición
+
+- Create: `addDoc(trades)` + link checklist si `createdFromChecklist`.
+- Edit: `setDoc(..., { merge: true })` — no duplica; preserva campos viejos/nuevos.
+- Quick path desde Checklist se mantiene (form compacto, sin stepper).
+- First-run CTA: `mtc-open-new-trade` (localStorage + CustomEvent) abre el form en Journal.
+
+### Cómo alimenta Decision Intelligence
+
+| Campo | Destino |
+|-------|---------|
+| resultMoney / resultR / result / asset / session / setup | Analytics, Cockpit, Calendar, Journal |
+| followedPlan / executionBehaviors / postTradeBehavior / mistakeType | Analytics disciplina, EmotionIntelligence |
+| emotionBefore/After, anxiety, confidence, clarity, recoveryImpulse | EmotionIntelligence / Risk emocional |
+| checklist / checklistComplete / createdFromChecklist | OperationalState, Risk snapshot |
+| notes / lesson / capture | Journal, evidencia |
+
+Aliases defensivos en payload: `planFollowed`, `stopLoss`/`takeProfit`, `rMultiple`, `accountName`, `symbol`, `notes`.
+
+### Archivos
+
+- `src/components/trade/TradeForm.jsx` — UI stepped
+- `src/components/trade/TradeFormStepper.jsx` — stepper + footer
+- `src/components/trade/tradeFormSteps.js` — steps, validación, warnings
+- `src/components/trade/tradeSavePipeline.js` / `tradePayload.js` — validación mínima + aliases DI
+- `src/main.jsx` — emptyForm DI fields + First-run open handler
+- `src/styles.css` — sección `TRADE FORM — STEPPED CAPTURE`
+
+### Riesgos restantes
+
+- Teclado mobile puede empujar el sticky footer en algunos WebViews (mitigado con safe-area; no perfect).
+- Trades legacy sin `followedPlanLabel` / `checklistComplete` siguen válidos; UI deriva de boolean.
+- Deep-link First-run depende de que Journal monte el listener; flag `mtc-open-new-trade` cubre race de tab switch.
+- Revisión avanzada ICC sigue en `<details>` — no es parte del path &lt;45s.

@@ -69,7 +69,7 @@ export function FirstRunPanel({
         compact ? 'firstRunPanel--compact' : 'firstRunPanel--hero',
         `firstRunPanel--${level}`
       ].join(' ')}
-      aria-label="Activación Decision Intelligence"
+      aria-label="Activación del diagnóstico operativo"
     >
       <header className="firstRunHeader">
         <div className="firstRunHeaderMain">
@@ -78,7 +78,9 @@ export function FirstRunPanel({
           </span>
           <h2>{titleForLevel(level, tradeCount)}</h2>
           <p>
-            Cargá {diagnosticMin} trades para que MTC detecte edge, fuga y acción semanal.
+            {tradeCount === 0
+              ? 'Primer trade: cargá resultado y setup. Podés completar conducta después.'
+              : `Cargá ${diagnosticMin} trades para que MTC detecte edge, fuga y acción semanal.`}
           </p>
         </div>
         {canDismiss && (
@@ -99,7 +101,7 @@ export function FirstRunPanel({
         </div>
         <div className="firstRunProgressMeta">
           <b>{tradeCount}/{diagnosticMin} trades</b>
-          <span>{Math.round(state.progressPct || progressPct)}% hacia Decision Intelligence</span>
+          <span>{Math.round(state.progressPct || progressPct)}% hacia diagnóstico operativo</span>
         </div>
       </div>
 

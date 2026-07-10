@@ -62,3 +62,18 @@ mentorship ↔ mentorship
 - **Real:** acceso aprobado vs paywall.  
 - **No real:** features “incluidas en Pro” bloqueadas a Club.  
 - Gating fino → deuda posterior (no Sprint 10).
+
+---
+
+## Hotfix — Club vs Pro copy clarity (post Sprint 12)
+
+**Frase estratégica:** Club registra y ordena. Pro interpreta y decide.
+
+| Plan | Posicionamiento | Copy clave |
+|------|-----------------|------------|
+| Club | Captura / control | Journal, checklist y riesgo para construir tu rutina diaria. |
+| Pro | Decision Intelligence | Diagnóstico de edge, fugas y conducta sobre tu historial. |
+
+- Eliminado “límites visibles” (se leía como membresía limitada).
+- AI / BrokerSync / PDF en Pro = **próximamente**, no activos.
+- Fuente: `src/lib/commercialConfig.js` (`COMMERCIAL_PLANS` + feature rows).
