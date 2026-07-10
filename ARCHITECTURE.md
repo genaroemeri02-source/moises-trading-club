@@ -13,6 +13,7 @@ Sin React. Lógica reutilizable y testeable.
 | `tradeUtils.js` | Normalización de trades, arrays, CSV import, cuentas, sanitización Firestore |
 | `analyticsUtils.js` | KPIs, calendario por día, behavior score, stats diarias |
 | `operationalState.js` | Estado operativo unificado (`ready` / `caution` / `blocked`) — Sprint 05 |
+| `emotionIntelligence.js` | Capa emocional: emoción ↔ conducta ↔ R/riesgo + directivas — Sprint 06 |
 | `importExportUtils.js` | Export/import JSON y CSV de trades |
 | `sharePngUtils.js` | Render canvas 9:16, normalización para share, descarga/compartir PNG |
 
@@ -179,7 +180,7 @@ buildOperationalState({
 })
 ```
 
-Aliases tolerados: `settings`/`risk`, `checklist`, `emotion`/`journalEmotional`.
+Aliases tolerados: `settings`/`risk`, `checklist`, `emotion`/`journalEmotional`, y desde Sprint 06 `emotionSignals` / `emotionalSignals`.
 
 ### Output esperado
 
@@ -260,3 +261,126 @@ Helpers exportados: `normalizeOperationalInputs`, `evaluateRiskLimits`, `evaluat
 | **Journal Emocional** | Señales anxiety / recovery → emotionalRisk |
 
 Sprint 05 **no** integra UI: solo la capa pura + contrato documentado.
+
+---
+
+## Sprint 06 — Emotion Intelligence Layer
+
+Capa pura que conecta **estado emocional + conducta** con ejecución, riesgo operativo y directivas. No diagnostica salud mental: solo señales operativas de performance.
+
+### Propósito
+
+Responder en &lt;60s (cuando haya muestra):
+
+1. ¿Qué estado emocional está afectando la ejecución?
+2. ¿Qué emoción/conducta reduce el R promedio?
+3. ¿Qué patrón aparece después de una pérdida?
+4. ¿Qué combinación emocional aumenta riesgo operativo?
+5. ¿Qué directiva emocional recibir esta semana?
+
+Módulo: `src/lib/emotionIntelligence.js`  
+API principal: `buildEmotionIntelligence(input)`
+
+Función pura: sin DOM, sin Firebase, sin side effects, sin mutar inputs. Sin rediseño de Dashboard/Analytics/UI.
+
+### Inputs
+
+```js
+buildEmotionIntelligence({
+  trades,              // trades con emotionBefore / anxiety / followedPlan / pnl / R
+  emotionalJournals,   // cierres: mood, anxietyLevel, confidenceLevel, feltRevengeImpulse, feltFomo…
+  checklistEntries,    // opcional: complete / score / finalGreen
+  now,                 // Date | ISO | ms
+  options              // { recentLoss?, anxietyHigh?, minCompareGroup? }
+})
+```
+
+Aliases: `journals` / `emotional`, `checklists`.
+
+### Output
+
+```js
+{
+  status: "stable" | "watch" | "risk" | "unknown",
+  label, severity, score,
+  summary, primaryPattern, primaryRisk,
+  emotionalProfile: { dominantState, bestState, worstState, avgAnxiety, avgClarity, avgConfidence, avgRecoveryImpulse, sampleSize },
+  performanceByEmotion: [{ emotion, trades, pnl, avgR, winrate, planCompliance, riskLevel, insight }],
+  behaviorSignals: {
+    anxietyDrag, recoveryRisk, postLossRisk, fomoRisk,
+    fatigueRisk, hesitationRisk, planBreakRisk, checklistMismatch
+  },
+  directives: [{ type: "protect"|"reduce"|"repeat"|"investigate", title, reason, metric, action, confidence }],
+  operationalSignals: {
+    emotionalRisk: "low"|"medium"|"high"|"unknown",
+    anxiety, recoveryImpulse, clarity, dominantState, recentEmotionalState,
+    postLossProtocolRequired, shouldBlockTrading, shouldReduceRisk, reason
+  },
+  sample: { tradesWithEmotion, journalEntries, quality, message, progressPct, total }
+}
+```
+
+### Helpers
+
+| Helper | Rol |
+|--------|-----|
+| `normalizeEmotionRecord` | Shape único trade/journal/checklist; labels emocionales consistentes |
+| `normalizeEmotionLabel` / `normalizeScale10` | Emoción + escalas 1–10 |
+| `buildEmotionSample` | empty / insufficient / observing / usable / reliable |
+| `buildPerformanceByEmotion` | R, winrate, plan por emoción |
+| `detectAnxietyDrag` | Ansiedad alta vs resto (R / plan) |
+| `detectRecoveryRisk` | Recovery alto + post-pérdida / clustering |
+| `detectPostLossRisk` | Deterioro tras pérdida |
+| `detectFomoRisk` / `detectFatigueRisk` / `detectHesitationRisk` | Señales conductuales |
+| `detectPlanBreakRisk` / `detectChecklistMismatch` | Plan/checklist + emoción |
+| `buildEmotionDirectives` | protect / reduce / repeat / investigate |
+| `buildOperationalEmotionSignals` | Señal compacta para Sprint 05 |
+
+### Muestra emocional
+
+| Registros emocionales | quality |
+|----------------------|---------|
+| 0 | `empty` |
+| 1–4 | `insufficient` |
+| 5–9 | `observing` |
+| 10–19 | `usable` |
+| 20+ | `reliable` |
+
+Con poca muestra: lenguaje de hipótesis (“Señal en observación”, “Aún no confirmado”). Nunca inventa emociones sin datos.
+
+### Conexión con Sprint 05 (`buildOperationalState`)
+
+`operationalSignals` (o el objeto equivalente) se puede pasar como:
+
+- `emotionSignals` (preferido), o
+- `emotionalSignals` / `emotionalState`
+
+Reglas adicionales (sin romper input legacy):
+
+| Señal | Efecto |
+|-------|--------|
+| `shouldBlockTrading === true` | `blocked` |
+| `postLossProtocolRequired === true` | `blocked` |
+| `emotionalRisk === "high"` | `blocked` |
+| `anxiety >= 7` + `recentLoss` | `blocked` |
+| `recoveryImpulse` alto + `recentLoss` | `blocked` |
+| `shouldReduceRisk === true` | `caution` |
+| `clarity <= 4` | `caution` |
+
+Sin emoción → comportamiento idéntico a Sprint 05 (`emotionalRisk: "unknown"`).
+
+### Consumidores posteriores
+
+| Módulo | Uso previsto |
+|--------|----------------|
+| **OperationalState** | Gate apto / precaución / bloqueado enriquecido |
+| **Dashboard Cockpit** | Badge + patrón emocional dominante (sin rediseño en este sprint) |
+| **Analytics Intelligence** | performanceByEmotion + directivas |
+| **Risk Lab** | shouldReduceRisk / shouldBlockTrading |
+| **Journal Emocional** | primaryPattern + progreso de muestra |
+
+### Limitaciones
+
+- No es diagnóstico clínico ni terapéutico.
+- Solo señales operativas de mesa de riesgo/performance.
+- Sprint 06 **no** integra UI/CSS/Firebase: capa pura + contrato + wire mínimo a OperationalState.
