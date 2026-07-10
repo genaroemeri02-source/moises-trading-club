@@ -23,10 +23,14 @@ Componentes del tab Dashboard. Datos y cálculos pesados vienen de `main.jsx` + 
 
 | Archivo | Rol |
 |---------|-----|
-| `DashboardHero.jsx` | Cabecera operativa |
-| `DashboardKpiStrip.jsx` + `DashboardKpiCard.jsx` | KPIs ejecutivos |
+| `DashboardHero.jsx` | Cabecera operativa (cuenta / sesión) |
+| `DashboardCockpitPanel.jsx` | Cockpit operativo: estado + razón + pulso (Sprint 07) |
+| `DashboardActionCard.jsx` | Próxima acción (1 directiva) |
+| `DashboardRiskSnapshot.jsx` | Snapshot compacto de límites / R / checklist |
+| `DashboardBehaviorSignal.jsx` | Señal emocional/conductual principal |
+| `DashboardKpiStrip.jsx` + `DashboardKpiCard.jsx` | KPIs ejecutivos (secundarios) |
 | `TradingCalendarPanel.jsx` | Calendario mensual / heatmap preview |
-| `DashboardRightRail.jsx` | Próxima acción, disciplina, riesgo, equity |
+| `DashboardRightRail.jsx` | Próxima acción legacy, disciplina, riesgo, equity |
 | `DashboardAdvancedInsights.jsx` | Score, curva P/L, heatmap sesiones |
 | `MtcScoreCard.jsx`, `PnlCumulativeChartCard.jsx`, `OperationalHeatmap.jsx` | Bloques de insights |
 | `MtcLightweightLineChart.jsx` | Gráficos lightweight-charts |
@@ -254,7 +258,7 @@ Helpers exportados: `normalizeOperationalInputs`, `evaluateRiskLimits`, `evaluat
 
 | Módulo | Uso previsto |
 |--------|----------------|
-| **Dashboard** | Badge / rail de estado operativo (apto / precaución / bloqueado) |
+| **Dashboard** | Badge / rail de estado operativo (apto / precaución / bloqueado) — **integrado en Sprint 07** |
 | **Analytics** | Contexto de confiabilidad + filtro de decisión (no ranking P/L) |
 | **Risk Lab** | Sustituir/enriquecer `evaluateRiskGuard` gate visual |
 | **Checklist** | Gate pre-ejecución + razón `complete-checklist` |
@@ -374,7 +378,7 @@ Sin emoción → comportamiento idéntico a Sprint 05 (`emotionalRisk: "unknown"
 | Módulo | Uso previsto |
 |--------|----------------|
 | **OperationalState** | Gate apto / precaución / bloqueado enriquecido |
-| **Dashboard Cockpit** | Badge + patrón emocional dominante (sin rediseño en este sprint) |
+| **Dashboard Cockpit** | Badge + patrón emocional dominante — **integrado en Sprint 07** |
 | **Analytics Intelligence** | performanceByEmotion + directivas |
 | **Risk Lab** | shouldReduceRisk / shouldBlockTrading |
 | **Journal Emocional** | primaryPattern + progreso de muestra |
@@ -384,3 +388,75 @@ Sin emoción → comportamiento idéntico a Sprint 05 (`emotionalRisk: "unknown"
 - No es diagnóstico clínico ni terapéutico.
 - Solo señales operativas de mesa de riesgo/performance.
 - Sprint 06 **no** integra UI/CSS/Firebase: capa pura + contrato + wire mínimo a OperationalState.
+
+---
+
+## Sprint 07 — Dashboard Cockpit
+
+Transforma el tab Dashboard en un **cockpit operativo**: estado → razón → acción → emoción → riesgo, con KPIs y calendario como soporte.
+
+### Propósito
+
+En &lt;60s el trader ve:
+
+1. Estado operativo: Apto / Precaución / Bloqueado
+2. Razón principal
+3. Acción inmediata (una directiva)
+4. Señal emocional/conductual relevante (o vacío seguro)
+5. Riesgo / límites actuales
+6. KPIs + calendario debajo (no protagonistas)
+
+### Componentes creados
+
+| Archivo | Rol |
+|---------|-----|
+| `DashboardCockpitPanel.jsx` | Panel superior + badge + pulso + grid |
+| `DashboardActionCard.jsx` | Próxima acción desde `operationalState.actions[0]` |
+| `DashboardRiskSnapshot.jsx` | trades hoy, R diario/semanal, hard stop, checklist, riesgo emocional |
+| `DashboardBehaviorSignal.jsx` | primaryRisk / patrón / empty state emocional |
+
+Wire en `Dashboard()` (`src/main.jsx`). CSS en sección `DASHBOARD — OPERATIVE COCKPIT` de `styles.css` (sin tocar EOF / mobile nav).
+
+### Cálculo en Dashboard
+
+Ambos motores se calculan con `useMemo` dentro de `Dashboard()`:
+
+```js
+emotionIntelligence = buildEmotionIntelligence({
+  trades: filtered,                 // cuenta activa
+  emotionalJournals,
+  checklistEntries: checklists,
+  now: new Date()
+})
+
+operationalState = buildOperationalState({
+  trades: filtered,
+  riskSettings,                     // localStorage + defaults
+  checklistState,                   // derivado de última checklist
+  emotionSignals: emotionIntelligence.operationalSignals,
+  account: { capital, name },
+  dailyPlan,
+  now: new Date()
+})
+```
+
+Fallback UI: `FALLBACK_OPERATIONAL_STATE` (`caution` suave) si falta output o hay excepciones. Sin journals emocionales → Emotion Intelligence en `unknown` / empty; OperationalState sigue con riesgo base.
+
+### Orden visual
+
+1. `DashboardHero` (cuenta / sesión)
+2. **Cockpit** (`DashboardCockpitPanel` → acción + riesgo + señal)
+3. KPI strip (secundario)
+4. Calendario + right rail + insights (evidencia)
+
+Mobile ≤390: stack vertical — Cockpit → acción → riesgo → señal → KPIs → calendario. Sin overflow horizontal; menú hamburguesa / command sheet intactos.
+
+### Reglas de copy
+
+Tono cockpit (apto / precaución / bloqueado / completar checklist / señal en observación). Sin coach motivacional ni lenguaje clínico.
+
+### Limitaciones
+
+- No reescribe shell, nav mobile, Firebase, Auth, Pricing, Journal save ni Analytics UI.
+- Right rail legacy se conserva (disciplina / equity); la directiva primaria vive en el Cockpit.
+- Sprint 07 no cambia reglas de Sprint 05/06; solo las consume.

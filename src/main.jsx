@@ -44,8 +44,11 @@ import { DashboardKpiStrip } from './components/dashboard/DashboardKpiStrip.jsx'
 import { CalendarHeatmapPreview, TradingMonthCalendar } from './components/dashboard/TradingCalendarPanel.jsx';
 import { DashboardRightRail } from './components/dashboard/DashboardRightRail.jsx';
 import { DashboardAdvancedInsights } from './components/dashboard/DashboardAdvancedInsights.jsx';
+import { DashboardCockpitPanel, FALLBACK_OPERATIONAL_STATE } from './components/dashboard/DashboardCockpitPanel.jsx';
 import { ResetTicker } from './components/dashboard/ResetTicker.jsx';
 import { clampScore, buildDailyNetCurve, buildOperationalHeatmap, sessionNameNY, tradeSortTime } from './components/dashboard/dashboardUtils.js';
+import { buildOperationalState } from './lib/operationalState.js';
+import { buildEmotionIntelligence } from './lib/emotionIntelligence.js';
 import { JournalHeader } from './components/journal/JournalHeader.jsx';
 import { JournalActions } from './components/journal/JournalActions.jsx';
 import { JournalMainGrid } from './components/journal/JournalMainGrid.jsx';
@@ -1112,6 +1115,24 @@ function ActivityFeed({data,setTab}){
   ].sort((a,b)=>b.time-a.time).slice(0,8);
   return <Card title="Actividad reciente" sub="Últimos movimientos del ecosistema."><div className="activityFeed">{items.map((it,i)=><button key={`${it.type}-${i}`} onClick={()=>setTab(it.target)}><span>{it.type}</span><b>{it.text}</b><small>{it.meta}</small></button>)}{!items.length&&<PremiumEmptyState title="Sin actividad reciente" text="Cuando haya trades, checklists o publicaciones aparecerán acá." cta="Registrar trade" icon={Activity} onClick={()=>setTab('journal')}/>}</div></Card>
 }
+function buildDashboardChecklistState(checklists=[], dayKey=tradingDayKey()){
+  const list=Array.isArray(checklists)?checklists:[];
+  if(!list.length) return {};
+  const sorted=[...list].sort((a,b)=>String(b.createdDate||safeDate(b.createdAt)||'').localeCompare(String(a.createdDate||safeDate(a.createdAt)||'')));
+  const today=sorted.find(c=>String(c.createdDate||c.date||'').slice(0,10)===dayKey) || null;
+  const last=today || sorted[0];
+  if(!last) return {};
+  const complete=last.finalGreen===true || last.green===true || Number(last.score||0)>=85;
+  return {
+    complete,
+    checklistComplete: complete,
+    score: Number(last.score||0),
+    finalGreen: last.finalGreen===true || last.green===true,
+    missing: !complete,
+    required: false
+  };
+}
+
 function Dashboard({data,profile,setTab}){
   useEffect(()=>{
     if(!window.location.search.includes('debugScroll=1')) return;
@@ -1132,7 +1153,7 @@ function Dashboard({data,profile,setTab}){
   const weekTrades=filtered.filter(t=>{const d=getTradeOperationalDateKey(t); return d&&d>=weekStartISO();});
   const weekWins=weekTrades.filter(t=>Number(t.resultMoney)>0).length;
   const weekWr=weekTrades.length?weekWins/weekTrades.length*100:0;
-  const riskSettings=getRiskSettings();
+  const riskSettings=useMemo(()=>getRiskSettings(),[filtered.length, todayKey]);
   const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===todayKey);
   const riskGuard=evaluateRiskGuard(filtered,riskSettings,initial,todayPlan);
   const riskLevel=riskGuard.blocked?'Alto':Number(s.maxDD||0)>4?'Moderado':'Bajo';
@@ -1164,8 +1185,64 @@ function Dashboard({data,profile,setTab}){
   const payoffTotal=Math.max(1,payoffWin+payoffLoss);
   const profitFactorGauge=hasProfitFactorSample?Math.min(100,Number(s.profitFactor||0)/2*100):0;
   const expectancyGauge=s.count>=10?clampScore((Number(s.meanR||0)+1)*50):Math.min(100,s.count*10);
+
+  const checklistState=useMemo(
+    ()=>buildDashboardChecklistState(data.checklists, todayKey),
+    [data.checklists, todayKey]
+  );
+  const accountForOps=useMemo(()=>{
+    if(active==='__all__') return { capital: initial, name: 'Todas' };
+    return { capital: initial, name: active };
+  },[active, initial]);
+
+  const emotionIntelligence=useMemo(()=>{
+    try{
+      return buildEmotionIntelligence({
+        trades: filtered,
+        emotionalJournals: data.emotionalJournals || [],
+        checklistEntries: data.checklists || [],
+        now: new Date(),
+        options: {}
+      });
+    }catch(err){
+      console.warn('Dashboard emotionIntelligence fallback', err?.message || err);
+      return null;
+    }
+  },[filtered, data.emotionalJournals, data.checklists]);
+
+  const operationalState=useMemo(()=>{
+    try{
+      return buildOperationalState({
+        trades: filtered,
+        riskSettings,
+        checklistState,
+        checklistEntries: data.checklists || [],
+        emotionSignals: emotionIntelligence?.operationalSignals,
+        emotionalState: emotionIntelligence?.operationalSignals,
+        account: accountForOps,
+        dailyPlan: todayPlan || null,
+        now: new Date()
+      }) || FALLBACK_OPERATIONAL_STATE;
+    }catch(err){
+      console.warn('Dashboard operationalState fallback', err?.message || err);
+      return FALLBACK_OPERATIONAL_STATE;
+    }
+  },[filtered, riskSettings, checklistState, data.checklists, emotionIntelligence, accountForOps, todayPlan]);
+
+  const safeOperationalState=operationalState || FALLBACK_OPERATIONAL_STATE;
+
   return <main className="page dashboardV38 dashboardClean">
     <DashboardHero activeLabel={activeLabel} headerActions={<AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>}/>
+    <DashboardCockpitPanel
+      operationalState={safeOperationalState}
+      emotionIntelligence={emotionIntelligence}
+      stats={s}
+      setTab={setTab}
+      onOpenChecklist={()=>setTab('checklist')}
+      onOpenRisk={()=>setTab('risk')}
+      onOpenJournal={()=>setTab('journal')}
+      onOpenEmotional={()=>setTab('emotional')}
+    />
     <DashboardKpiStrip s={s} monthly={monthly} dailyCurve={dailyCurve} spark={spark} winLossTotal={winLossTotal} avgWinLoss={avgWinLoss} avgWinLossSub={avgWinLossSub} payoffWin={payoffWin} payoffLoss={payoffLoss} payoffTotal={payoffTotal} profitFactor={profitFactor} profitFactorSub={profitFactorSub} hasProfitFactorSample={hasProfitFactorSample} profitFactorGauge={profitFactorGauge} streakValue={streakValue} streakSub={streakSub} streakInfo={streakInfo} expectancyValue={expectancyValue} expectancySub={expectancySub} expectancyGauge={expectancyGauge}/>
     <div className="dashboardVisualGrid">
       <div className="dashboardCalendarColumn">

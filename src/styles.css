@@ -15632,6 +15632,452 @@ html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurf
 }
 
 /* ==========================================================================
+   DASHBOARD — OPERATIVE COCKPIT
+   ========================================================================== */
+.dashboardCockpit{
+  display:grid;
+  gap:14px;
+  min-width:0;
+  max-width:100%;
+  padding:18px 18px 16px;
+  border-radius:22px;
+  border:1px solid rgba(124,92,255,.18);
+  background:
+    radial-gradient(circle at 12% 0%,rgba(51,230,196,.08),transparent 32%),
+    radial-gradient(circle at 92% 8%,rgba(124,92,255,.10),transparent 36%),
+    linear-gradient(180deg,rgba(18,15,31,.92),rgba(11,8,18,.96));
+  box-shadow:0 18px 48px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.045);
+  overflow:hidden;
+}
+.dashboardCockpit--ready{
+  border-color:rgba(51,230,196,.28);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(51,230,196,.14),transparent 34%),
+    radial-gradient(circle at 90% 10%,rgba(124,92,255,.08),transparent 38%),
+    linear-gradient(180deg,rgba(18,15,31,.94),rgba(11,8,18,.97));
+}
+.dashboardCockpit--caution{
+  border-color:rgba(247,201,72,.26);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(247,201,72,.12),transparent 34%),
+    radial-gradient(circle at 90% 10%,rgba(124,92,255,.10),transparent 38%),
+    linear-gradient(180deg,rgba(18,15,31,.94),rgba(11,8,18,.97));
+}
+.dashboardCockpit--blocked{
+  border-color:rgba(255,79,163,.30);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(255,79,163,.14),transparent 34%),
+    radial-gradient(circle at 90% 10%,rgba(124,92,255,.08),transparent 38%),
+    linear-gradient(180deg,rgba(18,15,31,.94),rgba(11,8,18,.97));
+}
+.dashboardCockpitHeader{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  min-width:0;
+}
+.dashboardCockpitHeaderMain{
+  min-width:0;
+  flex:1 1 auto;
+}
+.dashboardCockpitHeaderMain h2{
+  margin:8px 0 6px;
+  color:var(--text);
+  font-size:clamp(22px,2.4vw,30px);
+  line-height:1.08;
+  letter-spacing:-.035em;
+  font-weight:850;
+}
+.dashboardCockpitSummary{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.45;
+  font-weight:650;
+  max-width:64ch;
+}
+.dashboardCockpitBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  width:max-content;
+  max-width:100%;
+  padding:6px 11px;
+  border-radius:999px;
+  border:1px solid rgba(124,92,255,.24);
+  background:rgba(124,92,255,.10);
+  color:#c4b5fd;
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.dashboardCockpitBadge--ready{
+  border-color:rgba(51,230,196,.34);
+  background:rgba(51,230,196,.12);
+  color:var(--aurora-cyan);
+}
+.dashboardCockpitBadge--caution{
+  border-color:rgba(247,201,72,.36);
+  background:rgba(247,201,72,.12);
+  color:var(--aurora-warning);
+}
+.dashboardCockpitBadge--blocked{
+  border-color:rgba(255,79,163,.38);
+  background:rgba(255,79,163,.12);
+  color:var(--aurora-magenta);
+}
+.dashboardPulseScore{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:0 0 auto;
+  min-width:112px;
+  padding:12px 14px;
+  border-radius:16px;
+  border:1px solid rgba(124,92,255,.20);
+  background:rgba(255,255,255,.035);
+  color:var(--aurora-violet);
+}
+.dashboardPulseScore > div{
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+.dashboardPulseScore span{
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardPulseScore b{
+  color:var(--text);
+  font-size:28px;
+  line-height:1;
+  letter-spacing:-.04em;
+}
+.dashboardPulseScore small{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:650;
+}
+.dashboardCockpitReason{
+  display:grid;
+  gap:4px;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  min-width:0;
+}
+.dashboardCockpitReason span{
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardCockpitReason b{
+  color:var(--text);
+  font-size:15px;
+  line-height:1.35;
+  font-weight:750;
+  overflow-wrap:anywhere;
+}
+.dashboardCockpitGrid{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1.2fr) minmax(0,.95fr);
+  gap:12px;
+  min-width:0;
+}
+.dashboardActionCard,
+.dashboardRiskSnapshot,
+.dashboardBehaviorSignal{
+  min-width:0;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.09);
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
+  padding:14px;
+}
+.dashboardActionCard{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+.dashboardActionCardIcon{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(124,92,255,.24);
+  background:rgba(124,92,255,.10);
+  color:var(--aurora-violet);
+  flex-shrink:0;
+}
+.dashboardActionCard--ready .dashboardActionCardIcon{
+  border-color:rgba(51,230,196,.30);
+  background:rgba(51,230,196,.10);
+  color:var(--aurora-cyan);
+}
+.dashboardActionCard--caution .dashboardActionCardIcon{
+  border-color:rgba(247,201,72,.30);
+  background:rgba(247,201,72,.10);
+  color:var(--aurora-warning);
+}
+.dashboardActionCard--blocked .dashboardActionCardIcon{
+  border-color:rgba(255,79,163,.32);
+  background:rgba(255,79,163,.10);
+  color:var(--aurora-magenta);
+}
+.dashboardActionCardBody{
+  display:grid;
+  gap:6px;
+  min-width:0;
+}
+.dashboardActionCardBody span{
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardActionCardBody b{
+  color:var(--text);
+  font-size:16px;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+}
+.dashboardActionCardBody p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.4;
+  font-weight:650;
+}
+.dashboardActionCardBody .primary{
+  width:max-content;
+  max-width:100%;
+  margin-top:4px;
+}
+.dashboardRiskSnapshotHead{
+  display:grid;
+  gap:2px;
+  margin-bottom:10px;
+}
+.dashboardRiskSnapshotHead span{
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardRiskSnapshotHead b{
+  color:var(--text);
+  font-size:15px;
+}
+.dashboardRiskSnapshotGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.dashboardRiskSnapshotGrid > div{
+  min-width:0;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(0,0,0,.14);
+  display:grid;
+  gap:3px;
+}
+.dashboardRiskSnapshotGrid span{
+  color:var(--muted2);
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.dashboardRiskSnapshotGrid b{
+  color:var(--text);
+  font-size:15px;
+  line-height:1.15;
+  overflow-wrap:anywhere;
+}
+.dashboardRiskSnapshotGrid small{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.3;
+  font-weight:650;
+}
+.dashboardRiskSnapshotGrid .pos b{color:var(--aurora-cyan)}
+.dashboardRiskSnapshotGrid .neg b{color:var(--aurora-magenta)}
+.dashboardRiskSnapshotGrid .warn b{color:var(--aurora-warning)}
+.dashboardBehaviorSignal{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+.dashboardBehaviorSignalIcon{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(124,92,255,.24);
+  background:rgba(124,92,255,.10);
+  color:var(--aurora-violet);
+}
+.dashboardBehaviorSignal--stable .dashboardBehaviorSignalIcon{
+  border-color:rgba(51,230,196,.28);
+  background:rgba(51,230,196,.10);
+  color:var(--aurora-cyan);
+}
+.dashboardBehaviorSignal--watch .dashboardBehaviorSignalIcon{
+  border-color:rgba(247,201,72,.30);
+  background:rgba(247,201,72,.10);
+  color:var(--aurora-warning);
+}
+.dashboardBehaviorSignal--risk .dashboardBehaviorSignalIcon{
+  border-color:rgba(255,79,163,.32);
+  background:rgba(255,79,163,.10);
+  color:var(--aurora-magenta);
+}
+.dashboardBehaviorSignal--unknown .dashboardBehaviorSignalIcon{
+  border-color:rgba(156,151,184,.28);
+  background:rgba(156,151,184,.10);
+  color:var(--aurora-neutral);
+}
+.dashboardBehaviorSignalBody{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+.dashboardBehaviorSignalBody span{
+  color:var(--muted2);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.dashboardBehaviorSignalBody b{
+  color:var(--text);
+  font-size:15px;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+}
+.dashboardBehaviorSignalBody p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.4;
+  font-weight:650;
+}
+.dashboardBehaviorSignalBody small{
+  color:var(--muted2);
+  font-size:11px;
+  line-height:1.3;
+}
+.dashboardBehaviorSignalBody .ghost{
+  width:max-content;
+  max-width:100%;
+  margin-top:4px;
+}
+html[data-theme="light"] .dashboardCockpit,
+html[data-theme="light"] body:not(:has(.paywallFunnel)):not(:has(.commercialSurface)):not(:has(.publicLanding)) .dashboardCockpit{
+  border-color:rgba(124,92,255,.16);
+  background:
+    radial-gradient(circle at 12% 0%,rgba(51,230,196,.08),transparent 32%),
+    radial-gradient(circle at 92% 8%,rgba(124,92,255,.08),transparent 36%),
+    linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));
+  box-shadow:0 14px 36px rgba(15,23,42,.08),inset 0 1px 0 rgba(255,255,255,.92);
+}
+html[data-theme="light"] .dashboardCockpit--ready{
+  border-color:rgba(16,185,129,.28);
+}
+html[data-theme="light"] .dashboardCockpit--caution{
+  border-color:rgba(202,138,4,.28);
+}
+html[data-theme="light"] .dashboardCockpit--blocked{
+  border-color:rgba(219,39,119,.28);
+}
+html[data-theme="light"] .dashboardCockpitHeaderMain h2,
+html[data-theme="light"] .dashboardCockpitReason b,
+html[data-theme="light"] .dashboardActionCardBody b,
+html[data-theme="light"] .dashboardRiskSnapshotHead b,
+html[data-theme="light"] .dashboardRiskSnapshotGrid b,
+html[data-theme="light"] .dashboardBehaviorSignalBody b,
+html[data-theme="light"] .dashboardPulseScore b{
+  color:#0f172a;
+}
+html[data-theme="light"] .dashboardCockpitSummary,
+html[data-theme="light"] .dashboardActionCardBody p,
+html[data-theme="light"] .dashboardBehaviorSignalBody p,
+html[data-theme="light"] .dashboardRiskSnapshotGrid small{
+  color:#475569;
+}
+html[data-theme="light"] .dashboardCockpitReason,
+html[data-theme="light"] .dashboardActionCard,
+html[data-theme="light"] .dashboardRiskSnapshot,
+html[data-theme="light"] .dashboardBehaviorSignal,
+html[data-theme="light"] .dashboardPulseScore{
+  border-color:rgba(15,23,42,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.88));
+}
+html[data-theme="light"] .dashboardRiskSnapshotGrid > div{
+  background:rgba(248,250,252,.92);
+  border-color:rgba(15,23,42,.08);
+}
+@media(max-width:1180px){
+  .dashboardCockpitGrid{
+    grid-template-columns:1fr 1fr;
+  }
+  .dashboardBehaviorSignal{
+    grid-column:1 / -1;
+  }
+}
+@media(max-width:860px){
+  .dashboardCockpit{
+    padding:14px;
+    border-radius:18px;
+    gap:12px;
+  }
+  .dashboardCockpitHeader{
+    flex-direction:column;
+  }
+  .dashboardPulseScore{
+    width:100%;
+  }
+  .dashboardCockpitGrid{
+    grid-template-columns:1fr;
+  }
+  .dashboardBehaviorSignal{
+    grid-column:auto;
+  }
+  .dashboardRiskSnapshotGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:390px){
+  .dashboardCockpit{
+    padding:12px;
+  }
+  .dashboardCockpitHeaderMain h2{
+    font-size:22px;
+  }
+  .dashboardRiskSnapshotGrid{
+    grid-template-columns:1fr;
+  }
+  .dashboardActionCard,
+  .dashboardBehaviorSignal{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ==========================================================================
    ANALYTICS (dashboard workspace + cockpit follow)
    ========================================================================== */
 /* v47.41 - Dashboard lower analytics workspace */
@@ -21095,6 +21541,10 @@ html[data-theme="light"] .analyticsShell .analyticsBehaviorCompactFocusItem.nega
 .analyticsDirectivesGrid{
   display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
 }
+.analyticsDirectivesGrid.analyticsDirectivesGrid--x4,
+.analyticsDirectivesRail .analyticsDirectivesGrid.analyticsDirectivesGrid--x4{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
 .analyticsDirectiveCard{
   padding:10px 12px;border-radius:10px;
   background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);
@@ -21331,6 +21781,100 @@ html[data-theme="light"] .analyticsShell .analyticsBehaviorCompactFocusItem.nega
 .analyticsPerformanceEvidencePatternRow b.pos{color:#4ade80}
 .analyticsPerformanceEvidencePatternRow b.neg{color:#f87171}
 .analyticsPerformanceEvidencePatternRow small{color:var(--ax-muted);white-space:nowrap}
+
+/* ── Sprint 04: evidence secundaria (rBuckets + sesión×día) ── */
+.analyticsEvidenceSecondaryRow{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  min-width:0;
+}
+.analyticsEvidenceSecondaryLead{
+  margin:0 0 8px;
+  font-size:10px;
+  line-height:1.35;
+  color:var(--ax-muted);
+}
+.analyticsEvidenceRBucketBars{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.analyticsEvidenceRBucket{
+  display:grid;
+  grid-template-columns:72px 1fr 28px;
+  gap:6px;
+  align-items:center;
+  font-size:10px;
+}
+.analyticsEvidenceRBucketName{color:var(--ax-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.analyticsEvidenceRBucketTrack{
+  height:7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  overflow:hidden;
+}
+.analyticsEvidenceRBucketTrack>i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:rgba(124,92,255,.55);
+}
+.analyticsEvidenceRBucket.tone-pos .analyticsEvidenceRBucketTrack>i{background:rgba(51,230,196,.7)}
+.analyticsEvidenceRBucket.tone-neg .analyticsEvidenceRBucketTrack>i{background:rgba(255,79,163,.7)}
+.analyticsEvidenceRBucket.tone-neutral .analyticsEvidenceRBucketTrack>i{background:rgba(124,92,255,.55)}
+.analyticsEvidenceRBucket b{text-align:right;font-weight:750;color:var(--ax-text)}
+.analyticsEvidenceHeatmapGrid{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.analyticsEvidenceHeatmapGrid>span.analyticsEvidenceHeatmapCorner,
+.analyticsEvidenceHeatmapGrid>span.analyticsEvidenceHeatmapColHead{
+  display:none;
+}
+.analyticsEvidenceHeatmapRow{
+  display:grid;
+  grid-template-columns:52px repeat(var(--hm-cols,5),minmax(0,1fr));
+  gap:4px;
+  align-items:center;
+}
+.analyticsEvidenceHeatmapRowHead{
+  font-size:9px;
+  font-weight:700;
+  color:var(--ax-muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.analyticsEvidenceHeatCell{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:22px;
+  border-radius:6px;
+  font-size:9px;
+  font-weight:750;
+  background:rgba(255,255,255,.03);
+  color:var(--ax-muted);
+}
+.analyticsEvidenceHeatCell.tone-pos{
+  background:rgba(51,230,196,calc(.12 + var(--hm-intensity,0)*.35));
+  color:#33E6C4;
+}
+.analyticsEvidenceHeatCell.tone-neg{
+  background:rgba(255,79,163,calc(.12 + var(--hm-intensity,0)*.35));
+  color:#FF4FA3;
+}
+.analyticsEvidenceHeatCell.tone-flat{
+  background:rgba(124,92,255,.12);
+  color:#7C5CFF;
+}
+.analyticsEvidenceHeatCell.tone-empty{opacity:.45}
+@media(max-width:760px){
+  .analyticsEvidenceSecondaryRow{grid-template-columns:1fr}
+}
 
 /* ── 6. WEEKLY PLAN ── */
 .analyticsWeeklyPlan{
@@ -24602,6 +25146,9 @@ html[data-theme="light"] .analyticsOperatingProfile.compact-side{
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
   gap:6px!important;
 }
+.analyticsDirectivesRail .analyticsDirectivesGrid.analyticsDirectivesGrid--x4{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
 .analyticsDirectivesRail .analyticsDirectiveCard{
   padding:8px 9px!important;
   border-radius:9px!important;
@@ -24716,6 +25263,9 @@ html[data-theme="light"] .analyticsSystemHealthSecondary{
   .analyticsDirectivesRail .analyticsDirectivesGrid{
     grid-template-columns:1fr!important;
   }
+  .analyticsDirectivesRail .analyticsDirectivesGrid.analyticsDirectivesGrid--x4{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
 }
 @media(max-width:390px){
   .analyticsCockpitFlow .analyticsIntelligenceGrid{display:contents}
@@ -24723,6 +25273,9 @@ html[data-theme="light"] .analyticsSystemHealthSecondary{
   .analyticsCockpitFlow .analyticsIntelligenceSide{display:contents}
   .analyticsCommandStrip .analyticsCommandHeadline{-webkit-line-clamp:3}
   .analyticsDirectivesRail .analyticsDirectivesGrid{grid-template-columns:1fr!important}
+  .analyticsDirectivesRail .analyticsDirectivesGrid.analyticsDirectivesGrid--x4{
+    grid-template-columns:1fr!important;
+  }
   .analyticsEdgeLabUnified .analyticsEdgeMapZone{min-height:unset}
   .analyticsEdgeLabBase{border-top-color:rgba(255,255,255,.06)!important}
   .analyticsInsightNoteSecondary{-webkit-line-clamp:3}
