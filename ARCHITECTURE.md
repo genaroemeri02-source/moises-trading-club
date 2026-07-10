@@ -12,6 +12,7 @@ Sin React. Lógica reutilizable y testeable.
 | `formatUtils.js` | Dinero, %, R, labels de UI y share |
 | `tradeUtils.js` | Normalización de trades, arrays, CSV import, cuentas, sanitización Firestore |
 | `analyticsUtils.js` | KPIs, calendario por día, behavior score, stats diarias |
+| `operationalState.js` | Estado operativo unificado (`ready` / `caution` / `blocked`) — Sprint 05 |
 | `importExportUtils.js` | Export/import JSON y CSV de trades |
 | `sharePngUtils.js` | Render canvas 9:16, normalización para share, descarga/compartir PNG |
 
@@ -145,3 +146,117 @@ main.jsx (App, tabs, Firestore)
 2. Seguir bajando `!important` en capas no canónicas
 3. Consolidar `@media 860px` fragmentados
 4. Migrar `.primary` global → botones Aurora scoped (JSX)
+
+---
+
+## Sprint 05 — OperationalState
+
+Capa pura de **estado operativo unificado** para el bloque Cockpit.
+
+### Propósito
+
+Responder en &lt;60s: ¿el trader está **apto**, en **precaución** o **bloqueado** para operar ahora?
+
+Combina de forma defensiva: riesgo diario/semanal, drawdown, trades del día, pérdida reciente, checklist incompleto, señales emocionales (si existen) y reglas configurables (si existen).
+
+Módulo: `src/lib/operationalState.js`  
+API principal: `buildOperationalState(input)`
+
+Función pura: sin DOM, sin Firebase, sin side effects, sin mutar `trades`.
+
+### Input esperado
+
+```js
+buildOperationalState({
+  trades,            // array de trades (opcional)
+  riskSettings,      // límites Risk Lab / local settings (opcional)
+  checklistState,    // { complete, required, missing, attemptingToOperate, score, finalGreen }
+  emotionalState,    // { anxiety, recoveryImpulse, clarity, dominantState, emotionalRisk }
+  account,           // { capital | initialBalance | accountCapital }
+  dailyPlan,         // { maxRisk } opcional — alinea con plan diario
+  now,               // Date | ISO | ms — default: ahora
+  dayKey             // override jornada operativa (YYYY-MM-DD)
+})
+```
+
+Aliases tolerados: `settings`/`risk`, `checklist`, `emotion`/`journalEmotional`.
+
+### Output esperado
+
+```js
+{
+  status: "ready" | "caution" | "blocked",
+  label: "Apto" | "Precaución" | "Bloqueado",
+  severity: "success" | "warning" | "danger",
+  score: number,              // 0–100, orientación cockpit
+  summary: string,            // lectura ejecutiva
+  primaryReason: string,
+  reasons: [{ code, level, title, detail, metric?, action? }],
+  actions: [{ type, label, detail }],
+  inputs: {
+    dailyPnl, weeklyPnl, dailyR, weeklyR,
+    tradesToday, maxTradesPerDay,
+    dailyLossLimitHit, weeklyLossLimitHit, drawdownLimitHit,
+    recentLoss, checklistComplete, emotionalRisk
+  }
+}
+```
+
+Helpers exportados: `normalizeOperationalInputs`, `evaluateRiskLimits`, `evaluateChecklistRisk`, `evaluateEmotionalRisk`, `buildOperationalReasons`, `buildOperationalActions`, `weekStartFromDayKey`, constantes `OPERATIONAL_*`.
+
+### Reglas ready / caution / blocked
+
+**BLOCKED** si:
+- límite diario alcanzado ($ o R)
+- límite semanal alcanzado ($ o R)
+- drawdown máximo de jornada alcanzado
+- max trades por día alcanzado
+- checklist requerido incompleto **y** `attemptingToOperate`
+- pérdida reciente + ansiedad alta / impulso de recuperación
+- riesgo emocional `high`
+
+**CAUTION** si (y no hay bloqueo):
+- pérdida reciente sin límite alcanzado
+- checklist incompleto (no obligatorio / sin intento de operar)
+- ansiedad moderada (`medium`)
+- `tradesToday` cerca del máximo
+- pérdida diaria parcial relevante (≥50% del límite)
+- conducta riesgosa en trades del día
+
+**READY** si:
+- sin límites alcanzados
+- checklist completo o no requerido / desconocido
+- riesgo emocional low/unknown
+- trades dentro del plan
+- sin pérdida reciente relevante
+
+### Defaults
+
+| Clave | Default |
+|-------|---------|
+| `maxTradesPerDay` | `1` (o `maxTradesDay` / settings) |
+| `dailyLossLimitR` | `-1` |
+| `weeklyLossLimitR` | `-3` |
+| `maxDrawdownPct` | `5` (si no hay settings) |
+| money limits | desde `maxDailyLoss` / `maxWeeklyLoss` / plan `maxRisk` si existen |
+| `emotionalHighRiskThreshold` | `7/10` |
+| ventana pérdida reciente | trades de la jornada operativa actual |
+
+### Datos faltantes
+
+- Input vacío / parcial no lanza.
+- Sin checklist → se asume completo, reason `incomplete_data` si no hay otras señales.
+- Sin emoción → `emotionalRisk: "unknown"` (no bloquea solo por unknown).
+- Error interno → fallback `caution` suave con reason `incomplete_data`.
+
+### Consumidores posteriores (Cockpit)
+
+| Módulo | Uso previsto |
+|--------|----------------|
+| **Dashboard** | Badge / rail de estado operativo (apto / precaución / bloqueado) |
+| **Analytics** | Contexto de confiabilidad + filtro de decisión (no ranking P/L) |
+| **Risk Lab** | Sustituir/enriquecer `evaluateRiskGuard` gate visual |
+| **Checklist** | Gate pre-ejecución + razón `complete-checklist` |
+| **Journal Emocional** | Señales anxiety / recovery → emotionalRisk |
+
+Sprint 05 **no** integra UI: solo la capa pura + contrato documentado.
