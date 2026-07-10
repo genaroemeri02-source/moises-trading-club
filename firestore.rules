@@ -136,6 +136,11 @@ service cloud.firestore {
       allow read: if signedIn() && (request.auth.uid == userId || isAdmin() || isApproved());
       allow update: if isAdmin() || userCanUpdateOwnSafeFields(userId);
       allow delete: if isAdmin();
+
+      // Sprint 11 — Risk Lab limits per account
+      match /riskSettings/{accountId} {
+        allow read, create, update, delete: if isApproved() && (request.auth.uid == userId || isAdmin());
+      }
     }
 
     match /payments/{paymentId} {

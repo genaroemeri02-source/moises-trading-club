@@ -676,5 +676,90 @@ Activate borra cualquier cache ≠ actual (incluye v2). `skipWaiting` + `clients
 
 - Gating fino Club/Pro en frontend
 - Unificación completa orders vs subscriptions
-- Risk → Firestore (Sprint 11)
 - Verificar montos reales en PayPal Dashboard vs 14.99/24.99
+
+---
+
+## Sprint 11 — Risk Settings Firestore
+
+Persiste límites de Risk Lab por usuario y cuenta. Deja de depender solo de `localStorage` para el cockpit operativo.
+
+### Path Firestore
+
+```text
+users/{uid}/riskSettings/{accountId}
+```
+
+Fallback de documento cuando no hay cuenta activa / vista “Todas”:
+
+```text
+users/{uid}/riskSettings/default
+```
+
+Rules: subcolección bajo `users/{userId}` — read/write si `isApproved()` y owner (o admin). Ver `firestore.rules`.
+
+### Shape (dual-compatible)
+
+Campos canónicos + aliases UI legacy:
+
+| Campo | Alias UI | Notas |
+|-------|----------|--------|
+| `capital` | `accountCapital` | Capital base |
+| `riskPct` | `riskPerTradePct` | % riesgo por trade |
+| `dailyLossLimit` | `maxDailyLoss` | Hard stop diario $ |
+| `weeklyLossLimit` | `maxWeeklyLoss` | Límite semanal $ |
+| `maxTradesPerDay` | `maxTradesDay` | Ambos se escriben |
+| `maxDrawdownPct` | — | % |
+| `dailyLossLimitR` | — | default `-1` |
+| `weeklyLossLimitR` | — | default `-3` |
+| `accountId` / `accountName` | — | multi-account |
+| `currency` | — | default `USD` |
+| `source` | — | `firestore` \| `local` \| `default` |
+| `createdAt` / `updatedAt` | — | `serverTimestamp()` |
+
+Normalizador: `normalizeRiskSettings()` / `mergeRiskSettingsWithDefaults()` en `src/lib/riskSettingsStore.js`.
+
+Defaults Risk UI: `maxTradesDay/maxTradesPerDay: 3` (UI actual). OperationalState sigue resolviendo `maxTradesDay` ↔ `maxTradesPerDay` y aplica sus propios defaults solo si el campo falta.
+
+### Fallback localStorage
+
+| Key | Uso |
+|-----|-----|
+| `mtc-risk-settings` | Legacy + cache de cuenta `default` |
+| `mtc-risk-settings:{accountId}` | Cache por cuenta |
+
+Evento: `mtc-risk-settings-updated` (CustomEvent con `detail.{accountId,source,settings}`).
+
+Migración: en primera carga se usa local; en el primer **Guardar** con user logueado se escribe Firestore. No se borra local (queda como cache).
+
+### Store / helpers
+
+`src/lib/riskSettingsStore.js`:
+
+- `getRiskSettingsDocRef`, `loadRiskSettings`, `saveRiskSettings`
+- `normalizeRiskSettings`, `mergeRiskSettingsWithDefaults`
+- `getLocalRiskSettings`, `saveLocalRiskSettings`, `hasLocalRiskSettings`
+- `resolveRiskAccountId`, `resolveRiskAccountName`
+
+Defensivo: sin `db` / sin `uid` / sin cuenta → no rompe; guarda local.
+
+### Cómo alimenta Dashboard / OperationalState
+
+1. Risk Lab guarda → Firestore + local + evento.
+2. `useRiskSettings(profile, settings, active)` en Dashboard / Journal / Risk Lab recarga por cuenta y escucha el evento.
+3. `buildOperationalState({ riskSettings })` recibe el objeto normalizado (ambos shapes).
+4. Sin hard refresh: el evento actualiza listeners en la misma sesión. Si el Dashboard no está montado, refleja al volver a la tab.
+
+### Multi-account
+
+- Cuenta activa con `id` en `settings.accounts` → doc id = `account.id`.
+- Solo nombre → slug o match por nombre.
+- `__all__` / sin cuenta → `default`.
+- Dashboard usa límites de la cuenta activa del AccountSwitcher.
+
+### Riesgos pendientes
+
+- Deploy de `firestore.rules` requerido para que la subcolección sea escribible en prod.
+- Vista “Todas las cuentas” usa doc `default` (no agrega límites por cuenta).
+- `sharePngUtils` sigue leyendo cache local (suficiente para labels de share).
+- Gating fino Club/Pro y unificación PayPal siguen fuera de este sprint.

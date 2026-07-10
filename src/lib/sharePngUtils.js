@@ -5,12 +5,16 @@ import { today, formatDateLabel, safeDate } from './dateUtils.js';
 import { safeArray, normalizeTradeSetup } from './tradeUtils.js';
 import { normalizeTradeForExport, sanitizeFilenamePart } from './importExportUtils.js';
 import { behaviorScoreFromTrade, behaviorScoreLabel, calculateDailyTradeStats } from './analyticsUtils.js';
+import {
+  RISK_SETTINGS_DEFAULTS,
+  RISK_SETTINGS_LOCAL_KEY,
+  getLocalRiskSettings
+} from './riskSettingsStore.js';
 
-const riskDefaults = { maxDailyLoss: 300, maxWeeklyLoss: 900, maxTradesDay: 3, maxDrawdownPct: 5, riskPerTradePct: .5, accountCapital: 10000 };
+const riskDefaults = RISK_SETTINGS_DEFAULTS;
 
 function getRiskSettings() {
-  try { return { ...riskDefaults, ...JSON.parse(localStorage.getItem('mtc-risk-settings') || '{}') }; }
-  catch { return riskDefaults; }
+  return getLocalRiskSettings();
 }
 
 export function toCanvasBlob(canvas) { return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1)); }
@@ -38,7 +42,7 @@ function resolveTradeRiskPct(trade = {}, riskSettings = getRiskSettings()) {
   const rawPct = [trade.riskPct, trade.riskPercent, trade.risk_percentage, trade.risk].map(Number).find(n => Number.isFinite(n) && n > 0);
   const settingsPct = Number(riskSettings?.riskPerTradePct || 0);
   let storedRiskPct = null;
-  try { storedRiskPct = JSON.parse(localStorage.getItem('mtc-risk-settings') || '{}')?.riskPerTradePct; } catch {}
+  try { storedRiskPct = JSON.parse(localStorage.getItem(RISK_SETTINGS_LOCAL_KEY) || '{}')?.riskPerTradePct; } catch {}
   const hasStoredRiskPct = storedRiskPct !== null && storedRiskPct !== undefined && storedRiskPct !== '';
   if (rawPct && !(rawPct === riskDefaults.riskPerTradePct && (!hasStoredRiskPct || settingsPct !== rawPct))) return rawPct;
   const riskMoney = Number(trade.riskMoney || 0);

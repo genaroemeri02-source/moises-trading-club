@@ -80,6 +80,18 @@ import { TradeShareModal } from './components/share/TradeShareModal.jsx';
 import { DailyReviewShareModal } from './components/share/DailyReviewShareModal.jsx';
 import { mentorStatusLabel } from './components/trade/tradeFormConstants.js';
 import { AnalyticsPage } from './components/analytics/AnalyticsPage.jsx';
+import {
+  RISK_SETTINGS_DEFAULTS,
+  RISK_SETTINGS_EVENT,
+  RISK_SETTINGS_DEFAULT_ACCOUNT_ID,
+  getLocalRiskSettings,
+  saveLocalRiskSettings,
+  hasLocalRiskSettings,
+  loadRiskSettings as loadRiskSettingsStore,
+  saveRiskSettings as saveRiskSettingsStore,
+  resolveRiskAccountId,
+  resolveRiskAccountName,
+} from './lib/riskSettingsStore.js';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -154,7 +166,7 @@ const courseSeed=[
  {id:'co2',title:'Psicología y riesgo',level:'Todos',description:'Control emocional, riesgo y consistencia.',modules:[{title:'Disciplina',lessons:[{id:'l5',title:'Evitar sobreoperar',type:'video',duration:'22 min',locked:false}]}]}
 ];
 const settingsDefault={initialBalance:10000,monthlyGoal:8,mainStrategy:'Canal de Moisés',assets:['XAUUSD','NAS100','EURUSD'],accounts:[{id:'main',name:'Cuenta principal',capital:10000,type:'Personal',currency:'USD'}]};
-const riskDefaults={maxDailyLoss:300,maxWeeklyLoss:900,maxTradesDay:3,maxDrawdownPct:5,riskPerTradePct:.5,accountCapital:10000};
+const riskDefaults=RISK_SETTINGS_DEFAULTS;
 const instrumentPresets={
   XAUUSD:{label:'Oro / XAUUSD',type:'CFD / Forex',pipSize:.01,pipValuePerLot:1,notes:'1 lote de oro suele mover aprox. $1 por cada 0.01. Ajusta si tu broker difiere.'},
   US30:{label:'US30 / Dow Jones',type:'Índice CFD',pipSize:1,pipValuePerLot:1,notes:'Referencia CFD: $1 por punto por lote. Ajusta según broker.'},
@@ -166,8 +178,14 @@ const instrumentPresets={
   AUDUSD:{label:'AUD/USD',type:'Forex',pipSize:.0001,pipValuePerLot:10,notes:'Valor estándar aproximado: $10 por pip en 1 lote.'},
   GBPJPY:{label:'GBP/JPY',type:'Forex',pipSize:.01,pipValuePerLot:9.1,notes:'Valor aproximado. Verifica especificación de tu broker.'}
 };
-function getRiskSettings(){try{return {...riskDefaults,...JSON.parse(localStorage.getItem('mtc-risk-settings')||'{}')}}catch{return riskDefaults}}
-function saveRiskSettings(v){localStorage.setItem('mtc-risk-settings',JSON.stringify(v)); window.dispatchEvent(new Event('mtc-risk-settings-updated'));}
+/** Sync local read (legacy callers + evaluateRiskGuard defaults). Prefer loadRiskSettingsStore for account-aware loads. */
+function getRiskSettings(accountId=RISK_SETTINGS_DEFAULT_ACCOUNT_ID){
+  return getLocalRiskSettings(accountId);
+}
+/** Sync local write + event. Prefer saveRiskSettingsStore when uid/db available. */
+function saveRiskSettings(v, accountId=RISK_SETTINGS_DEFAULT_ACCOUNT_ID){
+  return saveLocalRiskSettings(accountId, v);
+}
 
 function cleanAccountsForSave(settings={}){
   const list=Array.isArray(settings.accounts)?settings.accounts:[];
@@ -235,6 +253,60 @@ function useAccountFilter(trades=[],settings={}){
   return {active:effectiveActive,setActive,accounts,filtered};
 }
 function AccountSwitcher({active,setActive,accounts=[]}){return <div className="accountSwitcher"><span>Cuenta</span><select className="input small" value={active} onChange={e=>setActive(e.target.value)}>{accounts.map(a=><option key={a} value={a}>{a==='__all__'?'Todas las cuentas':a}</option>)}</select></div>}
+
+/** Account-aware risk settings: Firestore → local → defaults. Emits/listens RISK_SETTINGS_EVENT. */
+function useRiskSettings(profile, tradingSettings, activeAccount){
+  const accountId=useMemo(
+    ()=>resolveRiskAccountId(activeAccount, tradingSettings),
+    [activeAccount, tradingSettings?.accounts, tradingSettings?.initialBalance]
+  );
+  const accountName=useMemo(
+    ()=>resolveRiskAccountName(activeAccount, tradingSettings, accountId),
+    [activeAccount, tradingSettings?.accounts, tradingSettings?.initialBalance, accountId]
+  );
+  const [riskSettings,setRiskSettings]=useState(()=>getLocalRiskSettings(accountId));
+  const [riskSource,setRiskSource]=useState(()=>hasLocalRiskSettings(accountId)?'local':'default');
+
+  useEffect(()=>{
+    let cancelled=false;
+    setRiskSettings(getLocalRiskSettings(accountId));
+    setRiskSource(hasLocalRiskSettings(accountId)?'local':'default');
+    (async()=>{
+      try{
+        const result=await loadRiskSettingsStore({
+          db,
+          uid:profile?.uid||null,
+          accountId,
+          accountName
+        });
+        if(cancelled) return;
+        setRiskSettings(result.settings);
+        setRiskSource(result.source||'default');
+      }catch(err){
+        console.warn('useRiskSettings load fallback', err?.message||err);
+      }
+    })();
+    return()=>{cancelled=true};
+  },[profile?.uid, accountId, accountName]);
+
+  useEffect(()=>{
+    const h=(e)=>{
+      const detailAccount=e?.detail?.accountId;
+      if(detailAccount && detailAccount!==accountId) return;
+      if(e?.detail?.settings){
+        setRiskSettings(e.detail.settings);
+        if(e.detail.source) setRiskSource(e.detail.source);
+        return;
+      }
+      setRiskSettings(getLocalRiskSettings(accountId));
+    };
+    window.addEventListener(RISK_SETTINGS_EVENT, h);
+    return()=>window.removeEventListener(RISK_SETTINGS_EVENT, h);
+  },[accountId]);
+
+  return {riskSettings, setRiskSettings, riskSource, accountId, accountName};
+}
+
 function AccountManager({settings,onChange}){
   const accounts=Array.isArray(settings.accounts)&&settings.accounts.length?settings.accounts:normalizedAccounts(settings);
   const totalCapital=list=>list.reduce((sum,a)=>sum+Number(a.capital||0),0)||10000;
@@ -252,13 +324,17 @@ function evaluateRiskGuard(trades=[],settings=getRiskSettings(),initial=10000,da
   const weeklyPnL=weekTrades.reduce((a,t)=>a+toNumberSafe(t.resultMoney),0);
   const dayStats=calc(todayTrades,dayStartEquity||initial);
   const reasons=[];
-  if(settings.maxTradesDay>0 && todayTrades.length>=settings.maxTradesDay) reasons.push(`Máximo de trades diarios alcanzado: ${todayTrades.length}/${settings.maxTradesDay}`);
-  if(settings.maxDailyLoss>0 && dailyPnL<=-Math.abs(settings.maxDailyLoss)) reasons.push(`Hard stop diario alcanzado: ${money(dailyPnL)}`);
+  const maxTradesDay=Number(settings.maxTradesDay ?? settings.maxTradesPerDay ?? 0);
+  const maxDailyLoss=Number(settings.maxDailyLoss ?? settings.dailyLossLimit ?? 0);
+  const maxWeeklyLoss=Number(settings.maxWeeklyLoss ?? settings.weeklyLossLimit ?? 0);
+  const maxDrawdownPct=Number(settings.maxDrawdownPct ?? 0);
+  if(maxTradesDay>0 && todayTrades.length>=maxTradesDay) reasons.push(`Máximo de trades diarios alcanzado: ${todayTrades.length}/${maxTradesDay}`);
+  if(maxDailyLoss>0 && dailyPnL<=-Math.abs(maxDailyLoss)) reasons.push(`Hard stop diario alcanzado: ${money(dailyPnL)}`);
   const planRisk=parseLimitMoney(dailyPlan?.maxRisk);
   if(planRisk>0 && dailyPnL<=-planRisk) reasons.push(`Riesgo máximo del plan diario cumplido: ${money(dailyPnL)} / -${money(planRisk)}`);
-  if(settings.maxWeeklyLoss>0 && weeklyPnL<=-Math.abs(settings.maxWeeklyLoss)) reasons.push(`Límite semanal alcanzado: ${money(weeklyPnL)}`);
+  if(maxWeeklyLoss>0 && weeklyPnL<=-Math.abs(maxWeeklyLoss)) reasons.push(`Límite semanal alcanzado: ${money(weeklyPnL)}`);
   // El drawdown del modo reflexión se evalúa por jornada operativa NY. Se reinicia en el rollover 17:00 ET.
-  if(settings.maxDrawdownPct>0 && dayStats.maxDD>=settings.maxDrawdownPct) reasons.push(`Drawdown diario alcanzado: ${pct(dayStats.maxDD)}`);
+  if(maxDrawdownPct>0 && dayStats.maxDD>=maxDrawdownPct) reasons.push(`Drawdown diario alcanzado: ${pct(dayStats.maxDD)}`);
   return {blocked:reasons.length>0,reasons,todayTrades,weekTrades,dailyPnL,weeklyPnL,drawdownPct:dayStats.maxDD,settings,todayStr,dayStartEquity};
 }
 
@@ -1124,7 +1200,7 @@ function Dashboard({data,profile,setTab}){
   const weekTrades=filtered.filter(t=>{const d=getTradeOperationalDateKey(t); return d&&d>=weekStartISO();});
   const weekWins=weekTrades.filter(t=>Number(t.resultMoney)>0).length;
   const weekWr=weekTrades.length?weekWins/weekTrades.length*100:0;
-  const riskSettings=useMemo(()=>getRiskSettings(),[filtered.length, todayKey]);
+  const {riskSettings, riskSource}=useRiskSettings(profile, data.settings, active);
   const todayPlan=(data.dailyPlans||[]).find(p=>(p.dayKey||p.date)===todayKey);
   const riskGuard=evaluateRiskGuard(filtered,riskSettings,initial,todayPlan);
   const riskLevel=riskGuard.blocked?'Alto':Number(s.maxDD||0)>4?'Moderado':'Bajo';
@@ -1223,8 +1299,8 @@ function Dashboard({data,profile,setTab}){
   const safeOperationalState=operationalState || FALLBACK_OPERATIONAL_STATE;
 
   const riskConfirmed=useMemo(()=>{
-    try{return !!localStorage.getItem('mtc-risk-settings');}catch{return false;}
-  },[riskSettings]);
+    return riskSource==='firestore' || riskSource==='local' || hasLocalRiskSettings(resolveRiskAccountId(active, data.settings));
+  },[riskSettings, riskSource, active, data.settings]);
 
   const onboardingState=useMemo(()=>buildOnboardingState({
     trades: filtered,
@@ -1293,10 +1369,9 @@ function Journal({data,profile}){
   const [form,setForm]=useState(null),[search,setSearch]=useState(''),[selectedTrade,setSelectedTrade]=useState(null),[checklistFilter,setChecklistFilter]=useState('Todos');
   const [shareTrade,setShareTrade]=useState(null),[shareDay,setShareDay]=useState(false);
   const [selectedDate,setSelectedDate]=useState(tradingDayKey());
-  const [riskSettings,setRiskSettings]=useState(getRiskSettings());
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
+  const {riskSettings}=useRiskSettings(profile, data.settings, active);
   const scopedData=useMemo(()=>({...data,trades:filtered}),[data,filtered]);
-  useEffect(()=>{const h=()=>setRiskSettings(getRiskSettings()); window.addEventListener('mtc-risk-settings-updated',h); return()=>window.removeEventListener('mtc-risk-settings-updated',h)},[]);
   const dayPlan=(data.dailyPlans||[]).find(p=>p.dayKey===selectedDate&&p.userId===profile.uid);
   const guard=evaluateRiskGuard(filtered,riskSettings,accountInitial(data.settings,active),dayPlan);
   const tradeDates=[...new Set((filtered||[]).map(getTradeOperationalDateKey).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
@@ -1933,17 +2008,20 @@ function NewsPage(){return <main className="page"><div className="heroSystem new
 
 
 function RiskLab({data,profile}){
-  const [settings,setSettings]=useState(getRiskSettings());
+  const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
+  const {riskSettings, setRiskSettings, riskSource, accountId, accountName}=useRiskSettings(profile, data.settings, active);
+  const [settings,setSettings]=useState(riskSettings);
+  const [persistStatus,setPersistStatus]=useState('');
+  const [saving,setSaving]=useState(false);
   const [instrument,setInstrument]=useState('XAUUSD');
-  const [capital,setCapital]=useState(settings.accountCapital||data.settings.initialBalance||10000);
-  const [riskPct,setRiskPct]=useState(settings.riskPerTradePct||.5);
+  const [capital,setCapital]=useState(riskSettings.accountCapital||data.settings.initialBalance||10000);
+  const [riskPct,setRiskPct]=useState(riskSettings.riskPerTradePct||.5);
   const [entry,setEntry]=useState(2350);
   const [stop,setStop]=useState(2347);
   const [mode,setMode]=useState('presets');
   const [tickSize,setTickSize]=useState(.25);
   const [tickValue,setTickValue]=useState(1.25);
   const [hypo,setHypo]=useState(0);
-  const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
   const initial=accountInitial(data.settings,active);
   const cfg=instrumentPresets[instrument]||instrumentPresets.XAUUSD;
   const riskMoney=Number(capital||0)*Number(riskPct||0)/100;
@@ -1957,13 +2035,65 @@ function RiskLab({data,profile}){
   const ddProgress=ddLimit?Math.min(100,(guard.drawdownPct/ddLimit)*100):0;
   const projectedTotal=s.total+Number(hypo||0);
   const projectedEquity=s.initial+projectedTotal;
-  function save(){saveRiskSettings({...settings,accountCapital:Number(capital),riskPerTradePct:Number(riskPct)}); toast('Límites de riesgo guardados')}
-  function upd(k,v){const n={...settings,[k]:Number(v)}; setSettings(n); saveRiskSettings(n)}
+
+  useEffect(()=>{
+    setSettings(riskSettings);
+    setCapital(riskSettings.accountCapital||data.settings.initialBalance||10000);
+    setRiskPct(riskSettings.riskPerTradePct||.5);
+    if(riskSource==='firestore') setPersistStatus('Límites guardados en la nube.');
+    else if(riskSource==='local') setPersistStatus('Usando respaldo local.');
+    else setPersistStatus('');
+  },[riskSettings, riskSource, accountId, data.settings.initialBalance]);
+
+  async function persistLimits(nextSettings, {toastOk=true}={}){
+    setSaving(true);
+    try{
+      const result=await saveRiskSettingsStore({
+        db,
+        uid:profile?.uid||null,
+        accountId,
+        accountName,
+        settings:nextSettings
+      });
+      setSettings(result.settings);
+      setRiskSettings(result.settings);
+      if(result.synced){
+        setPersistStatus('Límites guardados en la nube.');
+        if(toastOk) toast('Límites guardados en la nube.');
+      }else if(profile?.uid){
+        setPersistStatus('No se pudo sincronizar Firestore. Tus límites siguen guardados localmente.');
+        if(toastOk) toast('No se pudo sincronizar, usando respaldo local','error');
+      }else{
+        setPersistStatus('Usando respaldo local.');
+        if(toastOk) toast('Guardado localmente');
+      }
+      return result.settings;
+    }catch(err){
+      console.warn('RiskLab persist failed', err?.message||err);
+      setPersistStatus('No se pudo sincronizar Firestore. Tus límites siguen guardados localmente.');
+      if(toastOk) toast('No se pudo sincronizar, usando respaldo local','error');
+      return nextSettings;
+    }finally{
+      setSaving(false);
+    }
+  }
+
+  async function save(){
+    await persistLimits({...settings,accountCapital:Number(capital),riskPerTradePct:Number(riskPct),capital:Number(capital),riskPct:Number(riskPct)});
+  }
+  async function upd(k,v){
+    const n={...settings,[k]:Number(v)};
+    setSettings(n);
+    await persistLimits(n,{toastOk:false});
+  }
+
+  const statusLine=persistStatus||'Estos límites alimentan el estado operativo del Dashboard.';
+
   return <main className="page riskPage"><section className="riskHero"><div><span><Shield size={15}/> Risk Lab</span><h2>Calculadora, límites y protección operativa</h2><p>Calcula lotaje, define límites y protege tu ejecución antes de tomar riesgo real.</p></div><div className="riskHeroStats"><b>{guard.blocked?'Bloqueado':'Operativo'}</b><small>{guard.blocked?'Modo reflexión activo':'Dentro de límites'}</small></div></section>
   <AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>
   {guard.blocked&&<div className="riskAlert"><Shield size={20}/><div><b>Modo reflexión activo</b><p>{guard.reasons.join(' · ')}</p></div></div>}
-  <div className="grid2 riskGrid"><Card title="Calculadora de lotaje" sub="Capital + riesgo + entrada + stop. Usa presets de oro, US30 y pares principales."><div className="formGrid labeled"><Field label="Instrumento"><select className="input" value={instrument} onChange={e=>setInstrument(e.target.value)}>{Object.entries(instrumentPresets).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></Field><Field label="Modo"><select className="input" value={mode} onChange={e=>setMode(e.target.value)}><option value="presets">Forex / CFD preset</option><option value="futures">Futuros por tick</option></select></Field><Field label="Capital"><input className="input" type="number" value={capital} onChange={e=>setCapital(e.target.value)}/></Field><Field label="Riesgo %"><input className="input" type="number" step="0.1" value={riskPct} onChange={e=>setRiskPct(e.target.value)}/></Field><Field label="Entrada"><input className="input" type="number" step="0.01" value={entry} onChange={e=>setEntry(e.target.value)}/></Field><Field label="Stop Loss"><input className="input" type="number" step="0.01" value={stop} onChange={e=>setStop(e.target.value)}/></Field>{mode==='futures'&&<><Field label="Tick size"><input className="input" type="number" step="0.01" value={tickSize} onChange={e=>setTickSize(e.target.value)}/></Field><Field label="Valor tick"><input className="input" type="number" step="0.01" value={tickValue} onChange={e=>setTickValue(e.target.value)}/></Field></>}</div><div className="lotResult"><div><span>Riesgo monetario</span><b>{money(riskMoney)}</b></div><div><span>Distancia al stop</span><b>{distance.toFixed(mode==='futures'?2:5)}</b></div><div><span>{mode==='futures'?'Contratos':'Lotes sugeridos'}</span><b>{size>0?size.toFixed(2):'—'}</b></div></div><p className="microInsight">{cfg.notes} Verifica siempre la especificación exacta de tu broker antes de ejecutar.</p><button className="primary" onClick={save}>Guardar capital/riesgo base</button></Card>
-  <Card title="Límites de riesgo" sub="Configura hard stop diario, semanal y máximo de trades para bloquear registros nuevos."><div className="formGrid labeled"><Field label="Pérdida máxima diaria $"><input className="input" type="number" value={settings.maxDailyLoss} onChange={e=>upd('maxDailyLoss',e.target.value)}/></Field><Field label="Pérdida máxima semanal $"><input className="input" type="number" value={settings.maxWeeklyLoss} onChange={e=>upd('maxWeeklyLoss',e.target.value)}/></Field><Field label="Máximo trades por día"><input className="input" type="number" value={settings.maxTradesDay} onChange={e=>upd('maxTradesDay',e.target.value)}/></Field><Field label="Drawdown máximo %"><input className="input" type="number" value={settings.maxDrawdownPct} onChange={e=>upd('maxDrawdownPct',e.target.value)}/></Field></div><div className="limitCards"><div><span>Hoy</span><b className={guard.dailyPnL<0?'neg':'pos'}>{money(guard.dailyPnL)}</b><small>{guard.todayTrades.length}/{settings.maxTradesDay} trades</small></div><div><span>Semana</span><b className={guard.weeklyPnL<0?'neg':'pos'}>{money(guard.weeklyPnL)}</b><small>Límite {money(settings.maxWeeklyLoss)}</small></div></div></Card></div>
+  <div className="grid2 riskGrid"><Card title="Calculadora de lotaje" sub="Capital + riesgo + entrada + stop. Usa presets de oro, US30 y pares principales."><div className="formGrid labeled"><Field label="Instrumento"><select className="input" value={instrument} onChange={e=>setInstrument(e.target.value)}>{Object.entries(instrumentPresets).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></Field><Field label="Modo"><select className="input" value={mode} onChange={e=>setMode(e.target.value)}><option value="presets">Forex / CFD preset</option><option value="futures">Futuros por tick</option></select></Field><Field label="Capital"><input className="input" type="number" value={capital} onChange={e=>setCapital(e.target.value)}/></Field><Field label="Riesgo %"><input className="input" type="number" step="0.1" value={riskPct} onChange={e=>setRiskPct(e.target.value)}/></Field><Field label="Entrada"><input className="input" type="number" step="0.01" value={entry} onChange={e=>setEntry(e.target.value)}/></Field><Field label="Stop Loss"><input className="input" type="number" step="0.01" value={stop} onChange={e=>setStop(e.target.value)}/></Field>{mode==='futures'&&<><Field label="Tick size"><input className="input" type="number" step="0.01" value={tickSize} onChange={e=>setTickSize(e.target.value)}/></Field><Field label="Valor tick"><input className="input" type="number" step="0.01" value={tickValue} onChange={e=>setTickValue(e.target.value)}/></Field></>}</div><div className="lotResult"><div><span>Riesgo monetario</span><b>{money(riskMoney)}</b></div><div><span>Distancia al stop</span><b>{distance.toFixed(mode==='futures'?2:5)}</b></div><div><span>{mode==='futures'?'Contratos':'Lotes sugeridos'}</span><b>{size>0?size.toFixed(2):'—'}</b></div></div><p className="microInsight">{cfg.notes} Verifica siempre la especificación exacta de tu broker antes de ejecutar.</p><button className="primary" onClick={save} disabled={saving}>{saving?'Guardando…':'Guardar capital/riesgo base'}</button></Card>
+  <Card title="Límites de riesgo" sub="Configura hard stop diario, semanal y máximo de trades para bloquear registros nuevos."><div className="formGrid labeled"><Field label="Pérdida máxima diaria $"><input className="input" type="number" value={settings.maxDailyLoss} onChange={e=>upd('maxDailyLoss',e.target.value)}/></Field><Field label="Pérdida máxima semanal $"><input className="input" type="number" value={settings.maxWeeklyLoss} onChange={e=>upd('maxWeeklyLoss',e.target.value)}/></Field><Field label="Máximo trades por día"><input className="input" type="number" value={settings.maxTradesDay} onChange={e=>upd('maxTradesDay',e.target.value)}/></Field><Field label="Drawdown máximo %"><input className="input" type="number" value={settings.maxDrawdownPct} onChange={e=>upd('maxDrawdownPct',e.target.value)}/></Field></div><div className="limitCards"><div><span>Hoy</span><b className={guard.dailyPnL<0?'neg':'pos'}>{money(guard.dailyPnL)}</b><small>{guard.todayTrades.length}/{settings.maxTradesDay} trades</small></div><div><span>Semana</span><b className={guard.weeklyPnL<0?'neg':'pos'}>{money(guard.weeklyPnL)}</b><small>Límite {money(settings.maxWeeklyLoss)}</small></div></div><p className="microInsight">{statusLine}</p></Card></div>
   <div className="grid2"><Card title="Tracker de drawdown" sub="Muestra qué tan cerca estás del límite máximo permitido."><div className="ddTracker"><div><b>{pct(guard.drawdownPct)}</b><span>DD actual</span></div><div><b>{pct(settings.maxDrawdownPct)}</b><span>Límite</span></div></div><div className="ddBar"><i style={{width:`${ddProgress}%`}}></i></div><p className="microInsight">Si llega al límite, el journal activa modo reflexión para evitar seguir registrando operaciones impulsivas.</p></Card><Card title="Simulador de escenario" sub="¿Qué pasa si tomo este trade? Evalúa el impacto antes de operar."><div className="formGrid labeled"><Field label="Resultado hipotético $"><input className="input" type="number" value={hypo} onChange={e=>setHypo(e.target.value)}/></Field><Field label="Equity proyectada"><input className="input" readOnly value={money(projectedEquity)}/></Field><Field label="P/L proyectado"><input className="input" readOnly value={`${money(projectedTotal)} · ${pct((projectedTotal/s.initial)*100)}`}/></Field></div><div className="scenarioBox"><b>{Number(hypo)>0?'Escenario positivo':Number(hypo)<0?'Escenario de pérdida':'Sin impacto'}</b><p>{Number(hypo)<0 && Math.abs(Number(hypo))>Number(settings.maxDailyLoss)?'Esta pérdida supera tu hard stop diario. No deberías tomar el trade con ese tamaño.':'El escenario queda dentro de los límites configurados, siempre que el setup esté validado.'}</p></div></Card></div></main>
 }
 
