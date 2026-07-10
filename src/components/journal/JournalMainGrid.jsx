@@ -14,6 +14,7 @@ export function JournalMainGrid({
   selectedDate,
   onSelectCalendarDay,
   dayPlan,
+  totalTradeCount,
 }) {
   return (
     <div className="journalMainGrid">
@@ -26,6 +27,7 @@ export function JournalMainGrid({
           onExportTrade={onExportTrade}
           onShareTrade={onShareTrade}
           onNewTrade={onNewTrade}
+          totalTradeCount={totalTradeCount}
         />
       </div>
       <aside className="journalMainRight">

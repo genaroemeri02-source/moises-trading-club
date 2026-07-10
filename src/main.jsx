@@ -49,6 +49,14 @@ import { ResetTicker } from './components/dashboard/ResetTicker.jsx';
 import { clampScore, buildDailyNetCurve, buildOperationalHeatmap, sessionNameNY, tradeSortTime } from './components/dashboard/dashboardUtils.js';
 import { buildOperationalState } from './lib/operationalState.js';
 import { buildEmotionIntelligence } from './lib/emotionIntelligence.js';
+import {
+  buildOnboardingState,
+  shouldShowFirstRunPanel,
+  readOnboardingDismissed,
+  writeOnboardingDismissed,
+  ACTIVATION_LEVEL
+} from './lib/onboardingState.js';
+import { FirstRunPanel } from './components/onboarding/FirstRunPanel.jsx';
 import { JournalHeader } from './components/journal/JournalHeader.jsx';
 import { JournalActions } from './components/journal/JournalActions.jsx';
 import { JournalMainGrid } from './components/journal/JournalMainGrid.jsx';
@@ -1251,8 +1259,44 @@ function Dashboard({data,profile,setTab}){
 
   const safeOperationalState=operationalState || FALLBACK_OPERATIONAL_STATE;
 
+  const riskConfirmed=useMemo(()=>{
+    try{return !!localStorage.getItem('mtc-risk-settings');}catch{return false;}
+  },[riskSettings]);
+
+  const onboardingState=useMemo(()=>buildOnboardingState({
+    trades: filtered,
+    accounts: data.settings,
+    checklistEntries: data.checklists || [],
+    emotionalJournals: data.emotionalJournals || [],
+    riskSettings: riskConfirmed ? { ...riskSettings, confirmed: true } : {},
+    userProfile: profile,
+    now: new Date()
+  }),[filtered, data.settings, data.checklists, data.emotionalJournals, riskSettings, riskConfirmed, profile]);
+
+  const [onboardingDismissed,setOnboardingDismissed]=useState(()=>readOnboardingDismissed());
+  const showFirstRun=shouldShowFirstRunPanel(onboardingState,{dismissed:onboardingDismissed});
+  const firstRunCompact=onboardingState.activationLevel===ACTIVATION_LEVEL.STARTED
+    || onboardingState.activationLevel===ACTIVATION_LEVEL.BUILDING_SAMPLE;
+  const isEmptyActivation=onboardingState.activationLevel===ACTIVATION_LEVEL.EMPTY;
+
+  const dismissOnboarding=()=>{
+    if((onboardingState.counts?.trades||0)===0) return;
+    writeOnboardingDismissed(true);
+    setOnboardingDismissed(true);
+  };
+
+  const firstRunPanel=showFirstRun?(
+    <FirstRunPanel
+      onboardingState={onboardingState}
+      onNavigate={setTab}
+      onDismiss={firstRunCompact?dismissOnboarding:undefined}
+      compact={firstRunCompact}
+    />
+  ):null;
+
   return <main className="page dashboardV38 dashboardClean">
     <DashboardHero activeLabel={activeLabel} headerActions={<AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>}/>
+    {isEmptyActivation && firstRunPanel}
     <DashboardCockpitPanel
       operationalState={safeOperationalState}
       emotionIntelligence={emotionIntelligence}
@@ -1263,6 +1307,7 @@ function Dashboard({data,profile,setTab}){
       onOpenJournal={()=>setTab('journal')}
       onOpenEmotional={()=>setTab('emotional')}
     />
+    {!isEmptyActivation && firstRunPanel}
     <DashboardKpiStrip s={s} monthly={monthly} dailyCurve={dailyCurve} spark={spark} winLossTotal={winLossTotal} avgWinLoss={avgWinLoss} avgWinLossSub={avgWinLossSub} payoffWin={payoffWin} payoffLoss={payoffLoss} payoffTotal={payoffTotal} profitFactor={profitFactor} profitFactorSub={profitFactorSub} hasProfitFactorSample={hasProfitFactorSample} profitFactorGauge={profitFactorGauge} streakValue={streakValue} streakSub={streakSub} streakInfo={streakInfo} expectancyValue={expectancyValue} expectancySub={expectancySub} expectancyGauge={expectancyGauge}/>
     <div className="dashboardVisualGrid">
       <div className="dashboardCalendarColumn">
@@ -1407,6 +1452,7 @@ function Journal({data,profile}){
       selectedDate={selectedDate}
       onSelectCalendarDay={selectCalendarDay}
       dayPlan={dayPlan}
+      totalTradeCount={(data.trades||[]).length}
     />
     <JournalToolsCard
       exportDisabled={exportDisabled}
@@ -1693,14 +1739,14 @@ function EmotionalJournalPage({data,profile}){
             <p>Tu consistencia emocional empieza a verse cuando repetís el hábito. Cada cierre suma evidencia sobre cómo tomás decisiones.</p>
             <div className="emotionalWeeklyMetrics"><div><span>Ansiedad</span><b>{weeklySummary.anxiety}/10</b></div><div><span>Confianza</span><b>{weeklySummary.confidence}/10</b></div><div><span>Disciplina</span><b>{weeklySummary.discipline}/10</b></div><div><span>Estado frecuente</span><b>{weeklySummary.mood}</b></div><div><span>Cierres</span><b>{weeklySummary.count}</b></div></div>
             <div className="emotionalSignalList">{weeklySummary.signals.map(signal=><span key={signal}>{signal}</span>)}</div>
-          </div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Completá tu primer cierre para empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+          </div>:<div className="emotionalEmpty emptyStateActivation"><b>Registrá un check-in emocional para conectar estado interno y ejecución.</b><p>El primer cierre activa la señal emocional del cockpit. Completá ansiedad, confianza y lección del día.</p></div>}
         </Card>
         <Card title="Lectura del patrón" sub="Calidad emocional de la ejecución.">
           <div className="emotionalPattern"><Heart size={20}/><p>Este módulo está diseñado para ayudarte a observar cómo tu estado interno afecta tu ejecución. Con el tiempo, tus respuestas empiezan a revelar patrones: cuándo respetás tu plan, cuándo te exponés de más y qué emociones aparecen antes de tus peores decisiones.</p></div>
           <div className="emotionalPatternChips"><span>FOMO</span><span>Impulso</span><span>Disciplina</span></div>
         </Card>
         <Card title="Historial" sub="Reflexiones de tus sesiones.">
-          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,6).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><div className="emotionalHistoryTop"><span>{index===0?'Último cierre':'Cierre'}</span>{index===0&&<button className="ghost compact" onClick={()=>editJournal(item)}>Editar</button>}</div><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty"><b>Todavía no hay cierres registrados.</b><p>Completá tu primer cierre para empezar a construir un mapa de tus patrones emocionales y decisiones repetidas.</p></div>}
+          {data.loading?<div className="emotionalEmpty"><b>Cargando tus cierres...</b><p>Estamos preparando tu historial de reflexión.</p></div>:journals.length?<div className="emotionalHistoryList">{journals.slice(0,6).map((item,index)=><div className="emotionalHistoryCard" key={item.id}><div className="emotionalHistoryTop"><span>{index===0?'Último cierre':'Cierre'}</span>{index===0&&<button className="ghost compact" onClick={()=>editJournal(item)}>Editar</button>}</div><b>{formatDateLabel(item.date||safeDate(item.createdAt))}</b><p>{item.mood||'Neutral'} · Ansiedad {Number(item.anxietyLevel||0)}/10 · Confianza {Number(item.confidenceLevel||0)}/10 · Disciplina {Number(item.disciplineLevel||0)}/10</p><small>{item.lesson||'Sin lección escrita todavía.'}</small></div>)}</div>:<div className="emotionalEmpty emptyStateActivation"><b>Registrá un check-in emocional para conectar estado interno y ejecución.</b><p>Usá el formulario de esta página para registrar tu primer check-in.</p></div>}
         </Card>
       </div>
     </div>
@@ -1872,7 +1918,7 @@ ${msg}`))return;
   <BlockHeader n="2" title="Zona y riesgo" status={ev.blockStatus.execution}/><div className="checkBlocks"><FieldSelect id="q6" label="6. ¿Precio dentro de zona?" options={['Sí, está dentro de la zona','Sí, tocó zona y confirmó reacción','Está muy cerca','Todavía no llegó','Ya se pasó','No lo tengo claro']} locked={!ev.contextOk} help={!ev.contextOk?'Primero validá los primeros 5 puntos antes de evaluar zona, RR o entrada.':'Contexto validado. Ahora evaluá llegada a zona.'}/><FieldSelect id="q7" label="7. ¿RR mínimo 1:2?" options={['Sí, RR 1:2 o más','Sí, RR 1:3 o más','No, menor a 1:2','No lo calculé']} locked={!ev.contextOk} help={!ev.contextOk?'Primero validá los primeros 5 puntos antes de evaluar zona, RR o entrada.':'Validá que el trade pague mínimo 1:2 antes de buscar patrón M1.'}/></div>
   <BlockHeader n="3" title="Confirmación M1" status={ev.blockStatus.pattern}/><div className="checkBlocks"><FieldSelect id="q8" label="8. Patrón de Moisés en M1" options={patterns} locked={!(ev.contextOk && ev.executionOk)} help={!(ev.contextOk && ev.executionOk)?'Primero validá contexto, llegada a zona y RR mínimo 1:2. No busques patrón M1 antes de que el trade esté técnicamente ejecutable.':'Contexto, zona y RR validados. Ahora podés buscar confirmación M1.'}/></div>
   <div className={`checkResult ${ev.finalGreen?'ok':'bad'}`}><b>{ev.finalGreen?'LUZ VERDE — Podés ejecutar':'LUZ ROJA — No debés ejecutar'}</b><p>{ev.reason}</p><small>Estado operativo: {ev.operationalState}</small>{ev.warns.map(w=><span key={w}>⚠️ {w}</span>)}</div>{lastSaved&&!lastSavedTrade&&<div className={`postChecklistAction ${lastSaved.finalGreen?'ok':'warn'}`}><button className="postChecklistClose" onClick={()=>setLastSaved(null)}><X size={16}/></button><span>{lastSaved.finalGreen?'Luz verde confirmada':'Checklist guardado sin luz verde'}</span><h3>{lastSaved.finalGreen?'Checklist guardado correctamente':'Validación registrada como observación'}</h3><p>{lastSaved.finalGreen?'Tu validación quedó completa. Ahora podés registrar el trade con los datos del Checklist ya cargados.':'Esta validación quedó registrada como observación o setup en formación. No está habilitada como entrada A+.'}</p><div className="postChecklistActions"><button className="primary" onClick={()=>{openTradeFromChecklist(lastSaved,lastSavedTrade,profile,data);setLastSaved(null)}}>{lastSaved.finalGreen?'Cargar trade desde este Checklist':'Crear trade de todos modos'}</button><button className="ghost" onClick={()=>setSelected(lastSaved)}>Ver validación</button></div>{!lastSaved.finalGreen&&<small>Si cargás un trade, quedará marcado como ejecutado sin checklist completo.</small>}</div>}{lastSaved&&lastSavedTrade&&<div className="postChecklistAction linked"><span>Trade vinculado</span><h3>Trade creado desde Checklist</h3><p>La validación ya tiene un trade asociado.</p><button className="primary" onClick={()=>{localStorage.setItem('mtc-open-trade',lastSavedTrade.id); window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'journal'}));}}>Ver trade</button></div>}<Field label="Comentario del trader"><TextareaWithEmoji className="input" value={form.comment} onChange={e=>setForm({...form,comment:e.target.value})}/></Field><Field label="Capturas / links M15-M1"><input className="input" value={form.captures} onChange={e=>setForm({...form,captures:e.target.value})} placeholder="Links de Drive, TradingView o captura externa"/></Field><button className="primary" onClick={save}>Guardar validación</button></Card>
-  <Card title="Historial de validaciones" sub={admin?'Como mentor podés revisar, comentar y marcar interpretaciones.':'Tus validaciones quedan guardadas para medir disciplina.'}><div className="checkHistory">{validations.map(v=>{const lt=findLinkedTrade(data,v); return <article key={v.id} className="checkItem" onClick={()=>setSelected(v)}><div className="checkItemMain"><b>{v.asset} · {v.direction}</b><small>{v.userName||'Trader'} · {v.createdDate||safeDate(v.createdAt)} · {v.session}</small><span className={v.finalGreen?'pos':'neg'}>{v.score}/100 · {v.operationalState||v.status}</span><span className={`linkedMini ${lt?'ok':v.finalGreen&&Number(v.score)>=85?'gold':'muted'}`}>{lt?'Trade vinculado':v.finalGreen&&Number(v.score)>=85?'Setup A+':'Sin trade'}</span></div><div className="checkItemActions">{admin&&<select className="input small" value={v.mentorReview||''} onClick={e=>e.stopPropagation()} onChange={e=>review(v,{mentorReview:e.target.value})}><option value="">Revisión mentor...</option>{reviewOptions.map(x=><option key={x}>{x}</option>)}</select>}<button className="ghost compact danger" title="Borrar validación" onClick={e=>{e.stopPropagation();removeValidation(v)}}><Trash2 size={14}/></button></div></article>})}{!validations.length&&<Empty title="Sin validaciones" text="Creá tu primera validación operativa antes de ejecutar." cta="Completar checklist" icon={CheckCircle2} onClick={()=>document.querySelector('.main')?.scrollTo({top:0,behavior:'smooth'})}/>}</div></Card>
+  <Card title="Historial de validaciones" sub={admin?'Como mentor podés revisar, comentar y marcar interpretaciones.':'Tus validaciones quedan guardadas para medir disciplina.'}><div className="checkHistory">{validations.map(v=>{const lt=findLinkedTrade(data,v); return <article key={v.id} className="checkItem" onClick={()=>setSelected(v)}><div className="checkItemMain"><b>{v.asset} · {v.direction}</b><small>{v.userName||'Trader'} · {v.createdDate||safeDate(v.createdAt)} · {v.session}</small><span className={v.finalGreen?'pos':'neg'}>{v.score}/100 · {v.operationalState||v.status}</span><span className={`linkedMini ${lt?'ok':v.finalGreen&&Number(v.score)>=85?'gold':'muted'}`}>{lt?'Trade vinculado':v.finalGreen&&Number(v.score)>=85?'Setup A+':'Sin trade'}</span></div><div className="checkItemActions">{admin&&<select className="input small" value={v.mentorReview||''} onClick={e=>e.stopPropagation()} onChange={e=>review(v,{mentorReview:e.target.value})}><option value="">Revisión mentor...</option>{reviewOptions.map(x=><option key={x}>{x}</option>)}</select>}<button className="ghost compact danger" title="Borrar validación" onClick={e=>{e.stopPropagation();removeValidation(v)}}><Trash2 size={14}/></button></div></article>})}{!validations.length&&<Empty title="Definí tu filtro antes de operar." text="Completá el checklist operativo para separar sistema de impulso. Cada validación alimenta el cockpit." cta="Completar checklist" icon={CheckCircle2} onClick={()=>document.querySelector('.main')?.scrollTo({top:0,behavior:'smooth'})}/>}</div></Card>
   {selected&&<div className="modal"><div className="modalCard checklistModal"><div className="modalHead"><h3>{selected.asset} · {selected.operationalState||selected.status}</h3><div className="modalActions"><button className="ghost danger compact" onClick={()=>removeValidation(selected)}><Trash2 size={14}/>Borrar</button><button onClick={()=>setSelected(null)}><X/></button></div></div>{selectedTrade?<div className="linkedTradeCard"><div><span>Trade vinculado</span><b>{Number(selectedTrade.resultMoney||0)>0?'Profit':Number(selectedTrade.resultMoney||0)<0?'Stop / pérdida':'Resultado neutro'} · {Number(selectedTrade.resultMoney||0)>0?'+':''}{money(selectedTrade.resultMoney||0)}</b><small>{Number(selectedTrade.resultR||0)>0?'+':''}{Number(selectedTrade.resultR||0).toFixed(2)}R · {selectedTrade.date||selectedTrade.tradingDay||'—'}</small></div><button className="ghost compact" onClick={()=>{localStorage.setItem('mtc-open-trade',selectedTrade.id); window.dispatchEvent(new CustomEvent('mtc-tab',{detail:'journal'}));}}>Ver trade</button></div>:<div className={`linkedTradeCard ${selected.finalGreen?'ok':'warn'}`}><div><span>Trade vinculado</span><b>Sin trade asociado</b><small>{selected.finalGreen?'Validación lista para crear trade.':'Esta validación no tiene luz verde; si creás trade quedará marcado como ejecución sin checklist completo.'}</small></div><button className="primary compact" onClick={()=>openTradeFromChecklist(selected,selectedTrade,profile,data)}>Cargar trade desde este Checklist</button></div>}<div className="detailGrid"><DetailBlock title="Resumen"><p><b>Trader:</b> {selected.userName||'—'}<br/><b>Fecha:</b> {selected.createdDate||safeDate(selected.createdAt)||'—'}<br/><b>Sesión:</b> {selected.session||'—'}<br/><b>Dirección:</b> {selected.direction||'—'}<br/><b>Resultado posterior:</b> {selected.result||'No ejecutada'}</p></DetailBlock><DetailBlock title="Score y estado"><p><b>{selected.score||0}/100</b><br/>{selected.quality||'—'}<br/>{selected.green?'LUZ VERDE — Podés ejecutar':'LUZ ROJA — No debés ejecutar'}</p></DetailBlock><DetailBlock title="Respuestas del checklist"><div className="answerList">{answerRows(selected).map(([k,v])=><div key={k}><b>{k}</b><span>{v||'Sin responder'}</span></div>)}</div></DetailBlock><DetailBlock title="Comentario del trader"><p>{selected.comment||'—'}</p></DetailBlock><DetailBlock title="Capturas / links"><p>{selected.captures?<a href={selected.captures} target="_blank" rel="noreferrer">Abrir recurso</a>:'—'}</p></DetailBlock><DetailBlock title="Revisión del mentor"><select className="input" value={selected.mentorReview||''} onChange={async e=>{const mentorReview=e.target.value; setSelected({...selected,mentorReview}); await review(selected,{mentorReview});}}><option value="">Sin revisión</option>{reviewOptions.map(x=><option key={x}>{x}</option>)}</select><TextareaWithEmoji className="input mentorComment" value={selected.mentorComment||''} onChange={e=>setSelected({...selected,mentorComment:e.target.value})} placeholder="Comentario del mentor"/><button className="primary compact" onClick={()=>review(selected,{mentorComment:selected.mentorComment||''})}>Guardar comentario</button></DetailBlock></div></div></div>}
   </main>
 }

@@ -14,6 +14,7 @@ Sin React. Lógica reutilizable y testeable.
 | `analyticsUtils.js` | KPIs, calendario por día, behavior score, stats diarias |
 | `operationalState.js` | Estado operativo unificado (`ready` / `caution` / `blocked`) — Sprint 05 |
 | `emotionIntelligence.js` | Capa emocional: emoción ↔ conducta ↔ R/riesgo + directivas — Sprint 06 |
+| `onboardingState.js` | Activación first-run / progreso hacia diagnóstico (10 trades) — Sprint 08 |
 | `importExportUtils.js` | Export/import JSON y CSV de trades |
 | `sharePngUtils.js` | Render canvas 9:16, normalización para share, descarga/compartir PNG |
 
@@ -36,6 +37,13 @@ Componentes del tab Dashboard. Datos y cálculos pesados vienen de `main.jsx` + 
 | `MtcLightweightLineChart.jsx` | Gráficos lightweight-charts |
 | `ResetTicker.jsx` | Countdown rollover NY |
 | `dashboardUtils.js` | Curva diaria, heatmap operativo, utilidades locales |
+
+## `src/components/onboarding/` — Activación first-run
+
+| Archivo | Rol |
+|---------|-----|
+| `FirstRunPanel.jsx` | Panel de activación (hero / compact) en Dashboard |
+| `OnboardingProgress.jsx` | Steps visuales del progreso de activación |
 
 ## `src/components/journal/` — Journal operativo
 
@@ -479,3 +487,82 @@ Tono cockpit (apto / precaución / bloqueado / completar checklist / señal en o
 - No reescribe shell, nav mobile, Firebase, Auth, Pricing, Journal save ni Analytics UI.
 - Right rail legacy se conserva (disciplina / equity); la directiva primaria vive en el Cockpit.
 - Sprint 07 no cambia reglas de Sprint 05/06; solo las consume.
+
+---
+
+## Sprint 08 — First-run / Onboarding Activation
+
+Guía de activación para que un usuario con 0 trades no vea una plataforma vacía: entiende qué cargar primero, qué se desbloquea y el progreso hacia Decision Intelligence.
+
+### Propósito
+
+En &lt;60s el trader nuevo sabe:
+
+1. Qué hacer ahora (CTA primario)
+2. Que necesita 10 trades para diagnóstico operativo
+3. Qué se desbloquea (journal, hipótesis, diagnóstico, lectura confiable, cockpit completo)
+4. Progreso visible hacia activación
+
+### API — `buildOnboardingState(input)`
+
+```js
+buildOnboardingState({
+  trades,
+  accounts,            // settings o array
+  checklistEntries,
+  emotionalJournals,
+  riskSettings,        // confirmed/saved → step risk done
+  userProfile,
+  now
+})
+```
+
+Retorna:
+
+| Campo | Significado |
+|-------|-------------|
+| `isFirstRun` | `trades === 0` |
+| `isActivated` | `trades >= 10` |
+| `activationLevel` | `empty` \| `started` \| `building-sample` \| `diagnostic-ready` |
+| `progressPct` | Progreso compuesto (muestra + steps) |
+| `primaryStep` | Siguiente acción (id, title, detail, actionLabel, target) |
+| `steps` | account, first-trade, sample, checklist, emotion, risk |
+| `unlocks` | journal / hypotheses / diagnostic / reliable / cockpit-full |
+| `counts` | trades, accounts, checklistEntries, emotionalCheckins |
+
+Niveles por trades: 0 → empty · 1–4 → started · 5–9 → building-sample · 10+ → diagnostic-ready.
+
+### Dónde se monta
+
+`FirstRunPanel` en `Dashboard()` (`src/main.jsx`):
+
+- **0 trades:** Hero → FirstRun (protagonista) → Cockpit → KPIs…
+- **1–9 trades:** Hero → Cockpit → FirstRun compact → KPIs…
+- **10+ trades:** sin panel protagonista (`shouldShowFirstRunPanel` = false)
+
+Dismiss opcional (`mtc:onboarding:dismissed`) solo si `trades > 0`. Nunca se oculta con 0 trades.
+
+### Relación con la regla del minuto
+
+El panel responde “qué hacer ahora” antes de que existan métricas. El Cockpit (Sprint 07) sigue siendo el estado operativo del día; el onboarding es la rampa hacia muestra usable.
+
+### Empty states tocados
+
+- Journal (0 trades totales): copy de activación + CTA primer trade
+- Analytics: “se activa con 10 trades” + unlocks
+- Emotional: CTA check-in
+- Checklist historial vacío: “Definí tu filtro antes de operar”
+
+### Consumidores posteriores
+
+| Módulo | Uso |
+|--------|-----|
+| Dashboard | FirstRunPanel (este sprint) |
+| Analytics / Journal | Empty states alineados al umbral 10 |
+| Futuro paywall / tips | Pueden leer `activationLevel` sin recalcular |
+
+### Limitaciones
+
+- No Firebase/Auth/Pricing/Checkout, no shell/nav, no Journal save core, no Risk calc, no broker sync, no IA.
+- Persistencia dismiss = localStorage; risk step = key `mtc-risk-settings` presente.
+- CSS en sección `ONBOARDING / FIRST RUN` (no EOF).
