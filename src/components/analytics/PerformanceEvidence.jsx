@@ -180,14 +180,102 @@ function EvidenceFallback({ text }) {
   return <p className="analyticsPerformanceEvidenceFallback">{text}</p>;
 }
 
-export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rDistribution = [], hasSample }) {
+function RBucketStrip({ buckets = [] }) {
+  const total = buckets.reduce((s, b) => s + Number(b.count || 0), 0);
+  if (!total) return <EvidenceFallback text="Sin buckets R en la muestra." />;
+  const dominant = buckets.reduce((best, b) => (!best || Number(b.count) > Number(best.count) ? b : best), null);
+  return (
+    <div className="analyticsEvidenceRBuckets">
+      <p className="analyticsEvidenceSecondaryLead">
+        {dominant ? `Concentración en ${dominant.name} · ${dominant.count}/${total}` : `${total} trades con R`}
+      </p>
+      <div className="analyticsEvidenceRBucketBars" role="img" aria-label="Distribución por buckets de R">
+        {buckets.map((b) => {
+          const pct = total ? Math.round((Number(b.count || 0) / total) * 100) : 0;
+          return (
+            <div key={b.key} className={`analyticsEvidenceRBucket tone-${b.tone || 'neutral'}`}>
+              <span className="analyticsEvidenceRBucketName">{b.name}</span>
+              <div className="analyticsEvidenceRBucketTrack">
+                <i style={{ width: `${Math.max(pct, b.count ? 6 : 0)}%` }} />
+              </div>
+              <b>{b.count}</b>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SessionHeatmapCompact({ heatmap }) {
+  const cells = heatmap?.cells || [];
+  const weekdays = heatmap?.weekdays || [];
+  const sessions = heatmap?.sessions || [];
+  if (!cells.length || !weekdays.length || !sessions.length) {
+    return <EvidenceFallback text="Sin mapa sesión×día todavía." />;
+  }
+  const active = cells.filter((c) => Number(c.count || 0) > 0);
+  if (!active.length) return <EvidenceFallback text="Sin actividad por sesión/día." />;
+  const maxAbs = Math.max(...active.map((c) => Math.abs(Number(c.pnl || 0))), 1);
+  const best = active.reduce((a, b) => (Number(b.pnl) > Number(a.pnl) ? b : a), active[0]);
+  const worst = active.reduce((a, b) => (Number(b.pnl) < Number(a.pnl) ? b : a), active[0]);
+  const cellMap = new Map(cells.map((c) => [`${c.session}|${c.weekday}`, c]));
+
+  return (
+    <div className="analyticsEvidenceHeatmap">
+      <p className="analyticsEvidenceSecondaryLead">
+        Mejor {best.session}/{best.weekday} · peor {worst.session}/{worst.weekday}
+      </p>
+      <div className="analyticsEvidenceHeatmapGrid" style={{ '--hm-cols': weekdays.length }}>
+        <span className="analyticsEvidenceHeatmapCorner" />
+        {weekdays.map((d) => (
+          <span key={d} className="analyticsEvidenceHeatmapColHead">{d.slice(0, 3)}</span>
+        ))}
+        {sessions.map((session) => (
+          <div key={session} className="analyticsEvidenceHeatmapRow">
+            <span className="analyticsEvidenceHeatmapRowHead">{session}</span>
+            {weekdays.map((day) => {
+              const cell = cellMap.get(`${session}|${day}`) || { count: 0, pnl: 0 };
+              const count = Number(cell.count || 0);
+              const pnl = Number(cell.pnl || 0);
+              const intensity = count ? Math.min(1, Math.abs(pnl) / maxAbs) : 0;
+              const tone = !count ? 'empty' : pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : 'flat';
+              return (
+                <span
+                  key={`${session}-${day}`}
+                  className={`analyticsEvidenceHeatCell tone-${tone}`}
+                  style={{ '--hm-intensity': intensity.toFixed(2) }}
+                  title={count ? `${session} · ${day}: ${formatMoneyClean(pnl)} · ${count}t` : `${session} · ${day}: sin trades`}
+                >
+                  {count ? count : '·'}
+                </span>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function PerformanceEvidence({
+  stats,
+  equityCurve: equityCurveProp,
+  dailyPnl = [],
+  patternRows = [],
+  rDistribution = [],
+  rBuckets = [],
+  sessionHeatmap = null,
+  hasSample
+}) {
   const { mobile, narrow } = useAnalyticsViewport();
   const chartAxis = { fill: AURORA_CHART.dim, fontSize: mobile ? 12 : 12, fontWeight: 600 };
   const chartHPrimary = mobile ? 236 : narrow ? 272 : 304;
   const chartHSecondary = mobile ? 204 : narrow ? 216 : 228;
   const yAxisWidth = mobile ? 56 : narrow ? 52 : 48;
   const rAxisWidth = mobile ? 52 : 46;
-  const equityCurve = (stats?.curve || []).map(p => ({
+  const sourceCurve = equityCurveProp?.length ? equityCurveProp : (stats?.curve || []);
+  const equityCurve = sourceCurve.map(p => ({
     name: p.name,
     equity: p.equity,
     time: p.name === 'Inicio' ? null : p.name,
@@ -199,6 +287,8 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
   const hasMultiPattern = patternRows.length >= 2;
   const singlePattern = patternRows.length === 1 ? patternRows[0] : null;
   const hasRChart = rDistribution.length >= 2;
+  const hasRBuckets = rBuckets.some((b) => Number(b.count || 0) > 0);
+  const hasHeatmap = (sessionHeatmap?.cells || []).some((c) => Number(c.count || 0) > 0);
   const avgR = hasRChart
     ? rDistribution.reduce((sum, d) => sum + Number(d.r || 0), 0) / rDistribution.length
     : 0;
@@ -230,6 +320,20 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
   const patternNarrative = topPattern
     ? `${formatSetupLabel(topPattern.name)} · ${formatMoneyClean(topPattern.value)}`
     : 'Sin recurrencia clara';
+  const bucketTotal = rBuckets.reduce((s, b) => s + Number(b.count || 0), 0);
+  const dominantBucket = hasRBuckets
+    ? rBuckets.reduce((best, b) => (!best || Number(b.count) > Number(best.count) ? b : best), null)
+    : null;
+  const bucketNarrative = dominantBucket
+    ? `${dominantBucket.name} concentra ${dominantBucket.count}/${bucketTotal}`
+    : 'Sin buckets';
+  const heatActive = (sessionHeatmap?.cells || []).filter((c) => Number(c.count || 0) > 0);
+  const heatBest = heatActive.length
+    ? heatActive.reduce((a, b) => (Number(b.pnl) > Number(a.pnl) ? b : a), heatActive[0])
+    : null;
+  const heatNarrative = heatBest
+    ? `${heatBest.session} · ${heatBest.weekday} lidera`
+    : 'Sin mapa aún';
 
   if (!hasSample) return null;
 
@@ -237,7 +341,7 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
     <section className="analyticsPerformanceEvidence analyticsTier4 analyticsPerformanceEvidenceNarrative">
       <header className="analyticsPerformanceEvidenceHead">
         <h3>Evidencia de rendimiento</h3>
-        <p>Respaldá el diagnóstico con curva, jornadas, R y patrones.</p>
+        <p>Apoyo al diagnóstico: curva, jornadas, R, patrones y lectura secundaria.</p>
       </header>
 
       <div className="analyticsPerformanceEvidenceGrid">
@@ -389,6 +493,31 @@ export function PerformanceEvidence({ stats, dailyPnl = [], patternRows = [], rD
             <EvidenceFallback text="Aún no hay patrones suficientes para auditar recurrencia." />
           )}
         </EvidencePanel>
+
+        {(hasRBuckets || hasHeatmap) && (
+          <div className="analyticsEvidenceSecondaryRow">
+            {hasRBuckets && (
+              <EvidencePanel
+                title="Buckets R"
+                narrative={bucketNarrative}
+                size="compact"
+                className="rBuckets"
+              >
+                <RBucketStrip buckets={rBuckets} />
+              </EvidencePanel>
+            )}
+            {hasHeatmap && (
+              <EvidencePanel
+                title="Sesión × día"
+                narrative={heatNarrative}
+                size="compact"
+                className="sessionHeat"
+              >
+                <SessionHeatmapCompact heatmap={sessionHeatmap} />
+              </EvidencePanel>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -846,3 +846,203 @@ Aliases defensivos en payload: `planFollowed`, `stopLoss`/`takeProfit`, `rMultip
 - Trades legacy sin `followedPlanLabel` / `checklistComplete` siguen válidos; UI deriva de boolean.
 - Deep-link First-run depende de que Journal monte el listener; flag `mtc-open-new-trade` cubre race de tab switch.
 - Revisión avanzada ICC sigue en `<details>` — no es parte del path &lt;45s.
+
+---
+
+## Sprint 13 — Tags UI + Aurora Legacy Polish
+
+Clasificación operativa de trades vía tags + polish visual acotado a chips/form/journal/detail (sin rediseño global).
+
+### Propósito
+
+Los tags ayudan a responder en &lt;1 min: qué setups repito, qué errores aparecen, qué contextos afectan el edge, qué conducta aparece en pérdidas. No son decorativos.
+
+### Modelo de tags
+
+Fuente: `src/lib/tradeTags.js`
+
+| Grupo | id | Ejemplos |
+|-------|-----|----------|
+| Setup | `setup` | FVG, OB, Sweep, Breakout, Reversal, Continuation, Liquidity Grab, News, Manual |
+| Conducta | `behavior` | FOMO, Revenge, Overtrade, Early/Late Entry, Moved SL, Closed Early, No Plan, Hesitation |
+| Contexto | `context` | NY, London, Asia, Post News, High Impact, Range Day, Trend Day |
+| Calidad | `quality` | A+, A, B, C, Validated, Experimental |
+
+Helpers: `normalizeTradeTags`, `mergeTradeTags`, `getTagsByGroup`, `getTagMeta`, `getTradeTags`, `buildTagGroupsPayload`, `buildJournalTagFilterOptions`, `tradeHasTag`.
+
+### Dónde se guardan
+
+- Campo principal: `trade.tags: string[]` (ids limpios).
+- Denormalizado opcional: `trade.tagGroups: { setup, behavior, context, quality }` (arrays de ids).
+- Complementa — **no reemplaza** — `setup`, `mistakeType`, `session`, `quality`, `executionQuality`.
+- Opcional: crear/editar sin tags no rompe; trades viejos sin tags abren OK.
+- Export JSON/CSV ya incluía `tags` (`importExportUtils`); se preserva.
+- Import CSV no requiere tags.
+
+### Form / Journal / Detail
+
+| Superficie | Comportamiento |
+|------------|----------------|
+| Trade Form Step 2 (Setup) | `TradeTagsPicker` — chips multi-select por grupo |
+| Edit trade | Precarga `tags` vía `normalizeTradeArrayFields` |
+| Journal | `JournalTagFilters` — chips presentes (+ recomendados si sparse); combina con search + checklist filter + día |
+| Journal row | Hasta 4 chips de tag |
+| Trade Detail | Bloque “Clasificación / Tags del trade” |
+
+### Analytics futuro (prep only)
+
+- `getTradeTags(trade)` listo para Edge Lab / directivas.
+- `tagGroups` en payload para agregaciones futuras.
+- **No** se reescribe Analytics Intelligence en este sprint.
+
+### Polish Aurora aplicado (targeted)
+
+- Chips activos del trade form: cyan→violet (no gold).
+- `.tradeGuide` / `.resultInput` / `.fileName` scoped al form: Aurora.
+- Detail chips / journal tag chips: violet/cyan/magenta por grupo.
+- Dorado legacy agresivo en estas superficies reducido; gold queda brand/logo.
+
+### Límites
+
+- No gating / pricing / checkout / PayPal / SW / Risk Firestore / OperationalState / Emotion rules.
+- No shell/nav/mobile command sheet / bottom dock.
+- No Analytics engines profundos.
+- No refactor CSS global ni bloque EOF.
+
+### Archivos
+
+- `src/lib/tradeTags.js` — modelo + helpers
+- `src/components/trade/TradeTagsPicker.jsx` — picker + display
+- `src/components/trade/TradeForm.jsx` / `tradePayload.js` / `TradeDetailModal.jsx`
+- `src/components/journal/JournalTagFilters.jsx` / `JournalActions.jsx` / `JournalTradeRow.jsx`
+- `src/main.jsx` — emptyForm `tags:[]` + filtro Journal
+- `src/styles.css` — secciones `TAGS / CLASSIFICATION CHIPS` + `AURORA LEGACY POLISH — TARGETED`
+
+### Riesgos restantes
+
+- Filtro de tags opera sobre el día seleccionado (como search); no es un “all-time tag browser”.
+- Trades con tags custom legacy (strings libres) se normalizan a slug; labels desconocidos se muestran como id.
+- Quick-path Checklist no muestra picker de tags (path corto); se pueden agregar al editar.
+
+---
+
+## Sprint 14A — Landing Repositioning
+
+Reposicionamiento comercial de la landing pública hacia **Decision Intelligence para traders discrecionales**. Sin tocar checkout, PayPal, Auth, Firestore rules, SW, Risk rules, OperationalState, EmotionIntelligence, pipelines de save, shell/mobile ni gating fino Club/Pro.
+
+### Nuevo posicionamiento
+
+> MTC Analytics es Decision Intelligence para traders discrecionales.
+
+Frase estratégica:
+
+> No necesitás otro dashboard lleno de números. Necesitás saber qué repetir, qué cortar y qué corregir antes de volver a tomar riesgo.
+
+Abandona “registrá trades y mirá métricas”. Sostiene: qué edge funciona, qué fuga drena, qué conducta afecta, qué acción operativa tomar, y por qué Pro es un salto de categoría.
+
+### Estructura de landing
+
+1. Hero — Decision Intelligence  
+2. Diagnóstico en un minuto (edge / fuga / acción / estado)  
+3. Cockpit operativo (demo cards Aurora)  
+4. Edge / Fuga / Directiva  
+5. Journal + Checklist + Tags  
+6. Emotion Intelligence  
+7. Risk Lab  
+8. Club vs Pro vs Mentoría  
+9. Disponible / Próximamente  
+10. CTA final  
+
+Fuente UI: `PublicLanding` en `src/main.jsx`. Copy de planes: `src/lib/commercialConfig.js`. Estilos: sección `LANDING — DECISION INTELLIGENCE` en `src/styles.css`.
+
+### Club vs Pro messaging
+
+| Plan | Headline | Rol |
+|------|----------|-----|
+| **Club** | Ordená tu operativa. | Rutina: journal, checklist, calendario P/L, dashboard, riesgo básico |
+| **Pro** | Interpretá tu operativa. | Decision Intelligence: Analytics, Edge Lab, directivas, Emotion Intelligence, Cockpit avanzado |
+| **Mentoría** | Acompañamiento humano. | Pro + revisión 1:1, seguimiento, feedback |
+
+Frase: **Club te ayuda a construir evidencia. Pro te ayuda a interpretarla.**
+
+### Disponible vs Próximamente
+
+**Disponible:** Journal, Checklist, Calendario P/L, Risk Lab, Dashboard/Cockpit, Emotion Intelligence, Tags, Export CSV/JSON.
+
+**Próximamente (no vender como activo):** BrokerSync / MT5 Sync, AI Review, Reportes PDF.
+
+### Gating
+
+- **No implementado en este sprint.**  
+- Sigue `GATING_TRUTH.commercialComparisonOnly = true`.  
+- Nota en landing: planes = comparativa comercial; acceso real = membresía aprobada.
+
+### Demo cards
+
+Reemplazadas demos/video legacy por mock Aurora representativos (estado Precaución, edge FVG NY, fuga Early Entry, acción semanal, señal emocional, riesgo 1/3). Sin claims de IA, MT5 sync ni predicción.
+
+### Pendientes Sprint 14B
+
+- ~~Paywall / Upgrade Experience + Club vs Pro clarity~~ → **hecho en Sprint 14B**
+- Screenshots reales del producto (si se prioriza)
+- Enforcement funcional de `PLAN_CAPABILITIES` (si se decide)
+- Unificación PayPal orders vs subscriptions (deuda Sprint 10)
+- Alinear `defaultPlanFeatures` server (Club `analytics:true`) con marketing
+- Posible extracción de `PublicLanding` / `AccessGate` a componentes dedicados
+
+---
+
+## Sprint 14B — Paywall / Upgrade Experience
+
+Fecha: 2026-07-10  
+Alcance: paywall AccessGate, copy Club/Pro/Mentoría, comparativa corta, `PLAN_CAPABILITIES` preparado, CSS Aurora scoped, docs. **Sin** checkout / PayPal / Auth / rules / SW / pipelines / shell.
+
+### Posicionamiento
+
+> Club registra y ordena. Pro interpreta y decide. Mentoría acompaña y corrige.
+
+Header paywall:
+
+> Elegí tu nivel de inteligencia operativa.
+
+Subtitle:
+
+> Club te ayuda a construir evidencia. Pro convierte esa evidencia en decisiones.
+
+### Club vs Pro vs Mentoría
+
+| Plan | Headline | Best for | CTA |
+|------|----------|----------|-----|
+| **Club** | Ordená tu operativa. | Registrar, validar y ordenar el proceso diario | Empezar con Club |
+| **Pro** | Interpretá tu operativa. | Convertir datos en decisiones (edge, fuga, directivas) | Desbloquear Pro |
+| **Mentoría** | Acompañamiento humano. | Pro + revisión 1:1, seguimiento, feedback | Hablar por WhatsApp |
+
+### PLAN_CAPABILITIES
+
+Definido en `src/lib/commercialConfig.js` (club / pro / mentorship).  
+**No enforced** en UI en este sprint. Contrato preparado para gating fino posterior.
+
+### Commercial Truth
+
+**Disponible:** Journal, Checklist, Calendario P/L, Risk Lab, Dashboard/Cockpit, Emotion Intelligence (captura Club / insights Pro), Tags, Export CSV/JSON.
+
+**Próximamente (badge):** BrokerSync/MT5, AI Review, Reportes PDF.
+
+### Qué cambió en UX
+
+- AccessGate hero + plan cards alineados a Decision Intelligence (no “Founding Members”).
+- Comparativa corta (6 filas) Club / Pro / Mentoría.
+- Badges Disponible / Próximamente desde `FEATURE_STATUS_LABEL`.
+- `UPGRADE_SURFACE_COPY` listo para superficies Pro (analytics / emotion / risk).
+- CSS sección `PAYWALL — UPGRADE EXPERIENCE` (Aurora glass, Pro destacado cyan/violet).
+
+### Qué NO se tocó de checkout
+
+- `startCheckout` payload / endpoints / PayPal provider
+- Plan IDs runtime (`basic` / `premium` / mentorship WhatsApp)
+- `functions/`, `server/`, env PayPal, Service Worker
+
+### Gating enforcement pendiente
+
+- Sigue `GATING_TRUTH.commercialComparisonOnly = true`
+- `capabilitiesPrepared: true` — enforcement funcional = sprint posterior

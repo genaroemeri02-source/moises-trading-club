@@ -77,3 +77,76 @@ mentorship ↔ mentorship
 - Eliminado “límites visibles” (se leía como membresía limitada).
 - AI / BrokerSync / PDF en Pro = **próximamente**, no activos.
 - Fuente: `src/lib/commercialConfig.js` (`COMMERCIAL_PLANS` + feature rows).
+
+---
+
+## Sprint 14A — Landing Repositioning
+
+Fecha: 2026-07-10  
+Alcance: landing pública, hero, secciones de producto, demo cards, copy Club/Pro/Mentoría, CSS scoped. **Sin** checkout / PayPal / Auth / rules / SW / gating fino.
+
+### Veredicto
+
+La landing ya **no** vende demos viejas ni journal genérico. Comunica Decision Intelligence: edge, fuga, directiva, estado operativo y cockpit.
+
+### Commercial truth en landing
+
+| Item | Estado en landing |
+|------|-------------------|
+| AI Review | Badge **Próximamente** (+ fila Pro) |
+| BrokerSync / MT5 Sync | Badge **Próximamente** (+ fila Pro) |
+| Reportes PDF | Badge **Próximamente** (+ fila Pro) |
+| “límites visibles” | No usado; Risk Lab habla de límites **configurables** / control de exposición |
+| Club | Ordená tu operativa |
+| Pro | Interpretá tu operativa |
+| Mentoría | Acompañamiento humano |
+
+### Copy estratégico actualizado
+
+> Club te ayuda a construir evidencia. Pro te ayuda a interpretarla.
+
+### Qué no cambió
+
+- Precios 14.99 / 24.99 / 250  
+- Mapping club↔basic / pro↔premium  
+- Gating binario AccessGate (sin gate Club/Pro en UI)  
+- Feature rows coming-soon para AI / BrokerSync / PDF
+
+---
+
+## Sprint 14B — Paywall / Upgrade Experience
+
+Fecha: 2026-07-10  
+Alcance: AccessGate paywall UX/copy, `PLAN_CAPABILITIES`, comparativa, badges, CSS Aurora. **Checkout runtime intacto.**
+
+### Veredicto
+
+El paywall ya no vende “Founding Members” ni features genéricas. Comunica niveles de inteligencia operativa: Club (evidencia), Pro (decisiones), Mentoría (humano).
+
+### Commercial truth en paywall
+
+| Item | Estado |
+|------|--------|
+| AI Review | Badge **Próximamente** |
+| BrokerSync / MT5 | Badge **Próximamente** |
+| Reportes PDF | Badge **Próximamente** |
+| Club / Pro | Diferenciados (registra vs interpreta) |
+| Mentoría | WhatsApp / contacto (no PayPal) |
+| Checkout | Intact: `basic`/`premium` + WhatsApp mentorship |
+
+### PLAN_CAPABILITIES
+
+Preparado en `commercialConfig.js`. Enforcement funcional **no** activado.
+
+### Copy estratégico
+
+> Club registra y ordena. Pro interpreta y decide.
+
+> Club te ayuda a construir evidencia. Pro convierte esa evidencia en decisiones.
+
+### Qué no cambió
+
+- PayPal provider / create order / capture  
+- Plan IDs de checkout  
+- Auth, Firestore rules, SW  
+- Gating binario (approved vs paywall)

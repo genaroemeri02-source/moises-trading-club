@@ -13,8 +13,9 @@ export function DashboardRiskSnapshot({ operationalState, emotionIntelligence })
   const maxTrades = Number(inputs.maxTradesPerDay || 0) || '—';
   const dailyR = Number(inputs.dailyR || 0);
   const weeklyR = Number(inputs.weeklyR || 0);
+  const currentSignals = emotionIntelligence?.operationalSignals;
   const emotionalRisk = inputs.emotionalRisk
-    || emotionIntelligence?.operationalSignals?.emotionalRisk
+    || (currentSignals?.isCurrent ? currentSignals.emotionalRisk : null)
     || 'unknown';
   const emotionalLabel = {
     low: 'Bajo',
@@ -22,6 +23,9 @@ export function DashboardRiskSnapshot({ operationalState, emotionIntelligence })
     high: 'Alto',
     unknown: 'Sin datos'
   }[emotionalRisk] || 'Sin datos';
+  const emotionalSub = currentSignals?.isCurrent
+    ? 'Señal de la jornada'
+    : 'Sin check-in de hoy';
 
   const cells = [
     {
@@ -54,7 +58,7 @@ export function DashboardRiskSnapshot({ operationalState, emotionIntelligence })
     {
       label: 'Riesgo emocional',
       value: emotionalLabel,
-      sub: emotionalRisk === 'unknown' ? 'Sin check-ins suficientes' : 'Señal operativa',
+      sub: emotionalSub,
       tone: emotionalRisk === 'high' ? 'neg' : emotionalRisk === 'medium' ? 'warn' : emotionalRisk === 'low' ? 'pos' : ''
     }
   ];

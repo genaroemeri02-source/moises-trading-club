@@ -1,5 +1,6 @@
 import { Plus, Search } from 'lucide-react';
 import { Card } from '../ui/Card.jsx';
+import { JournalTagFilters } from './JournalTagFilters.jsx';
 
 const CHECKLIST_FILTER_OPTIONS = [
   'Todos',
@@ -18,6 +19,9 @@ export function JournalActions({
   onChecklistFilterChange,
   search,
   onSearchChange,
+  tagFilterTrades = [],
+  selectedTag = '',
+  onTagFilterChange,
 }) {
   return (
     <Card title="Acciones rápidas" className="journalOpsCard" sub="Cuenta activa, filtros y búsqueda">
@@ -34,12 +38,17 @@ export function JournalActions({
         <div className="search journalSearch">
           <Search size={16} />
           <input
-            placeholder="Buscar por activo, setup, patrón o nota"
+            placeholder="Buscar por activo, setup, patrón, tag o nota"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
       </div>
+      <JournalTagFilters
+        trades={tagFilterTrades}
+        selectedTag={selectedTag}
+        onSelectTag={onTagFilterChange}
+      />
     </Card>
   );
 }

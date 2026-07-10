@@ -92,7 +92,7 @@ export function AnalyticsPage({ data }) {
           dateFrom={filters.dateFrom}
           dateTo={filters.dateTo}
           sample={sample}
-          subtitle="Decision Intelligence · diagnóstico operativo"
+          subtitle="Diagnóstico operativo"
         />
         <AnalyticsFilters {...filters} tradeCount={0} />
         <AnalyticsEmptyState onGoJournal={goJournal} count={0} sample={sample} />
@@ -108,7 +108,7 @@ export function AnalyticsPage({ data }) {
         dateFrom={filters.dateFrom}
         dateTo={filters.dateTo}
         sample={sample}
-        subtitle="Decision Intelligence · diagnóstico operativo"
+        subtitle="Diagnóstico operativo"
       />
       <AnalyticsFilters {...filters} tradeCount={tradeCount} />
 
@@ -158,9 +158,12 @@ export function AnalyticsPage({ data }) {
             <div className="analyticsTier4 analyticsZone analyticsZone--evidence">
               <PerformanceEvidence
                 stats={stats}
+                equityCurve={evidence.equityCurve}
                 dailyPnl={evidence.dailyPnl}
                 patternRows={evidence.patternRows}
                 rDistribution={evidence.rDistribution}
+                rBuckets={evidence.rBuckets}
+                sessionHeatmap={evidence.sessionHeatmap}
                 hasSample={hasSample}
               />
             </div>

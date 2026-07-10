@@ -1,12 +1,14 @@
 import { Download, Share2, Trash2 } from 'lucide-react';
 import { money, pct } from '../../lib/formatUtils.js';
 import { accountName, normalizeTradeSetup, safeArray } from '../../lib/tradeUtils.js';
+import { getTradeTags, getTagMeta } from '../../lib/tradeTags.js';
 
 export function JournalTradeRow({ trade, onOpen, onDelete, onExport, onShare }) {
   const value = Number(trade.resultMoney || 0);
   const pctVal = Number(trade.resultPct || 0);
   const rVal = Number(trade.resultR || 0);
   const confluencesUsed = safeArray(trade.confluencesUsed);
+  const tags = getTradeTags(trade).slice(0, 4);
   return (
     <div
       className="trade tradePro clickableTrade journalTradeRow"
@@ -21,6 +23,14 @@ export function JournalTradeRow({ trade, onOpen, onDelete, onExport, onShare }) 
           <div className="journalTradeTags">
             <span className={trade.side === 'BUY' ? 'buy' : 'sell'}>{trade.side}</span>
             <span className="quality">{trade.quality}</span>
+            {tags.map((id) => {
+              const meta = getTagMeta(id);
+              return (
+                <span key={id} className={`journalRowTag journalRowTag--${meta?.group || 'custom'}`}>
+                  {meta?.label || id}
+                </span>
+              );
+            })}
           </div>
         </div>
         <p className="journalTradeMeta">

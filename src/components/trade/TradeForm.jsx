@@ -34,6 +34,8 @@ import {
   resolveChecklistCompleteFields,
   resolveChecklistQualityFields
 } from './tradeFormSteps.js';
+import { TradeTagsPicker } from './TradeTagsPicker.jsx';
+import { normalizeTradeTags } from '../../lib/tradeTags.js';
 
 function ynSelectValue(form, key, trueLabel = 'Sí', falseLabel = 'No') {
   if (form[`${key}Label`]) return form[`${key}Label`];
@@ -52,6 +54,7 @@ export function TradeForm({ form, setForm, profile, data, db, uploadFile, uid, t
   const formChecklist = safeArray(form.checklist);
   const formConfluences = safeArray(form.confluencesUsed);
   const formExecutionBehaviors = safeArray(form.executionBehaviors);
+  const formTags = normalizeTradeTags(form.tags);
   const ch = createTradeFormChangeHandler(setForm);
   const toggle = (x) => ch('checklist', formChecklist.includes(x) ? formChecklist.filter(a => a !== x) : [...formChecklist, x]);
   const toggleConfluence = (x) => ch('confluencesUsed', formConfluences.includes(x) ? formConfluences.filter(a => a !== x) : [...formConfluences, x]);
@@ -380,6 +383,12 @@ export function TradeForm({ form, setForm, profile, data, db, uploadFile, uid, t
                 </select>
               </Field>
             </div>
+            <TradeTagsPicker
+              value={formTags}
+              onChange={(next) => ch('tags', next)}
+              title="Tags rápidos"
+              hint="Opcional. Los tags ayudan a detectar patrones, errores y contextos."
+            />
             {!String(form.setup || '').trim() && (
               <p className="tradeFormWarning">Sin setup, Analytics lo agrupará como &apos;Sin setup&apos;.</p>
             )}
@@ -511,6 +520,7 @@ export function TradeForm({ form, setForm, profile, data, db, uploadFile, uid, t
                 <li><span>Sesión / lado</span><strong>{summary.session} · {summary.side}</strong></li>
                 <li><span>Plan</span><strong>{summary.followedPlan}</strong></li>
                 <li><span>Emoción</span><strong>{summary.emotionBefore} → {summary.emotionAfter}</strong></li>
+                <li><span>Tags</span><strong>{formTags.length ? formTags.join(', ') : '—'}</strong></li>
               </ul>
             </div>
             {softWarnings.map(w => (

@@ -28,21 +28,37 @@ export function normalizeDateKey(value) {
     return new Date(n > 9999999999 ? n : n * 1000).toISOString().slice(0, 10);
   }
   const raw = String(value).trim();
-  let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  // Strip trailing time: "2026-07-09 14:30" / "09/07/2026 14:30:00"
+  const datePart = raw.split(/[T\s]/)[0] || raw;
+  let m = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m) {
-    const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+    const mo = Number(m[2]), d = Number(m[3]);
     if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
     return `${m[1]}-${m[2]}-${m[3]}`;
   }
-  m = raw.match(/^(\d{2})[-/](\d{2})$/);
+  // DD/MM/YYYY or DD-MM-YYYY (app locale es-AR — prefer day-first)
+  m = datePart.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (m) {
+    const d = Number(m[1]), mo = Number(m[2]), y = Number(m[3]);
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  }
+  m = datePart.match(/^(\d{2})[-/](\d{2})$/);
   if (m) {
     const year = String(monthKey()).slice(0, 4);
     const mo = Number(m[1]), d = Number(m[2]);
     if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
     return `${year}-${m[1]}-${m[2]}`;
   }
-  const parsed = Date.parse(raw);
-  return Number.isFinite(parsed) ? new Date(parsed).toISOString().slice(0, 10) : null;
+  // Avoid Date.parse on bare DD/MM — it shifts timezone/day. Only ISO-like leftovers.
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+    const parsed = Date.parse(raw);
+    if (Number.isFinite(parsed)) {
+      // Noon UTC slice keeps calendar day stable for ISO dates with time.
+      return new Date(parsed).toISOString().slice(0, 10);
+    }
+  }
+  return null;
 }
 
 export function getTradeOperationalDateKey(trade = {}) {

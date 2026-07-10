@@ -11,7 +11,7 @@ export function AnalyticsHeader({
   dateFrom = '',
   dateTo = '',
   sample: sampleProp = null,
-  subtitle = 'Decision Intelligence · diagnóstico operativo'
+  subtitle = 'Diagnóstico operativo'
 }) {
   const sample = sampleProp
     ? {

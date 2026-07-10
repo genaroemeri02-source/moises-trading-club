@@ -1,6 +1,8 @@
 /**
  * Sprint 09 — Commercial Truth
  * Sprint 10 — SW + Payment Runtime Integrity
+ * Sprint 14A — Landing Repositioning (Decision Intelligence copy)
+ * Sprint 14B — Paywall / Upgrade Experience (Club vs Pro clarity)
  * Single source of truth for plans, prices, and feature availability.
  *
  * Plan id model:
@@ -9,9 +11,16 @@
  * - Brand aliases accepted at edges: club ↔ basic, pro ↔ premium
  * - Mentorship is WhatsApp-only (no PayPal checkout)
  *
- * Gating truth (Sprint 09/10):
+ * Positioning (Sprint 14A/14B):
+ * - Club = registra y ordena (captura / rutina)
+ * - Pro = interpreta y decide (Decision Intelligence)
+ * - Mentoría = acompaña y corrige (Pro + humano)
+ * - Strategic line: "Club te ayuda a construir evidencia. Pro convierte esa evidencia en decisiones."
+ *
+ * Gating truth (Sprint 09/10/14B):
  * - Real gate: approved/paid vs AccessGate (binary)
  * - Club vs Pro feature gating is NOT enforced in the frontend
+ * - PLAN_CAPABILITIES is prepared for fine gating; enforcement is a later sprint
  * - Plan matrices below are commercial comparison + honesty labels
  */
 
@@ -152,16 +161,23 @@ export const COMMERCIAL_FEATURES = [
     plans: ['premium', 'mentorship'],
   },
   {
-    id: 'emotional-journal',
-    label: 'Journal emocional',
-    description: 'Check-ins y lectura de estado emocional.',
+    id: 'tags',
+    label: 'Tags y clasificación de trades',
+    description: 'Clasificación por setup, conducta, contexto y calidad.',
     status: FEATURE_STATUS.AVAILABLE,
-    plans: ['premium', 'mentorship'],
+    plans: ['basic', 'premium', 'mentorship'],
+  },
+  {
+    id: 'emotional-journal',
+    label: 'Registro emocional',
+    description: 'Check-ins emocionales en el journal (Club captura; Pro analiza).',
+    status: FEATURE_STATUS.AVAILABLE,
+    plans: ['basic', 'premium', 'mentorship'],
   },
   {
     id: 'emotion-intelligence',
-    label: 'Señales de conducta',
-    description: 'Señales de conducta y estado emocional en el cockpit.',
+    label: 'Emotion Intelligence',
+    description: 'Análisis de conducta y estado emocional conectado a performance.',
     status: FEATURE_STATUS.AVAILABLE,
     plans: ['premium', 'mentorship'],
   },
@@ -177,12 +193,12 @@ export const COMMERCIAL_FEATURES = [
     label: 'Export JSON / CSV',
     description: 'Exportación manual de trades.',
     status: FEATURE_STATUS.AVAILABLE,
-    plans: ['premium', 'mentorship'],
+    plans: ['basic', 'premium', 'mentorship'],
   },
   {
     id: 'broker-sync',
     label: 'BrokerSync / MT5',
-    description: 'Sincronización automática con broker. Hoy: importación manual; sync automático próximamente.',
+    description: 'Sync automático con broker en roadmap. Hoy: importación manual.',
     status: FEATURE_STATUS.COMING_SOON,
     plans: ['premium', 'mentorship'],
   },
@@ -196,7 +212,7 @@ export const COMMERCIAL_FEATURES = [
   {
     id: 'pdf-reports',
     label: 'Reportes PDF',
-    description: 'Exportación de reportes en PDF.',
+    description: 'Exportación de reportes en PDF. En roadmap.',
     status: FEATURE_STATUS.COMING_SOON,
     plans: ['premium', 'mentorship'],
   },
@@ -209,36 +225,114 @@ export const COMMERCIAL_FEATURES = [
   },
 ];
 
+/**
+ * Prepared capability map for fine gating (Sprint 14B).
+ * NOT enforced in UI yet — commercial truth + future enforcement contract.
+ * Brand keys: club | pro | mentorship (map to basic | premium | mentorship at checkout).
+ */
+export const PLAN_CAPABILITIES = {
+  club: {
+    journal: 'full',
+    checklist: 'full',
+    calendar: 'full',
+    risk: 'basic',
+    dashboard: 'basic',
+    analytics: 'limited',
+    emotion: 'capture',
+    edgeLab: false,
+    directives: false,
+    exports: 'basic',
+  },
+  pro: {
+    journal: 'full',
+    checklist: 'full',
+    calendar: 'full',
+    risk: 'advanced',
+    dashboard: 'advanced',
+    analytics: 'full',
+    emotion: 'insights',
+    edgeLab: true,
+    directives: true,
+    exports: 'advanced',
+  },
+  mentorship: {
+    inherits: 'pro',
+    humanReview: true,
+    coaching: true,
+  },
+};
+
+/** Short paywall comparison (max 6 rows). Values are display strings. */
+export const PLAN_COMPARISON_ROWS = [
+  { id: 'trades', label: 'Registro de trades', club: '✓', pro: '✓', mentorship: '✓' },
+  { id: 'checklist-calendar', label: 'Checklist + calendario', club: '✓', pro: '✓', mentorship: '✓' },
+  { id: 'risk', label: 'Risk Lab', club: 'Básico', pro: 'Avanzado', mentorship: 'Avanzado' },
+  { id: 'analytics', label: 'Analytics / Edge Lab', club: 'Vista básica', pro: '✓', mentorship: '✓' },
+  { id: 'emotion', label: 'Emotion Intelligence', club: 'Registro', pro: 'Análisis', mentorship: 'Análisis + feedback' },
+  { id: 'human', label: 'Acompañamiento humano', club: '—', pro: '—', mentorship: '✓' },
+];
+
+/**
+ * Upgrade / AccessGate surface copy (value-first, no cold "upgrade required").
+ * Prepared for fine gating; AccessGate paywall uses the shared intelligence framing.
+ */
+export const UPGRADE_SURFACE_COPY = {
+  analytics: {
+    title: 'Desbloqueá interpretación operativa.',
+    body: 'Pro analiza tu historial para mostrar edge, fuga principal y directivas de mejora. Club registra la evidencia; Pro la convierte en decisión.',
+    cta: 'Desbloquear Pro',
+  },
+  emotion: {
+    title: 'Convertí conducta en datos.',
+    body: 'Registrá emociones en Club. Con Pro, conectá ansiedad, FOMO, claridad y post-loss behavior con tu performance.',
+    cta: 'Desbloquear Pro',
+  },
+  risk: {
+    title: 'Controlá exposición con más precisión.',
+    body: 'Pro combina riesgo, conducta y estado operativo para ayudarte a decidir cuándo reducir, pausar o bloquear riesgo.',
+    cta: 'Desbloquear Pro',
+  },
+  default: {
+    title: 'Elegí tu nivel de inteligencia operativa.',
+    body: 'Club te ayuda a construir evidencia. Pro convierte esa evidencia en decisiones.',
+    cta: 'Desbloquear Pro',
+  },
+};
+
 /** Plan feature rows for landing / paywall (honest labels + status).
- * Club = captura/control. Pro = Decision Intelligence.
- * Strategic line: "Club registra y ordena. Pro interpreta y decide."
+ * Club = Ordená tu operativa. Pro = Interpretá tu operativa.
+ * Strategic line: "Club te ayuda a construir evidencia. Pro convierte esa evidencia en decisiones."
  */
 const CLUB_FEATURE_ROWS = [
   { id: 'journal', label: 'Journal manual', status: FEATURE_STATUS.AVAILABLE },
   { id: 'checklist', label: 'Checklist operativo', status: FEATURE_STATUS.AVAILABLE },
   { id: 'calendar-pl', label: 'Calendario P/L', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'risk-basic', label: 'Gestión básica de riesgo', status: FEATURE_STATUS.AVAILABLE },
   { id: 'dashboard', label: 'Dashboard operativo', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'export-basic', label: 'Export básico (CSV)', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'risk-basic', label: 'Gestión básica de riesgo', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'tags', label: 'Tags y clasificación de trades', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'export-basic', label: 'Export CSV / JSON', status: FEATURE_STATUS.AVAILABLE },
 ];
 
 const PRO_FEATURE_ROWS = [
   { id: 'club-included', label: 'Todo Club', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'analytics', label: 'Analytics y diagnóstico operativo', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'edge-lab', label: 'Edge Lab y directivas operativas', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'emotional-journal', label: 'Journal emocional y señales de conducta', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'analytics', label: 'Analytics avanzado', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'edge-lab', label: 'Edge Lab y diagnóstico de fuga', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'directives', label: 'Directivas operativas', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'emotion-intelligence', label: 'Emotion Intelligence', status: FEATURE_STATUS.AVAILABLE },
   { id: 'cockpit-advanced', label: 'Cockpit avanzado', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'behavior-reading', label: 'Lectura de conducta y errores', status: FEATURE_STATUS.AVAILABLE },
   { id: 'pdf-reports', label: 'Reportes PDF', status: FEATURE_STATUS.COMING_SOON },
   { id: 'ai-review', label: 'AI Review', status: FEATURE_STATUS.COMING_SOON },
-  { id: 'broker-sync', label: 'BrokerSync', status: FEATURE_STATUS.COMING_SOON },
+  { id: 'broker-sync', label: 'BrokerSync / MT5', status: FEATURE_STATUS.COMING_SOON },
 ];
 
 const MENTORSHIP_FEATURE_ROWS = [
   { id: 'pro-included', label: 'Todo Pro', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'mentorship-review', label: 'Revisión personalizada 1 a 1', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'mentorship-followup', label: 'Acompañamiento y seguimiento', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'mentorship-feedback', label: 'Feedback sobre proceso', status: FEATURE_STATUS.AVAILABLE },
-  { id: 'limited-seats', label: 'Cupos limitados', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'mentorship-review', label: 'Revisión 1:1', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'mentorship-followup', label: 'Seguimiento personalizado', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'mentorship-feedback', label: 'Feedback operativo', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'mentorship-community', label: 'Comunidad / WhatsApp', status: FEATURE_STATUS.AVAILABLE },
+  { id: 'mentorship-roadmap', label: 'Roadmap de mejora', status: FEATURE_STATUS.AVAILABLE },
 ];
 
 export const COMMERCIAL_PLANS = [
@@ -248,12 +342,13 @@ export const COMMERCIAL_PLANS = [
     name: 'Club',
     priceMonthly: 14.99,
     currency: 'USD',
-    kicker: 'Founding Access',
-    badge: 'Founding Access',
-    subtitle: 'Journal, checklist y riesgo para construir tu rutina diaria.',
-    headline: 'Journal, checklist y riesgo para construir tu rutina diaria.',
-    valueNote: 'Para quien empieza a ordenar su operativa: registro manual, validación pre-trade, calendario P/L y control básico de riesgo.',
-    cta: 'Activar Club',
+    kicker: 'Registra y ordena',
+    badge: 'Club',
+    subtitle: 'Ordená tu operativa.',
+    headline: 'Ordená tu operativa.',
+    bestFor: 'Para traders que necesitan registrar, validar y ordenar su proceso diario.',
+    valueNote: 'Journal, checklist, calendario P/L y control de riesgo para construir una rutina consistente.',
+    cta: 'Empezar con Club',
     recommended: false,
     tone: 'base',
     available: true,
@@ -266,12 +361,13 @@ export const COMMERCIAL_PLANS = [
     name: 'Pro',
     priceMonthly: 24.99,
     currency: 'USD',
-    kicker: 'Más elegido',
+    kicker: 'Interpreta y decide',
     badge: 'Más elegido',
-    subtitle: 'Diagnóstico de edge, fugas y conducta sobre tu historial.',
-    headline: 'Diagnóstico de edge, fugas y conducta sobre tu historial.',
-    valueNote: 'Decision Intelligence: edge, fuga principal, directivas semanales y lectura emocional conectada a tu historial.',
-    cta: 'Activar Pro',
+    subtitle: 'Interpretá tu operativa.',
+    headline: 'Interpretá tu operativa.',
+    bestFor: 'Para traders que ya registran su operativa y quieren convertir datos en decisiones.',
+    valueNote: 'Decision Intelligence para detectar edge, fuga principal, conducta y directivas operativas.',
+    cta: 'Desbloquear Pro',
     recommended: true,
     tone: 'pro',
     available: true,
@@ -284,12 +380,13 @@ export const COMMERCIAL_PLANS = [
     name: 'Mentoría',
     priceMonthly: 250,
     currency: 'USD',
-    kicker: '1 a 1',
+    kicker: 'Acompaña y corrige',
     badge: '1 a 1',
-    subtitle: 'Revisión 1 a 1 del proceso, con Pro incluido.',
-    headline: 'Revisión 1 a 1 del proceso, con Pro incluido.',
-    valueNote: 'Cupos limitados. Feedback directo sobre ejecución, riesgo y disciplina. Incluye todo Pro.',
-    cta: 'Aplicar a mentoría',
+    subtitle: 'Acompañamiento humano.',
+    headline: 'Acompañamiento humano.',
+    bestFor: 'Para traders que quieren acompañamiento, criterio externo y corrección del proceso.',
+    valueNote: 'Pro + revisión estratégica, seguimiento y feedback operativo.',
+    cta: 'Hablar por WhatsApp',
     recommended: false,
     tone: 'mentor',
     available: true,
@@ -303,20 +400,35 @@ export const ACCESS_PLANS = COMMERCIAL_PLANS;
 
 export const GATING_TRUTH = {
   mode: 'binary_access',
-  summary: 'El frontend solo distingue acceso aprobado vs paywall. Club vs Pro no está gated en UI.',
+  summary: 'El frontend solo distingue acceso aprobado vs paywall. Club vs Pro no está gated en UI. PLAN_CAPABILITIES prepara enforcement futuro.',
   real: [
     'isApproved / hasActiveAccess → AccessGate vs app completa',
     'Roles privilegiados (admin, mentor, etc.) bypass',
     'Backend requireFeatureForUser solo en rutas MT5 (UI no las usa)',
   ],
   pending: [
-    'Gating Club vs Pro en frontend (Analytics, Emotional, Edge Lab)',
+    'Enforcement funcional de PLAN_CAPABILITIES (Analytics, Edge Lab, Emotion insights, Risk advanced)',
     'Alinear defaultPlanFeatures del server (Club analytics:true) con marketing',
     'Unificar PayPal orders (server) vs subscriptions (api/createPayPalOrder)',
     'Verificar PayPal Dashboard plan amounts vs 14.99/24.99 (env PAYPAL_PLAN_ID_*)',
   ],
   commercialComparisonOnly: true,
+  capabilitiesPrepared: true,
+  enforcementSprint: 'pending',
 };
+
+/** Resolve brand capability map for a plan id (club|pro|mentorship|basic|premium). */
+export function resolvePlanCapabilities(planId) {
+  const brand = resolveBrandPlanId(planId);
+  if (!brand) return null;
+  const cap = PLAN_CAPABILITIES[brand];
+  if (!cap) return null;
+  if (cap.inherits) {
+    const base = PLAN_CAPABILITIES[cap.inherits] || {};
+    return { ...base, ...cap, inherits: undefined };
+  }
+  return { ...cap };
+}
 
 /** Resolve any known id to backend plan id, or null if unknown. */
 export function resolveBackendPlanId(planId) {

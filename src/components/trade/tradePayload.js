@@ -1,6 +1,7 @@
 import { tradingDayKey } from '../../lib/dateUtils.js';
 import { toNumberSafe, normalizeTradeArrayFields, normalizeTradeSetup, sanitizeFirestoreObject } from '../../lib/tradeUtils.js';
 import { behaviorScoreFromTrade, behaviorScoreLabel } from '../../lib/analyticsUtils.js';
+import { normalizeTradeTags, buildTagGroupsPayload } from '../../lib/tradeTags.js';
 import { resolveChecklistQualityFields } from './tradeFormSteps.js';
 
 export function numericTradePayload(form) {
@@ -42,6 +43,8 @@ export function buildTradeSavePayload({ form, profile, selectedAccountValue, cap
   const accountName = selectedAccountValue || form.account || form.accountName || 'Cuenta principal';
   const notes = form.notes || form.lesson || form.privateJournal || '';
   const checklistQuality = resolveChecklistQualityFields(form);
+  const tags = normalizeTradeTags(form.tags);
+  const tagGroups = buildTagGroupsPayload(tags);
   const payload = numericTradePayload({
     ...form,
     account: accountName,
@@ -52,6 +55,9 @@ export function buildTradeSavePayload({ form, profile, selectedAccountValue, cap
     tradeSystem: form.tradeSystem || 'Sistema de Moisés',
     system: form.tradeSystem || 'Sistema de Moisés',
     setup: form.setup || normalizeTradeSetup(form),
+    // Sprint 13 — classification tags (complement setup / mistakeType / session / quality)
+    tags,
+    tagGroups,
     // Decision Intelligence aliases (optional / defensive — do not drop legacy fields)
     planFollowed: form.planFollowed ?? form.followedPlan,
     followedPlan: form.followedPlan,

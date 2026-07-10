@@ -1351,6 +1351,31 @@ export function buildActionDirectives(trades = [], stats = {}, sessionRows = [],
   };
 }
 
+function normalizeProtectDirective({
+  title,
+  reason,
+  metric,
+  action,
+  tone = 'warn',
+  setup = null
+}) {
+  const evidence = metric || reason || '';
+  return {
+    type: 'protect',
+    label: 'Proteger',
+    title,
+    setup: setup || title,
+    reason,
+    metric: evidence,
+    evidence,
+    line: evidence,
+    confidence: reason,
+    motive: action,
+    action,
+    tone
+  };
+}
+
 function buildProtectDirective(stats = {}, behaviorData = {}, sample = {}, leak = null) {
   const disc = Number(stats?.discipline || 0);
   const behaviorAvg = Number(behaviorData?.behaviorAvg || stats?.behaviorAvg || 0);
@@ -1359,80 +1384,73 @@ function buildProtectDirective(stats = {}, behaviorData = {}, sample = {}, leak 
   const count = Number(stats?.count || sample.totalTrades || 0);
 
   if (dd > 10) {
-    return {
-      type: 'protect',
-      label: 'Proteger',
+    return normalizeProtectDirective({
       title: 'Proteger capital ante drawdown',
+      setup: 'Capital · drawdown',
       reason: 'El drawdown de la muestra está elevado.',
       metric: `DD ${pct(dd)} · ${formatMoneyClean(stats.ddMoney || 0)}`,
       action: 'No escalar riesgo hasta nueva evidencia positiva.',
       tone: 'warn'
-    };
+    });
   }
   if (behaviorAvg > 0 && behaviorAvg < 50) {
-    return {
-      type: 'protect',
-      label: 'Proteger',
+    return normalizeProtectDirective({
       title: 'Proteger disciplina de ejecución',
+      setup: 'Conducta de ejecución',
       reason: 'La conducta está erosionando el edge.',
       metric: `Conducta ${Math.round(behaviorAvg)}/100`,
       action: 'Revisar checklist antes de aumentar tamaño.',
       tone: 'warn'
-    };
+    });
   }
   if (disc > 0 && disc < 60) {
-    return {
-      type: 'protect',
-      label: 'Proteger',
+    return normalizeProtectDirective({
       title: 'Proteger adherencia al plan',
+      setup: 'Adherencia al plan',
       reason: 'La disciplina de plan está por debajo del umbral operativo.',
       metric: `Plan seguido ${formatPercentCard(disc)}`,
       action: 'Operar solo setups con checklist completo.',
       tone: 'warn'
-    };
+    });
   }
   if (impulse >= 2) {
-    return {
-      type: 'protect',
-      label: 'Proteger',
+    return normalizeProtectDirective({
       title: 'Proteger contra impulsividad',
+      setup: 'Impulsividad',
       reason: 'Hay trades impulsivos recurrentes en la muestra.',
       metric: `${impulse} trades impulsivos`,
       action: 'Pausar si aparece impulso o sobreoperación.',
       tone: 'warn'
-    };
+    });
   }
   if (leak?.name) {
-    return {
-      type: 'protect',
-      label: 'Proteger',
+    return normalizeProtectDirective({
       title: `Proteger exposición en ${formatSetupLabel(leak.name)}`,
+      setup: formatSetupLabel(leak.name),
       reason: 'La fuga activa puede amplificar pérdidas si se escala.',
       metric: `${formatMoneyClean(leak.value)} · ${leak.count} trades`,
       action: 'Mantener tamaño base hasta cortar la fuga.',
       tone: 'warn'
-    };
+    });
   }
   if (sample.quality === 'insufficient' || sample.quality === 'observing') {
-    return {
-      type: 'protect',
-      label: 'Proteger',
+    return normalizeProtectDirective({
       title: 'Proteger lectura prematura',
+      setup: 'Muestra en formación',
       reason: 'La muestra todavía no sostiene conclusiones fuertes.',
       metric: sample.message,
       action: 'No escalar riesgo; priorizar registro limpio.',
       tone: 'neutral'
-    };
+    });
   }
-  return {
-    type: 'protect',
-    label: 'Proteger',
+  return normalizeProtectDirective({
     title: 'Proteger el proceso de registro',
+    setup: 'Calidad de registro',
     reason: 'Sin alerta crítica; el riesgo es perder calidad de muestra.',
     metric: `${count} trades · disciplina ${formatPercentCard(disc || 0)}`,
     action: 'Mantener etiquetado de setup, sesión y conducta.',
     tone: 'neutral'
-  };
+  });
 }
 
 export function buildWeeklyPlan(trades = [], stats = {}, sessionRows = [], setupRows = []) {

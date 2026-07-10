@@ -6,6 +6,8 @@ import { safeArray, normalizeTradeSetup } from '../../lib/tradeUtils.js';
 import { behaviorScoreFromTrade, behaviorScoreLabel } from '../../lib/analyticsUtils.js';
 import { DetailBlock, TraderBehaviorReviewDetail } from './TraderBehaviorReviewDetail.jsx';
 import { mentorStatusLabel } from './tradeFormConstants.js';
+import { TradeTagsDisplay } from './TradeTagsPicker.jsx';
+import { getTradeTags } from '../../lib/tradeTags.js';
 
 function metricTone(value) {
   const n = Number(value || 0);
@@ -82,6 +84,9 @@ export function TradeDetailModal({ trade, onClose, onEdit, onDelete, data, onExp
           <div className="detailGrid tradeReviewBody">
             <DetailBlock title="Patrón de Moisés"><p>{trade.pattern || trade.otherSystem || '—'}</p></DetailBlock>
             <DetailBlock title="Setup / contexto"><p>{normalizeTradeSetup(trade)}</p></DetailBlock>
+            <DetailBlock title="Clasificación">
+              <TradeTagsDisplay tags={getTradeTags(trade)} title="Tags del trade" empty />
+            </DetailBlock>
             <DetailBlock title="Precios"><p>{`Entry: ${trade.entry || '—'} · SL: ${trade.sl || '—'} · TP: ${trade.tp || '—'} · Exit: ${trade.exit || '—'} · Riesgo: ${trade.riskMoney ? money(trade.riskMoney) : '—'}`}</p></DetailBlock>
             <DetailBlock title="Confluencias usadas">
               <div className="detailChips">{confluencesUsed.length ? confluencesUsed.map(x => <span key={x}>{x}</span>) : <em>Sin confluencias registradas</em>}</div>

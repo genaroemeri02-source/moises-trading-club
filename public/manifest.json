@@ -1,7 +1,7 @@
 {
   "name": "MTC Analytics",
   "short_name": "MTC Analytics",
-  "description": "Trading performance platform para medir ejecución, riesgo, conducta y revisión.",
+  "description": "Journal y analytics de proceso para traders discrecionales.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#07050D",

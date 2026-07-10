@@ -5,7 +5,7 @@ const navLinks = ['Producto', 'Soluciones', 'Pricing', 'Recursos'];
 const stats = [
   { value: '30+', label: 'Traders activos' },
   { value: 'The5ers', label: 'Partnership oficial' },
-  { value: '3x', label: 'Más rápido detectás tu edge' },
+  { value: '10+', label: 'Trades para diagnóstico usable' },
   { value: 'A+', label: 'Score de disciplina' },
 ];
 
@@ -81,7 +81,7 @@ function HeroSection() {
           <div className="mtcHeroProof">
             <span>Journal operativo</span>
             <span>Risk Guard diario</span>
-            <span>Analytics accionables</span>
+            <span>Analytics de edge y fugas</span>
           </div>
         </div>
 

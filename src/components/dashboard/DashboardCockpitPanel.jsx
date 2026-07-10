@@ -62,11 +62,12 @@ export function DashboardCockpitPanel({
     <section className={`dashboardCockpit dashboardCockpit--${meta.className}`} data-status={state.status}>
       <header className="dashboardCockpitHeader">
         <div className="dashboardCockpitHeaderMain">
+          <span className="dashboardCockpitEyebrow">Estado operativo</span>
           <span className={`dashboardCockpitBadge dashboardCockpitBadge--${meta.className}`}>
             <StatusIcon size={14} />
             {state.label || meta.label}
           </span>
-          <h2>Centro de Control Operativo</h2>
+          <h2>Lectura operativa actual</h2>
           <p className="dashboardCockpitSummary">{state.summary}</p>
         </div>
         <div className="dashboardPulseScore" aria-label="Pulso operativo">
