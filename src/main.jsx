@@ -771,8 +771,8 @@ function PublicLanding(){
     <section className="landingSection finalConversionSection" id="modulos" aria-label="Sistema comercial MTC Analytics">
       <div className="conversionIntro">
         <span className="landingBadge soft">Sistema operativo</span>
-        <h2>La solución a todo lo que afecta tu performance, en un mismo lugar.</h2>
-        <p>Checklist, journal, riesgo, conducta y analytics conectados para convertir cada sesión en evidencia accionable.</p>
+        <h2>Checklist, journal, riesgo, conducta y analytics en un mismo flujo.</h2>
+        <p>Checklist, journal, riesgo, conducta y analytics conectados para convertir cada sesión en evidencia usable.</p>
       </div>
       <div className="outcomePillGrid" aria-label="Resultados operativos de MTC Analytics">
         {['Menos impulso','Más estructura','Riesgo visible','Revisión con evidencia','Decisiones más claras'].map((v,index)=><div className="outcomePill" key={v}><span>{String(index+1).padStart(2,'0')}</span><b>{v}</b></div>)}
@@ -791,13 +791,13 @@ function PublicLanding(){
       </div>
       <div className="conversionClose">
         <b>Menos ruido. Más criterio. Mejor revisión.</b>
-        <p>Una plataforma para ordenar tu proceso, detectar errores repetidos y llegar a Founding Members con una operación más medible.</p>
+        <p>Ordená el proceso, detectá errores repetidos y medí disciplina con evidencia de sesión.</p>
       </div>
     </section>
     <section className="landingSection landingPricingSection finalPricingSection" id="precios">
       <span className="landingBadge soft">Acceso Founding Members</span>
       <h2>Elegí el nivel de estructura que exige tu operativa.</h2>
-      <p>Precio preferencial durante etapa de expansión. Comparativa comercial honesta: disponible hoy, beta o próximamente — sin prometer sync automático ni IA que aún no existe.</p>
+      <p>Elegí según el nivel de revisión que necesitás. Lo disponible y lo en roadmap aparecen marcados en cada plan.</p>
       {GATING_TRUTH.commercialComparisonOnly&&<p className="commercialGatingNote">Los planes describen el producto. El acceso actual se activa por membresía aprobada; el gating fino Club/Pro sigue en roadmap.</p>}
       <div className="landingPlanGrid">{landingPlans.map(plan=><article className={plan.recommended?'landingPlanCard featured':'landingPlanCard'} key={plan.id}>
         <div className="landingPlanTop"><span>{plan.badge}</span><h3>{plan.name}</h3><p>{plan.subtitle}</p></div>
@@ -1027,7 +1027,7 @@ function PremiumEmptyState({title,text,cta,onClick,icon:Icon=Sparkles}){
 }
 function ProcessSummaryCard({data,setTab}){
   const rows=[['Trades',data.trades?.length||0,'journal'],['Checklists',data.checklists?.length||0,'checklist'],['Cierres emocionales',data.emotionalJournals?.length||0,'emotional'],['Ideas',data.ideas?.length||0,'ideas'],['Resultados',data.resultPosts?.length||0,'results']];
-  return <Card title="Resumen del proceso" sub="Evidencia registrada, sin métricas ficticias." className="processSummaryCard"><div className="processSummaryGrid">{rows.map(([label,value,target])=><button key={label} onClick={()=>setTab(target)}><span>{label}</span><b>{formatMetricCard(value)}</b></button>)}</div></Card>
+  return <Card title="Resumen del proceso" sub="Métricas calculadas solo con lo que registraste." className="processSummaryCard"><div className="processSummaryGrid">{rows.map(([label,value,target])=><button key={label} onClick={()=>setTab(target)}><span>{label}</span><b>{formatMetricCard(value)}</b></button>)}</div></Card>
 }
 function StructuredOnboardingCard({data,setTab}){
   const settingsReady=Number(data.settings?.initialBalance||0)>0||normalizedAccounts(data.settings).some(a=>Number(a.capital||0)>0);
@@ -1478,7 +1478,7 @@ const ecosystemStages=[
   {title:'Después de operar',label:'Registro',icon:LineChart,text:'Después de operar, la sesión todavía no terminó. El progreso aparece cuando cada ejecución se convierte en información útil.',points:['Cargar trade','Resultado','Captura','Setup','Error','Lección']},
   {title:'Cierre emocional',label:'Criterio',icon:Heart,text:'Cerrá tu jornada con una revisión honesta: qué sentiste, qué pensamiento dominó tu sesión y qué decisión querés mejorar mañana.',points:[]},
   {title:'Revisión semanal',label:'Mejora',icon:BarChart3,text:'Una semana de operaciones sin revisión es solo actividad. Una semana medida se convierte en criterio.',points:['Analytics','Errores repetidos','Mejores setups','Peores horarios','Ajustes al plan']},
-  {title:'Mentalidad del ecosistema',label:'Sistema',icon:Sparkles,text:'La plataforma está diseñada para transformar actividad operativa en evidencia, criterio y mejora continua.',points:[]}
+  {title:'Mentalidad del ecosistema',label:'Sistema',icon:Sparkles,text:'Cada sesión registrada alimenta revisión semanal: errores, setups y ajustes al plan.',points:[]}
 ];
 const ecosystemMetrics=[['15 min/día','Rutina diaria'],['5 etapas','Proceso completo'],['1 proceso','Evolución continua']];
 const idealRoutine=['3 min revisar dashboard y contexto','3 min checklist y riesgo','Operar solo si hay setup','5 min registrar trade','4 min revisar lección y estado mental'];
@@ -2119,13 +2119,13 @@ function BrokerSync({data,profile}){
         <span className="brokerBadge"><Clock3 size={15}/> Próximamente</span>
         <h2>BrokerSync / MT4 · MT5</h2>
         <p>La sincronización automática con broker todavía no está disponible en la app. Hoy podés cargar operaciones de forma manual (journal y CSV). El sync automático forma parte del roadmap.</p>
-        <div className="brokerHeroStats"><span>Importación manual disponible</span><span>Sync automático próximamente</span><span>Sin promesas de conexión activa</span></div>
+        <div className="brokerHeroStats"><span>Importación manual disponible</span><span>Sync automático próximamente</span><span>Registro manual activo</span></div>
       </div>
       <div className="brokerHeroPanel"><b>Estado: próximamente</b><small>No hay conexión MT5 activa en esta versión. Cuando esté listo, te avisamos.</small></div>
     </section>
 
     <div className="brokerGrid">
-      <Card title="Qué está disponible hoy" sub="Honestidad comercial: no vendemos sync automático hasta que exista.">
+      <Card title="Qué está disponible hoy" sub="Hoy: journal e importación manual. Sync automático en roadmap.">
         <div className="comingSoonStack">
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Journal manual disponible</b><p>Cargá operaciones, emociones, checklist, capturas, resultado en R y lecciones.</p></div></div>
           <div className="comingSoonItem"><CheckCircle2 size={18}/><div><b>Importación / export manual</b><p>Podés exportar e importar datos desde el journal. No hay auto-sync con el broker.</p></div></div>
@@ -2134,7 +2134,7 @@ function BrokerSync({data,profile}){
         <div className="brokerActions"><button className="primary" onClick={activateReminder}>{notify?'Aviso activado':'Avisarme cuando esté disponible'}</button></div>
       </Card>
       <Card title="Flujo actual del ecosistema" sub="Registrá, validá y medí sin depender de sync externo.">
-        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Journal</span><p>Registro manual de operaciones y lecciones.</p></div><div><b>2</b><span>Checklist</span><p>Validación operativa antes de ejecutar.</p></div><div><b>3</b><span>Analytics</span><p>Decision Intelligence sobre tu evidencia.</p></div><div><b>4</b><span>BrokerSync</span><p>Sincronización automática — roadmap.</p></div></div>
+        <div className="brokerFlow commercialFlow"><div><b>1</b><span>Journal</span><p>Registro manual de operaciones y lecciones.</p></div><div><b>2</b><span>Checklist</span><p>Validación operativa antes de ejecutar.</p></div><div><b>3</b><span>Analytics</span><p>Diagnóstico de edge y fugas sobre tu historial.</p></div><div><b>4</b><span>BrokerSync</span><p>Sincronización automática — roadmap.</p></div></div>
       </Card>
     </div>
 
@@ -2296,7 +2296,7 @@ function CoachIA({data,profile}){
   ];
   parts.push('Regla de cierre: si tu estado emocional busca alivio, validación o recuperación, no estás operando: estás reaccionando. Volvé al checklist.'); setAns(parts.join('\n\n'));}
   const prompt=`Actúa como psicólogo de trading de Moisés Trading Club. Analiza mi situación sin motivación vacía, detecta sesgos emocionales, riesgo de venganza/sobreoperativa y dame una regla concreta. Contexto: ${q}`;
-  return <main className="page"><Card title="Coach de proceso (reglas locales)" sub="No es IA conectada a tus datos. Es un asistente de palabras clave + prompts para copiar a una IA externa."><div className="coachFaqs">{faqs.map(f=><button key={f} onClick={()=>{setQ(f); analyze(f)}}>{f}</button>)}</div><TextareaWithEmoji className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Escribí cómo te sentís, qué trade querés tomar o qué error repetiste..."/><div className="actions"><button className="primary" onClick={()=>analyze()}><Activity size={16}/>Analizar con reglas locales</button><button className="ghost" onClick={()=>copyText(prompt,'Prompt para IA externa copiado')}><Copy size={16}/>Copiar prompt para IA externa</button></div>{ans&&<div className="coachAnswer"><h3>Lectura del coach</h3>{ans.split('\n\n').map((p,i)=><p key={i}>{p}</p>)}</div>}</Card><Card title="AI Review — próximamente" sub="Revisión asistida por IA basada en tus datos operativos aún no está disponible."><p className="muted">Cuando exista AI Review, usará tu journal y métricas reales. Hoy este módulo no analiza tus trades con un modelo de IA.</p></Card></main>
+  return <main className="page"><Card title="Coach de proceso (reglas locales)" sub="Asistente por palabras clave. Podés copiar el prompt a una IA externa si querés ampliar la lectura."><div className="coachFaqs">{faqs.map(f=><button key={f} onClick={()=>{setQ(f); analyze(f)}}>{f}</button>)}</div><TextareaWithEmoji className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Escribí cómo te sentís, qué trade querés tomar o qué error repetiste..."/><div className="actions"><button className="primary" onClick={()=>analyze()}><Activity size={16}/>Analizar con reglas locales</button><button className="ghost" onClick={()=>copyText(prompt,'Prompt para IA externa copiado')}><Copy size={16}/>Copiar prompt para IA externa</button></div>{ans&&<div className="coachAnswer"><h3>Lectura del coach</h3>{ans.split('\n\n').map((p,i)=><p key={i}>{p}</p>)}</div>}</Card><Card title="AI Review — próximamente" sub="Revisión asistida por IA basada en tus datos operativos aún no está disponible."><p className="muted">Cuando exista AI Review, usará tu journal y métricas reales. Hoy este módulo no analiza tus trades con un modelo de IA.</p></Card></main>
 }
 
 function Notifications({data,profile,setTab}){async function read(n){await markNotificationAsRead(n.id); const target=n.target||n.type; if(target==='announcement'||target==='announcements') setTab('announcements'); else if(target==='idea'||target==='ideas') setTab('ideas'); else if(target==='academy') setTab('academy'); else if(target==='community') setTab('community'); else if(target==='chat') setTab('chat'); else toast('Notificación leída');} const ordered=[...(data.notifications||[])].sort((a,b)=>(a.read===b.read?0:a.read?1:-1)); return <main className="page"><Card title="Centro de notificaciones" sub="Tocá una notificación para ir directo a la sección correspondiente.">{ordered.map(n=><button className="notif clickable" key={n.id} onClick={()=>read(n)}><span className={n.read?'read':''}></span><div><b>{n.text}</b><p>{safeDate(n.createdAt)||n.date} · {n.type||'general'}</p></div><ChevronRight size={16}/></button>)}{!ordered.length&&<Empty title="Sin notificaciones" text="Las alertas aparecerán acá."/>}</Card></main>}
@@ -2388,7 +2388,7 @@ function AccessGate({profile}){
   const isBlocked=status==='denied'||status==='suspended'||status==='blocked';
   const billingOptions=[
     {id:'monthly',label:'Mensual',note:'Flexible'},
-    {id:'quarterly',label:'Trimestral',note:'Patrones reales'},
+    {id:'quarterly',label:'Trimestral',note:'3 meses'},
     {id:'annual',label:'Anual',note:'Mejor valor'}
   ];
   const statusCopy={
@@ -2477,13 +2477,13 @@ function AccessGate({profile}){
           <div className="paywallFunnelHero finalPaywallHero">
             <p>Acceso Founding Members</p>
             <h1>Dejá de operar por sensación. Mejorá con evidencia.</h1>
-            <h2>Accedé a una plataforma para medir ejecución, riesgo, conducta y revisión en un solo sistema.</h2>
-            <div className="paywallFunnelChips"><span><Target size={14}/> Checklist operativo</span><span><BarChart3 size={14}/> Analytics accionables</span><span><Shield size={14}/> Sistema de revisión</span></div>
+            <h2>Medí ejecución, riesgo y conducta. Revisá con el mismo registro que usás para operar.</h2>
+            <div className="paywallFunnelChips"><span><Target size={14}/> Checklist operativo</span><span><BarChart3 size={14}/> Analytics de edge y fugas</span><span><Shield size={14}/> Sistema de revisión</span></div>
           </div>
           <div className="finalPaywallDemoFrame">{paywallDemo}</div>
         </div>
         <div className="paywallFunnelBilling finalPaywallBilling">
-          <div><b>Precio preferencial durante etapa de expansión.</b><span>Comparativa honesta: disponible hoy vs próximamente. Sin sync automático ni IA vendidos como activos.</span></div>
+          <div><b>Tarifas de acceso founding.</b><span>Cada plan lista lo disponible hoy; BrokerSync y AI Review figuran como roadmap.</span></div>
           <div>{billingOptions.map(c=><button key={c.id} className={cycle===c.id?'active':''} onClick={()=>setCycle(c.id)}><b>{c.label}</b><small>{c.note}</small></button>)}</div>
         </div>
         {isBlocked||['past_due','canceled','expired'].includes(status)?<div className="paywallFunnelNotice"><AlertTriangle size={17}/>{statusCopy[status]||'Contactá al administrador para revisar tu acceso.'}</div>:null}
@@ -2505,7 +2505,7 @@ function AccessGate({profile}){
             </article>
           })}
         </div>
-        <p className="paywallFunnelDisclaimer">MTC Analytics no promete resultados financieros. Es una plataforma para registrar, analizar y mejorar tu proceso de trading. BrokerSync y AI Review están marcados como próximamente hasta que existan.</p>
+        <p className="paywallFunnelDisclaimer">MTC Analytics es software de registro y análisis de proceso. No constituye asesoramiento financiero ni garantiza resultados. Funciones en roadmap (BrokerSync, AI Review) se indican como tales hasta su lanzamiento.</p>
       </div>
     </section>
   </div>
