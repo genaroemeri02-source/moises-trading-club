@@ -77,6 +77,7 @@ import { JournalMainGrid } from './components/journal/JournalMainGrid.jsx';
 import { JournalToolsCard } from './components/journal/JournalToolsCard.jsx';
 import { TradeForm } from './components/trade/TradeForm.jsx';
 import { TradeDetailModal } from './components/trade/TradeDetailModal.jsx';
+import { DetailBlock } from './components/trade/TraderBehaviorReviewDetail.jsx';
 import { TradeShareModal } from './components/share/TradeShareModal.jsx';
 import { DailyReviewShareModal } from './components/share/DailyReviewShareModal.jsx';
 import { mentorStatusLabel } from './components/trade/tradeFormConstants.js';
@@ -2259,6 +2260,13 @@ function RiskLab({data,profile}){
   const {active,setActive,accounts,filtered}=useAccountFilter(data.trades,data.settings);
   const {riskSettings, setRiskSettings, riskSource, accountId, accountName}=useRiskSettings(profile, data.settings, active);
   const [settings,setSettings]=useState(riskSettings);
+  const buildLimitDraft=(src)=>({
+    maxDailyLoss:String(src.maxDailyLoss ?? ''),
+    maxWeeklyLoss:String(src.maxWeeklyLoss ?? ''),
+    maxTradesDay:String(src.maxTradesDay ?? src.maxTradesPerDay ?? ''),
+    maxDrawdownPct:String(src.maxDrawdownPct ?? '')
+  });
+  const [limitDraft,setLimitDraft]=useState(()=>buildLimitDraft(riskSettings));
   const [persistStatus,setPersistStatus]=useState('');
   const [saving,setSaving]=useState(false);
   const [instrument,setInstrument]=useState('XAUUSD');
@@ -2286,6 +2294,7 @@ function RiskLab({data,profile}){
 
   useEffect(()=>{
     setSettings(riskSettings);
+    setLimitDraft(buildLimitDraft(riskSettings));
     setCapital(riskSettings.accountCapital||data.settings.initialBalance||10000);
     setRiskPct(riskSettings.riskPerTradePct||.5);
     if(riskSource==='firestore') setPersistStatus('Límites guardados en la nube.');
@@ -2329,8 +2338,24 @@ function RiskLab({data,profile}){
   async function save(){
     await persistLimits({...settings,accountCapital:Number(capital),riskPerTradePct:Number(riskPct),capital:Number(capital),riskPct:Number(riskPct)});
   }
-  async function upd(k,v){
-    const n={...settings,[k]:Number(v)};
+  function updLimit(k,v){
+    // String-friendly during edit: no coerción ni persistencia por tecla.
+    setLimitDraft(d=>({...d,[k]:v}));
+  }
+  async function commitLimit(k){
+    const raw=limitDraft[k];
+    const parsed=Number(raw);
+    // Si queda vacío o inválido al blur, conservamos el último valor válido (no invade el default 3).
+    const fallback=Number(settings[k] ?? 0);
+    let value=(raw===''||raw==null||!Number.isFinite(parsed))?fallback:parsed;
+    const patch={[k]:value};
+    if(k==='maxTradesDay'){
+      value=Math.max(0,Math.floor(value));
+      patch.maxTradesDay=value;
+      patch.maxTradesPerDay=value; // mantener ambos alias en sync para normalizeRiskSettings.
+    }
+    setLimitDraft(d=>({...d,[k]:String(value)}));
+    const n={...settings,...patch};
     setSettings(n);
     await persistLimits(n,{toastOk:false});
   }
@@ -2341,7 +2366,7 @@ function RiskLab({data,profile}){
   <AccountSwitcher active={active} setActive={setActive} accounts={accounts}/>
   {guard.blocked&&<div className="riskAlert"><Shield size={20}/><div><b>Modo reflexión activo</b><p>{guard.reasons.join(' · ')}</p></div></div>}
   <div className="grid2 riskGrid"><Card title="Calculadora de lotaje" sub="Capital + riesgo + entrada + stop. Usa presets de oro, US30 y pares principales."><div className="formGrid labeled"><Field label="Instrumento"><select className="input" value={instrument} onChange={e=>setInstrument(e.target.value)}>{Object.entries(instrumentPresets).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></Field><Field label="Modo"><select className="input" value={mode} onChange={e=>setMode(e.target.value)}><option value="presets">Forex / CFD preset</option><option value="futures">Futuros por tick</option></select></Field><Field label="Capital"><input className="input" type="number" value={capital} onChange={e=>setCapital(e.target.value)}/></Field><Field label="Riesgo %"><input className="input" type="number" step="0.1" value={riskPct} onChange={e=>setRiskPct(e.target.value)}/></Field><Field label="Entrada"><input className="input" type="number" step="0.01" value={entry} onChange={e=>setEntry(e.target.value)}/></Field><Field label="Stop Loss"><input className="input" type="number" step="0.01" value={stop} onChange={e=>setStop(e.target.value)}/></Field>{mode==='futures'&&<><Field label="Tick size"><input className="input" type="number" step="0.01" value={tickSize} onChange={e=>setTickSize(e.target.value)}/></Field><Field label="Valor tick"><input className="input" type="number" step="0.01" value={tickValue} onChange={e=>setTickValue(e.target.value)}/></Field></>}</div><div className="lotResult"><div><span>Riesgo monetario</span><b>{money(riskMoney)}</b></div><div><span>Distancia al stop</span><b>{distance.toFixed(mode==='futures'?2:5)}</b></div><div><span>{mode==='futures'?'Contratos':'Lotes sugeridos'}</span><b>{size>0?size.toFixed(2):'—'}</b></div></div><p className="microInsight">{cfg.notes} Verifica siempre la especificación exacta de tu broker antes de ejecutar.</p><button className="primary" onClick={save} disabled={saving}>{saving?'Guardando…':'Guardar capital/riesgo base'}</button></Card>
-  <Card title="Límites de riesgo" sub="Configura hard stop diario, semanal y máximo de trades para bloquear registros nuevos."><div className="formGrid labeled"><Field label="Pérdida máxima diaria $"><input className="input" type="number" value={settings.maxDailyLoss} onChange={e=>upd('maxDailyLoss',e.target.value)}/></Field><Field label="Pérdida máxima semanal $"><input className="input" type="number" value={settings.maxWeeklyLoss} onChange={e=>upd('maxWeeklyLoss',e.target.value)}/></Field><Field label="Máximo trades por día"><input className="input" type="number" value={settings.maxTradesDay} onChange={e=>upd('maxTradesDay',e.target.value)}/></Field><Field label="Drawdown máximo %"><input className="input" type="number" value={settings.maxDrawdownPct} onChange={e=>upd('maxDrawdownPct',e.target.value)}/></Field></div><div className="limitCards"><div><span>Hoy</span><b className={guard.dailyPnL<0?'neg':'pos'}>{money(guard.dailyPnL)}</b><small>{guard.todayTrades.length}/{settings.maxTradesDay} trades</small></div><div><span>Semana</span><b className={guard.weeklyPnL<0?'neg':'pos'}>{money(guard.weeklyPnL)}</b><small>Límite {money(settings.maxWeeklyLoss)}</small></div></div><p className="microInsight">{statusLine}</p></Card></div>
+  <Card title="Límites de riesgo" sub="Configura hard stop diario, semanal y máximo de trades para bloquear registros nuevos."><div className="formGrid labeled"><Field label="Pérdida máxima diaria $"><input className="input" type="number" value={limitDraft.maxDailyLoss} onChange={e=>updLimit('maxDailyLoss',e.target.value)} onBlur={()=>commitLimit('maxDailyLoss')}/></Field><Field label="Pérdida máxima semanal $"><input className="input" type="number" value={limitDraft.maxWeeklyLoss} onChange={e=>updLimit('maxWeeklyLoss',e.target.value)} onBlur={()=>commitLimit('maxWeeklyLoss')}/></Field><Field label="Máximo trades por día"><input className="input" type="number" min="0" step="1" inputMode="numeric" value={limitDraft.maxTradesDay} onChange={e=>updLimit('maxTradesDay',e.target.value)} onBlur={()=>commitLimit('maxTradesDay')}/></Field><Field label="Drawdown máximo %"><input className="input" type="number" value={limitDraft.maxDrawdownPct} onChange={e=>updLimit('maxDrawdownPct',e.target.value)} onBlur={()=>commitLimit('maxDrawdownPct')}/></Field></div><div className="limitCards"><div><span>Hoy</span><b className={guard.dailyPnL<0?'neg':'pos'}>{money(guard.dailyPnL)}</b><small>{guard.todayTrades.length}/{settings.maxTradesDay} trades</small></div><div><span>Semana</span><b className={guard.weeklyPnL<0?'neg':'pos'}>{money(guard.weeklyPnL)}</b><small>Límite {money(settings.maxWeeklyLoss)}</small></div></div><p className="microInsight">{statusLine}</p></Card></div>
   <div className="grid2"><Card title="Tracker de drawdown" sub="Muestra qué tan cerca estás del límite máximo permitido."><div className="ddTracker"><div><b>{pct(guard.drawdownPct)}</b><span>DD actual</span></div><div><b>{pct(settings.maxDrawdownPct)}</b><span>Límite</span></div></div><div className="ddBar"><i style={{width:`${ddProgress}%`}}></i></div><p className="microInsight">Si llega al límite, el journal activa modo reflexión para evitar seguir registrando operaciones impulsivas.</p></Card><Card title="Simulador de escenario" sub="¿Qué pasa si tomo este trade? Evalúa el impacto antes de operar."><div className="formGrid labeled"><Field label="Resultado hipotético $"><input className="input" type="number" value={hypo} onChange={e=>setHypo(e.target.value)}/></Field><Field label="Equity proyectada"><input className="input" readOnly value={money(projectedEquity)}/></Field><Field label="P/L proyectado"><input className="input" readOnly value={`${money(projectedTotal)} · ${pct((projectedTotal/s.initial)*100)}`}/></Field></div><div className="scenarioBox"><b>{Number(hypo)>0?'Escenario positivo':Number(hypo)<0?'Escenario de pérdida':'Sin impacto'}</b><p>{Number(hypo)<0 && Math.abs(Number(hypo))>Number(settings.maxDailyLoss)?'Esta pérdida supera tu hard stop diario. No deberías tomar el trade con ese tamaño.':'El escenario queda dentro de los límites configurados, siempre que el setup esté validado.'}</p></div></Card></div></main>
 }
 

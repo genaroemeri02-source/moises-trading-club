@@ -34871,6 +34871,21 @@ html[data-theme="light"] .diLanding .diDemoCard small{
   overflow:visible!important;
   border-radius:0!important;
   padding:0!important;
+  filter:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  transform:none!important;
+  opacity:1!important;
+}
+/* Kill any legacy pseudo-element overlay/glow that washes the demos */
+.diLanding .landingMediaStack.finalLandingVisual.diHeroVisual::before,
+.diLanding .landingMediaStack.finalLandingVisual.diHeroVisual::after,
+.diLanding .mobileHeroVideoFrame.diMobileHeroDemo::before,
+.diLanding .mobileHeroVideoFrame.diMobileHeroDemo::after,
+.activationPaywall .finalPaywallDemoFrame::before,
+.activationPaywall .finalPaywallDemoFrame::after{
+  content:none!important;
+  display:none!important;
 }
 
 .activationPaywall .finalPaywallDemoFrame{
@@ -34896,9 +34911,19 @@ html[data-theme="light"] .diLanding .diDemoCard small{
   object-fit:contain!important;
   object-position:center!important;
   background:transparent!important;
-  border:1px solid rgba(124,92,255,.16)!important;
-  border-radius:22px!important;
-  box-shadow:0 44px 130px rgba(6,4,16,.6),0 0 0 1px rgba(124,92,255,.08) inset!important;
+  /* La imagen ya trae su propio marco → sin border ni recuadro extra (no doble marco). */
+  border:none!important;
+  border-radius:0!important;
+  /* Sólo un glow muy sutil, sin caja/inset detrás. */
+  box-shadow:0 30px 90px rgba(6,4,16,.42)!important;
+  /* Nitidez garantizada en desktop y mobile: sin blur/scale/opacidad. */
+  filter:none!important;
+  -webkit-filter:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  transform:none!important;
+  opacity:1!important;
+  image-rendering:auto!important;
 }
 
 .diLanding .diHeroVisual .landingSurfaceImage{
@@ -34910,7 +34935,16 @@ html[data-theme="light"] .diLanding .diDemoCard small{
   .diLanding .diHeroVisual .landingSurfaceImage,
   .diLanding .diMobileHeroDemo .landingSurfaceImage,
   .activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{
-    border-radius:18px!important;
+    border:none!important;
+    border-radius:0!important;
+    box-shadow:0 20px 60px rgba(6,4,16,.4)!important;
+    filter:none!important;
+    -webkit-filter:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    transform:none!important;
+    opacity:1!important;
+    image-rendering:auto!important;
   }
 }
 
@@ -34945,6 +34979,28 @@ html[data-theme="light"] .diLanding .diDemoCard small{
 .auroraPaywall.finalPaywallSurface.paywallFunnel,
 .authExperience.authPage{
   background-color:#07050D!important;
+}
+
+/* ==========================================================================
+   HOTFIX — CHECKLIST RISK AND COMMERCIAL DEMO POLISH
+   ========================================================================== */
+
+/* Copy alrededor de las demos: más contraste/legibilidad (menos gris apagado). */
+.diLanding .finalLandingCopy p,
+.diLanding .diHero .diLead{
+  color:rgba(226,230,240,.94)!important;
+}
+.diLanding .diLead,
+.diLanding .landingMicro,
+.diLanding .finalLandingCopy .landingMicro{
+  color:rgba(206,201,228,.9)!important;
+}
+.auroraPaywall .finalPaywallHero h1{
+  color:var(--aurora-text,#F8F7FF)!important;
+}
+.auroraPaywall .finalPaywallHero h2,
+.auroraPaywall .auroraPaywallStrategic{
+  color:rgba(222,218,238,.92)!important;
 }
 
 /* ==========================================================================

@@ -1046,3 +1046,60 @@ Definido en `src/lib/commercialConfig.js` (club / pro / mentorship).
 
 - Sigue `GATING_TRUTH.commercialComparisonOnly = true`
 - `capabilitiesPrepared: true` — enforcement funcional = sprint posterior
+
+---
+
+## Sprint 15 — Commercial Experience Rebuild
+
+Fecha: 2026-07-10  
+Alcance: rework profundo de las 3 superficies comerciales (Landing, Login/Auth, Paywall/Activation) hacia **Aurora Institutional SaaS**. **Sin** tocar checkout, PayPal, Auth internals, Firestore rules, SW, pipelines de save, engines internos, dashboard interno ni shell/mobile.
+
+### Superficies
+
+| Superficie | Componente (`src/main.jsx`) | Clase raíz |
+|-----------|------------------------------|-----------|
+| Landing | `PublicLanding` + `LandingDemoCockpit` | `.diLanding.commercialShell` |
+| Login/Auth | `Login` | `.authExperience` |
+| Paywall/Activation | `AccessGate` | `.activationPaywall` |
+
+### Landing (narrativa)
+
+Hero → Problema (journal común vs MTC) → Sistema MTC (Trade→Checklist→Riesgo→Emoción→Tags→Diagnóstico→Acción) → Diagnóstico → Cockpit → Edge → Journal → Emoción → Risk → Módulos (grid) → Planes → Roadmap honesto → CTA final.
+
+- Nav unificada: **Plataforma / Inteligencia / Planes**.
+- Header sticky con `backdrop-filter` + `scroll-margin-top:96px` para no tapar títulos.
+- Hero CTAs: **Crear cuenta** / **Ver plataforma**.
+- Demo cockpit = Aurora card (sin screenshot viejo).
+
+### Login (dos paneles)
+
+- Left `.authValue`: eyebrow "Acceso a workspace", título, proof cards (Risk Lab / Journal / Cockpit / Emotion).
+- Right `.authCard`: Google + email/pass, tabs `.authTabs` (cyan→violet, **sin dorado**), CTA gradiente cyan→violet.
+- Errores: copy amable ("No pudimos iniciar sesión…").
+- Mobile: card primero, valor debajo, sin overflow.
+
+### Paywall / Activation
+
+- Eyebrow "Activación de workspace", título "Elegí cómo querés usar MTC Analytics."
+- Badge de estado: Activación pendiente / Elegí tu plan / Acceso en revisión.
+- **Video eliminado** → Aurora demo card estática (sin caja negra).
+- Features por plan divididas en **Incluye** / **Próximamente** (sin badge "Disponible" repetido).
+- Comparativa compacta + disclaimer roadmap.
+- Checkout `startCheckout` intacto; Mentoría → WhatsApp; CTA "Hablar por Mentoría".
+
+### Legacy eliminado de la superficie activa
+
+- "Acceso Founding Members", "Founding Access", "Tarifas de acceso founding".
+- Video `mtc-paywall-demo-premium.mp4` (caja negra) fuera del paywall.
+- Tabs `.seg` doradas del login → `.authTabs` Aurora.
+- Dorado legacy dominante reemplazado por violet/cyan en las 3 superficies.
+
+### CSS
+
+Secciones nuevas scoped en `src/styles.css`: `COMMERCIAL EXPERIENCE — SHARED`, `COMMERCIAL LANDING — PREMIUM REBUILD`, `AUTH EXPERIENCE — PREMIUM LOGIN`, `ACTIVATION PAYWALL — PREMIUM REBUILD`. Prefijos `.commercialHeader`, `.authExperience`, `.activationPaywall`, `.paywallAurora*`, `.diSystem*`, `.diModule*`.
+
+### Qué no se tocó
+
+- PayPal provider / endpoints / plan IDs (`basic`/`premium`/mentorship)
+- Firebase Auth internals, Firestore rules, Service Worker
+- Save pipelines, engines, dashboard interno, shell/mobile
