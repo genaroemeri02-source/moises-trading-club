@@ -35134,6 +35134,170 @@ will-change / filtros de sharpening a la imagen (eso agravaría el problema).
 }
 
 /* ==========================================================================
+   HOTFIX — MOBILE NATIVE DECISION DEMOS (Landing + Paywall)
+   --------------------------------------------------------------------------
+   Root cause recap: landing2026.png / paywall2026.png bake small UI text into a
+   raster. On high-DPR phones the browser upscales that raster and the text goes
+   soft — CSS cannot recover sharpness of text that lives inside an image.
+   Definitive fix: on mobile we stop using the PNG as the primary demo and render
+   real HTML/CSS cards (native Aurora). Desktop keeps the PNG (has room to shrink
+   the raster => stays sharp).
+   Rules honored below: no filter / backdrop-filter / transform / will-change /
+   mix-blend-mode / position:fixed / opacity<1 on the wrapper / internal raster.
+   ========================================================================== */
+
+/* Hidden on desktop/tablet — the PNG stays as the demo there. */
+.mobileDecisionDemo{ display:none; }
+
+/* Shared native demo shell (Aurora tokens, high-contrast text). */
+.mobileDecisionDemo{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  padding:16px;
+  border-radius:22px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(124,92,255,.12), transparent 60%),
+    linear-gradient(180deg, var(--aurora-surface,#120F1F), var(--aurora-surface-1,#0B0812));
+  border:1px solid var(--aurora-border-strong,rgba(124,92,255,.28));
+  box-shadow:0 20px 60px rgba(6,4,16,.42);
+  color:var(--aurora-text,#F8F7FF);
+  font-family:var(--font-ui,'Inter',system-ui,sans-serif);
+  text-align:left;
+  overflow:hidden;
+}
+
+.mobileDecisionDemoHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.mobileDecisionDemoTitle{
+  font-family:var(--font-display,'Space Grotesk',system-ui,sans-serif);
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:.01em;
+  color:var(--aurora-text,#F8F7FF);
+}
+.mobileDecisionDemoBadge{
+  flex:0 0 auto;
+  padding:5px 11px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.03em;
+  white-space:nowrap;
+  border:1px solid transparent;
+}
+.mobileDecisionDemoBadge--warn{
+  color:#0B0812;
+  background:var(--aurora-warning,#F7C948);
+}
+.mobileDecisionDemoBadge--pro{
+  color:var(--aurora-text,#F8F7FF);
+  background:rgba(124,92,255,.18);
+  border-color:var(--aurora-border-strong,rgba(124,92,255,.28));
+}
+
+.mobileDecisionDemoSynthesis{
+  margin:0 0 14px;
+  font-size:14.5px;
+  line-height:1.5;
+  color:var(--aurora-text-soft,rgba(248,247,255,.86));
+}
+
+.mobileDecisionDemoGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.mobileDecisionCard{
+  box-sizing:border-box;
+  min-width:0;
+  padding:12px;
+  border-radius:16px;
+  background:var(--aurora-panel-strong,rgba(255,255,255,.055));
+  border:1px solid var(--aurora-border,rgba(124,92,255,.16));
+  border-left-width:3px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.mobileDecisionCardKicker{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--aurora-text-muted,rgba(191,184,218,.72));
+}
+.mobileDecisionCardValue{
+  font-family:var(--font-display,'Space Grotesk',system-ui,sans-serif);
+  font-size:16px;
+  font-weight:700;
+  line-height:1.15;
+  color:var(--aurora-text,#F8F7FF);
+  overflow-wrap:anywhere;
+}
+.mobileDecisionCardHint{
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--aurora-text-soft,rgba(248,247,255,.78));
+}
+
+.mobileDecisionCard--edge{ border-left-color:var(--aurora-semantic-green,#20D47B); }
+.mobileDecisionCard--edge .mobileDecisionCardHint{ color:var(--aurora-semantic-green,#20D47B); }
+.mobileDecisionCard--leak{ border-left-color:var(--aurora-semantic-red,#FF4D6D); }
+.mobileDecisionCard--leak .mobileDecisionCardHint{ color:var(--aurora-semantic-red-alt,#FF5C7A); }
+.mobileDecisionCard--risk{ border-left-color:var(--aurora-warning,#F7C948); }
+.mobileDecisionCard--risk .mobileDecisionCardHint{ color:var(--aurora-warning,#F7C948); }
+.mobileDecisionCard--emotion{ border-left-color:var(--aurora-violet,#7C5CFF); }
+.mobileDecisionCard--emotion .mobileDecisionCardHint{ color:#B9A8FF; }
+
+.mobileDecisionDirective,
+.mobileDecisionVerdict{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(124,92,255,.12);
+  border:1px solid var(--aurora-border-strong,rgba(124,92,255,.28));
+}
+.mobileDecisionDirectiveLabel{
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#B9A8FF;
+  margin-bottom:4px;
+}
+.mobileDecisionDirective p,
+.mobileDecisionVerdict p{
+  margin:0;
+  font-size:14px;
+  line-height:1.5;
+  font-weight:600;
+  color:var(--aurora-text,#F8F7FF);
+}
+
+/* Mobile switch: native demo replaces the raster PNG. */
+@media(max-width:640px){
+  .mobileDecisionDemo{ display:block; }
+  /* Paywall PNG lives in the same frame as the native demo — hide it on mobile. */
+  .activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{ display:none!important; }
+  /* Landing PNG (.diHeroVisual) is already display:none on mobile; the native demo
+     sits inside .diMobileHeroDemo which is shown on mobile. */
+}
+
+/* Desktop/tablet: guarantee the native demo never appears (belt-and-suspenders,
+   even though .diMobileHeroDemo is display:none above 640px). */
+@media(min-width:641px){
+  .mobileDecisionDemo{ display:none!important; }
+}
+
+/* ==========================================================================
    MTC CSS GUARDRAILS
    ========================================================================== */
 

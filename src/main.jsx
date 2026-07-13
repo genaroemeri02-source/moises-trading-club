@@ -805,6 +805,65 @@ function LandingDemoCockpit(){
   return <img className="commercialSurfaceImage landingSurfaceImage" src="/landing2026.png" alt="MTC Analytics — lectura operativa del producto" loading="lazy" decoding="async"/>;
 }
 
+/* Mobile-only native demo (React/CSS, real HTML text) that replaces the raster
+   landing2026.png on phones, where the baked-in text renders blurry. Desktop keeps
+   the PNG. Visibility is handled by scoped CSS in styles.css. */
+function MobileLandingDecisionDemo(){
+  const cards=[
+    {tone:'edge',kicker:'Edge activo',value:'FVG NY',hint:'+1.8R promedio'},
+    {tone:'leak',kicker:'Fuga principal',value:'Entrada temprana',hint:'−3.2R semana'},
+    {tone:'risk',kicker:'Riesgo hoy',value:'1/3 ops',hint:'límite diario activo'},
+    {tone:'emotion',kicker:'Señal emocional',value:'Ansiedad alta',hint:'post-loss'},
+  ];
+  return <div className="mobileDecisionDemo mobileDecisionDemo--landing" role="img" aria-label="MTC Analytics — lectura operativa del producto en mobile">
+    <div className="mobileDecisionDemoHeader">
+      <span className="mobileDecisionDemoTitle">Lectura operativa</span>
+      <span className="mobileDecisionDemoBadge mobileDecisionDemoBadge--warn">Precaución</span>
+    </div>
+    <p className="mobileDecisionDemoSynthesis">Tu edge está en FVG NY, pero la entrada temprana te drena después de una pérdida.</p>
+    <div className="mobileDecisionDemoGrid">
+      {cards.map(c=><div key={c.kicker} className={`mobileDecisionCard mobileDecisionCard--${c.tone}`}>
+        <span className="mobileDecisionCardKicker">{c.kicker}</span>
+        <b className="mobileDecisionCardValue">{c.value}</b>
+        <span className="mobileDecisionCardHint">{c.hint}</span>
+      </div>)}
+    </div>
+    <div className="mobileDecisionDirective">
+      <span className="mobileDecisionDirectiveLabel">Directiva</span>
+      <p>Reducir riesgo 50% después de pérdida y esperar confirmación completa.</p>
+    </div>
+  </div>;
+}
+
+/* Mobile-only native demo for the paywall/activation surface. Sells Pro with real
+   HTML instead of the paywall2026.png raster. Desktop keeps the PNG. */
+function MobilePaywallDecisionDemo(){
+  const cards=[
+    {tone:'edge',kicker:'Qué repetir',value:'FVG NY validado',hint:'+1.8R promedio'},
+    {tone:'leak',kicker:'Qué cortar',value:'Early Entry',hint:'−3.2R semanal'},
+    {tone:'risk',kicker:'Conducta',value:'Disciplina 72/100',hint:'mejora al reducir velocidad'},
+    {tone:'emotion',kicker:'Próxima directiva',value:'Esperar confirmación',hint:'riesgo 50% post-loss'},
+  ];
+  return <div className="mobileDecisionDemo mobileDecisionDemo--paywall" role="img" aria-label="Qué desbloquea Pro en MTC Analytics">
+    <div className="mobileDecisionDemoHeader">
+      <span className="mobileDecisionDemoTitle">Qué desbloquea Pro</span>
+      <span className="mobileDecisionDemoBadge mobileDecisionDemoBadge--pro">Decision Intelligence</span>
+    </div>
+    <p className="mobileDecisionDemoSynthesis">Club registra evidencia. Pro la convierte en edge, fuga y directiva.</p>
+    <div className="mobileDecisionDemoGrid">
+      {cards.map(c=><div key={c.kicker} className={`mobileDecisionCard mobileDecisionCard--${c.tone}`}>
+        <span className="mobileDecisionCardKicker">{c.kicker}</span>
+        <b className="mobileDecisionCardValue">{c.value}</b>
+        <span className="mobileDecisionCardHint">{c.hint}</span>
+      </div>)}
+    </div>
+    <div className="mobileDecisionVerdict">
+      <span className="mobileDecisionDirectiveLabel">Veredicto</span>
+      <p>Repetí lo validado. Cortá la entrada temprana. Reducí riesgo después de pérdida.</p>
+    </div>
+  </div>;
+}
+
 function PublicLanding(){
   const landingPlans=COMMERCIAL_PLANS;
   const diagnosisCards=[
@@ -906,7 +965,7 @@ function PublicLanding(){
           <button className="primary landingCta" onClick={()=>goPublic('/register')}>Crear cuenta</button>
           <a className="ghost landingCta" href="#sistema">Ver plataforma</a>
         </div>
-        <div className="mobileHeroVideoFrame diMobileHeroDemo"><LandingDemoCockpit/></div>
+        <div className="mobileHeroVideoFrame diMobileHeroDemo"><MobileLandingDecisionDemo/></div>
         <small className="landingMicro">Journal, Checklist, Risk Lab, Emotion Intelligence, Tags y Cockpit operativo.</small>
       </div>
       <div className="landingMediaStack finalLandingVisual diHeroVisual">
@@ -2882,7 +2941,7 @@ function AccessGate({profile}){
             <p className="auroraPaywallStrategic">Club registra y ordena. Pro interpreta y decide. Mentoría acompaña y corrige.</p>
             <div className="paywallFunnelChips"><span><Target size={14}/> Checklist operativo</span><span><BarChart3 size={14}/> Analytics de edge y fuga</span><span><Shield size={14}/> Sistema de revisión</span></div>
           </div>
-          <div className="finalPaywallDemoFrame">{paywallDemo}</div>
+          <div className="finalPaywallDemoFrame">{paywallDemo}<MobilePaywallDecisionDemo/></div>
         </div>
         <div className="paywallFunnelBilling finalPaywallBilling">
           <div><b>Elegí el ciclo de facturación.</b><span>Los precios reflejan el plan; AI Review, BrokerSync/MT5 y PDF avanzado figuran como próximamente.</span></div>
