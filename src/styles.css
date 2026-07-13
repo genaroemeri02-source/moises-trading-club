@@ -35085,6 +35085,55 @@ html[data-theme="light"] .authExperience .orLine span{
 }
 
 /* ==========================================================================
+   HOTFIX — iOS SAFARI COMMERCIAL DEMO COMPOSITING (dynamic scroll blur)
+   ========================================================================== */
+/*
+Auditoría del árbol (img -> ancestros hasta body):
+- PAYWALL: la demo (.finalPaywallDemoFrame) vive DENTRO de
+  .paywallFunnelShell.finalPaywallShell, que tiene `backdrop-filter:blur(14px)`.
+  Un ancestro con backdrop-filter fuerza a Safari iOS a rasterizar el subárbol en
+  su propia capa compuesta; durante el scroll async esa capa se re-samplea a una
+  escala distinta -> el <img> alterna nítido/borroso (el texto vectorial no).
+- LANDING: la demo del hero no tiene backdrop directo, pero la página se mantiene
+  en modo compositing async por: header sticky .commercialHeader.landingNav con
+  `backdrop-filter:blur(14px)` (+ .landingNav blur(18px)) y DOS pseudo-capas
+  `position:fixed` a pantalla completa (.publicLanding:before y
+  .finalCommercialSurface.publicLanding::after). Con capas fixed + backdrop
+  activas, iOS cachea el <img> grande del hero como tiles y lo baja de resolución
+  mientras hay momentum, recuperando nitidez sólo en algunos frames -> el blur
+  "dinámico" descrito.
+Por qué se veía nítido por momentos: al re-rasterizar la capa (fin de un frame de
+scroll) Safari repinta a resolución de dispositivo un instante; al asentarse vuelve
+al tile cacheado de menor resolución.
+Fix (Fase 4): neutralizar SOLO en mobile los disparadores de compositing en el
+árbol de las demos comerciales. No se toca desktop. No se agrega translateZ /
+will-change / filtros de sharpening a la imagen (eso agravaría el problema).
+*/
+@media (max-width:640px){
+  /* Paywall: el shell que envuelve la demo deja de crear capa de backdrop.
+     Conserva su gradiente/borde; sólo se quita el blur del backdrop. */
+  .auroraPaywall .paywallFunnelShell.finalPaywallShell,
+  .activationPaywall .paywallFunnelShell.finalPaywallShell{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  /* Landing: header sticky sin backdrop-filter (sigue sticky, fondo sólido).
+     Elimina la recomposición por frame que degrada el raster del hero. */
+  .diLanding .commercialHeader.landingNav,
+  .diLanding .landingNav{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    background:rgba(7,5,13,.94)!important;
+  }
+  /* Landing: pseudo-capas decorativas dejan de ser `fixed` (sin capa fija que
+     obligue a componer toda la página en cada frame de scroll). */
+  .diLanding.publicLanding:before,
+  .finalCommercialSurface.publicLanding::after{
+    position:absolute!important;
+  }
+}
+
+/* ==========================================================================
    MTC CSS GUARDRAILS
    ========================================================================== */
 
