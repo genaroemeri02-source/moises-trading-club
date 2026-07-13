@@ -35004,6 +35004,87 @@ html[data-theme="light"] .diLanding .diDemoCard small{
 }
 
 /* ==========================================================================
+   HOTFIX — MOBILE DEMO SHARPNESS + LOGIN DIVIDER
+   ========================================================================== */
+
+/* --- 1) Mobile demo sharpness ---------------------------------------------
+   Root cause: landing2026.png / paywall2026.png son mockups raster de 1024px
+   (4:3). En desktop (DPR1, <=560px) el browser SIEMPRE reduce -> nítido. En
+   mobile de alta densidad (DPR 2/3) el ancho de columna pide MÁS píxeles de los
+   que trae el asset -> el browser sobre-escala -> se ve blando/borroso.
+   No es un filter: es densidad de píxeles. Solución definitiva: acotar el ancho
+   mostrado por DPR para que el asset SOLO se reduzca (nunca se agrande) = nítido.
+   (Para tamaño mayor + nitidez total en DPR3, exportar un asset @2x de ~2048px.) */
+@media(max-width:640px){
+  /* Sombra grande y difusa detrás de una demo chica lee como "halo/blur": la bajamos. */
+  .diLanding .diMobileHeroDemo .landingSurfaceImage,
+  .activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{
+    width:100%!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-shadow:0 16px 44px rgba(6,4,16,.34)!important;
+  }
+}
+
+/* DPR ~2 (la mayoría de Android/iPhone estándar): 1024/2 = 512px sin sobre-escalar. */
+@media(max-width:640px) and (min-resolution:1.5dppx),
+       (max-width:640px) and (-webkit-min-device-pixel-ratio:1.5){
+  .diLanding .diMobileHeroDemo .landingSurfaceImage,
+  .activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{
+    max-width:512px!important;
+  }
+}
+
+/* DPR ~3 (iPhone Pro / Pro Max): 1024/3 ≈ 340px es el techo nítido real del asset. */
+@media(max-width:640px) and (min-resolution:2.5dppx),
+       (max-width:640px) and (-webkit-min-device-pixel-ratio:2.5){
+  .diLanding .diMobileHeroDemo .landingSurfaceImage,
+  .activationPaywall .finalPaywallDemoFrame .paywallSurfaceImage{
+    max-width:340px!important;
+  }
+}
+
+/* --- 2) Login divider "o con email" ---------------------------------------
+   Root cause: .authPage .orLine span traía background:#ffffff!important (rezago
+   del login claro viejo) y ganaba por !important sobre la regla Aurora. Eso
+   dibujaba un recuadro blanco detrás del texto. Fix definitivo: divider flex con
+   dos hairlines Aurora y texto SIN caja (nada de fondo blanco). */
+.authExperience .orLine{
+  display:flex!important;
+  align-items:center;
+  gap:12px;
+  margin:14px 0!important;
+}
+.authExperience .orLine::before{
+  content:''!important;
+  position:static!important; /* anula la línea absolute full-width heredada */
+  left:auto!important;
+  right:auto!important;
+  top:auto!important;
+  flex:1 1 auto!important;
+  width:auto!important;
+  height:1px!important;
+  background:linear-gradient(90deg,transparent,rgba(124,92,255,.30),transparent)!important;
+}
+.authExperience .orLine::after{
+  content:''!important;
+  flex:1 1 auto!important;
+  height:1px!important;
+  background:linear-gradient(90deg,transparent,rgba(124,92,255,.30),transparent)!important;
+}
+.authExperience .orLine span,
+html[data-theme="light"] .authExperience .orLine span{
+  flex:0 0 auto!important;
+  background:transparent!important;
+  padding:0!important;
+  white-space:nowrap!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  letter-spacing:.04em!important;
+  color:var(--aurora-text-muted,rgba(191,184,218,.72))!important;
+}
+
+/* ==========================================================================
    MTC CSS GUARDRAILS
    ========================================================================== */
 
